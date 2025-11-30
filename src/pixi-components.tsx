@@ -1,5 +1,6 @@
 import type * as pixi from "pixi.js";
 
+import type { JSX, Ref } from "solid-js";
 import {
   AnimatedSprite as PixiAnimatedSprite,
   BitmapText as PixiBitmapText,
@@ -19,15 +20,14 @@ import {
   Text as PixiText,
   TilingSprite as PixiTilingSprite,
 } from "pixi.js";
-import type { JSX, Ref } from "solid-js";
 import { insert, spread } from "./runtime";
 
-import { splitProps } from "solid-js";
 import { pixiEvents } from "./pixi-events";
+import { splitProps } from "solid-js";
 
 // Define event handler types for better autocompletion and type safety.
 type PixiEventHandlers = {
-  [K in keyof pixi.FederatedEventMap as `on${Capitalize<K>}`]?: (event: pixi.FederatedEventMap[K]) => void;
+  [K in keyof pixi.AllFederatedEventMap as `on${Capitalize<K>}`]?: (event: pixi.AllFederatedEventMap[K]) => void;
 };
 
 // Prop definition for components that CAN have children
@@ -57,12 +57,13 @@ const createContainerComponent = <InstanceType extends PixiContainer, OptionsTyp
       props,
       CommonPropKeys,
       Object.keys(props).filter(
-        (key) => key.startsWith("on") && pixiEvents.has(key.slice(2).toLowerCase() as keyof pixi.FederatedEventMap)
+        (key) => key.startsWith("on") && pixiEvents.has(key.slice(2).toLowerCase() as keyof pixi.AllFederatedEventMap)
       ) as (keyof typeof props)[]
     );
     const instance = common.as || new PixiClass(pixiProps as any);
-    // Correctly spread both pixiProps and the separated event handlers.
-    spread(instance, () => ({ ...pixiProps, ...events }));
+    spread(instance, () => common);
+    spread(instance, () => pixiProps);
+    spread(instance, () => events);
     insert(instance, () => common.children);
     return instance as unknown as JSX.Element;
   };
@@ -77,12 +78,13 @@ const createLeafComponent = <InstanceType extends object, OptionsType extends ob
       props,
       CommonPropKeys,
       Object.keys(props).filter(
-        (key) => key.startsWith("on") && pixiEvents.has(key.slice(2).toLowerCase() as keyof pixi.FederatedEventMap)
+        (key) => key.startsWith("on") && pixiEvents.has(key.slice(2).toLowerCase() as keyof pixi.AllFederatedEventMap)
       ) as (keyof typeof props)[]
     );
     const instance = common.as || new PixiClass(pixiProps as any);
-    // Correctly spread both pixiProps and the separated event handlers.
-    spread(instance, () => ({ ...pixiProps, ...events }));
+    spread(instance, () => common);
+    spread(instance, () => pixiProps);
+    spread(instance, () => events);
     return instance as unknown as JSX.Element;
   };
 };
@@ -108,7 +110,7 @@ export const RenderContainer = createContainerComponent<PixiRenderContainer, pix
 );
 export const RenderLayer = createContainerComponent<PixiRenderLayer, pixi.RenderLayerOptions>(PixiRenderLayer);
 export const Sprite = createLeafComponent<PixiSprite, pixi.SpriteOptions>(PixiSprite);
-export const Text = createLeafComponent<PixiText, pixi.TextOptions>(PixiText);
+export const Text = createLeafComponent<PixiText, pixi.CanvasTextOptions>(PixiText);
 export const TilingSprite = createLeafComponent<PixiTilingSprite, pixi.TilingSpriteOptions>(PixiTilingSprite);
 
 // export const MeshGeometry = createLeafComponent<PixiMeshGeometry, pixi.MeshGeometryOptions>(PixiMeshGeometry);
@@ -129,15 +131,3 @@ export const ParticleContainer = createContainerComponent<PixiParticleContainer,
 
 // TODO: Don't need a component for the Culler. It needs to interact with the stage directly.
 // export const Culler = createLeafComponent<PixiCuller, pixi.Culler>(PixiCuller);
-
-const test = (): JSX.Element => {
-  return (
-    <Container>
-      <Container onClick={(e) => console.log("clicked")}>
-        <Container />
-        <Sprite></Sprite>
-        {/* <PerspectivePlaneGeometry height={100} width={100} /> */}
-      </Container>
-    </Container>
-  );
-};
