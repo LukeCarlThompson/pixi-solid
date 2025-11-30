@@ -1,10 +1,10 @@
-import type { AllFederatedEventMap, ApplicationOptions, Ticker, TickerCallback } from "pixi.js";
+import type { ApplicationOptions, Ticker, TickerCallback } from "pixi.js";
 import { Show, createContext, createEffect, createResource, onCleanup, splitProps, useContext } from "solid-js";
 
 import { Application } from "pixi.js";
 import { CommonPropKeys } from "./pixi-components";
 import type { ContainerProps } from "./pixi-components";
-import { pixiEvents } from "./pixi-events";
+import { solidPixiEvents } from "./pixi-events";
 import { spread } from "./runtime";
 
 const PixiAppContext = createContext<Application>();
@@ -37,9 +37,7 @@ export const PixiAppProvider = (props: PixiAppProviderProps) => {
   const [common, events, rest] = splitProps(
     props,
     CommonPropKeys,
-    Object.keys(props).filter(
-      (key) => key.startsWith("on") && pixiEvents.has(key.slice(2).toLowerCase() as keyof AllFederatedEventMap)
-    ) as (keyof typeof props)[]
+    Object.keys(props).filter((key) => solidPixiEvents.has(key)) as (keyof typeof props)[]
   );
 
   const [appResource] = createResource(async () => {

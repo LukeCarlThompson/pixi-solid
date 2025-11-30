@@ -1,9 +1,8 @@
 import { Application, Container as PixiContainer, Text as PixiText } from "pixi.js";
 
-import type { AllFederatedEventMap } from "pixi.js";
 import { createRenderEffect } from "solid-js";
 import { createRenderer } from "solid-js/universal";
-import { pixiEvents } from "./pixi-events";
+import { solidPixiEvents } from "./pixi-events";
 
 export const {
   effect,
@@ -32,25 +31,23 @@ export const {
   replaceText(textNode: PixiText, value) {
     textNode.text = value;
   },
-  setProperty(node, name, value, _prev) {
+  setProperty(node, name, value, prev) {
     // Check for event listeners and handle them appropriately.
-    if (name.startsWith("on")) {
+    if (solidPixiEvents.has(name)) {
       const eventName = name.slice(2).toLowerCase();
       // Validate that it's a known PixiJS event
-      if (pixiEvents.has(eventName as keyof AllFederatedEventMap)) {
-        if (node instanceof Application) {
-          if (_prev) {
-            node.stage.removeEventListener(eventName, _prev as any);
-          }
-          node.stage.addEventListener(eventName, value as any);
-          return;
+      if (node instanceof Application) {
+        if (prev) {
+          node.stage.removeEventListener(eventName, prev as any);
         }
-        if (_prev) {
-          node.removeEventListener(eventName, _prev as any);
-        }
-        node.addEventListener(eventName, value as any);
+        node.stage.addEventListener(eventName, value as any);
         return;
       }
+      if (prev) {
+        node.removeEventListener(eventName, prev as any);
+      }
+      node.addEventListener(eventName, value as any);
+      return;
     }
 
     if (name in node) {
