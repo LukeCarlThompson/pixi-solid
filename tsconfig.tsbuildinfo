@@ -1,0 +1,1 @@
+{"root":["./eslint.config.js","./vite.config.ts","./src/index.ts","./src/pixi-app-context.tsx","./src/pixi-canvas.tsx","./src/pixi-components.tsx","./src/pixi-events.ts","./src/runtime.tsx"],"version":"5.9.3"}
