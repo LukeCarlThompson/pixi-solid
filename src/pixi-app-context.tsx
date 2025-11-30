@@ -1,8 +1,11 @@
-import type { ApplicationOptions, Ticker, TickerCallback } from "pixi.js";
-import type { JSX, ParentProps } from "solid-js";
-import { Show, createContext, createResource, onCleanup, useContext } from "solid-js";
+import type { AllFederatedEventMap, ApplicationOptions, Ticker, TickerCallback } from "pixi.js";
+import { Show, createContext, createEffect, createResource, onCleanup, splitProps, useContext } from "solid-js";
 
 import { Application } from "pixi.js";
+import { CommonPropKeys } from "./pixi-components";
+import type { ContainerProps } from "./pixi-components";
+import { pixiEvents } from "./pixi-events";
+import { spread } from "./runtime";
 
 const PixiAppContext = createContext<Application>();
 
@@ -28,42 +31,60 @@ export const useTicker = (): Ticker => {
   return ticker;
 };
 
-export type PixiAppProviderProps = ParentProps & ApplicationOptions;
+export type PixiAppProviderProps = Partial<Omit<ApplicationOptions, "children">> & ContainerProps<Application>;
 
-export const PixiAppProvider = (props: PixiAppProviderProps): JSX.Element => {
-  const [app] = createResource(async () => {
+export const PixiAppProvider = (props: PixiAppProviderProps) => {
+  const [common, events, rest] = splitProps(
+    props,
+    CommonPropKeys,
+    Object.keys(props).filter(
+      (key) => key.startsWith("on") && pixiEvents.has(key.slice(2).toLowerCase() as keyof AllFederatedEventMap)
+    ) as (keyof typeof props)[]
+  );
+
+  const [appResource] = createResource(async () => {
     // Enforce singleton pattern: Check if an app already exists
     // @ts-expect-error
-    if (globalThis.__PIXI_APP__) {
+    if (globalThis.__PIXI_DEVTOOLS__) {
       throw new Error("Only one PixiAppProvider can be active at a time. Multiple instances detected.");
     }
 
-    const app = new Application();
+    const app = common.as || new Application();
     await app.init({
       autoDensity: true,
       resolution: Math.min(window.devicePixelRatio, 2),
       antialias: false,
       sharedTicker: true,
-      ...props,
+      ...rest,
     });
-
-    app.ticker.autoStart = false;
-    app.ticker.start();
 
     // @ts-expect-error
-    globalThis.__PIXI_APP__ = app;
+    globalThis.__PIXI_DEVTOOLS__ = {
+      app,
+    };
 
-    onCleanup(() => {
-      app.destroy(true, { children: true });
-      // @ts-expect-error
-      globalThis.__PIXI_APP__ = undefined;
-    });
     return app;
   });
 
+  createEffect(() => {
+    const app = appResource();
+    if (app) {
+      spread(app, () => ({ ...rest, ...events }));
+
+      app.ticker.autoStart = false;
+      app.ticker.start();
+
+      onCleanup(() => {
+        app.destroy(true, { children: true });
+        // @ts-expect-error
+        globalThis.__PIXI_DEVTOOLS__ = undefined;
+      });
+    }
+  });
+
   return (
-    <Show when={app()}>
-      <PixiAppContext.Provider value={app()}>{props.children}</PixiAppContext.Provider>
+    <Show when={appResource()}>
+      {(app) => <PixiAppContext.Provider value={app()}>{common.children}</PixiAppContext.Provider>}
     </Show>
   );
 };
