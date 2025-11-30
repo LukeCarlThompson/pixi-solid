@@ -1,8 +1,8 @@
 import { onCleanup, onMount } from "solid-js";
 
 import type { JSX } from "solid-js";
-import { usePixiApp } from "./pixi-app-context";
 import { insert } from "./runtime";
+import { usePixiApp } from "./pixi-app-context";
 
 export const PixiCanvas = (props: { children: JSX.Element }): JSX.Element => {
   let canvasWrapElement: HTMLDivElement | undefined;
