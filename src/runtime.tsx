@@ -1,6 +1,6 @@
-import { Container as PixiContainer, Text as PixiText } from "pixi.js";
+import { Application, Container as PixiContainer, Text as PixiText } from "pixi.js";
 
-import type { FederatedEventMap } from "pixi.js";
+import type { AllFederatedEventMap } from "pixi.js";
 import { createRenderEffect } from "solid-js";
 import { createRenderer } from "solid-js/universal";
 import { pixiEvents } from "./pixi-events";
@@ -16,14 +16,6 @@ export const {
   setProp,
   mergeProps,
   use,
-  /**
-   * Renders a Solid Pixi application
-   * Handles cleanup and disposal of rendered elements.
-   *
-   * @param code - A function that returns a JSX element to render
-   * @returns A dispose function that cleans up the rendered element
-   */
-  render,
 } = createRenderer<PixiContainer>({
   createElement(name: string) {
     // This function is for lowercase string tags like `<container />`.
@@ -45,7 +37,14 @@ export const {
     if (name.startsWith("on")) {
       const eventName = name.slice(2).toLowerCase();
       // Validate that it's a known PixiJS event
-      if (pixiEvents.has(eventName as keyof FederatedEventMap)) {
+      if (pixiEvents.has(eventName as keyof AllFederatedEventMap)) {
+        if (node instanceof Application) {
+          if (_prev) {
+            node.stage.removeEventListener(eventName, _prev as any);
+          }
+          node.stage.addEventListener(eventName, value as any);
+          return;
+        }
         if (_prev) {
           node.removeEventListener(eventName, _prev as any);
         }
@@ -108,12 +107,12 @@ export const {
 export function spread<T extends object>(node: any, accessor: () => T) {
   createRenderEffect(() => {
     const props = accessor();
-    // Handle the ref prop first.
-    if ("ref" in props && typeof (props as any).ref === "function") {
-      (props as any).ref(node);
-    }
     for (const key in props) {
-      if (key !== "children" && key !== "ref") {
+      // The 'ref' prop is special and is handled by Solid's compiler and runtime.
+      // We assign it directly to the node. Other props are set via setProp.
+      if (key === "ref") {
+        (props as any)[key](node);
+      } else if (key !== "children") {
         setProp(node, key, props[key as keyof T]);
       }
     }
