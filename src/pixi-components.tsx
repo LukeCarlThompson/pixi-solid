@@ -21,90 +21,61 @@ import {
   TilingSprite as PixiTilingSprite,
 } from "pixi.js";
 import { createRenderEffect, splitProps } from "solid-js"; // Ensure splitProps is imported
-import { insert, setProp } from "./runtime";
+import { insert, setProp } from "./renderer";
 
-import { transformedPixiEventNames } from "./pixi-events"; // Import transformedPixiEventNames
-
-// Helper for type safety when iterating over object keys
-// This function acts as a user-defined type guard, narrowing 'key' to 'keyof T'
-function hasOwnProp<T extends object>(obj: T, key: PropertyKey): key is keyof T {
-  return Object.prototype.hasOwnProperty.call(obj, key);
-}
-
-// Define event handler types for better autocompletion and type safety.
-type PixiEventHandlers = {
-  [K in keyof pixi.AllFederatedEventMap as `on${Capitalize<K>}`]?: (event: pixi.AllFederatedEventMap[K]) => void;
-};
+import { PIXI_EVENT_HANDLER_NAMES } from "./pixi-events";
+import type { PixiEventHandlerMap } from "./pixi-events";
 
 // Prop definition for components that CAN have children
-export type ContainerProps<Component> = PixiEventHandlers & {
+export type ContainerProps<Component> = PixiEventHandlerMap & {
   ref?: Ref<Component>;
   as?: Component;
   children?: JSX.Element;
 };
 
-// TODO: Find a way to enforce that 'children' is not provided with this type
 // Prop definition for components that CANNOT have children
-export type LeafProps<Component> = PixiEventHandlers & {
-  ref?: Ref<Component>;
-  as?: Component;
-  children?: never;
-};
+export type LeafProps<Component> = Omit<ContainerProps<Component>, "children">;
 
 // Keys that should be split from component props
-export const CommonPropKeys = ["ref", "as", "children"] as const;
+export const COMMON_PROP_KEYS = ["ref", "as", "children"] as const;
+
+export const applyProps = <InstanceType extends PixiContainer, OptionsType extends ContainerProps<InstanceType>>(
+  instance: InstanceType,
+  props: OptionsType
+) => {
+  for (const key in props) {
+    if (key === "as") continue;
+
+    if (key === "ref") {
+      createRenderEffect(() => {
+        // Solid converts the ref prop to a callback function
+        (props[key] as unknown as (arg: any) => void)(instance);
+      });
+    } else if (key === "children") {
+      if (!("addChild" in instance)) {
+        throw new Error(`Cannot set children on non-container instance.`);
+      }
+      createRenderEffect(() => {
+        insert(instance, () => props.children);
+      });
+    } else {
+      createRenderEffect(() => {
+        setProp(instance, key, props[key as keyof typeof props]);
+      });
+    }
+  }
+};
 
 const createContainerComponent = <InstanceType extends PixiContainer, OptionsType extends object>(
   PixiClass: new (props: OptionsType) => InstanceType
 ) => {
   return (props: Omit<OptionsType, "children"> & ContainerProps<InstanceType>): JSX.Element => {
-    const [common, events, pixiProps] = splitProps(
-      props,
-      CommonPropKeys,
-      transformedPixiEventNames as (keyof typeof props)[]
-    );
+    const [runtimeProps, initialisationProps] = splitProps(props, [...COMMON_PROP_KEYS, ...PIXI_EVENT_HANDLER_NAMES]);
 
-    // Pass only the pixiProps to the PixiClass constructor
-    const instance = common.as || new PixiClass(pixiProps as any);
+    const instance = props.as || new PixiClass(initialisationProps as any);
 
-    // Handle 'ref' prop directly as SolidJs handles this as a signal behind the scenes.
-    if (common.ref) {
-      (common.ref as (arg: any) => void)(instance);
-    }
-
-    // Apply remaining common props (excluding 'ref', 'as', and 'children')
-    for (const key in common) {
-      if (hasOwnProp(common, key)) {
-        if (key !== "ref" && key !== "as" && key !== "children") {
-          createRenderEffect(() => {
-            setProp(instance, key, common[key]);
-          });
-        }
-      }
-    }
-
-    // Apply Pixi-specific props with individual effects for granularity
-    for (const key in pixiProps) {
-      if (hasOwnProp(pixiProps, key)) {
-        createRenderEffect(() => {
-          setProp(instance, key, pixiProps[key]);
-        });
-      }
-    }
-
-    // Apply event handlers with individual effects for granularity
-    for (const key in events) {
-      if (hasOwnProp(events, key)) {
-        createRenderEffect(() => {
-          setProp(instance, key, events[key]);
-        });
-      }
-    }
-
-    // TODO: Do other checks here for other containers that can have children and check to make sure they are valid children.
-    if (instance instanceof PixiContainer) {
-      insert(instance, () => common.children);
-    }
+    applyProps(instance, initialisationProps);
+    applyProps(instance, runtimeProps);
 
     return instance as unknown as JSX.Element;
   };
@@ -118,7 +89,6 @@ const createLeafComponent = <InstanceType extends PixiContainer, OptionsType ext
   };
 };
 
-// Explicitly export each PixiJS component using the helper,
 export const Container = createContainerComponent<PixiContainer, pixi.ContainerOptions>(PixiContainer);
 export const AnimatedSprite = createLeafComponent<PixiAnimatedSprite, pixi.AnimatedSpriteOptions>(PixiAnimatedSprite);
 export const BitmapText = createLeafComponent<PixiBitmapText, pixi.TextOptions>(PixiBitmapText);

@@ -1,8 +1,7 @@
-import { onCleanup, onMount } from "solid-js";
+import { createRenderEffect, onCleanup, onMount } from "solid-js";
 
 import type { JSX } from "solid-js";
-import { insert } from "./runtime";
-import { usePixiApp } from "./pixi-app-context";
+import { usePixiApp } from "./pixi-application";
 
 export const PixiCanvas = (props: { children: JSX.Element }): JSX.Element => {
   let canvasWrapElement: HTMLDivElement | undefined;
@@ -10,7 +9,11 @@ export const PixiCanvas = (props: { children: JSX.Element }): JSX.Element => {
   const pixiApp = usePixiApp();
   pixiApp.canvas.style.display = "block";
 
-  insert(pixiApp.stage, () => props.children);
+  createRenderEffect(() => {
+    if (props.children === undefined) {
+      throw new Error("PixiCanvas requires the `PixiStage` component to render.");
+    }
+  });
 
   let previousResizeTo: typeof pixiApp.resizeTo;
   let resizeObserver: ResizeObserver | undefined;

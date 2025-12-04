@@ -1,8 +1,8 @@
-import { Application, Container as PixiContainer, Text as PixiText } from "pixi.js";
+import type { PIXI_EVENT_NAMES, PixiEventHandlerMap } from "./pixi-events";
+import { Container as PixiContainer, Text as PixiText } from "pixi.js";
 
-import { createRenderEffect } from "solid-js";
+import { PIXI_EVENT_HANDLER_NAME_SET } from "./pixi-events";
 import { createRenderer } from "solid-js/universal";
-import { solidPixiEvents } from "./pixi-events";
 
 export const {
   effect,
@@ -33,16 +33,10 @@ export const {
   },
   setProperty(node, name, value, prev) {
     // Check for event listeners and handle them appropriately.
-    if (solidPixiEvents.has(name)) {
-      const eventName = name.slice(2).toLowerCase();
-      // Validate that it's a known PixiJS event
-      if (node instanceof Application) {
-        if (prev) {
-          node.stage.removeEventListener(eventName, prev as any);
-        }
-        node.stage.addEventListener(eventName, value as any);
-        return;
-      }
+    if (PIXI_EVENT_HANDLER_NAME_SET.has(name as keyof PixiEventHandlerMap)) {
+      // Remove the 'on' prefix to get the actual event name.
+      const eventName = name.slice(2) as (typeof PIXI_EVENT_NAMES)[number];
+
       if (prev) {
         node.removeEventListener(eventName, prev as any);
       }
@@ -57,16 +51,13 @@ export const {
   },
   insertNode(parent, node, anchor) {
     // RenderLayer uses `attach` instead of `addChild`.
-    // We check for its existence and use it if available.
     if ("attach" in parent && typeof parent.attach === "function") {
       parent.attach(node);
       // Note: `attach` does not support anchoring, so we ignore the anchor.
       return;
     }
 
-    // Check for the existence of addChild methods instead of a specific class.
-    // This automatically supports Container, ParticleContainer, RenderLayer, etc.
-    if (typeof (parent as any).addChild !== "function") {
+    if (!("addChildAt" in parent) || !("addChild" in parent) || typeof parent.addChild !== "function") {
       throw new Error("Parent does not support children.");
     }
 
@@ -95,23 +86,3 @@ export const {
     return index > -1 ? node.parent.children[index + 1] : undefined;
   },
 });
-
-/**
- * A simplified and reactive spread function for applying props to a PixiJS instance.
- * @param node The PixiJS instance to apply props to.
- * @param accessor A function that returns the props object.
- */
-export function spread<T extends object>(node: any, accessor: () => T) {
-  createRenderEffect(() => {
-    const props = accessor();
-    for (const key in props) {
-      // The 'ref' prop is special and is handled by Solid's compiler and runtime.
-      // We assign it directly to the node. Other props are set via setProp.
-      if (key === "ref") {
-        (props as any)[key](node);
-      } else if (key !== "children") {
-        setProp(node, key, props[key as keyof T]);
-      }
-    }
-  });
-}
