@@ -18,6 +18,8 @@
     "moduleDetection": "force",
     "noUncheckedSideEffectImports": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist"
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
   }
 }
