@@ -1,8 +1,8 @@
-import type { PIXI_EVENT_NAMES, PixiEventHandlerMap } from "./pixi-events";
-import { Container as PixiContainer, Text as PixiText } from "pixi.js";
-
-import { PIXI_EVENT_HANDLER_NAME_SET } from "./pixi-events";
+import type { Container as PixiContainer } from "pixi.js";
+import { Text as PixiText } from "pixi.js";
 import { createRenderer } from "solid-js/universal";
+import type { PIXI_EVENT_NAMES, PixiEventHandlerMap } from "./pixi-events";
+import { PIXI_EVENT_HANDLER_NAME_SET } from "./pixi-events";
 
 export const {
   effect,
@@ -15,6 +15,8 @@ export const {
   setProp,
   mergeProps,
   use,
+  render,
+  spread,
 } = createRenderer<PixiContainer>({
   createElement(name: string) {
     // This function is for lowercase string tags like `<container />`.
@@ -22,7 +24,7 @@ export const {
     // directly and use them with an uppercase name like `<Container />`,
     // which does not call this function.
     throw new Error(
-      `Cannot create element "${name}". Please import components directly from 'pixi-solid' and use them with a capital letter.`
+      `Cannot create element "${name}". Please import components directly from 'pixi-solid' and use them with a capital letter.`,
     );
   },
   createTextNode(value) {
@@ -57,7 +59,11 @@ export const {
       return;
     }
 
-    if (!("addChildAt" in parent) || !("addChild" in parent) || typeof parent.addChild !== "function") {
+    if (
+      !("addChildAt" in parent) ||
+      !("addChild" in parent) ||
+      typeof parent.addChild !== "function"
+    ) {
       throw new Error("Parent does not support children.");
     }
 
@@ -71,13 +77,14 @@ export const {
     return node instanceof PixiText;
   },
   removeNode(_, node) {
-    node?.removeFromParent();
+    node.removeFromParent();
+    node.destroy({ children: true });
   },
   getParentNode(node) {
     return node?.parent ?? undefined;
   },
   getFirstChild(node) {
-    return node?.children?.[0];
+    return node.children?.[0];
   },
   getNextSibling(node) {
     if (!node.parent) return undefined;

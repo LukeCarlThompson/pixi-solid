@@ -1,20 +1,37 @@
 import type { ApplicationOptions, Container } from "pixi.js";
+import { Application } from "pixi.js";
+import type { JSX, Ref } from "solid-js";
 import {
-  Show,
   createContext,
   createEffect,
   createResource,
   onCleanup,
+  Show,
   splitProps,
   useContext,
-  type JSX,
-  type Ref,
 } from "solid-js";
-
-import { Application } from "pixi.js";
 
 const PixiAppContext = createContext<Application>();
 
+/**
+ * A custom SolidJS hook to access the root PIXI.Application instance.
+ * This hook must be called from a component that is a descendant of `PixiApplication`.
+ *
+ * @returns The PIXI.Application instance provided by the `PixiApplication` component.
+ * @throws Will throw an error if used outside of a `PixiApplication` context provider.
+ * @example
+ * ```tsx
+ * const MyComponent = () => {
+ *   const app = usePixiApp();
+ *
+ *   createEffect(() => {
+ *     console.log('App resolution:', app.renderer.resolution);
+ *   });
+ *
+ *   return <Sprite texture={Texture.WHITE} />;
+ * };
+ * ```
+ */
 export const usePixiApp = () => {
   const app = useContext(PixiAppContext);
   if (!app) {
@@ -23,11 +40,30 @@ export const usePixiApp = () => {
   return app;
 };
 
-export type PixiApplicationProps = Partial<Omit<ApplicationOptions, "children" | "resizeTo" | "view">> & {
+/**
+ * Props for the `PixiApplication` component. It extends the PIXI.ApplicationOptions
+ * to allow passing configuration directly to the Pixi.js Application constructor,
+ * but omits properties that are handled by the component itself.
+ */
+export type PixiApplicationProps = Partial<
+  Omit<ApplicationOptions, "children" | "resizeTo" | "view">
+> & {
   ref?: Ref<Container>;
   children?: JSX.Element;
 };
 
+/**
+ * A SolidJS component that creates and manages a PIXI.Application instance.
+ * It provides the application instance through context to be used by child components
+ * and custom hooks like `usePixiApp`, `useTick`, and `useTicker`.
+ *
+ * This component should only be used once in your application.
+ *
+ * @param props The properties to configure the Pixi.js Application.
+ * 
+ * **Example**
+ * {@includeCode ./examples/PixiApplication.example.tsx}
+ */
 export const PixiApplication = (props: PixiApplicationProps) => {
   const [_solidProps, initialisationProps] = splitProps(props, ["ref", "children"]);
 
@@ -37,7 +73,9 @@ export const PixiApplication = (props: PixiApplicationProps) => {
     // Enforce singleton pattern: Check if an app already exists
     // @ts-expect-error
     if (globalThis.__PIXI_DEVTOOLS__) {
-      throw new Error("Only one PixiApplication can be active at a time. Multiple instances detected.");
+      throw new Error(
+        "Only one PixiApplication can be active at a time. Multiple instances detected.",
+      );
     }
 
     const app = new Application();
