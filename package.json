@@ -1,6 +1,5 @@
 {
   "name": "pixi-solid",
-  "private": true,
   "version": "0.0.1",
   "description": "A library to write PixiJS applications with SolidJS",
   "author": "Luke Thompson",
