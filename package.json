@@ -17,11 +17,17 @@
       "types": "./dist/types/index.d.ts"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "vite",
     "prebuild": "rm -rf dist",
     "build": "tsc --project tsconfig.build.json && npm run build:docs",
     "build:docs": "typedoc --options typedoc.config.js",
+    "prepublishOnly": "npm run build",
     "preview": "vite preview"
   },
   "peerDependencies": {
