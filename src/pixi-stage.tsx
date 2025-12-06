@@ -1,10 +1,8 @@
 import type { Container, ContainerOptions } from "pixi.js";
 import type { JSX, Ref } from "solid-js";
-import { createRenderEffect } from "solid-js";
 import { usePixiApp } from "./pixi-application";
 import { applyProps } from "./pixi-components";
 import type { PixiEventHandlerMap } from "./pixi-events";
-import { insert } from "./renderer";
 
 export type PixiStageProps = PixiEventHandlerMap &
   Omit<ContainerOptions, "children"> & {
@@ -33,10 +31,6 @@ export const PixiStage = (props: PixiStageProps): JSX.Element => {
   const pixiApp = usePixiApp();
 
   applyProps(pixiApp.stage, props);
-
-  createRenderEffect(() => {
-    insert(pixiApp.stage, () => props.children);
-  });
 
   return <>{pixiApp.stage}</>;
 };
