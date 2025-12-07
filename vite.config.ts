@@ -12,7 +12,7 @@ export default defineConfig({
       formats: ["es"],
     },
     rollupOptions: {
-      external: ["solid-js", "solid-js/web", "pixi.js"],
+      external: ["solid-js", "solid-js/web", "solid-js/universal", "pixi.js"],
       output: {
         preserveModules: true,
         minify: false,
@@ -20,6 +20,5 @@ export default defineConfig({
     },
     target: "es2022",
     sourcemap: true,
-    minify: false,
   },
 });
