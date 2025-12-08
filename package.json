@@ -25,10 +25,11 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "rm -rf dist",
-    "build": "vite build && tsc --project tsconfig.build.json --emitDeclarationOnly && npm run build:docs",
+    "build": "vite build && tsc --project tsconfig.build.json --emitDeclarationOnly && pnpm run build:docs",
     "build:docs": "typedoc --options typedoc.config.js",
-    "prepublishOnly": "npm run build",
-    "preview": "vite preview"
+    "prepublishOnly": "pnpm run build",
+    "preview": "vite preview",
+    "preinstall": "npx only-allow pnpm"
   },
   "peerDependencies": {
     "pixi.js": "^8.14.3",
