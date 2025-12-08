@@ -1,4 +1,4 @@
-import type { ApplicationOptions, Container } from "pixi.js";
+import type { ApplicationOptions } from "pixi.js";
 import { Application } from "pixi.js";
 import type { JSX, Ref } from "solid-js";
 import {
@@ -48,7 +48,7 @@ export const usePixiApp = () => {
 export type PixiApplicationProps = Partial<
   Omit<ApplicationOptions, "children" | "resizeTo" | "view">
 > & {
-  ref?: Ref<Container>;
+  ref?: Ref<Application>;
   children?: JSX.Element;
 };
 
@@ -60,7 +60,7 @@ export type PixiApplicationProps = Partial<
  * This component should only be used once in your application.
  *
  * @param props The properties to configure the Pixi.js Application.
- * 
+ *
  * **Example**
  * {@includeCode ./examples/PixiApplication.example.tsx}
  */
@@ -70,14 +70,6 @@ export const PixiApplication = (props: PixiApplicationProps) => {
   // TODO: Reinitialise the pixi app if any of the initialisationProps change that we can't set at runtime
 
   const [appResource] = createResource(async () => {
-    // Enforce singleton pattern: Check if an app already exists
-    // @ts-expect-error
-    if (globalThis.__PIXI_DEVTOOLS__) {
-      throw new Error(
-        "Only one PixiApplication can be active at a time. Multiple instances detected.",
-      );
-    }
-
     const app = new Application();
     await app.init({
       autoDensity: true,
@@ -94,7 +86,7 @@ export const PixiApplication = (props: PixiApplicationProps) => {
     if (app) {
       if (props.ref) {
         // Solid converts the ref prop to a callback function
-        (props.ref as unknown as (arg: any) => void)(app.stage);
+        (props.ref as unknown as (arg: any) => void)(app);
       }
 
       // TODO: Go through the other props that can be set at runtime and apply them here
@@ -110,8 +102,6 @@ export const PixiApplication = (props: PixiApplicationProps) => {
 
       onCleanup(() => {
         app.destroy(true, { children: true });
-        // @ts-expect-error
-        globalThis.__PIXI_DEVTOOLS__ = undefined;
       });
     }
   });
