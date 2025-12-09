@@ -1,15 +1,7 @@
 import type { ApplicationOptions } from "pixi.js";
 import { Application } from "pixi.js";
 import type { JSX, Ref } from "solid-js";
-import {
-  createContext,
-  createEffect,
-  createResource,
-  onCleanup,
-  Show,
-  splitProps,
-  useContext,
-} from "solid-js";
+import { createContext, createEffect, createResource, onCleanup, Show, splitProps, useContext } from "solid-js";
 
 const PixiAppContext = createContext<Application>();
 
@@ -19,18 +11,6 @@ const PixiAppContext = createContext<Application>();
  *
  * @returns The PIXI.Application instance provided by the `PixiApplication` component.
  * @throws Will throw an error if used outside of a `PixiApplication` context provider.
- * @example
- * ```tsx
- * const MyComponent = () => {
- *   const app = usePixiApp();
- *
- *   createEffect(() => {
- *     console.log('App resolution:', app.renderer.resolution);
- *   });
- *
- *   return <Sprite texture={Texture.WHITE} />;
- * };
- * ```
  */
 export const usePixiApp = () => {
   const app = useContext(PixiAppContext);
@@ -45,9 +25,7 @@ export const usePixiApp = () => {
  * to allow passing configuration directly to the Pixi.js Application constructor,
  * but omits properties that are handled by the component itself.
  */
-export type PixiApplicationProps = Partial<
-  Omit<ApplicationOptions, "children" | "resizeTo" | "view">
-> & {
+export type PixiApplicationProps = Partial<Omit<ApplicationOptions, "children" | "resizeTo" | "view">> & {
   ref?: Ref<Application>;
   children?: JSX.Element;
 };
@@ -61,8 +39,6 @@ export type PixiApplicationProps = Partial<
  *
  * @param props The properties to configure the Pixi.js Application.
  *
- * **Example**
- * {@includeCode ./examples/PixiApplication.example.tsx}
  */
 export const PixiApplication = (props: PixiApplicationProps) => {
   const [_solidProps, initialisationProps] = splitProps(props, ["ref", "children"]);
