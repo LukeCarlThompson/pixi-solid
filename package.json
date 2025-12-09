@@ -1,39 +1,15 @@
 {
-  "name": "pixi-solid",
-  "private": false,
-  "version": "0.0.6",
-  "description": "A library to write PixiJS applications with SolidJS",
-  "author": "Luke Thompson",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/LukeCarlThompson/pixi-solid"
-  },
-  "type": "module",
-  "sideEffects": false,
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/types/index.d.ts"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
+  "name": "pixi-solid-monorepo",
+  "private": true,
+  "version": "0.0.1",
+  "workspaces": [
+    "packages/*"
   ],
   "scripts": {
-    "dev": "vite",
-    "prebuild": "rm -rf dist",
-    "build": "vite build && tsc --project tsconfig.build.json --emitDeclarationOnly && pnpm run build:docs",
-    "build:docs": "typedoc --options typedoc.config.js",
-    "prepublishOnly": "pnpm run build",
-    "preview": "vite preview",
+    "build": "pnpm -r run build",
+    "dev": "pnpm -r run dev",
+    "test": "pnpm -r run test",
     "preinstall": "npx only-allow pnpm"
-  },
-  "peerDependencies": {
-    "pixi.js": "^8.14.3",
-    "solid-js": "^1.9.10"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.8",

@@ -43,7 +43,7 @@ export const SOLID_PROP_KEYS = ["ref", "as", "children"] as const;
 
 /**
  * Apply's the props to a Pixi instance with subsriptions to maintain reactivity.
- * 
+ *
  * @param instance The Pixi instance we want to apply props to.
  * @param props The props object.
  */
@@ -104,96 +104,50 @@ const createLeafComponent = <InstanceType extends PixiContainer, OptionsType ext
 };
 
 /**
- * A SolidJS component that renders a PIXI.AnimatedSprite.
- *
- * **Example**
- * {@includeCode ./examples/AnimatedSprite.example.tsx}
- * 
- * {@link PixiAnimatedSprite}
- *
+ * A SolidJS component that renders a `PIXI.AnimatedSprite`.
  */
 export const AnimatedSprite = createLeafComponent<PixiAnimatedSprite, Pixi.AnimatedSpriteOptions>(
   PixiAnimatedSprite,
 );
 /**
- * A SolidJS component that renders a PIXI.BitmapText.
- *
- * **Example**
- * {@includeCode ./examples/BitmapText.example.tsx}
- * 
- * {@link PixiBitmapText}
- *
+ * A SolidJS component that renders a `PIXI.BitmapText`.
  */
 export const BitmapText = createLeafComponent<PixiBitmapText, Pixi.TextOptions>(PixiBitmapText);
 /**
- * A SolidJS component that renders a PIXI.Container.
- *
- * **Example**
- * {@includeCode ./examples/Container.example.tsx}
- *
+ * A SolidJS component that renders a `PIXI.Container`.
  */
 export const Container = createContainerComponent<PixiContainer, Pixi.ContainerOptions>(
   PixiContainer,
 );
 /**
- * A SolidJS component that renders a PIXI.Graphics.
+ * A SolidJS component that renders a `PIXI.Graphics`.
  * Use a ref to access the underlying graphics instance and draw with it.
- *
- * **Example**
- * {@includeCode ./examples/Graphics.example.tsx}
- *
- * {@link PixiGraphics}
  */
 export const Graphics = createLeafComponent<PixiGraphics, Pixi.GraphicsOptions>(PixiGraphics);
 /**
- * A SolidJS component that renders a PIXI.HTMLText.
- *
- * **Example**
- * {@includeCode ./examples/HTMLText.example.tsx}
- *
- * {@link PixiHTMLText}
+ * A SolidJS component that renders a `PIXI.HTMLText`.
  */
 export const HTMLText = createLeafComponent<PixiHTMLText, Pixi.HTMLTextOptions>(PixiHTMLText);
 
 /**
- * A SolidJS component that renders a PIXI.MeshPlane.
- *
- * **Example**
- * {@includeCode ./examples/MeshPlane.example.tsx}
- *
- * {@link PixiMeshPlane}
+ * A SolidJS component that renders a `PIXI.MeshPlane`.
  */
 export const MeshPlane = createLeafComponent<PixiMeshPlane, Pixi.MeshPlaneOptions>(PixiMeshPlane);
 
 /**
- * A SolidJS component that renders a PIXI.MeshRope.
- *
- * **Example**
- * {@includeCode ./examples/MeshRope.example.tsx}
- *
- * {@link PixiMeshRope}
+ * A SolidJS component that renders a `PIXI.MeshRope`.
  */
 export const MeshRope = createLeafComponent<PixiMeshRope, Pixi.MeshRopeOptions>(PixiMeshRope);
 
 /**
- * A SolidJS component that renders a PIXI.MeshSimple.
- *
- * **Example**
- * {@includeCode ./examples/MeshSimple.example.tsx}
- *
- * {@link PixiMeshSimple}
+ * A SolidJS component that renders a `PIXI.MeshSimple`.
  */
 export const MeshSimple = createLeafComponent<PixiMeshSimple, Pixi.SimpleMeshOptions>(
   PixiMeshSimple,
 );
 
 /**
- * A SolidJS component that renders a PIXI.NineSliceSprite.
- *
- * **Example**
- * {@includeCode ./examples/NineSliceSprite.example.tsx}
- *
- * {@link PixiNineSliceSprite}
+ * A SolidJS component that renders a `PIXI.NineSliceSprite`.
  */
 export const NineSliceSprite = createLeafComponent<
   PixiNineSliceSprite,
@@ -201,12 +155,9 @@ export const NineSliceSprite = createLeafComponent<
 >(PixiNineSliceSprite);
 
 /**
- * A SolidJS component that renders a PIXI.ParticleContainer.
+ * A SolidJS component that renders a `PIXI.ParticleContainer`.
  *
- * **Example**
- * {@includeCode ./examples/ParticleContainer.example.tsx}
- *
- * {@link PixiParticleContainer}
+ * Particles should be added and removed from this component imperatively. Please see the docs for a reference example.
  */
 export const ParticleContainer = createLeafComponent<
   PixiParticleContainer,
@@ -214,12 +165,7 @@ export const ParticleContainer = createLeafComponent<
 >(PixiParticleContainer);
 
 /**
- * A SolidJS component that renders a PIXI.PerspectiveMesh.
- *
- * **Example**
- * {@includeCode ./examples/PerspectiveMesh.example.tsx}
- *
- * {@link PixiPerspectiveMesh}
+ * A SolidJS component that renders a `PIXI.PerspectiveMesh`.
  */
 export const PerspectiveMesh = createLeafComponent<
   PixiPerspectiveMesh,
@@ -227,12 +173,7 @@ export const PerspectiveMesh = createLeafComponent<
 >(PixiPerspectiveMesh);
 
 /**
- * A SolidJS component that renders a PIXI.RenderContainer.
- *
- * **Example**
- * {@includeCode ./examples/RenderContainer.example.tsx}
- *
- * {@link PixiRenderContainer}
+ * A SolidJS component that renders a `PIXI.RenderContainer`.
  */
 export const RenderContainer = createContainerComponent<
   PixiRenderContainer,
@@ -240,43 +181,23 @@ export const RenderContainer = createContainerComponent<
 >(PixiRenderContainer);
 
 /**
- * A SolidJS component that renders a PIXI.RenderLayer.
- *
- * **Example**
- * {@includeCode ./examples/RenderLayer.example.tsx}
- *
- * {@link PixiRenderLayer}
+ * A SolidJS component that renders a `PIXI.RenderLayer`.
  */
 export const RenderLayer = createContainerComponent<PixiRenderLayer, Pixi.RenderLayerOptions>(
   PixiRenderLayer,
 );
 
 /**
- * A SolidJS component that renders a PIXI.Sprite.
- *
- * **Example**
- * {@includeCode ./examples/Sprite.example.tsx}
- *
- * {@link PixiSprite}
+ * A SolidJS component that renders a `PIXI.Sprite`.
  */
 export const Sprite = createLeafComponent<PixiSprite, Pixi.SpriteOptions>(PixiSprite);
 /**
- * A SolidJS component that renders a PIXI.Text.
- *
- * **Example**
- * {@includeCode ./examples/Text.example.tsx}
- *
- * {@link PixiText}
+ * A SolidJS component that renders a `PIXI.Text`.
  */
 export const Text = createLeafComponent<PixiText, Pixi.CanvasTextOptions>(PixiText);
 
 /**
- * A SolidJS component that renders a PIXI.TilingSprite.
- *
- * **Example**
- * {@includeCode ./examples/TilingSprite.example.tsx}
- *
- * {@link PixiTilingSprite}
+ * A SolidJS component that renders a `PIXI.TilingSprite`.
  */
 export const TilingSprite = createLeafComponent<PixiTilingSprite, Pixi.TilingSpriteOptions>(
   PixiTilingSprite,
