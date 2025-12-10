@@ -8,16 +8,11 @@ import { usePixiApp } from "./pixi-application";
  * A small wrapper that mounts the PIXI application's canvas element into the DOM
  * and automatically resizes it.
  *
- * - Requires a surrounding `PixiApplication` (accessed via `usePixiApp`).
+ * - Requires a surrounding `PixiApplication` component.
  * - Requires a `PixiStage` component as a child.
  *
  * Props:
- * @param props.children - JSX content to render inside the canvas wrapper. Use
- *   `PixiStage` as the only child.
- *
- * **Example**
- * {@includeCode ./examples/PixiCanvas.example.tsx}
- *
+ * @param props.children - JSX content to render inside the canvas wrapper. Use `PixiStage` as the only child.
  */
 
 export const PixiCanvas = (props: {

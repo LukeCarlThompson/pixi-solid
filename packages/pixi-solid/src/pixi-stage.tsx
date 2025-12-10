@@ -23,9 +23,6 @@ export type PixiStageProps = PixiEventHandlerMap &
  * - Any other container options supported by Pixi may be passed.
  *
  * Children passed to `PixiStage` are inserted into the application stage.
- *
- * **Example**
- * {@includeCode ./examples/PixiStage.example.tsx}
  */
 export const PixiStage = (props: PixiStageProps): JSX.Element => {
   const pixiApp = usePixiApp();
