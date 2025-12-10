@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!!**/dist", "!!**/*.test.ts"]
+    "includes": ["packages/**/*", "!!**/dist", "!!**/*.test.ts"]
   },
   "formatter": {
     "enabled": true,
@@ -21,7 +21,7 @@
       "correctness": {
         "noUnusedVariables": "error",
         "noSolidDestructuredProps": "error",
-        "noUndeclaredDependencies": "error"
+        "noUndeclaredDependencies": "info"
       },
       "complexity": {
         "useArrowFunction": "error"

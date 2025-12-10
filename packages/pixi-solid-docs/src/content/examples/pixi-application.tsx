@@ -6,7 +6,7 @@ export const PixiApplicationExample = () => {
     <PixiApplication background="#1099bb">
       <PixiCanvas>
         <PixiStage>
-          <Sprite texture={Texture.WHITE} x={120} y={80} />
+          <Sprite texture={Texture.WHITE} x={120} y={80} scale={40} />
         </PixiStage>
       </PixiCanvas>
     </PixiApplication>
