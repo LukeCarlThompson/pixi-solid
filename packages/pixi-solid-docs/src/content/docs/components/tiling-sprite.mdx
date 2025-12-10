@@ -1,0 +1,21 @@
+---
+title: Tiling Sprite
+description: A reference page in my new Starlight docs site.
+---
+
+import { Code } from "@astrojs/starlight/components";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import demoCode from "../../examples/tiling-sprite.demo.tsx?raw";
+import exampleCode from "../../examples/tiling-sprite.tsx?raw";
+import { ClientOnly } from "../../examples/client-only";
+
+<ClientOnly filePath="./tiling-sprite.demo" client:only="solid-js" />
+
+<Tabs>
+  <TabItem label="tiling-sprite.tsx">
+    <Code code={exampleCode} lang="tsx" />
+  </TabItem>
+  <TabItem label="demo-app.tsx">
+    <Code code={demoCode} lang="tsx" />
+  </TabItem>
+</Tabs>
