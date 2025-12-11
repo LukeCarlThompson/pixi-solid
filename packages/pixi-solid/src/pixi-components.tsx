@@ -104,7 +104,9 @@ export const AnimatedSprite = createLeafComponent<PixiAnimatedSprite, Pixi.Anima
 /**
  * A SolidJS component that renders a `PIXI.BitmapText`.
  */
-export const BitmapText = createLeafComponent<PixiBitmapText, Pixi.TextOptions>(PixiBitmapText);
+export const BitmapText = createLeafComponent<PixiBitmapText, ConstructorParameters<typeof PixiBitmapText>>(
+  PixiBitmapText
+);
 /**
  * A SolidJS component that renders a `PIXI.Container`.
  */
