@@ -1,6 +1,6 @@
-import type { AllFederatedEventMap } from "pixi.js";
+import type { FederatedEventEmitterTypes } from "pixi.js";
 
-export const PIXI_EVENT_NAMES: (keyof AllFederatedEventMap)[] = [
+export const PIXI_EVENT_NAMES: (keyof FederatedEventEmitterTypes)[] = [
   "click",
   "mousedown",
   "mouseenter",
@@ -34,6 +34,36 @@ export const PIXI_EVENT_NAMES: (keyof AllFederatedEventMap)[] = [
   "globalmousemove",
   "globalpointermove",
   "globaltouchmove",
+  "clickcapture",
+  "mousedowncapture",
+  "mouseentercapture",
+  "mouseleavecapture",
+  "mousemovecapture",
+  "mouseoutcapture",
+  "mouseovercapture",
+  "mouseupcapture",
+  "mouseupoutsidecapture",
+  "pointercancelcapture",
+  "pointerdowncapture",
+  "pointerentercapture",
+  "pointerleavecapture",
+  "pointermovecapture",
+  "pointeroutcapture",
+  "pointerovercapture",
+  "pointertapcapture",
+  "pointerupcapture",
+  "pointerupoutsidecapture",
+  "rightclickcapture",
+  "rightdowncapture",
+  "rightupcapture",
+  "rightupoutsidecapture",
+  "tapcapture",
+  "touchcancelcapture",
+  "touchendcapture",
+  "touchendoutsidecapture",
+  "touchmovecapture",
+  "touchstartcapture",
+  "wheelcapture",
 ] as const;
 
 export const PIXI_EVENT_HANDLER_NAMES = PIXI_EVENT_NAMES.map(
@@ -41,7 +71,9 @@ export const PIXI_EVENT_HANDLER_NAMES = PIXI_EVENT_NAMES.map(
 );
 
 export type PixiEventHandlerMap = {
-  [K in (typeof PIXI_EVENT_NAMES)[number] as `on${K}`]?: (event: AllFederatedEventMap[K]) => void;
+  [K in (typeof PIXI_EVENT_NAMES)[number] as `on${K}`]?:
+    | null
+    | ((...args: FederatedEventEmitterTypes[K]) => void);
 };
 
 export const PIXI_EVENT_HANDLER_NAME_SET: Readonly<Set<(typeof PIXI_EVENT_HANDLER_NAMES)[number]>> =
@@ -51,7 +83,7 @@ export const PIXI_EVENT_HANDLER_NAME_SET: Readonly<Set<(typeof PIXI_EVENT_HANDLE
  * This is a type-safe check that ensures `PIXI_EVENT_NAMES` includes every key from Pixi's `AllFederatedEventMap` type.
  * It will cause a build error if any event names are missing.
  */
-type MissingKeys = Exclude<keyof AllFederatedEventMap, (typeof PIXI_EVENT_NAMES)[number]>;
+type MissingKeys = Exclude<keyof FederatedEventEmitterTypes, (typeof PIXI_EVENT_NAMES)[number]>;
 type AllEventsAreHandled = MissingKeys extends never
   ? true
   : `Error: Missing event keys: ${MissingKeys}`;
