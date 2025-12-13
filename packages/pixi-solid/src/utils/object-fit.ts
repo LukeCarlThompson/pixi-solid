@@ -10,13 +10,14 @@ export type ObjectFitMode = "cover" | "contain" | "fill" | "scale-down";
  */
 export const objectFit = (
   object: Pixi.Container,
-  bounds: Pixi.Rectangle,
+  bounds: { width: number; height: number },
   fitMode: ObjectFitMode,
 ): void => {
   const originalWidth = object.width / object.scale.x;
   const originalHeight = object.height / object.scale.y;
 
-  if (originalWidth === 0 || originalHeight === 0 || bounds.x === 0 || bounds.y === 0) return;
+  if (originalWidth === 0 || originalHeight === 0 || bounds.width === 0 || bounds.height === 0)
+    return;
 
   const widthRatio = bounds.width / originalWidth;
   const heightRatio = bounds.height / originalHeight;
