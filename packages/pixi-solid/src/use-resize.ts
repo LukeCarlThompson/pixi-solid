@@ -12,13 +12,10 @@ import { usePixiApp } from "./pixi-application";
 export const useResize = (resizeCallback: (screen: Pixi.Rectangle) => void): void => {
   const app = usePixiApp();
 
-  app.renderer.screen.fit;
-
   const handleResize = () => {
     resizeCallback(app.renderer.screen);
   };
 
-  // Call once to initialise
   handleResize();
 
   app.renderer.addListener("resize", handleResize);

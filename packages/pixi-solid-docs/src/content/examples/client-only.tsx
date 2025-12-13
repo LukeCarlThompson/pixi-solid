@@ -11,8 +11,6 @@ export const ClientOnly = (props: { fileName: string }) => {
     const firstKey = Object.keys(file)[0];
     const firstExport = file[firstKey];
 
-    console.log(firstExport);
-
     return {
       default: firstExport,
     };
