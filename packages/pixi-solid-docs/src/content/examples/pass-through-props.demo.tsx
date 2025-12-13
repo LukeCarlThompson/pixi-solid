@@ -1,6 +1,7 @@
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
 import { PixiApplication, PixiCanvas, PixiStage, Text, usePixiApp, useTick } from "pixi-solid";
+import { objectFit } from "pixi-solid/utils";
 import { createResource, createSignal, Show } from "solid-js";
 import { Sky } from "./pass-through-props";
 
@@ -40,22 +41,7 @@ export const DemoApp = () => {
               ref={(component) => {
                 const app = usePixiApp();
                 useTick(() => {
-                  const originalWidth = component.width / component.scale.x;
-                  const originalHeight = component.height / component.scale.y;
-
-                  if (originalWidth === 0 || originalHeight === 0) return;
-
-                  const rendererWidth = app.renderer.width;
-                  const rendererHeight = app.renderer.height;
-
-                  const widthRatio = rendererWidth / originalWidth;
-                  const heightRatio = rendererHeight / originalHeight;
-
-                  component.scale.set(Math.max(widthRatio, heightRatio));
-
-                  // Center the skyContainer
-                  component.x = (rendererWidth - component.width) / 2;
-                  component.y = (rendererHeight - component.height) / 2;
+                  objectFit(component, app.renderer, "cover");
                 });
               }}
             />
