@@ -14,7 +14,7 @@ export const Sky = () => {
   });
   return (
     <Show when={textureResource()}>
-      {(texture) => <Sprite texture={texture()} position={{ x: 0, y: -50 }} scale={1.5} />}
+      {(texture) => <Sprite texture={texture()} position={{ x: 0, y: -50 }} scale={3.6} />}
     </Show>
   );
 };

@@ -4,12 +4,22 @@ description: A reference page in my new Starlight docs site.
 ---
 
 import { Code } from "@astrojs/starlight/components";
-import code from "../../examples/animated-sprite.tsx?raw";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import demoCode from "../../examples/animated-sprite.demo.tsx?raw";
+import exampleCode from "../../examples/animated-sprite.tsx?raw";
 import { ClientOnly } from "../../examples/client-only";
 
-Reference pages are ideal for outlining how things work in terse and clear terms.
-Less concerned with telling a story or addressing a specific use case, they should give a comprehensive outline of what you're documenting.
+### Demo
 
-<ClientOnly filePath="./animated-sprite" client:only="solid-js" />
+<ClientOnly fileName="animated-sprite" client:only="solid-js" />
 
-<Code code={code} lang="tsx" title={"AnimatedSprite"} />
+### Code example
+
+<Tabs>
+  <TabItem label="animated-sprite.tsx">
+    <Code code={exampleCode} lang="tsx" />
+  </TabItem>
+  <TabItem label="demo-app.tsx">
+    <Code code={demoCode} lang="tsx" />
+  </TabItem>
+</Tabs>
