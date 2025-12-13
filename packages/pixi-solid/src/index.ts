@@ -24,4 +24,5 @@ export type { PixiEventHandlerMap } from "./pixi-events";
 export { PIXI_EVENT_NAMES } from "./pixi-events";
 export type { PixiStageProps } from "./pixi-stage";
 export { PixiStage } from "./pixi-stage";
+export { useResize } from "./use-resize";
 export { useTick, useTicker } from "./use-ticker";
