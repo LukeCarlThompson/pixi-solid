@@ -1,7 +1,7 @@
 {
   "name": "pixi-solid",
   "private": false,
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "A library to write PixiJS applications with SolidJS",
   "author": "Luke Thompson",
   "license": "MIT",
@@ -15,6 +15,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/types/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "types": "./dist/types/utils/index.d.ts"
     }
   },
   "files": [
