@@ -1,0 +1,52 @@
+---
+title: usePixiApp
+description: A Solid.js hook to access the root PIXI.Application instance.
+sidebar:
+  order: 1
+---
+
+The `usePixiApp` hook provides a way to access the root `PIXI.Application` instance created by the `<PixiApplication />` component.
+This is useful when you need to interact directly with the Pixi.js application, for example, to access the renderer.
+
+## Usage
+
+This hook must be called from a component that is a descendant of the `<PixiApplication />` component.
+If used outside of this context, it will throw an error.
+
+```tsx
+import { usePixiApp, Container } from "pixi-solid";
+import { createEffect } from "solid-js";
+
+const MyComponent = () => {
+  const app = usePixiApp();
+
+  createEffect(() => {
+    // You can now safely use the Pixi.js Application instance
+    console.log("Pixi.js Application instance:", app);
+    console.log("Renderer dimensions:", app.renderer.width, app.renderer.height);
+  });
+
+  return <Container>{/* Your components here*/}</Container>;
+};
+
+export const DemoApp = () => {
+  return (
+    <PixiApplication>
+      <PixiCanvas>
+        <PixiStage>
+          <MyComponent />
+        </PixiStage>
+      </PixiCanvas>
+    </PixiApplication>
+  );
+};
+```
+
+## When to use it
+
+- When you need direct access to the `PIXI.Application` instance to perform operations not covered by specific `pixi-solid` components.
+- To get information about the Pixi.js renderer, such as its dimensions, resolution, or view.
+
+## Further reading
+
+- Read more about the [`PIXI.Application` class](https://pixijs.com/8.x/guides/components/application) in the PixiJS documentation.
