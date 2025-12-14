@@ -66,7 +66,7 @@ export const PIXI_EVENT_NAMES: (keyof FederatedEventEmitterTypes)[] = [
   "wheelcapture",
 ] as const;
 
-export const PIXI_EVENT_HANDLER_NAMES = PIXI_EVENT_NAMES.map(
+export const PIXI_SOLID_EVENT_HANDLER_NAMES = PIXI_EVENT_NAMES.map(
   (eventName) => `on${eventName}` as const,
 );
 
@@ -76,8 +76,9 @@ export type PixiEventHandlerMap = {
     | ((...args: FederatedEventEmitterTypes[K]) => void);
 };
 
-export const PIXI_EVENT_HANDLER_NAME_SET: Readonly<Set<(typeof PIXI_EVENT_HANDLER_NAMES)[number]>> =
-  new Set(PIXI_EVENT_HANDLER_NAMES);
+export const PIXI_EVENT_HANDLER_NAME_SET: Readonly<
+  Set<(typeof PIXI_SOLID_EVENT_HANDLER_NAMES)[number]>
+> = new Set(PIXI_SOLID_EVENT_HANDLER_NAMES);
 
 /**
  * This is a type-safe check that ensures `PIXI_EVENT_NAMES` includes every key from Pixi's `AllFederatedEventMap` type.

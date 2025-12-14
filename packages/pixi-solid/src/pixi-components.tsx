@@ -18,10 +18,10 @@ import {
   TilingSprite as PixiTilingSprite,
 } from "pixi.js";
 import type { JSX, Ref } from "solid-js";
-import { createRenderEffect, splitProps } from "solid-js";
+import { createRenderEffect, on, splitProps } from "solid-js";
 import type { PixiEventHandlerMap } from "./pixi-events";
 
-import { PIXI_EVENT_HANDLER_NAMES } from "./pixi-events";
+import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./pixi-events";
 import { insert, setProp } from "./renderer";
 
 /**
@@ -46,10 +46,14 @@ export const SOLID_PROP_KEYS = ["ref", "as", "children"] as const;
  *
  * @param instance The Pixi instance we want to apply props to.
  * @param props The props object.
+ * @param defer Defers the createRenderEffect so the props aren't set on the first run.
+ * This is useful because setting initialisation props can have unintended side effects.
+ * Notibly in AnimatedSprite, if we set the textures roperty after instantiation it will stop the instance from playing.
  */
 export const applyProps = <InstanceType extends PixiContainer, OptionsType extends ContainerProps<InstanceType>>(
   instance: InstanceType,
-  props: OptionsType
+  props: OptionsType,
+  defer?: boolean
 ) => {
   for (const key in props) {
     if (key === "as") continue;
@@ -66,6 +70,16 @@ export const applyProps = <InstanceType extends PixiContainer, OptionsType exten
       createRenderEffect(() => {
         insert(instance, () => props.children);
       });
+    } else if (defer) {
+      createRenderEffect(
+        on(
+          () => props[key as keyof typeof props],
+          () => {
+            setProp(instance, key, props[key as keyof typeof props]);
+          },
+          { defer }
+        )
+      );
     } else {
       createRenderEffect(() => {
         setProp(instance, key, props[key as keyof typeof props]);
@@ -78,11 +92,14 @@ const createContainerComponent = <InstanceType extends PixiContainer, OptionsTyp
   PixiClass: new (props: OptionsType) => InstanceType
 ) => {
   return (props: Omit<OptionsType, "children"> & ContainerProps<InstanceType>): JSX.Element => {
-    const [runtimeProps, initialisationProps] = splitProps(props, [...SOLID_PROP_KEYS, ...PIXI_EVENT_HANDLER_NAMES]);
+    const [runtimeProps, initialisationProps] = splitProps(props, [
+      ...SOLID_PROP_KEYS,
+      ...PIXI_SOLID_EVENT_HANDLER_NAMES,
+    ]);
 
     const instance = props.as || new PixiClass(initialisationProps as any);
 
-    applyProps(instance, initialisationProps);
+    applyProps(instance, initialisationProps, true);
     applyProps(instance, runtimeProps);
 
     return instance as unknown as JSX.Element;
@@ -186,17 +203,21 @@ export const Text = createLeafComponent<PixiText, Pixi.CanvasTextOptions>(PixiTe
 export const TilingSprite = createLeafComponent<PixiTilingSprite, Pixi.TilingSpriteOptions>(PixiTilingSprite);
 
 // export const MeshGeometry = createLeafComponent<PixiMeshGeometry, Pixi.MeshGeometryOptions>(PixiMeshGeometry);
+
 // export const NineSliceGeometry = createLeafComponent<PixiNineSliceGeometry, Pixi.NineSliceGeometryOptions>(
 //   PixiNineSliceGeometry
 // );
 
 // export const Particle = createLeafComponent<PixiParticle, Pixi.ParticleOptions>(PixiParticle);
+
 // export const PerspectivePlaneGeometry = createLeafComponent<
 //   PixiPerspectivePlaneGeometry,
 //   Pixi.PerspectivePlaneGeometryOptions
 // >(PixiPerspectivePlaneGeometry);
+
 // export const PlaneGeometry = createLeafComponent<PixiPlaneGeometry, Pixi.PlaneGeometryOptions>(PixiPlaneGeometry);
+
 // export const RopeGeometry = createLeafComponent<PixiRopeGeometry, Pixi.RopeGeometryOptions>(PixiRopeGeometry);
 
-// TODO: Don't need a component for the Culler. It needs to interact with the stage directly.
+// TODO: Do we need a component for the Culler. It needs to interact with the stage directly.
 // export const Culler = createLeafComponent<PixiCuller, Pixi.Culler>(PixiCuller);
