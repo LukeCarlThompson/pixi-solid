@@ -24,7 +24,7 @@ export const DemoApp = () => {
   });
   return (
     <PixiApplication background="#1099bb">
-      <PixiCanvas>
+      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
         {/* Show our Stage when the assets are loaded */}
         <Show when={textureResource()}>
           {(textures) => (
