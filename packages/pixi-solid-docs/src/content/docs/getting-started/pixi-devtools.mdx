@@ -1,0 +1,40 @@
+---
+title: Pixi Devtools
+description: Setting up Pixi Devtools with Pixi Solid.
+---
+
+### Attach to the window
+
+The [PixiJS Devtools](https://pixijs.io/devtools/) are very useful for debugging and inspecting your PixiJS applications.
+For the tools to find your application all you need to do it attach it to the window.
+
+```tsx
+import { PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
+import { onCleanup } from "solid-js";
+
+/**
+ * The DemoApp component sets up the Pixi Application
+ * and can be mounted anywhere in your SolidJS app.
+ * It will render a Canvas element with a Pixi Stage inside it.
+ */
+export const DemoApp = () => {
+  return (
+    <PixiApplication
+      ref={(app) => {
+        // @ts-expect-error
+        globalThis.__PIXI_DEVTOOLS__ = {
+          app,
+        };
+        onCleanup(() => {
+          // @ts-expect-error
+          globalThis.__PIXI_DEVTOOLS__ = undefined;
+        });
+      }}
+    >
+      <PixiCanvas>
+        <PixiStage>{/* Your Pixi Solid components go here */}</PixiStage>
+      </PixiCanvas>
+    </PixiApplication>
+  );
+};
+```

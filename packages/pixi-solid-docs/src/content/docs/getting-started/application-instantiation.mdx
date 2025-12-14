@@ -1,0 +1,34 @@
+---
+title: Creating a Pixi Application
+description: How to get started with Pixi Solid.
+---
+
+### Instantiating the Pixi Application
+
+To start rending in PixiJS, you'll need to create a `PixiApplication` component that will instantiate the `PIXI.Application` instance and provide it to all child components via context.
+
+import { Aside } from "@astrojs/starlight/components";
+
+```tsx
+import { PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
+
+/**
+ * The DemoApp component sets up the Pixi Application
+ * and can be mounted anywhere in your SolidJS app.
+ * It will render a Canvas element with a Pixi Stage inside it.
+ */
+export const DemoApp = () => {
+  return (
+    <PixiApplication>
+      <PixiCanvas>
+        <PixiStage>{/* Your Pixi Solid components go here */}</PixiStage>
+      </PixiCanvas>
+    </PixiApplication>
+  );
+};
+```
+
+<Aside>
+  The `pixi-solid` library only supports client side rendering. So you may need to use the `lazy` helper to dynamically
+  import on the client or use the `import {clientOnly} from "@solidjs/start";` if using Solid Start.
+</Aside>
