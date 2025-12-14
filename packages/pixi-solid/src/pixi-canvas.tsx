@@ -24,6 +24,11 @@ export const PixiCanvas = (props: {
 
   const pixiApp = usePixiApp();
   pixiApp.canvas.style.display = "block";
+  pixiApp.canvas.style.position = "absolute";
+  pixiApp.canvas.style.top = "0";
+  pixiApp.canvas.style.left = "0";
+  pixiApp.canvas.style.width = "100%";
+  pixiApp.canvas.style.height = "100%";
 
   createRenderEffect(() => {
     if (props.children === undefined) {
@@ -56,6 +61,7 @@ export const PixiCanvas = (props: {
     <div
       ref={canvasWrapElement}
       style={{
+        position: "relative",
         ...(typeof props.style === "object" ? props.style : {}),
       }}
       class={props.className}
