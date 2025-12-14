@@ -1,13 +1,16 @@
 import type * as Pixi from "pixi.js";
-import { Assets } from "pixi.js";
-import { PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
+import { Assets, TextureStyle } from "pixi.js";
+import { AnimatedSprite, PixiApplication, PixiCanvas, PixiStage, Sprite } from "pixi-solid";
 import { createResource, Show } from "solid-js";
-import { RunningMan } from "./animated-sprite";
-import { Sky } from "./sprite";
 
 export const DemoApp = () => {
-  const [texturesResource] = createResource(async () => {
-    const assets = await Assets.load<Pixi.Texture>([
+  // Create a resource to load the sky texture
+  const [textureResource] = createResource(async () => {
+    // Setting scale mode to nearest for crisp pixel art
+    TextureStyle.defaultOptions.scaleMode = "nearest";
+
+    const skyTexture = await Assets.load<Pixi.Texture>("/sky.png");
+    const runTextures = await Assets.load<Pixi.Texture>([
       "/run_0.png",
       "/run_1.png",
       "/run_2.png",
@@ -16,23 +19,27 @@ export const DemoApp = () => {
       "/run_5.png",
     ]);
 
-    const textures = Object.values(assets);
-
-    textures.forEach((texture) => {
-      // Setting scale mode to nearest for crisp pixel art
-      texture.source.scaleMode = "nearest";
-    });
-
-    return textures;
+    return { skyTexture, runTextures: Object.values(runTextures) };
   });
+
   return (
-    <PixiApplication background="#1099bb">
+    <PixiApplication>
       <PixiCanvas>
-        <Show when={texturesResource()}>
-          <PixiStage>
-            <Sky />
-            <RunningMan />
-          </PixiStage>
+        {/* Show our Stage when the assets are loaded */}
+        <Show when={textureResource()}>
+          {(textures) => (
+            <PixiStage>
+              <Sprite texture={textures().skyTexture} position={{ x: 0, y: -50 }} scale={3.6} />
+              <AnimatedSprite
+                autoPlay={true}
+                textures={textures().runTextures}
+                scale={4}
+                animationSpeed={0.25}
+                anchor={{ x: 0.5, y: 0.5 }}
+                position={{ x: 350, y: 300 }}
+              />
+            </PixiStage>
+          )}
         </Show>
       </PixiCanvas>
     </PixiApplication>

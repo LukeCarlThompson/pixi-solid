@@ -1,0 +1,81 @@
+---
+title: Overview
+description: A page describing the components available in Pixi Solid.
+sidebar:
+  order: 1
+---
+
+### Available components
+
+Most of the PixiJS display components are available as Solid components in Pixi Solid.
+
+All components are named the same as their PixiJS counterparts and should be imported individually.
+
+This pattern also allows treeshaking when using a bundler that supports it as each component only imports the necessary parts of PixiJS that it needs.
+
+All of the components take the same props as their PixiJS counterparts, with the addition of event handlers.
+
+These include:
+
+```ts
+import {
+  AnimatedSprite,
+  BitmapText,
+  Container,
+  Graphics,
+  HTMLText,
+  MeshPlane,
+  MeshRope,
+  MeshSimple,
+  NineSliceSprite,
+  ParticleContainer,
+  PerspectiveMesh,
+  RenderContainer,
+  RenderLayer,
+  Sprite,
+  Text,
+  TilingSprite,
+} from "pixi-solid";
+```
+
+This can cause some name clashes if you are also importing classes or types from `pixi.js` directly.
+
+It's recommended to alias the imports from `pixi.js` in these cases, for example:
+
+```ts
+import { Sprite as PixiSprite } from "pixi.js";
+import { Sprite } from "pixi-solid";
+//...
+```
+
+Or import all Pixi types under a namespace because these will not be budnled into the final build anyway:
+
+```ts
+import * as Pixi from "pixi.js";
+import { Sprite } from "pixi-solid";
+
+//...
+
+let spriteRef: Pixi.Sprite | undefined;
+//...
+```
+
+### Omissions
+
+There's a few deliberate omossions of PixiJS classes from the components list because wrapping them in a SolidJS component doesn't add much value. These include:
+
+- `Particle`
+  Particles inside a `ParticleContainer` are intended for when you want to the maximum performance for a particle system so a dedicated component here is in opposition to that.
+  It's recommended to create and manage the particle instances imperatively with a `<ParticleContainer />` as a parent..
+
+- `MeshGeometry`
+- `NineSliceGeometry`
+- `PerspectivePlaneGeometry`
+- `PlaneGeometry`
+- `RopeGeometry`
+  The geometry classes are pretty low level and generally used when creating custom meshes.
+  This kind of work is best created once imperatively with PixiJS directly and then wrapped in a custom `pixi-solid` component.
+
+- `Culler`
+  It may be worth adding in the future.
+  Have't experimented enough with this one to know if a SolidJS component would be useful just yet.

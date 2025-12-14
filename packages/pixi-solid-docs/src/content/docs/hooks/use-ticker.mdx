@@ -1,0 +1,46 @@
+---
+title: useTicker and useTick
+description: Solid.js hooks for interacting with the Pixi.js Ticker.
+sidebar:
+  order: 2
+---
+
+The `pixi-solid` library provides two hooks, `useTicker` and `useTick`, to interact with the Pixi.js `Ticker` instance. The `Ticker` is responsible for driving the animation loop in a Pixi.js application, making it essential for any dynamic or animated content.
+
+Both hooks must be called from a component that is a descendant of the `<PixiApplication />`component. If used outside of this context, they will throw an error.
+
+## `useTicker` Hook
+
+The `useTicker` hook provides direct access to the `PIXI.Application`'s shared `Ticker` instance. This is useful when you need more control over the ticker, such as pausing, starting, or adjusting its speed globally.
+
+### Usage
+
+```tsx
+import { useTicker, Container } from "pixi-solid";
+import { createEffect, createSignal } from "solid-js";
+
+const MyComponent = () => {
+  const [tickerRunning, setTickerRunning] = createSignal(true);
+  const ticker = useTicker();
+
+  createEffect(() => {
+    // You can now safely use the Pixi.js Ticker instance
+    console.log("Pixi.js Ticker instance:", ticker);
+
+    // Example start and stop the ticker based on a signal
+    if (tickerRunning()) {
+      ticker.start();
+    } else {
+      ticker.stop();
+    }
+  });
+
+  return <Container>{/* Your components here*/}</Container>;
+};
+```
+
+### When to use it
+
+- When you need to globally control the animation loop (e.g., stopping or starting all animations).
+- To adjust the overall speed or framerate of the application.
+- To add or remove ticker callbacks dynamically based on complex logic.

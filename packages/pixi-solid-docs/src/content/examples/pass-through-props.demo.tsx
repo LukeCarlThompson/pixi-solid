@@ -26,7 +26,11 @@ export const DemoApp = () => {
   });
 
   const handlePointerMove = (e: Pixi.FederatedPointerEvent) => {
-    const speed = Math.min(Math.max((e.global.x / e.currentTarget.width) * 2, 0.1), 2);
+    const notInsideCanvas =
+      e.global.x < 0 || e.global.x > e.currentTarget.width || e.global.y < 0 || e.global.y > e.currentTarget.height;
+    if (notInsideCanvas) return;
+
+    const speed = Math.min(Math.max((e.global.x / e.currentTarget.width) * 2, 0), 2);
     setFlyingSpeed(speed);
   };
   return (
