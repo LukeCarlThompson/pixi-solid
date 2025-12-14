@@ -1,0 +1,38 @@
+---
+title: Overview
+description: A page describing the events available in Pixi Solid.
+sidebar:
+  order: 1
+---
+
+### Event handlers
+
+Pixi Solid components support's all PixiJS event handlers for various user interactions and events.
+These event handlers can be added as props to the components, similar to how event handlers are added in SolidJS.
+
+The event handler names are the same as in PixiJS, but prefixed with `on`.
+Refer to the [PixiJS events docs](https://pixijs.com/8.x/guides/components/events) for more details on each event and when they are triggered.
+The usage is exactly the same as in PixiJS but we access them via SolidJS props instead of adding and removing listeners imperatively.
+
+```tsx
+//...
+<Sprite
+  //...
+  eventMode="static"
+  onpointertap={(event) => {
+    console.log("Sprite clicked!", event);
+  }}
+  onpointerover={(event) => {
+    console.log("Pointer moved over Sprite!", event);
+  }}
+/>
+//...
+```
+
+import { EventNamesList } from "./event-names-as-string";
+
+import { Code } from "@astrojs/starlight/components";
+
+### Full event list
+
+<EventNamesList client:only="solid-js" />
