@@ -1,27 +1,66 @@
 ---
-title: Individual Assets
-description: How to load assets with pixi-solid.
+title: Loading Individual Assets
+description: Learn how to load individual assets in your pixi-solid application using Solid.js's createResource.
 sidebar:
   order: 1
 ---
 
-### Using Pixi Assets Loader
+When building a Pixi.js application with `pixi-solid`, you often need to load assets like images, spritesheets, or fonts. Solid.js's `createResource` function provides an excellent way to handle asynchronous data loading, including assets, while integrating seamlessly with Solid's reactivity system.
 
-To use `pixi-solid` you'll need to have a SolidJS project set up.
-If you don't have one yet, you can create a new SolidJS project using the following command:
+This guide demonstrates how to load individual assets using `createResource` and Pixi.js's `Assets` manager.
 
-```bash
-npm init solid@latest
+## Using `createResource` for Individual Assets
+
+The `createResource` function in Solid.js is ideal for fetching data that might take some time to load. By integrating it with Pixi.js's `Assets.load()`, you can easily manage the loading state of your textures and other assets.
+
+### Example: Loading a Single Image
+
+Let's say you want to load a single background image for your scene.
+
+```tsx
+import type * as Pixi from "pixi.js";
+import { Assets } from "pixi.js";
+import { PixiApplication, PixiCanvas, PixiStage, Sprite } from "pixi-solid";
+import { createResource, Show } from "solid-js";
+
+export const IndividualAssetLoadingDemo = () => {
+  // Use createResource to load a single asset
+  const [backgroundImage] = createResource(async () => {
+    // Initialize Pixi.js Assets manager if not already done globally
+    await Assets.init();
+    // Load a single asset by its path
+    const texture = await Assets.load<Pixi.Texture>("/background.png");
+    return texture;
+  });
+
+  return (
+    <PixiApplication background={0x1099bb}>
+      <PixiCanvas>
+        {/* Use the <Show> component to render the Sprite only when the asset is loaded */}
+        <Show when={backgroundImage()}>
+          {(texture) => (
+            <PixiStage>
+              <Sprite texture={texture()} anchor={0.5} position={[400, 300]} scale={0.5} />
+            </PixiStage>
+          )}
+        </Show>
+      </PixiCanvas>
+    </PixiApplication>
+  );
+};
 ```
 
-This will create a new SolidJS project in a directory of your choice.
+**Explanation:**
 
-### Install Pixi Solid and PixiJS
+1.  **`createResource(async () => { ... })`**: We wrap the asset loading logic inside an `async` function passed to `createResource`.
+2.  **`Assets.init()`**: It's good practice to ensure the `Assets` manager is initialized but we only need to do this once per application.
+3.  **`Assets.load<Pixi.Texture>("/background.png")`**: This loads the specified image file and returns a `Promise` that resolves with the `Pixi.Texture` object.
+4.  **`[backgroundImage]`**: `createResource` returns a signal-like tuple. `backgroundImage` will be `undefined` initially, then a `Promise`, and finally the loaded `Pixi.Texture`.
+5.  **`<Show when={backgroundImage()}> ... </Show>`**: The `Show` component from Solid.js is used to conditionally render the `Sprite` only when `backgroundImage()` evaluates to a truthy value (i.e., when the texture has finished loading). The loaded `texture` is then passed to the `Sprite` component.
 
-You can install `pixi-solid` along with its peer dependency `pixi.js` using npm, pnpm or yarn:
+This approach ensures that your Pixi.js components only try to render assets once they are fully loaded.
 
-```bash
-npm i pixi-solid pixi.js
-```
+## Further reading
 
-If you already have a project setup you'll need to make sure that you also have `pixi.js` and `solid-js` installed.
+- Read more about [Solid.js `createResource`](https://docs.solidjs.com/reference/basic-reactivity/create-resource) in the SolidJS documentation.
+- Explore the [Pixi.js Assets Management](https://pixijs.com/8.x/guides/components/assets) docs for more details on the Pixi Assets class.
