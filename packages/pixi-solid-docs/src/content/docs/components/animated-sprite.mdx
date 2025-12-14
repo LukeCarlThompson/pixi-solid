@@ -6,7 +6,7 @@ description: A reference page in my new Starlight docs site.
 import { Code } from "@astrojs/starlight/components";
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 import demoCode from "../../examples/animated-sprite.demo.tsx?raw";
-import exampleCode from "../../examples/animated-sprite.tsx?raw";
+import referenceCode from "../../examples/animated-sprite.tsx?raw";
 import { ClientOnly } from "../../examples/client-only";
 
 ### Demo
@@ -16,10 +16,10 @@ import { ClientOnly } from "../../examples/client-only";
 ### Code example
 
 <Tabs>
-  <TabItem label="animated-sprite.tsx">
-    <Code code={exampleCode} lang="tsx" />
+  <TabItem label="component.tsx">
+    <Code code={referenceCode} lang="tsx" />
   </TabItem>
-  <TabItem label="demo-app.tsx">
+  <TabItem label="app.tsx">
     <Code code={demoCode} lang="tsx" />
   </TabItem>
 </Tabs>
