@@ -1,25 +1,140 @@
 ---
-title: Asset Manifest
-description: How to load assets with pixi-solid.
+title: Loading an Asset Manifest
+description: Learn how to load multiple assets efficiently using an asset manifest with Solid.js's createResource in pixi-solid.
 ---
 
-### Using Pixi Assets Loader
+For applications with many assets, managing individual asset loading can become cumbersome. Pixi.js provides a robust **Asset Manifest** system that allows you to define all your assets, their paths, and groups in a single JSON file. This approach simplifies asset management, improves organization, and enables more efficient loading strategies.
 
-To use `pixi-solid` you'll need to have a SolidJS project set up.
-If you don't have one yet, you can create a new SolidJS project using the following command:
+It's recommended to use PixiJs [AssetPack](https://pixijs.io/assetpack/) to generate the asset manifest automatically for you.
 
-```bash
-npm init solid@latest
+This guide demonstrates how to use Solid.js's `createResource` to load an entire asset manifest and then access the loaded assets within your `pixi-solid` application.
+
+## What is an Asset Manifest?
+
+An asset manifest is a JSON file that describes your application's assets. It typically includes:
+
+- **`bundles`**: Groups of assets that can be loaded together. This is extremely useful for loading assets required for a specific scene or component.
+- **`assets`**: Individual assets with their unique `alias` (how you refer to them in code) and `src` (their file path).
+
+### Example `assets-manifest.json`
+
+Let's assume you have an `assets-manifest.json` file in your `public` folder like this:
+
+```json
+{
+  "bundles": [
+    {
+      "name": "game-assets",
+      "assets": [
+        {
+          "alias": "background",
+          "src": "/assets/background.png"
+        },
+        {
+          "alias": "player_idle",
+          "src": "/assets/player_idle.png"
+        },
+        {
+          "alias": "coin",
+          "src": "/assets/coin.png"
+        }
+      ]
+    },
+    {
+      "name": "ui-assets",
+      "assets": [
+        {
+          "alias": "button_play",
+          "src": "/assets/button_play.png"
+        },
+        {
+          "alias": "font_pixel",
+          "src": "/assets/pixel_font.fnt"
+        }
+      ]
+    }
+  ]
+}
 ```
 
-This will create a new SolidJS project in a directory of your choice.
+## Using `createResource` to Load an Asset Manifest
 
-### Install Pixi Solid and PixiJS
+With `createResource`, you can easily load your manifest and then use Pixi.js's `Assets` manager to load the bundles defined within it.
 
-You can install `pixi-solid` along with its peer dependency `pixi.js` using npm, pnpm or yarn:
+### Example: Loading Assets from a Manifest
 
-```bash
-npm i pixi-solid pixi.js
+```tsx
+import type * as Pixi from "pixi.js";
+import { Assets } from "pixi.js";
+import { PixiApplication, PixiCanvas, PixiStage, Sprite, Text } from "pixi-solid";
+import { createResource, Show, createSignal } from "solid-js";
+
+export const AssetManifestLoadingDemo = () => {
+  // Use createResource to initialize Assets and load the manifest
+  const [assetsLoaded] = createResource(async () => {
+    // 1. Initialize Pixi.js Assets manager
+    await Assets.init({
+      manifest: "/assets-manifest.json", // Specify your manifest file here
+    });
+
+    // 2. Load a specific bundle (or all bundles if you don't specify)
+    // Here, we load the "game-assets" bundle.
+    await Assets.loadBundle("game-assets");
+
+    // We can also load other bundles as needed, or all of them.
+    await Assets.loadBundle("ui-assets");
+
+    // Return a boolean or any indicator that assets are ready
+    return true;
+  });
+
+  return (
+    <PixiApplication>
+    {/* Suspense will show the fallback while any resources inside it are pending */}
+      <Suspense fallback={<p>Loading...</p>}>
+        <PixiCanvas>
+          {/* Use <Show> to render components only after assets are loaded */}
+          <Show when={assetsLoaded()}>
+            <PixiStage>
+              {/* Access assets using their alias defined in the manifest */}
+              <Sprite texture={Assets.get<Pixi.Texture>("background")} anchor={0.5} position={[400, 300]} scale={0.8} />
+              <Sprite texture={Assets.get<Pixi.Texture>("player_idle")} anchor={0.5} position={[400, 300]} />
+              <Sprite texture={Assets.get<Pixi.Texture>("coin")} anchor={0.5} position={[450, 250]} />
+              <Sprite texture={Assets.get<Pixi.Texture>("button_play")} anchor={0.5} position={[400, 450]} />
+              <Text
+                text="Game Loaded!"
+                style={{ fontFamily: "font_pixel", fontSize: 32, fill: 0xffffff }}
+                position={[200, 50]}
+              />
+            </PixiStage>
+          </Show>
+        </PixiCanvas>
+      <Suspense>
+    </PixiApplication>
+  );
+};
 ```
 
-If you already have a project setup you'll need to make sure that you also have `pixi.js` and `solid-js` installed.
+**Explanation:**
+
+1.  **`Assets.init({ manifest: "/assets-manifest.json" })`**: Instead of calling `Assets.init()` without arguments, we pass an options object with the `manifest` property pointing to our JSON file. This tells Pixi.js where to find the manifest.
+1.  **`Assets.loadBundle("game-assets")`**: After the manifest is initialized, you can use `Assets.loadBundle()` to load all assets belonging to a specific bundle defined in your manifest.
+1.  **`Assets.get<Pixi.Texture>("background")`**: Once a bundle is loaded, you can retrieve individual assets by their `alias` using `Assets.get()`. This method is synchronous because the assets are already in the cache.
+1.  **`<Suspense fallback={...}>`**: This is a core SolidJS primitive for handling asynchronous UI states.
+    - Any component rendered within `Suspense` that reads a pending `createResource` will trigger the `fallback` content to be displayed.
+    - Once all resources within the `Suspense` boundary have resolved (e.g., `assetsLoaded` is true), the `fallback` content is replaced by the actual component content (`<AssetLoader />`).
+    - In our example, we show a "Loading Assets..." HTML text as the fallback but we could put the suspense boundary inside our PixiJS stage and show a PixiJS fallback as an alternative as well.
+1.  **`<Show when={assetsLoaded()}> ... </Show>`**: The `Show` component ensures that your Pixi.js components attempting to use these assets only render after the `createResource` has resolved, meaning all specified bundles have been loaded.
+    Without this SolidJS will try to instantiate the components and then update the properties depending on assets later which can cause unexpected behaviour in some cases.
+
+**Even Further:**
+
+If we have a HTML based SolidJS app we can go further and put the Suspense boundary around a `lazy` dynamic import of our whole pixi-solid app.
+That way we could show a loading indicator before we even start loading PixiJS itself.
+
+Using an asset manifest is a powerful way to streamline asset loading in larger `pixi-solid` applications and we can combine with the SolidJS built in `createResource` and `<Suspense>` to manage loading states.
+
+## Further reading
+
+- Read more about [Pixi.js Assets Management and Manifests](https://pixijs.com/8.x/guides/components/assets) in the official PixiJS documentation.
+- Learn about [Solid.js `createResource`](https://www.solidjs.com/docs/latest/api#createresource) for asynchronous data handling.

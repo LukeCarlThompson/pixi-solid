@@ -3,17 +3,17 @@ title: Pixi Solid
 description: Docs and examples for Pixi Solid.
 template: splash # Remove or comment out this line to display the site sidebar on this page.
 hero:
-  tagline: Docs and examples for Pixi Solid.
+  tagline: A perfect team for high performance interactive 2D graphics on the web.
   image:
     file: ../../assets/pixi-solid-logo.png
   actions:
-    - text: Go to the docs and demos
+    - text: Go to the docs and examples
       link: /getting-started/project-setup
       icon: right-arrow
 ---
 
 import { Card, CardGrid, Code, Tabs, TabItem } from "@astrojs/starlight/components";
-import demoCode from "../examples/tiling-sprite.demo.tsx?raw";
+import demoCode from "../examples/home-page.demo.tsx?raw";
 import { ClientOnly } from "../examples/client-only";
 
 ### Overview?
@@ -41,8 +41,8 @@ If you're new to either library, be sure to check out their respective documenta
 
 ### Demo
 
-<ClientOnly fileName="tiling-sprite" client:only="solid-js" />
+<ClientOnly fileName="home-page" client:only="solid-js" />
 
 ### Code example
 
-<Code code={demoCode} title="tiling-sprite-demo.tsx" lang="tsx" />
+<Code code={demoCode} lang="tsx" />
