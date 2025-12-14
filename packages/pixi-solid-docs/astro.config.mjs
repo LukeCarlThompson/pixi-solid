@@ -9,18 +9,30 @@ export default defineConfig({
   site: "https://github.com/LukeCarlThompson/pixi-solid",
   integrations: [
     starlight({
-      title: "Pixi Solid Docs",
+      title: "Pixi Solid",
       social: [
         { icon: "github", label: "GitHub", href: "https://github.com/LukeCarlThompson/pixi-solid" },
       ],
       sidebar: [
         {
-          label: "Guides",
-          autogenerate: { directory: "guides" },
+          label: "Getting started",
+          autogenerate: { directory: "getting-started" },
+        },
+        {
+          label: "Asset loading",
+          autogenerate: { directory: "asset-loading" },
         },
         {
           label: "Components",
           autogenerate: { directory: "components" },
+        },
+        {
+          label: "Events",
+          autogenerate: { directory: "events" },
+        },
+        {
+          label: "Hooks",
+          autogenerate: { directory: "hooks" },
         },
         {
           label: "Examples",
