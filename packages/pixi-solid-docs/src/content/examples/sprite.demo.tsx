@@ -9,7 +9,7 @@ export const DemoApp = () => {
   return (
     <PixiApplication background="#1099bb">
       <Suspense fallback={<div>Loading...</div>}>
-        <PixiCanvas style={{ height: "600px" }}>
+        <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
           {/* Show our Stage when the assets are loaded */}
           <Show when={textureResource()}>
             {(texture) => (
