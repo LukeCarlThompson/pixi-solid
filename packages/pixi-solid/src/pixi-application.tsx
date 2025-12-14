@@ -25,7 +25,7 @@ export const usePixiApp = () => {
  * to allow passing configuration directly to the Pixi.js Application constructor,
  * but omits properties that are handled by the component itself.
  */
-export type PixiApplicationProps = Partial<Omit<ApplicationOptions, "children" | "resizeTo" | "view">> & {
+export type PixiApplicationProps = Partial<Omit<ApplicationOptions, "children" | "resizeTo">> & {
   ref?: Ref<Application>;
   children?: JSX.Element;
 };
@@ -43,7 +43,7 @@ export type PixiApplicationProps = Partial<Omit<ApplicationOptions, "children" |
 export const PixiApplication = (props: PixiApplicationProps) => {
   const [_solidProps, initialisationProps] = splitProps(props, ["ref", "children"]);
 
-  // TODO: Reinitialise the pixi app if any of the initialisationProps change that we can't set at runtime
+  // TODO: Split props into initialisation props and runtime props
 
   const [appResource] = createResource(async () => {
     const app = new Application();
@@ -70,11 +70,6 @@ export const PixiApplication = (props: PixiApplicationProps) => {
 
       app.ticker.autoStart = false;
       app.ticker.start();
-
-      // @ts-expect-error
-      globalThis.__PIXI_DEVTOOLS__ = {
-        app,
-      };
 
       onCleanup(() => {
         app.destroy(true, { children: true });
