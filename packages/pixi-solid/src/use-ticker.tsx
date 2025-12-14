@@ -29,9 +29,6 @@ export const useTicker = (): Ticker => usePixiApp().ticker;
  * @param tickerCallback - The function to call on each ticker update. It receives
  *   the `PIXI.Ticker` instance as its argument.
  *
- * **Example**
- * @example {@link ./examples/useTick.example.tsx}
- * {@includeCode ./examples/useTick.example.tsx}
  */
 export const useTick = (tickerCallback: TickerCallback<Ticker>): void => {
   const { ticker } = usePixiApp();
