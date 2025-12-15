@@ -42,7 +42,7 @@ export type PixiApplicationProps = Partial<Omit<ApplicationOptions, "children" |
  *
  */
 export const PixiApplication = (props: PixiApplicationProps) => {
-  const [_solidProps, initialisationProps] = splitProps(props, ["ref", "children"]);
+  const [, initialisationProps] = splitProps(props, ["ref", "children"]);
 
   // TODO: Split props into initialisation props and runtime props
 
