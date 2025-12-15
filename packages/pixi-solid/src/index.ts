@@ -1,5 +1,11 @@
 export type { PixiApplicationProps } from "./pixi-application";
-export { PixiApplication, usePixiApp } from "./pixi-application";
+export {
+  PixiApplication,
+  TickerProvider,
+  usePixiApp,
+  useTick,
+  useTicker,
+} from "./pixi-application";
 export { PixiCanvas } from "./pixi-canvas";
 export type { ContainerProps, LeafProps } from "./pixi-components";
 export {
@@ -25,4 +31,3 @@ export { PIXI_EVENT_NAMES, PIXI_SOLID_EVENT_HANDLER_NAMES } from "./pixi-events"
 export type { PixiStageProps } from "./pixi-stage";
 export { PixiStage } from "./pixi-stage";
 export { useResize } from "./use-resize";
-export { useTick, useTicker } from "./use-ticker";
