@@ -91,7 +91,7 @@ export const applyProps = <InstanceType extends PixiContainer, OptionsType exten
 const createContainerComponent = <InstanceType extends PixiContainer, OptionsType extends object>(
   PixiClass: new (props: OptionsType) => InstanceType
 ) => {
-  return (props: Omit<OptionsType, "children"> & ContainerProps<InstanceType>): JSX.Element => {
+  return (props: Omit<OptionsType, "children"> & ContainerProps<InstanceType>): InstanceType & JSX.Element => {
     const [runtimeProps, initialisationProps] = splitProps(props, [
       ...SOLID_PROP_KEYS,
       ...PIXI_SOLID_EVENT_HANDLER_NAMES,
@@ -102,15 +102,15 @@ const createContainerComponent = <InstanceType extends PixiContainer, OptionsTyp
     applyProps(instance, initialisationProps, true);
     applyProps(instance, runtimeProps);
 
-    return instance as unknown as JSX.Element;
+    return instance as InstanceType & JSX.Element;
   };
 };
 
 const createLeafComponent = <InstanceType extends PixiContainer, OptionsType extends object>(
   PixiClass: new (props: OptionsType) => InstanceType
 ) => {
-  return (props: Omit<OptionsType, "children"> & LeafProps<InstanceType>): JSX.Element => {
-    return createContainerComponent<PixiContainer, OptionsType>(PixiClass)(props as any);
+  return (props: Omit<OptionsType, "children"> & LeafProps<InstanceType>): InstanceType & JSX.Element => {
+    return createContainerComponent<InstanceType, OptionsType>(PixiClass)(props);
   };
 };
 
