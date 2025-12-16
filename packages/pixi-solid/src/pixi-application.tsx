@@ -145,3 +145,51 @@ export const useTick = (tickerCallback: TickerCallback<Ticker>): void => {
     ticker.remove(tickerCallback);
   });
 };
+
+/**
+ * Delay until a given number of milliseconds has passed on the application ticker.
+ *
+ * It is guaranteed to be in sync with the ticker and uses accumulated deltaMs not an external time measurement.
+ *
+ * Simply await for it to resolve if in an async context or pass in a callback function.
+ * It's not recommended to use both techniques at once.
+ *
+ * @param delayMs - Number of milliseconds to wait (measured in the ticker's time units).
+ *
+ * @param callback - Optional callback function that will fire when the delayMs time has passed.
+ *
+ * @returns A Promise that resolves once the ticker's time has advanced by `delayMs`.
+ *
+ * @throws {Error} If called outside of a `PixiApplication` or `TickerProvider` context.
+ *
+ * @note It will not resolve or fire the callback if the ticker is paused or stopped.
+ *
+ */
+export const useDelay = async (delayMs: number, callback?: () => void): Promise<void> => {
+  const ticker = useContext(TickerContext);
+
+  if (!ticker) {
+    throw new Error("useDelay must be used within a PixiApplication or a TickerProvider");
+  }
+
+  let timeDelayed = 0;
+
+  let resolvePromise: (value: void | PromiseLike<void>) => void;
+
+  const promise = new Promise<void>((resolve) => {
+    resolvePromise = resolve;
+  });
+
+  const internalCallback = () => {
+    timeDelayed += ticker.deltaMS;
+    if (timeDelayed < delayMs) return;
+    callback?.();
+    resolvePromise();
+  };
+
+  ticker.add(internalCallback);
+
+  await promise;
+
+  ticker.remove(internalCallback);
+};
