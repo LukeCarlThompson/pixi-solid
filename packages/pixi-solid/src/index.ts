@@ -2,6 +2,7 @@ export type { PixiApplicationProps } from "./pixi-application";
 export {
   PixiApplication,
   TickerProvider,
+  useDelay,
   usePixiApp,
   useTick,
   useTicker,
