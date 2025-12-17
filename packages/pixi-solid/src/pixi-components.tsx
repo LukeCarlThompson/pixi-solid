@@ -7,7 +7,6 @@ import {
   HTMLText as PixiHTMLText,
   MeshPlane as PixiMeshPlane,
   MeshRope as PixiMeshRope,
-  MeshSimple as PixiMeshSimple,
   NineSliceSprite as PixiNineSliceSprite,
   ParticleContainer as PixiParticleContainer,
   PerspectiveMesh as PixiPerspectiveMesh,
@@ -121,9 +120,7 @@ export const AnimatedSprite = createLeafComponent<PixiAnimatedSprite, Pixi.Anima
 /**
  * A SolidJS component that renders a `PIXI.BitmapText`.
  */
-export const BitmapText = createLeafComponent<PixiBitmapText, ConstructorParameters<typeof PixiBitmapText>>(
-  PixiBitmapText
-);
+export const BitmapText = createLeafComponent<PixiBitmapText, Pixi.TextOptions>(PixiBitmapText);
 /**
  * A SolidJS component that renders a `PIXI.Container`.
  */
@@ -147,11 +144,6 @@ export const MeshPlane = createLeafComponent<PixiMeshPlane, Pixi.MeshPlaneOption
  * A SolidJS component that renders a `PIXI.MeshRope`.
  */
 export const MeshRope = createLeafComponent<PixiMeshRope, Pixi.MeshRopeOptions>(PixiMeshRope);
-
-/**
- * A SolidJS component that renders a `PIXI.MeshSimple`.
- */
-export const MeshSimple = createLeafComponent<PixiMeshSimple, Pixi.SimpleMeshOptions>(PixiMeshSimple);
 
 /**
  * A SolidJS component that renders a `PIXI.NineSliceSprite`.
