@@ -1,21 +1,16 @@
 ---
 title: Graphics
-description: A reference page in my new Starlight docs site.
+description: A reference page for the Graphics component.
 ---
 
 import { Code } from "@astrojs/starlight/components";
-import { Tabs, TabItem } from "@astrojs/starlight/components";
-import demoCode from "../../examples/sprite.demo.tsx?raw";
+import demoCode from "../../examples/graphics.demo.tsx?raw";
 import { ClientOnly } from "../../examples/client-only";
 
 ### Demo
 
-<ClientOnly fileName="sprite" client:only="solid-js" />
+<ClientOnly fileName="graphics" client:only="solid-js" />
 
 ### Code example
 
-<Tabs>
-  <TabItem label="sprite-demo.tsx">
-    <Code code={demoCode} lang="tsx" />
-  </TabItem>
-</Tabs>
+<Code code={demoCode} lang="tsx" title="graphics-demo.tsx" />
