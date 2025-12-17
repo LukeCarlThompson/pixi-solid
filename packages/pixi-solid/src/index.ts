@@ -17,7 +17,6 @@ export {
   HTMLText,
   MeshPlane,
   MeshRope,
-  MeshSimple,
   NineSliceSprite,
   ParticleContainer,
   PerspectiveMesh,
