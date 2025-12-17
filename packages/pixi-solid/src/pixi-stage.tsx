@@ -1,6 +1,6 @@
 import type { Container, ContainerOptions } from "pixi.js";
 import type { JSX, Ref } from "solid-js";
-import { usePixiApp } from "./pixi-application";
+import { getPixiApp } from "./pixi-application";
 import { applyProps } from "./pixi-components";
 import type { PixiEventHandlerMap } from "./pixi-events";
 
@@ -25,7 +25,7 @@ export type PixiStageProps = PixiEventHandlerMap &
  * Children passed to `PixiStage` are inserted into the application stage.
  */
 export const PixiStage = (props: PixiStageProps): JSX.Element => {
-  const pixiApp = usePixiApp();
+  const pixiApp = getPixiApp();
 
   applyProps(pixiApp.stage, props);
 

@@ -17,7 +17,7 @@ By using `pixi-solid`, you can write your PixiJS applications declaratively usin
 It is intended to provide nice abstractions for encapsulating useful functionality and state management to represent the core logic of your application.
 
 In some cases when creating high performance applications like games which may have lots of fast changing state and logic every frame it may be beneficial to escape from SolidJS and use Pixi imperatively.
-In these cases you may want to create an imperative component and update it every frame with the `useTick` method and then wrap it inside a `<Container />` component as an easy way of packaging it.
+In these cases you may want to create an imperative component and update it every frame with the `onTick` method and then wrap it inside a `<Container />` component as an easy way of packaging it.
 
 ## Getting Started
 
@@ -41,7 +41,7 @@ Here's a simple example to get you started. This will render a "Hello World" tex
 
 ```jsx
 import { render } from "solid-js/web";
-import { PixiApplication, PixiStage, usePixiApp } from "pixi-solid";
+import { PixiApplication, PixiStage, getPixiApp } from "pixi-solid";
 import { Text, FederatedPointerEvent } from "pixi.js";
 import { createSignal, onMount } from "solid-js";
 
@@ -93,15 +93,15 @@ This component creates a `div` and mounts the PixiJS canvas into it. It automati
 
 This component gives us a reference to the Pixi stage which is the top level container of your scene. It is useful for listening to global events.
 
-### `usePixiApp()`
+### `getPixiApp()`
 
 A hook to get access to the PixiJS `Application` instance.
 
-### `useTicker()`
+### `getTicker()`
 
 A hook to get access to the Pixi ticker instance.
 
-### `useTick()`
+### `onTick()`
 
 A hook to auto subscribe and unsubscribe to the ticker in sync with the components lifecycle.
 Any function passed in here will be called every frame whilst the component is mounted.

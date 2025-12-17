@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { onCleanup } from "solid-js";
-import { usePixiApp } from "./pixi-application";
+import { getPixiApp } from "./pixi-application";
 
 /**
  * A SolidJS hook that runs a callback function whenever the PixiJS renderer is resized.
@@ -9,8 +9,8 @@ import { usePixiApp } from "./pixi-application";
  *
  * Because we listen for the renderer's "resize" event, this hook will work correctly whether the window is resized or just the DOM element the PixiCanvas is inside changes size.
  */
-export const useResize = (resizeCallback: (screen: Pixi.Rectangle) => void): void => {
-  const app = usePixiApp();
+export const onResize = (resizeCallback: (screen: Pixi.Rectangle) => void): void => {
+  const app = getPixiApp();
 
   const handleResize = () => {
     resizeCallback(app.renderer.screen);
