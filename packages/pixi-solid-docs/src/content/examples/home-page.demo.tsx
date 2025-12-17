@@ -3,13 +3,13 @@ import { Assets, Rectangle, TextureStyle } from "pixi.js";
 import {
   AnimatedSprite,
   Container,
+  getPixiApp,
+  onTick,
   PixiApplication,
   PixiCanvas,
   PixiStage,
   Sprite,
   TilingSprite,
-  usePixiApp,
-  useTick,
 } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, Show } from "solid-js";
@@ -45,8 +45,8 @@ export const DemoApp = () => {
               <Container
                 boundsArea={sceneBounds}
                 ref={(container) => {
-                  const app = usePixiApp();
-                  useTick(() => {
+                  const app = getPixiApp();
+                  onTick(() => {
                     objectFit(container, app.renderer, "cover");
                   });
                 }}
@@ -54,7 +54,7 @@ export const DemoApp = () => {
                 <Sprite texture={textures().skyTexture} />
                 <TilingSprite
                   ref={(tileRef) => {
-                    useTick((ticker) => {
+                    onTick((ticker) => {
                       tileRef.tilePosition.x -= 1.3 * ticker.deltaTime;
                     });
                   }}

@@ -1,27 +1,26 @@
 ---
-title: useTick
-description: Solid.js hooks for subscribing and unsubscribing to the Pixi.js Ticker.
+title: onTick
+description: Solid.js hook for subscribing and unsubscribing to the Pixi.js Ticker.
 sidebar:
   order: 3
 ---
 
-## `useTick` Hook
-
-The `useTick` hook is a more focused utility for registering a callback function to be executed on every frame of the `PIXI.Application`'s ticker. The callback is automatically added when the component mounts and removed when the component or hook's owning computation is cleaned up, ensuring proper resource management.
+The `onTick` hook is a more focused utility for registering a callback function to be executed on every frame of the `PIXI.Application`'s ticker.
+The callback is automatically added when the component mounts and removed when the component or hook's owning computation is cleaned up, ensuring proper resource management.
 
 It must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication`.
 
 ### Usage
 
 ```tsx
-import { useTick, Sprite } from "pixi-solid";
+import { onTick, Sprite } from "pixi-solid";
 import { createSignal } from "solid-js";
 import * as Pixi from "pixi.js";
 
 const RotatingSpriteBySignal = (props: { texture: Pixi.Texture }) => {
   const [rotation, setRotation] = createSignal(0);
 
-  useTick((ticker) => {
+  onTick((ticker) => {
     // Set a signal every frame
     setRotation((r) => r + 0.01 * ticker.deltaTime);
   });
@@ -35,8 +34,9 @@ const RotatingSprite = (props: { texture: Pixi.Texture }) => {
       texture={props.texture}
       anchor={0.5}
       ref={(sprite) => {
-        useTick((ticker) => {
+        onTick((ticker) => {
           // Update rotation directly every frame
+          // Slightly more efficient but limited in scope
           sprite.rotation = sprite.rotation + 0.01 * ticker.deltaTime;
         });
       }}
