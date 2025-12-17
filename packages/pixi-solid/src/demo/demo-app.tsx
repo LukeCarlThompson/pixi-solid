@@ -3,11 +3,11 @@ import type { FederatedPointerEvent } from "pixi.js";
 import { Texture } from "pixi.js";
 import type { JSX } from "solid-js";
 import { createSignal } from "solid-js";
-import { PixiApplication, usePixiApp } from "../pixi-application";
+import { getPixiApp, PixiApplication } from "../pixi-application";
 import { PixiCanvas } from "../pixi-canvas";
 import { Container, Sprite, Text } from "../pixi-components";
 import { PixiStage } from "../pixi-stage";
-import { useTick } from "../use-ticker";
+import { onTick } from "../use-ticker";
 
 type FollowTextProps = {
   position: { x: number; y: number };
@@ -15,7 +15,7 @@ type FollowTextProps = {
 const FollowText = (props: FollowTextProps): JSX.Element => {
   let spriteRef: Pixi.Sprite | undefined;
 
-  useTick((ticker) => {
+  onTick((ticker) => {
     if (!spriteRef) return;
 
     spriteRef.angle += ticker.deltaTime;
@@ -29,13 +29,7 @@ const FollowText = (props: FollowTextProps): JSX.Element => {
       }}
     >
       <Text text="Hello World" anchor={{ x: 0.5, y: 0.5 }} style={{ fill: "white" }} />
-      <Sprite
-        ref={spriteRef}
-        anchor={{ x: 0.5, y: 0.5 }}
-        texture={Texture.WHITE}
-        scale={100}
-        tint={"#ff0000"}
-      />
+      <Sprite ref={spriteRef} anchor={{ x: 0.5, y: 0.5 }} texture={Texture.WHITE} scale={100} tint={"#ff0000"} />
       <Sprite ref={spriteRef} texture={Texture.WHITE} scale={100} tint={"#00ff00"}></Sprite>
     </Container>
   );
@@ -43,9 +37,9 @@ const FollowText = (props: FollowTextProps): JSX.Element => {
 
 const CenteredText = (props: { text: string }): JSX.Element => {
   let textRef: Pixi.Text | undefined;
-  const app = usePixiApp();
+  const app = getPixiApp();
 
-  useTick(() => {
+  onTick(() => {
     if (!textRef || !textRef.parent) return;
 
     textRef.position.set(app.renderer.width / 2, app.renderer.height / 2);

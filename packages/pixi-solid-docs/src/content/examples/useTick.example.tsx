@@ -1,11 +1,11 @@
 import type * as Pixi from "pixi.js";
 import { Texture } from "pixi.js";
-import { Sprite, useTick } from "pixi-solid";
+import { onTick, Sprite } from "pixi-solid";
 
-export const UseTickExample = () => {
+export const OnTickExample = () => {
   let spriteRef: Pixi.Sprite | undefined;
 
-  useTick((ticker) => {
+  onTick((ticker) => {
     if (spriteRef) {
       spriteRef.rotation += 0.01 * ticker.deltaTime;
     }

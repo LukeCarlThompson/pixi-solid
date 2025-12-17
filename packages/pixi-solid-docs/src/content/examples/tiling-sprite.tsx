@@ -1,12 +1,12 @@
-import { TilingSprite, useTick } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
+import { onTick, TilingSprite } from "pixi-solid";
 import { createResource, Show } from "solid-js";
 
 export const Ground = () => {
   let tileRef: Pixi.TilingSprite | undefined;
 
-  useTick((ticker) => {
+  onTick((ticker) => {
     if (!tileRef) return;
 
     tileRef.tilePosition.x -= 6 * ticker.deltaTime;

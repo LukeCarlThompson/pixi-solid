@@ -1,20 +1,20 @@
 ---
-title: useResize
+title: onResize
 description: A Solid.js hook that runs a callback function whenever the PixiJS renderer is resized.
 sidebar:
   order: 5
 ---
 
-The `useResize` hook provides a convenient way to react to changes in the Pixi.js renderer's dimensions. It executes a specified callback function whenever the renderer's screen size is updated, which occurs when the browser window is resized or when the HTML element containing the PixiCanvas changes dimensions.
+The `onResize` hook provides a convenient way to react to changes in the Pixi.js renderer's dimensions. It executes a specified callback function whenever the renderer's screen size is updated, which occurs when the browser window is resized or when the HTML element containing the PixiCanvas changes dimensions.
 
 This hook must be called from a component that is a descendant of the `<PixiApplication />` component. If used outside of this context, it will throw an error.
 
 ## Usage
 
-The `useResize` hook takes a single argument: a `resizeCallback` function. This callback receives a `Pixi.Rectangle` object, which contains the current `width`, `height`, `x`, and `y` of the renderer's screen. The callback is invoked immediately upon the hook's initialization and then again every time the renderer detects a resize event.
+The `onResize` hook takes a single argument: a `resizeCallback` function. This callback receives a `Pixi.Rectangle` object, which contains the current `width`, `height`, `x`, and `y` of the renderer's screen. The callback is invoked immediately upon the hook's initialization and then again every time the renderer detects a resize event.
 
 ```tsx
-import { useResize, PixiApplication, PixiCanvas, PixiStage, Text } from "pixi-solid";
+import { onResize, PixiApplication, PixiCanvas, PixiStage, Text } from "pixi-solid";
 import { createSignal } from "solid-js";
 import type * as Pixi from "pixi.js";
 
@@ -22,7 +22,7 @@ const MyResponsiveComponent = () => {
   const [rendererWidth, setRendererWidth] = createSignal(0);
   const [rendererHeight, setRendererHeight] = createSignal(0);
 
-  useResize((screen: Pixi.Rectangle) => {
+  onResize((screen: Pixi.Rectangle) => {
     setRendererWidth(screen.width);
     setRendererHeight(screen.height);
     console.log("Renderer resized to:", screen.width, "x", screen.height);

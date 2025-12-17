@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { PixiApplication, PixiCanvas, PixiStage, Text, usePixiApp, useTick } from "pixi-solid";
+import { getPixiApp, onTick, PixiApplication, PixiCanvas, PixiStage, Text } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, createSignal, Show } from "solid-js";
 import { Sky } from "./pass-through-props";
@@ -43,8 +43,8 @@ export const DemoApp = () => {
               flyingSpeed={flyingSpeed()}
               tint={"#fff0a6"}
               ref={(component) => {
-                const app = usePixiApp();
-                useTick(() => {
+                const app = getPixiApp();
+                onTick(() => {
                   objectFit(component, app.renderer, "cover");
                 });
               }}

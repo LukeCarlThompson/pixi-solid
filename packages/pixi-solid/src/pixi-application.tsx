@@ -13,10 +13,10 @@ const TickerContext = createContext<Ticker>();
  * @returns The PIXI.Application instance provided by the `PixiApplication` component.
  * @throws Will throw an error if used outside of a `PixiApplication` context provider.
  */
-export const usePixiApp = () => {
+export const getPixiApp = () => {
   const app = useContext(PixiAppContext);
   if (!app) {
-    throw new Error("usePixiApp must be used within a PixiApplication");
+    throw new Error("getPixiApp must be used within a PixiApplication");
   }
   return app;
 };
@@ -34,7 +34,7 @@ export type PixiApplicationProps = Partial<Omit<ApplicationOptions, "children" |
 /**
  * A SolidJS component that creates and manages a PIXI.Application instance.
  * It provides the application instance through context to be used by child components
- * and custom hooks like `usePixiApp`, `useTick`, and `useTicker`.
+ * and custom hooks like `getPixiApp`, `onTick`, and `getTicker`.
  *
  * This component should only be used once in your application.
  *
@@ -93,7 +93,7 @@ export type TickerProviderProps = ParentProps<{ ticker: Ticker }>;
 
 /**
  * This is only required if you want a ticker without the Application.
- * It provides context for the `useTick` and `useTicker` hooks so we can run tests that use them without having to instantate a Pixi Application.
+ * It provides context for the `onTick` and `getTicker` hooks so we can run tests that use them without having to instantate a Pixi Application.
  *
  * You need to pass in the ticker instance you want to use so it can be manually controled form the outside for testing.
  */
@@ -102,7 +102,7 @@ export const TickerProvider = (props: TickerProviderProps) => {
 };
 
 /**
- * useTicker
+ * getTicker
  *
  * A custom SolidJS hook that provides access to the PIXI.Application's shared Ticker instance.
  * This hook must be called from a component that is a descendant of `PixiApplication`.
@@ -111,16 +111,16 @@ export const TickerProvider = (props: TickerProviderProps) => {
  * @returns The PIXI.Ticker instance from the application context.
  * @throws Will throw an error if used outside of a `PixiApplication` or `TickerProvider` context.
  */
-export const useTicker = (): Ticker => {
+export const getTicker = (): Ticker => {
   const ticker = useContext(TickerContext);
   if (!ticker) {
-    throw new Error("useTicker must be used within a PixiApplication or a TickerProvider");
+    throw new Error("getTicker must be used within a PixiApplication or a TickerProvider");
   }
   return ticker;
 };
 
 /**
- * useTick
+ * onTick
  *
  * A custom SolidJS hook that registers a callback function to be executed on every frame
  * of the PIXI.Application's ticker. The callback is automatically removed when the
@@ -133,11 +133,11 @@ export const useTicker = (): Ticker => {
  * the `PIXI.Ticker` instance as its argument.
  *
  */
-export const useTick = (tickerCallback: TickerCallback<Ticker>): void => {
+export const onTick = (tickerCallback: TickerCallback<Ticker>): void => {
   const ticker = useContext(TickerContext);
 
   if (!ticker) {
-    throw new Error("useTick must be used within a PixiApplication or a TickerProvider");
+    throw new Error("onTick must be used within a PixiApplication or a TickerProvider");
   }
 
   ticker.add(tickerCallback);
@@ -165,11 +165,11 @@ export const useTick = (tickerCallback: TickerCallback<Ticker>): void => {
  * @note It will not resolve or fire the callback if the ticker is paused or stopped.
  *
  */
-export const useDelay = async (delayMs: number, callback?: () => void): Promise<void> => {
+export const delay = async (delayMs: number, callback?: () => void): Promise<void> => {
   const ticker = useContext(TickerContext);
 
   if (!ticker) {
-    throw new Error("useDelay must be used within a PixiApplication or a TickerProvider");
+    throw new Error("delay must be used within a PixiApplication or a TickerProvider");
   }
 
   let timeDelayed = 0;
