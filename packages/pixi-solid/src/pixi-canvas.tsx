@@ -1,6 +1,6 @@
 import type { JSX } from "solid-js";
 import { createRenderEffect, onCleanup, onMount } from "solid-js";
-import { usePixiApp } from "./pixi-application";
+import { getPixiApp } from "./pixi-application";
 
 /**
  * PixiCanvas
@@ -22,7 +22,7 @@ export const PixiCanvas = (props: {
 }): JSX.Element => {
   let canvasWrapElement: HTMLDivElement | undefined;
 
-  const pixiApp = usePixiApp();
+  const pixiApp = getPixiApp();
   pixiApp.canvas.style.display = "block";
   pixiApp.canvas.style.position = "absolute";
   pixiApp.canvas.style.top = "0";

@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { AnimatedSprite, PixiApplication, PixiCanvas, PixiStage, Sprite, TilingSprite, useTick } from "pixi-solid";
+import { AnimatedSprite, onTick, PixiApplication, PixiCanvas, PixiStage, Sprite, TilingSprite } from "pixi-solid";
 import { createResource, Show } from "solid-js";
 
 export const DemoApp = () => {
@@ -32,7 +32,7 @@ export const DemoApp = () => {
               <Sprite texture={textures().skyTexture} position={{ x: 0, y: -50 }} scale={3.6} />
               <TilingSprite
                 ref={(tileRef) => {
-                  useTick((ticker) => {
+                  onTick((ticker) => {
                     tileRef.tilePosition.x -= 6 * ticker.deltaTime;
                   });
                 }}

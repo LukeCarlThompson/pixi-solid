@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Particle, Texture } from "pixi.js";
-import { ParticleContainer, useTick } from "pixi-solid";
+import { onTick, ParticleContainer } from "pixi-solid";
 import { onMount } from "solid-js";
 
 export const MyParticleContainerComponent = () => {
@@ -17,11 +17,11 @@ export const MyParticleContainerComponent = () => {
         y: Math.random() * 600,
         anchorX: 0.5,
         anchorY: 0.5,
-      }),
+      })
   );
 
-  // Update the particles imperatively in a useTick hook
-  useTick((ticker) => {
+  // Update the particles imperatively in a onTick hook
+  onTick((ticker) => {
     particles.forEach((particle) => {
       particle.rotation += 0.01 * ticker.deltaTime;
       particle.x = Math.sin(particle.rotation) * 100 + 400;

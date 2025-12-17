@@ -1,11 +1,11 @@
 ---
-title: usePixiApp
+title: getPixiApp
 description: A Solid.js hook to access the root PIXI.Application instance.
 sidebar:
   order: 1
 ---
 
-The `usePixiApp` hook provides a way to access the root `PIXI.Application` instance created by the `<PixiApplication />` component.
+The `getPixiApp` hook provides a way to access the root `PIXI.Application` instance created by the `<PixiApplication />` component.
 This is useful when you need to interact directly with the Pixi.js application, for example, to access the renderer.
 
 ## Usage
@@ -14,11 +14,11 @@ This hook must be called from a component that is a descendant of the `<PixiAppl
 If used outside of this context, it will throw an error.
 
 ```tsx
-import { usePixiApp, Container } from "pixi-solid";
+import { getPixiApp, Container } from "pixi-solid";
 import { createEffect } from "solid-js";
 
 const MyComponent = () => {
-  const app = usePixiApp();
+  const app = getPixiApp();
 
   createEffect(() => {
     // You can now safely use the Pixi.js Application instance

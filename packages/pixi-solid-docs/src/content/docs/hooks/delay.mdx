@@ -1,13 +1,11 @@
 ---
-title: useDelay
+title: delay
 description: A Solid.js hook for creating delay's in sync with the Pixi.js Ticker.
 sidebar:
   order: 4
 ---
 
-## `useDelay` Hook
-
-The `useDelay` hook provides a way to delay execution for a specified number of milliseconds of ticker time.
+The `delay` hook provides a way to delay execution for a specified number of milliseconds of ticker time.
 
 It ensures that the delay is in sync with the ticker's time units, making it ideal for animations or syncing with other actions based on ticker time.
 
@@ -18,11 +16,11 @@ This hook must be called within a SolidJS tracking scope, such as a component or
 ### Usage
 
 ```tsx
-import { useDelay, Text } from "pixi-solid";
+import { delay, Text } from "pixi-solid";
 
 const DelayedActionComponent = () => {
   const handlePointerDown = async () => {
-    await useDelay(2000);
+    await delay(2000);
     console.log("2 seconds have passed!");
   };
 
@@ -31,7 +29,7 @@ const DelayedActionComponent = () => {
 
 const DelayedCallbackComponent = () => {
   const handlePointerDown = () => {
-    useDelay(1000, () => {
+    delay(1000, () => {
       console.log("1 second has passed!");
     });
   };

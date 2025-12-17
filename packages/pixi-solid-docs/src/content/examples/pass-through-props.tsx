@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { AnimatedSprite, Container, Sprite, useTick } from "pixi-solid";
+import { AnimatedSprite, Container, onTick, Sprite } from "pixi-solid";
 import type { Ref } from "solid-js";
 import { splitProps } from "solid-js";
 
@@ -35,7 +35,7 @@ export const Sky = (props: SkyProps) => {
         ref={(bird) => {
           bird.play();
           let time = 0;
-          useTick((ticker) => {
+          onTick((ticker) => {
             time = time + ticker.deltaTime * props.flyingSpeed;
             bird.position.x = Math.sin(time / 90) * 20 + 60;
             bird.position.y = Math.cos(time / 30) * 25 + 30;
