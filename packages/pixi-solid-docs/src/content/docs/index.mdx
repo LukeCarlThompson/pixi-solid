@@ -1,7 +1,7 @@
 ---
 title: Pixi Solid
-description: Docs and examples for Pixi Solid.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+description: Docs and examples for pixi-solid.
+template: splash
 hero:
   tagline: PixiJS and SolidJS. A excellent combination for high performance interactive 2D graphics on the web.
   image:
@@ -16,32 +16,48 @@ import { Card, CardGrid, Code, Tabs, TabItem } from "@astrojs/starlight/componen
 import demoCode from "../examples/home-page.demo.tsx?raw";
 import { ClientOnly } from "../examples/client-only";
 
-### Overview?
+### Features
 
-Pixi Solid is a library that provides [SolidJS](https://docs.solidjs.com/) components and hooks for working with [PixiJS](https://pixijs.com/), a popular 2D rendering engine for the web.
+Pixi Solid is a library that provides [SolidJS](https://docs.solidjs.com/) components and hooks for working with [PixiJS](https://pixijs.com/).
 
-All that's needed to get started is a basic understanding of both SolidJS and PixiJS.
-If you're new to either library, be sure to check out their respective documentation to get up to speed.
+- 💙 Lightweight and flexible SolidJS library for creating PixiJS applications.
+- 🎁 Provides a set of custom SolidJS components that create PixiJS objects instead of HTML elements.
+- 📦 Supports all PixiJS objects, such as Filter, Container, Sprite, Graphics, Text, etc.
+- 🧑‍💻 The convenience and speed of SolidJS stores and signals to manage state.
+- ✨ All events emitted by PixiJS objects are supported.
+- 😎 No limitations. Break out of SolidJS any time and interact directly with PixiJS.
+- 💫 Useful helper utilities included.
+- 🤩 Full Typescript support for type safety and auto completion.
+
+---
+
+### Install
 
 ```bash
 npm i pixi-solid
 ```
 
-### Why use it?
+---
 
-- **SolidJS integration**: Pixi Solid provides a set of SolidJS components and hooks that make it easy to work with PixiJS in a SolidJS application.
+### Why combine SolidJS with PixiJS?
 
-- **HTML and PixiJS together**: Pixi Solid makes it easy to use HTML elements alongside a PixiJS canvas, allowing you to create rich user interfaces that combine the strengths of both technologies.
+- **Declerative PixiJS scene graph**: Using SolidJS's JSX templating means we get declerative control over the scene graph. No longer necessary to imperatively add and remove children.
+
+- **Lifecycle hooks in our PixiJS components**: SolidJS rendering PixiJS components means we can take advantage of the built in lifecycle methods in SolidJS `onMount` and `onCleanup` as well as few extra custom hooks so we can automatically subscribe and unsubscribe from the ticker.
 
 - **Shared State and Reactivity**: Pixi Solid leverages SolidJS's reactivity system to automatically update PixiJS components when SolidJS signals or stores change. So your HTML and PixiJS graphics can stay in sync effortlessly.
 
-- **Declarative syntax**: Pixi Solid allows you to use a declarative syntax to define your PixiJS scenes, making it easier to read and maintain your code.
+- **Combine the best of both worlds**: Pixi Solid makes it easy to use HTML elements alongside a PixiJS canvas, allowing you to create rich user interfaces that combine the strengths of both technologies.
 
-- **Composability**: Pixi Solid components can be easily composed together to create complex scenes and animations.
+- **Composability**: Pixi Solid components can be easily composed together to create complex scenes and animations out of reusable components.
 
-- **Freedom to use all PixiJS features**: While Pixi Solid provides a high-level abstraction over PixiJS, it doesn't limit your ability to use low level PixiJS features to create custom PixiJS components and wrap into a SolidJS component for composability and reusability.
+- **SolidJS is a thin wrapper**: While Pixi Solid provides a nice abstraction over PixiJS it provides access to all the properties and events of PixiJS objects.
 
-- **TypeScript support**: Pixi Solid is written in TypeScript and provides type definitions for all components and hooks, making it easy to use in TypeScript projects.
+- **SolidJS is really fast**: SolidJs is on of the fatsest front0end frameworks out there so the overhead is very minimal.
+
+- **SolidJS is fully featured**: It has stores, signals, suspense, error boundaries, resource fetching and more. It's a great feature set for simple of complex applications and you won't have to reach for other libraries to manage templating or state.
+
+---
 
 ### Demo
 
