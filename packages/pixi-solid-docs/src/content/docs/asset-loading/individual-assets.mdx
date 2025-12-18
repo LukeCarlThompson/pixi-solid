@@ -5,13 +5,7 @@ sidebar:
   order: 1
 ---
 
-When building a Pixi.js application with `pixi-solid`, you often need to load assets like images, spritesheets, or fonts. Solid.js's `createResource` function provides an excellent way to handle asynchronous data loading, including assets, while integrating seamlessly with Solid's reactivity system.
-
-This guide demonstrates how to load individual assets using `createResource` and Pixi.js's `Assets` manager.
-
-## Using `createResource` for Individual Assets
-
-The `createResource` function in Solid.js is ideal for fetching data that might take some time to load. By integrating it with Pixi.js's `Assets.load()`, you can easily manage the loading state of your textures and other assets.
+Solid.js's `createResource` function provides an excellent way to handle asynchronous data loading and we can pair it very simply with the PixiJS `Assets` class.
 
 ### Example: Loading a Single Image
 
@@ -34,7 +28,7 @@ export const IndividualAssetLoadingDemo = () => {
   });
 
   return (
-    <PixiApplication background={0x1099bb}>
+    <PixiApplication>
       <PixiCanvas>
         {/* Use the <Show> component to render the Sprite only when the asset is loaded */}
         <Show when={backgroundImage()}>
@@ -50,17 +44,7 @@ export const IndividualAssetLoadingDemo = () => {
 };
 ```
 
-**Explanation:**
-
-1.  **`createResource(async () => { ... })`**: We wrap the asset loading logic inside an `async` function passed to `createResource`.
-2.  **`Assets.init()`**: It's good practice to ensure the `Assets` manager is initialized but we only need to do this once per application.
-3.  **`Assets.load<Pixi.Texture>("/background.png")`**: This loads the specified image file and returns a `Promise` that resolves with the `Pixi.Texture` object.
-4.  **`[backgroundImage]`**: `createResource` returns a signal-like tuple. `backgroundImage` will be `undefined` initially, then a `Promise`, and finally the loaded `Pixi.Texture`.
-5.  **`<Show when={backgroundImage()}> ... </Show>`**: The `Show` component from Solid.js is used to conditionally render the `Sprite` only when `backgroundImage()` evaluates to a truthy value (i.e., when the texture has finished loading). The loaded `texture` is then passed to the `Sprite` component.
-
-This approach ensures that your Pixi.js components only try to render assets once they are fully loaded.
-
-## Further reading
+### Further reading
 
 - Read more about [Solid.js `createResource`](https://docs.solidjs.com/reference/basic-reactivity/create-resource) in the SolidJS documentation.
 - Explore the [Pixi.js Assets Management](https://pixijs.com/8.x/guides/components/assets) docs for more details on the Pixi Assets class.
