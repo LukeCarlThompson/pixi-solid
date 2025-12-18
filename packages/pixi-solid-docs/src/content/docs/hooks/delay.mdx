@@ -7,9 +7,9 @@ sidebar:
 
 The `delay` hook provides a way to delay execution for a specified number of milliseconds of ticker time.
 
-It ensures that the delay is in sync with the ticker's time units, making it ideal for animations or syncing with other actions based on ticker time.
+It ensures that the delay is in sync with the shared ticker's time units, making it ideal for animations or syncing with other actions based on ticker time.
 
-The delay is synchronized with the ticker, so it will not progress if the ticker is paused or stopped.
+The delay is synchronized with the shared ticker, so it will not progress if the ticker is paused or stopped.
 
 This hook must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication` or `TickerProvider`.
 

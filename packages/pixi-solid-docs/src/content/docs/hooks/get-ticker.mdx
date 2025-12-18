@@ -5,13 +5,11 @@ sidebar:
   order: 2
 ---
 
-The `pixi-solid` library provides two hooks, `getTicker` and `onTick`, to interact with the Pixi.js `Ticker` instance. The `Ticker` is responsible for driving the animation loop in a Pixi.js application, making it essential for any dynamic or animated content.
+The `pixi-solid` library provides two hooks, `getTicker` and `onTick`, to interact with the Pixi.js `Ticker` instance.
 
-Both hooks must be called from a component that is a descendant of the `<PixiApplication />`component. If used outside of this context, they will throw an error.
-
-## `getTicker` Hook
-
-The `getTicker` hook provides direct access to the `PIXI.Application`'s shared `Ticker` instance. This is useful when you need more control over the ticker, such as pausing, starting, or adjusting its speed globally.
+The `getTicker` hook provides direct access to the `PIXI.Application`'s shared `Ticker` instance.
+This is useful when you need more control over the ticker, such as pausing, starting, or adjusting its speed globally.
+The hook must be called from a component that is a descendant of the `<PixiApplication />`component.
 
 ### Usage
 
