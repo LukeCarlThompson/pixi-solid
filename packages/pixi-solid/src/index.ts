@@ -1,3 +1,4 @@
+export { onResize } from "./on-resize";
 export type { PixiApplicationProps } from "./pixi-application";
 export {
   delay,
@@ -30,4 +31,3 @@ export type { PixiEventHandlerMap } from "./pixi-events";
 export { PIXI_EVENT_NAMES, PIXI_SOLID_EVENT_HANDLER_NAMES } from "./pixi-events";
 export type { PixiStageProps } from "./pixi-stage";
 export { PixiStage } from "./pixi-stage";
-export { onResize } from "./use-resize";
