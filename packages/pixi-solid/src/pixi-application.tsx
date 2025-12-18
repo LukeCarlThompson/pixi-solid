@@ -1,10 +1,10 @@
-import type { ApplicationOptions, Ticker, TickerCallback } from "pixi.js";
-import { Application } from "pixi.js";
+import type { ApplicationOptions, TickerCallback } from "pixi.js";
+import { Application, Ticker } from "pixi.js";
 import type { JSX, ParentProps, Ref } from "solid-js";
 import { createContext, createEffect, createResource, onCleanup, Show, splitProps, useContext } from "solid-js";
 
 const PixiAppContext = createContext<Application>();
-const TickerContext = createContext<Ticker>();
+const TickerContext = createContext<Ticker>(Ticker.shared);
 
 /**
  * A custom SolidJS hook to access the root PIXI.Application instance.
@@ -147,9 +147,9 @@ export const onTick = (tickerCallback: TickerCallback<Ticker>): void => {
 };
 
 /**
- * Delay until a given number of milliseconds has passed on the application ticker.
+ * Delay until a given number of milliseconds has passed on the shared ticker.
  *
- * It is guaranteed to be in sync with the ticker and uses accumulated deltaMs not an external time measurement.
+ * It is guaranteed to be in sync with the shared ticker and uses accumulated deltaMs not an external time measurement.
  *
  * Simply await for it to resolve if in an async context or pass in a callback function.
  * It's not recommended to use both techniques at once.

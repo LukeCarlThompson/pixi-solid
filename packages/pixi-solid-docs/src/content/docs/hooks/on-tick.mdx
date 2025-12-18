@@ -6,7 +6,7 @@ sidebar:
 ---
 
 The `onTick` hook is a more focused utility for registering a callback function to be executed on every frame of the `PIXI.Application`'s ticker.
-The callback is automatically added when the component mounts and removed when the component or hook's owning computation is cleaned up, ensuring proper resource management.
+The callback is automatically added to the ticker when it first runs and removed when the hook's owning scope is cleaned up, ensuring proper resource management.
 
 It must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication`.
 
