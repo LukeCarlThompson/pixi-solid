@@ -3,7 +3,7 @@ title: Pixi Solid
 description: Docs and examples for pixi-solid.
 template: splash
 hero:
-  tagline: PixiJS and SolidJS. A excellent combination for high performance interactive 2D graphics on the web.
+  tagline: PixiJS and SolidJS. An excellent combination for high performance interactive 2D graphics on the web.
   image:
     file: ../../assets/pixi-solid-logo.png
   actions:
@@ -34,14 +34,23 @@ Pixi Solid is a library that provides [SolidJS](https://docs.solidjs.com/) compo
 ### Install
 
 ```bash
-npm i pixi-solid
+npm i pixi-solid pixi.js solid-js
+```
+
+Peer dependencies of
+
+```json
+{
+  "pixi.js": "^8.14.3",
+  "solid-js": "^1.9.10"
+}
 ```
 
 ---
 
 ### Why combine SolidJS with PixiJS?
 
-- **Declerative PixiJS scene graph**: Using SolidJS's JSX templating means we get declerative control over the scene graph. No longer necessary to imperatively add and remove children.
+- **Declarative PixiJS scene graph**: Using SolidJS's JSX templating means we get declarative control over the scene graph. No longer necessary to imperatively add and remove children.
 
 - **Lifecycle hooks in our PixiJS components**: SolidJS rendering PixiJS components means we can take advantage of the built in lifecycle methods in SolidJS `onMount` and `onCleanup` as well as few extra custom hooks so we can automatically subscribe and unsubscribe from the ticker.
 
@@ -53,9 +62,9 @@ npm i pixi-solid
 
 - **SolidJS is a thin wrapper**: While Pixi Solid provides a nice abstraction over PixiJS it provides access to all the properties and events of PixiJS objects.
 
-- **SolidJS is really fast**: SolidJs is on of the fatsest front0end frameworks out there so the overhead is very minimal.
+- **SolidJS is really fast**: SolidJs is on of the fatsest front-end frameworks out there so the overhead is very minimal.
 
-- **SolidJS is fully featured**: It has stores, signals, suspense, error boundaries, resource fetching and more. It's a great feature set for simple of complex applications and you won't have to reach for other libraries to manage templating or state.
+- **SolidJS is fully featured**: It has stores, signals, suspense, error boundaries, resource fetching and more. It's a great feature set for simple or complex applications and you won't have to reach for other libraries to manage templating or state.
 
 ---
 
