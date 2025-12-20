@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   publish:
-    environment: npm_publish
+    environment: npm-publish
     runs-on: ubuntu-latest
     defaults:
       run:
