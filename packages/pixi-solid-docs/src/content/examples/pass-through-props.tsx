@@ -5,7 +5,8 @@ import type { Ref } from "solid-js";
 import { splitProps } from "solid-js";
 
 // Using the Pixi ContainerOptions type to allow passing through any ContainerOptions props as well as adding a ref type to forward the ref to an internal Container.
-export type SkyProps = Pixi.ContainerOptions & {
+// We omit the `children` prop because the Pixi `children` prop clashes with the `children` prop needed for our JSX.
+export type SkyProps = Omit<Pixi.ContainerOptions, "children"> & {
   ref?: Ref<Pixi.Container>;
   flyingSpeed: number;
 };

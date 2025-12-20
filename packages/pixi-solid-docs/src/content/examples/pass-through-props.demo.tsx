@@ -35,7 +35,7 @@ export const DemoApp = () => {
   };
   return (
     <PixiApplication background="#1099bb">
-      <PixiCanvas>
+      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
         <Show when={texturesResource()}>
           <PixiStage onglobalpointermove={handlePointerMove} eventMode="static">
             {/* Here on our `Sky` custom component we can also set any valid ContainerOptions and they will be passed through to the underlying Container */}
