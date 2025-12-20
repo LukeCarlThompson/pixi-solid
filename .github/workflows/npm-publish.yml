@@ -2,7 +2,6 @@ name: Publish pixi-solid package to NPM (pnpm + NPM_TOKEN)
 
 on:
   release:
-    types: [created, published, prereleased]
   workflow_dispatch:
 
 permissions:
@@ -44,7 +43,7 @@ jobs:
 
       - name: Verify auth (safe debug)
         run: npm whoami --registry=https://registry.npmjs.org/ || true
-        
+
       - name: Publish (dry-run while testing)
         if: github.event.release.prerelease == false
         run: pnpm publish --access public --dry-run
