@@ -1,21 +1,21 @@
 ---
 title: Render Container
-description: A reference page in my new Starlight docs site.
+description: A SolidJS component that renders a PixiJS RenderContainer.
 ---
 
 import { Code } from "@astrojs/starlight/components";
 import { Tabs, TabItem } from "@astrojs/starlight/components";
-import demoCode from "../../examples/sprite.demo.tsx?raw";
+import demoCode from "../../examples/render-container.demo.tsx?raw";
 import { ClientOnly } from "../../examples/client-only";
+
+A SolidJS component that renders a PixiJS `RenderContainer`.
+
+Please see the [PixiJS docs](https://pixijs.download/release/docs/scene.RenderContainer.html) for detailed information.
 
 ### Demo
 
-<ClientOnly fileName="sprite" client:only="solid-js" />
+<ClientOnly fileName="render-container" client:only="solid-js" />
 
 ### Code example
 
-<Tabs>
-  <TabItem label="sprite-demo.tsx">
-    <Code code={demoCode} lang="tsx" />
-  </TabItem>
-</Tabs>
+<Code code={demoCode} lang="tsx" title="render-container-demo.tsx" />
