@@ -54,6 +54,11 @@ jobs:
             echo "published=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Warn and skip publish if version already exists
+        if: steps.check_published.outputs.published == 'true'
+        run: |
+          echo "::warning::Package ${{ steps.check_published.outputs.name }}@${{ steps.check_published.outputs.version }} is already published to npm. Publish will be skipped."
+
       - name: Configure npm auth for pnpm
         if: steps.check_published.outputs.published == 'false'
         run: printf "//registry.npmjs.org/:_authToken=%s\n" "${{ secrets.NPM_TOKEN }}" > ~/.npmrc
