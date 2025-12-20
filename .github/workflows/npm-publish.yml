@@ -44,12 +44,11 @@ jobs:
       - name: Check if version is already published
         id: check_published
         run: |
-          pkg_path=packages/pixi-solid
-          pkg_name=$(node -e "console.log(require('./$pkg_path/package.json').name)")
-          pkg_version=$(node -e "console.log(require('./$pkg_path/package.json').version)")
+          pkg_name=$(node -e "console.log(require('./package.json').name)")
+          pkg_version=$(node -e "console.log(require('./package.json').version)")
           echo "name=$pkg_name" >> $GITHUB_OUTPUT
           echo "version=$pkg_version" >> $GITHUB_OUTPUT
-          if npm view "$pkg_name@$pkg_version" >/dev/null 2>&1; then
+          if npm view "$pkg_name@$pkg_version" --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
             echo "published=true" >> $GITHUB_OUTPUT
           else
             echo "published=false" >> $GITHUB_OUTPUT
