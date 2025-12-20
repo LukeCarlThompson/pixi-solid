@@ -5,13 +5,6 @@ A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your sce
 [![NPM Version](https://img.shields.io/npm/v/pixi-solid.svg)](https://www.npmjs.com/package/pixi-solid)
 [![License](https://img.shields.io/npm/l/pixi-solid.svg)](https://github.com/your-username/pixi-solid/blob/main/LICENSE)
 
-## Why Pixi-Solid?
-
-`pixi-solid` combines the power of two amazing libraries:
-
-- **PixiJS:** A fast, lightweight, and powerful 2D rendering library.
-- **SolidJS:** A declarative, performant, and reactive JavaScript library for building user interfaces.
-
 - 💙 Lightweight and flexible SolidJS library for creating PixiJS applications.
 - 🎁 Provides a set of custom SolidJS components that create PixiJS objects instead of HTML elements.
 - 📦 Supports all PixiJS objects, such as Filter, Container, Sprite, Graphics, Text, etc.
