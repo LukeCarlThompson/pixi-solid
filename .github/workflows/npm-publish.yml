@@ -15,7 +15,6 @@ permissions:
 
 jobs:
   publish:
-    environment: npm-publish
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -33,6 +32,14 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Verify NPM_TOKEN present (debug)
+        run: |
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "NPM_TOKEN is empty — check environment secrets and job.environment"
+            exit 1
+          fi
+          echo "NPM_TOKEN is present"
 
       - name: Run tests
         run: pnpm test
