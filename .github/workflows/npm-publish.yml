@@ -37,9 +37,6 @@ jobs:
       - name: Run tests
         run: pnpm test
 
-      - name: Build package
-        run: pnpm build
-
       - name: Configure npm auth for pnpm
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
