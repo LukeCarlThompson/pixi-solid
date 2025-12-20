@@ -1,7 +1,13 @@
-name: Publish pixi-solid package to NPM (pnpm + NPM_TOKEN)
+# Publish pixi-solid to npm (pnpm). Skips publish if the package version is already published.
+# Triggers:
+#  - push to main (real publish)
+#  - manual run (workflow_dispatch) — does a dry-run by default
+name: Publish pixi-solid
 
 on:
-  release:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -14,9 +20,11 @@ jobs:
       run:
         working-directory: packages/pixi-solid
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
@@ -27,23 +35,38 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify NPM_TOKEN present (debug)
-        run: |
-          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
-            echo "NPM_TOKEN is empty — check environment secrets and job.environment"
-            exit 1
-          fi
-          echo "NPM_TOKEN is present"
+      - name: Build
+        run: pnpm build
 
-      - name: Run tests
+      - name: Test
         run: pnpm test
 
+      - name: Check if version is already published
+        id: check_published
+        run: |
+          pkg_path=packages/pixi-solid
+          pkg_name=$(node -e "console.log(require('./$pkg_path/package.json').name)")
+          pkg_version=$(node -e "console.log(require('./$pkg_path/package.json').version)")
+          echo "name=$pkg_name" >> $GITHUB_OUTPUT
+          echo "version=$pkg_version" >> $GITHUB_OUTPUT
+          if npm view "$pkg_name@$pkg_version" >/dev/null 2>&1; then
+            echo "published=true" >> $GITHUB_OUTPUT
+          else
+            echo "published=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Configure npm auth for pnpm
+        if: steps.check_published.outputs.published == 'false'
         run: printf "//registry.npmjs.org/:_authToken=%s\n" "${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-      - name: Verify auth (safe debug)
+      - name: Verify npm auth (safe)
+        if: steps.check_published.outputs.published == 'false'
         run: npm whoami --registry=https://registry.npmjs.org/ || true
 
-      - name: Publish (dry-run while testing)
-        if: github.event.release.prerelease == false
+      - name: Publish (dry-run for manual runs)
+        if: github.event_name == 'workflow_dispatch' && steps.check_published.outputs.published == 'false'
         run: pnpm publish --access public --dry-run
+
+      - name: Publish (real on push to main)
+        if: github.event_name == 'push' && steps.check_published.outputs.published == 'false'
+        run: pnpm publish --access public
