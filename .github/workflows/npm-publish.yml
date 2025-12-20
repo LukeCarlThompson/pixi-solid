@@ -27,6 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
       - name: Verify NPM_TOKEN present (debug)
         run: |
           if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
@@ -34,12 +35,16 @@ jobs:
             exit 1
           fi
           echo "NPM_TOKEN is present"
+
       - name: Run tests
         run: pnpm test
+
       - name: Configure npm auth for pnpm
         run: printf "//registry.npmjs.org/:_authToken=%s\n" "${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
       - name: Verify auth (safe debug)
         run: npm whoami --registry=https://registry.npmjs.org/ || true
+        
       - name: Publish (dry-run while testing)
         if: github.event.release.prerelease == false
         run: pnpm publish --access public --dry-run
