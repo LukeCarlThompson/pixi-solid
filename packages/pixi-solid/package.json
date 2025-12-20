@@ -33,7 +33,8 @@
     "build:docs": "typedoc --options typedoc.config.js",
     "prepublishOnly": "pnpm run build",
     "preview": "vite preview",
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "test": "echo \"A dummy test\""
   },
   "peerDependencies": {
     "pixi.js": "^8.14.3",
