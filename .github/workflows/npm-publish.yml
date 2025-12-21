@@ -60,9 +60,9 @@ jobs:
       - name: Configure pnpm auth
         if: steps.check_published.outputs.published == 'false'
         run: |
-          # Use NPM_CONFIG_USERCONFIG to ensure pnpm writes to the correct .npmrc file
-          pnpm config set registry https://registry.npmjs.org/ --config "$NPM_CONFIG_USERCONFIG"
-          pnpm config set //registry.npmjs.org/:_authToken "${{ secrets.NPM_TOKEN }}" --config "$NPM_CONFIG_USERCONFIG"
+          # pnpm should automatically respect NPM_CONFIG_USERCONFIG
+          pnpm config set registry https://registry.npmjs.org/
+          pnpm config set //registry.npmjs.org/:_authToken "${{ secrets.NPM_TOKEN }}"
 
       - name: Debug .npmrc content # This step will now show the .npmrc created by pnpm config set at the correct path
         if: steps.check_published.outputs.published == 'false'
