@@ -16,6 +16,8 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,6 +56,4 @@ jobs:
       - name: Publish (real on push to main)
         if: github.event_name == 'push' && steps.check_published.outputs.published == 'false'
         run: pnpm --filter "pixi-solid" publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         
