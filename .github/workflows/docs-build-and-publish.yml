@@ -1,0 +1,60 @@
+# Build and publish pixi-solid-docs to GitHub Pages
+# - Triggers on push to main and manual runs
+# - Uses pnpm (via Corepack) to install and build
+# - Uploads the build output to the Pages artifact and deploys it
+name: Build & publish docs to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      DOCS_DIR: "packages/pixi-solid-docs"   # path to your docs project relative to repo root
+      BUILD_OUTPUT: "dist"                 # directory inside DOCS_DIR that contains the built site
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable pnpm (Corepack)
+        run: corepack enable && corepack prepare pnpm@latest --activate
+
+      - name: Install dependencies (docs)
+        run: |
+          cd $DOCS_DIR
+          pnpm install --frozen-lockfile
+
+      - name: Build docs
+        run: |
+          cd $DOCS_DIR
+          pnpm build
+
+      - name: Verify build output exists (debug)
+        run: |
+          ls -la $DOCS_DIR/$BUILD_OUTPUT
+          echo "Built files listed above."
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ${{ env.DOCS_DIR }}/${{ env.BUILD_OUTPUT }}
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
