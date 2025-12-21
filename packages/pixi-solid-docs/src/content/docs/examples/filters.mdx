@@ -4,11 +4,22 @@ description: An example of using filters in solid-pixi.
 ---
 
 import { Code } from "@astrojs/starlight/components";
-import { Tabs, TabItem } from "@astrojs/starlight/components";
-import demoCode from "../../examples/pass-through-props.demo.tsx?raw";
-import exampleCode from "../../examples/pass-through-props.tsx?raw";
+import demoCode from "../../examples/filters.demo.tsx?raw";
 import { ClientOnly } from "../../examples/client-only";
+
+To use PixiJS filters we should instantiate them directly from the PixiJS classes and then bind them to any properties we want to change with signals.
+
+Don't forget that any PixiJS classes we insantiate direcly we need to manually destory them when our component is cleaned up.
+SolidJs makes this really easy with the `onCleanup` hook.
+
+Please see the [PixiJS docs](https://pixijs.download/release/docs/filters.html) for detailed information.
 
 ### Demo
 
-WIP.
+Move your mouse left to right across the sky to adjust the strength of the blur filter.
+
+<ClientOnly fileName="filters" client:only="solid-js" />
+
+### Code example
+
+<Code code={demoCode} lang="tsx" title="filters-demo.tsx" />
