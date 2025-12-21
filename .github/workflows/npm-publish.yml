@@ -16,57 +16,32 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/pixi-solid
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+          run_install: false # Prevents auto install, we will handle it later
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
-
-      - name: Enable pnpm (Corepack)
-        run: corepack enable && corepack prepare pnpm@latest --activate
+          node-version: '20' # Or your desired version
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm' # Caches pnpm dependencies
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm --filter "pixi-solid" install --frozen-lockfile
 
       - name: Test
-        run: pnpm test
+        run: pnpm --filter "pixi-solid" test
 
       - name: Check if version is already published
         id: check_published
-        run: |
-          pkg_name=$(node -e "console.log(require('./package.json').name)")
-          pkg_version=$(node -e "console.log(require('./package.json').version)")
-          echo "name=$pkg_name" >> $GITHUB_OUTPUT
-          echo "version=$pkg_version" >> $GITHUB_OUTPUT
-          if npm view "$pkg_name@$pkg_version" --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
-            echo "published=true" >> $GITHUB_OUTPUT
-          else
-            echo "published=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Warn and skip publish if version already exists
-        if: steps.check_published.outputs.published == 'true'
-        run: |
-          echo "::warning::Package ${{ steps.check_published.outputs.name }}@${{ steps.check_published.outputs.version }} is already published to npm. Publish will be skipped."
-
-      # Add this step to explicitly configure pnpm auth
-      - name: Configure pnpm auth
-        if: steps.check_published.outputs.published == 'false'
-        run: |
-          # pnpm should automatically respect NPM_CONFIG_USERCONFIG
-          pnpm config set registry https://registry.npmjs.org/
-          pnpm config set //registry.npmjs.org/:_authToken "${{ secrets.NPM_TOKEN }}"
-
-      - name: Debug .npmrc content # This step will now show the .npmrc created by pnpm config set at the correct path
-        if: steps.check_published.outputs.published == 'false'
-        run: cat "$NPM_CONFIG_USERCONFIG" | grep "//registry.npmjs.org/:_authToken=" || echo ".npmrc line not found or token missing"
+        run: node .github/scripts/check-published-version.mjs
 
       - name: Verify npm auth (safe)
         if: steps.check_published.outputs.published == 'false'
@@ -74,8 +49,11 @@ jobs:
 
       - name: Publish (dry-run for manual runs)
         if: github.event_name == 'workflow_dispatch' && steps.check_published.outputs.published == 'false'
-        run: pnpm publish --access public --dry-run
+        run: pnpm --filter "pixi-solid" publish --access public --dry-run
 
       - name: Publish (real on push to main)
         if: github.event_name == 'push' && steps.check_published.outputs.published == 'false'
-        run: pnpm publish --access public
+        run: pnpm --filter "pixi-solid" publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        
