@@ -1,3 +1,4 @@
+export type { ContainerProps, LeafProps } from "./component-creation";
 export { onResize } from "./on-resize";
 export type { PixiApplicationProps } from "./pixi-application";
 export {
@@ -9,7 +10,6 @@ export {
   TickerProvider,
 } from "./pixi-application";
 export { PixiCanvas } from "./pixi-canvas";
-export type { ContainerProps, LeafProps } from "./pixi-components";
 export {
   AnimatedSprite,
   BitmapText,
