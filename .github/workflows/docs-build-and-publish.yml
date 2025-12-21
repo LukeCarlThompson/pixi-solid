@@ -1,7 +1,6 @@
-# Build and publish pixi-solid-docs to GitHub Pages
-# - Triggers on push to main and manual runs
-# - Uses pnpm (via Corepack) to install and build
-# - Uploads the build output to the Pages artifact and deploys it
+# Build & publish pixi-solid-docs to GitHub Pages (pnpm workspace-friendly)
+# - Runs pnpm install at the repository root so `workspace:*` deps resolve
+# - Builds the docs in packages/pixi-solid-docs and publishes the build output to GitHub Pages
 name: Build & publish docs to GitHub Pages
 
 on:
@@ -13,14 +12,13 @@ on:
 permissions:
   contents: read
   pages: write
-  id-token: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
       DOCS_DIR: "packages/pixi-solid-docs"   # path to your docs project relative to repo root
-      BUILD_OUTPUT: "dist"                 # directory inside DOCS_DIR that contains the built site
+      BUILD_OUTPUT: "dist"                  # directory inside DOCS_DIR that contains the built site
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,27 +31,31 @@ jobs:
       - name: Enable pnpm (Corepack)
         run: corepack enable && corepack prepare pnpm@latest --activate
 
-      - name: Install dependencies (docs)
-        run: |
-          cd $DOCS_DIR
-          pnpm install --frozen-lockfile
+      - name: Install workspace dependencies (root)
+        # run pnpm install from the repo root so workspace:* dependencies (like pixi-solid) are linked
+        run: pnpm install --frozen-lockfile
 
       - name: Build docs
         run: |
           cd $DOCS_DIR
           pnpm build
 
-      - name: Verify build output exists (debug)
+      - name: Verify build output exists
         run: |
+          if [ ! -d "${{ env.DOCS_DIR }}/${{ env.BUILD_OUTPUT }}" ]; then
+            echo "Build output not found: $DOCS_DIR/$BUILD_OUTPUT"
+            ls -la $DOCS_DIR || true
+            exit 1
+          fi
           ls -la $DOCS_DIR/$BUILD_OUTPUT
-          echo "Built files listed above."
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v3
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+      - name: Upload Pages artifact (use upload-artifact v4)
+        uses: actions/upload-artifact@v4
         with:
+          name: pages
           path: ${{ env.DOCS_DIR }}/${{ env.BUILD_OUTPUT }}
 
       - name: Deploy to GitHub Pages
