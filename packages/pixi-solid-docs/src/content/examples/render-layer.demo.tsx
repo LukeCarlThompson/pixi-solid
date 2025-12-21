@@ -6,7 +6,7 @@ import type { JSX } from "solid-js";
 import { createResource, onCleanup, Show, Suspense } from "solid-js";
 import birdAssetUrl from "@/assets/bird_05.png";
 import eelAssetUrl from "@/assets/eel.png";
-import runAssetUrl from "@/assets/run_3.png";
+import runAssetUrl from "@/assets/run_03.png";
 import skyAssetUrl from "@/assets/sky.png";
 
 export const DemoApp = () => {
