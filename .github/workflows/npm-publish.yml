@@ -56,13 +56,14 @@ jobs:
         run: |
           echo "::warning::Package ${{ steps.check_published.outputs.name }}@${{ steps.check_published.outputs.version }} is already published to npm. Publish will be skipped."
 
-      - name: Configure npm auth for pnpm
-        if: steps.check_published.outputs.published == 'false'
-        run: printf "//registry.npmjs.org/:_authToken=%s\n" "${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+      # REMOVE this step:
+      # - name: Configure npm auth for pnpm
+      #   if: steps.check_published.outputs.published == 'false'
+      #   run: printf "//registry.npmjs.org/:_authToken=%s\n" "${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-      - name: Debug .npmrc content
+      - name: Debug .npmrc content # This step will now show the .npmrc created by setup-node
         if: steps.check_published.outputs.published == 'false'
-        run: cat ~/.npmrc | grep "//registry.npmjs.org/:_authToken=" || echo ".npmrc line not found or token missing"
+        run: cat "$NPM_CONFIG_USERCONFIG" | grep "//registry.npmjs.org/:_authToken=" || echo ".npmrc line not found or token missing"
 
       - name: Verify npm auth (safe)
         if: steps.check_published.outputs.published == 'false'
