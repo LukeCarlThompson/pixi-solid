@@ -1,8 +1,8 @@
-# Build & publish pixi-solid-docs to GitHub Pages (pnpm workspace-friendly)
+# Build & publish pixi-solid-docs to the gh-pages branch (push deploy)
 # - Runs pnpm install at the repository root so `workspace:*` deps resolve
-# - Builds lib packages (so pixi-solid has its built entry available)
-# - Builds the docs in packages/pixi-solid-docs and publishes the build output to GitHub Pages
-name: Build & publish docs to GitHub Pages
+# - Builds library packages (so pixi-solid has its built entry available)
+# - Builds the docs in packages/pixi-solid-docs and pushes the built site to gh-pages
+name: Build & publish docs to gh-pages
 
 on:
   push:
@@ -10,20 +10,20 @@ on:
       - main
   workflow_dispatch:
 
+# Ensure the workflow token can push the gh-pages branch
 permissions:
-  contents: read
-  pages: write
-  id-token: write     # <-- required for actions/deploy-pages@v1 to request an OIDC ID token
+  contents: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
       DOCS_DIR: "packages/pixi-solid-docs"   # path to your docs project relative to repo root
-      BUILD_OUTPUT: "dist"                  # directory inside DOCS_DIR that contains the built site
-      LIB_PACKAGE: "packages/pixi-solid"    # used for verification
+      BUILD_OUTPUT: "dist"                  # output folder inside DOCS_DIR (adjust if different)
+      LIB_PACKAGE: "packages/pixi-solid"    # package to verify build output for
+      PUBLISH_BRANCH: "gh-pages"
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -35,20 +35,15 @@ jobs:
         run: corepack enable && corepack prepare pnpm@latest --activate
 
       - name: Install workspace dependencies (root)
-        # run pnpm install from the repo root so workspace:* dependencies (like pixi-solid) are linked
         run: pnpm install --frozen-lockfile
 
       - name: Build library workspace packages
-        # Option A: build all workspace packages that have a "build" script
-        # This ensures pixi-solid (and any other packages) are built before docs
+        # Build all workspace packages that have a "build" script.
+        # Replace with `pnpm --filter pixi-solid run build` if you only want to build the library package.
         run: pnpm -w -r run build
-
-        # If you prefer to only build pixi-solid, replace the above with:
-        # run: pnpm --filter pixi-solid run build
 
       - name: Verify pixi-solid build output exists
         run: |
-          # adjust if your package outputs to "dist" or another folder
           if [ ! -d "${{ env.LIB_PACKAGE }}/dist" ]; then
             echo "ERROR: Expected build output not found at ${{ env.LIB_PACKAGE }}/dist"
             echo "Listing files in ${LIB_PACKAGE}:"
@@ -63,23 +58,23 @@ jobs:
           cd $DOCS_DIR
           pnpm build
 
-      - name: Verify build output exists
+      - name: Verify docs build output exists
         run: |
           if [ ! -d "${{ env.DOCS_DIR }}/${{ env.BUILD_OUTPUT }}" ]; then
-            echo "Build output not found: $DOCS_DIR/$BUILD_OUTPUT"
+            echo "ERROR: Build output not found: $DOCS_DIR/$BUILD_OUTPUT"
             ls -la $DOCS_DIR || true
             exit 1
           fi
           ls -la $DOCS_DIR/$BUILD_OUTPUT
 
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v3
-
-      - name: Upload Pages artifact (use upload-artifact v4)
-        uses: actions/upload-artifact@v4
+      - name: Deploy to gh-pages (push)
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          name: pages
-          path: ${{ env.DOCS_DIR }}/${{ env.BUILD_OUTPUT }}
-
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v1
+          publish_dir: ${{ env.DOCS_DIR }}/${{ env.BUILD_OUTPUT }}
+          publish_branch: ${{ env.PUBLISH_BRANCH }}
+          # Use the automatically provided token; ensure workflow permissions allow write
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # optional: set commit metadata
+          commit_message: "chore(docs): update site from ${GITHUB_SHA}"
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
