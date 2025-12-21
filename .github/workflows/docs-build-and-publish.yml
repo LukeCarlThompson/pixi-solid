@@ -18,9 +18,12 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
-      DOCS_DIR: "packages/pixi-solid-docs"   # path to your docs project relative to repo root
-      BUILD_OUTPUT: "dist"                  # output folder inside DOCS_DIR (adjust if different)
-      LIB_PACKAGE: "packages/pixi-solid"    # package to verify build output for
+      # path to your docs project relative to repo root
+      DOCS_DIR: "packages/pixi-solid-docs"
+      # output folder inside DOCS_DIR
+      BUILD_OUTPUT: "dist"
+      # package to verify build output for
+      LIB_PACKAGE: "packages/pixi-solid"
       PUBLISH_BRANCH: "gh-pages"
     steps:
       - name: Checkout repository
