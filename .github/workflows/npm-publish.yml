@@ -60,6 +60,10 @@ jobs:
         if: steps.check_published.outputs.published == 'false'
         run: printf "//registry.npmjs.org/:_authToken=%s\n" "${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
+      - name: Debug .npmrc content
+        if: steps.check_published.outputs.published == 'false'
+        run: cat ~/.npmrc | grep "//registry.npmjs.org/:_authToken=" || echo ".npmrc line not found or token missing"
+
       - name: Verify npm auth (safe)
         if: steps.check_published.outputs.published == 'false'
         run: npm whoami --registry=https://registry.npmjs.org/ || true
