@@ -28,6 +28,8 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
+          # Pass the NPM_TOKEN directly to setup-node
+          token: ${{ secrets.NPM_TOKEN }}
 
       - name: Enable pnpm (Corepack)
         run: corepack enable && corepack prepare pnpm@latest --activate
