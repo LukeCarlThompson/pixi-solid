@@ -32,13 +32,6 @@ jobs:
       - name: Enable pnpm (Corepack)
         run: corepack enable && corepack prepare pnpm@latest --activate
 
-      # Add this step to explicitly configure pnpm auth
-      - name: Configure pnpm auth
-        if: steps.check_published.outputs.published == 'false'
-        run: |
-          pnpm config set registry https://registry.npmjs.org/
-          pnpm config set //registry.npmjs.org/:_authToken "${{ secrets.NPM_TOKEN }}"
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -63,9 +56,17 @@ jobs:
         run: |
           echo "::warning::Package ${{ steps.check_published.outputs.name }}@${{ steps.check_published.outputs.version }} is already published to npm. Publish will be skipped."
 
-      - name: Debug .npmrc content # This step will now show the .npmrc created by pnpm config set
+      # Add this step to explicitly configure pnpm auth
+      - name: Configure pnpm auth
         if: steps.check_published.outputs.published == 'false'
-        run: cat ~/.npmrc | grep "//registry.npmjs.org/:_authToken=" || echo ".npmrc line not found or token missing"
+        run: |
+          # Use NPM_CONFIG_USERCONFIG to ensure pnpm writes to the correct .npmrc file
+          pnpm config set registry https://registry.npmjs.org/ --config "$NPM_CONFIG_USERCONFIG"
+          pnpm config set //registry.npmjs.org/:_authToken "${{ secrets.NPM_TOKEN }}" --config "$NPM_CONFIG_USERCONFIG"
+
+      - name: Debug .npmrc content # This step will now show the .npmrc created by pnpm config set at the correct path
+        if: steps.check_published.outputs.published == 'false'
+        run: cat "$NPM_CONFIG_USERCONFIG" | grep "//registry.npmjs.org/:_authToken=" || echo ".npmrc line not found or token missing"
 
       - name: Verify npm auth (safe)
         if: steps.check_published.outputs.published == 'false'
