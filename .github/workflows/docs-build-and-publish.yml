@@ -40,7 +40,7 @@ jobs:
       - name: Install workspace dependencies (root)
         run: pnpm install --frozen-lockfile
 
-      - name: Build library workspace packages
+      - name: Build all workspace packages
         # Build all workspace packages that have a "build" script.
         # Replace with `pnpm --filter pixi-solid run build` if you only want to build the library package.
         run: pnpm -w -r run build
@@ -55,11 +55,6 @@ jobs:
           fi
           echo "pixi-solid build output found:"
           ls -la ${{ env.LIB_PACKAGE }}/dist || true
-
-      - name: Build docs
-        run: |
-          cd $DOCS_DIR
-          pnpm build
 
       - name: Verify docs build output exists
         run: |
