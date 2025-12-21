@@ -3,7 +3,7 @@ import path from 'path';
 import { execSync } from 'child_process';
 
 // Determine the package.json path based on the working directory
-const packageJsonPath = path.join(process.cwd(), 'package.json');
+const packageJsonPath = path.join(process.cwd(), 'pixi-solid', 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
 const pkg_name = packageJson.name;
