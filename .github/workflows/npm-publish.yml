@@ -2,7 +2,7 @@
 # Triggers:
 #  - push to main (real publish)
 #  - manual run (workflow_dispatch) — does a dry-run by default
-name: Publish pixi-solid
+name: Publish pixi-solid to NPM
 
 on:
   push:
