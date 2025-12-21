@@ -6,7 +6,8 @@ import { defineConfig } from "astro/config";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://github.com/LukeCarlThompson/pixi-solid",
+  site: "https://lukecarlthompson.github.io",
+  base: "/pixi-solid",
   integrations: [
     starlight({
       title: "Pixi Solid",
