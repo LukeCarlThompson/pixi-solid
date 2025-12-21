@@ -4,6 +4,10 @@ import { Container, onResize, PixiApplication, PixiCanvas, PixiStage, RenderLaye
 import { objectFit } from "pixi-solid/utils";
 import type { JSX } from "solid-js";
 import { createResource, onCleanup, Show, Suspense } from "solid-js";
+import birdAssetUrl from "@/assets/bird_05.png";
+import eelAssetUrl from "@/assets/eel.png";
+import runAssetUrl from "@/assets/run_3.png";
+import skyAssetUrl from "@/assets/sky.png";
 
 export const DemoApp = () => {
   // Setting scale mode to nearest for crisp pixel art
@@ -11,7 +15,12 @@ export const DemoApp = () => {
 
   // Create a resource to load the sky texture
   const [textureResource] = createResource(() =>
-    Assets.load<Pixi.Texture>(["/sky.png", "/bird_05.png", "/run_3.png", "/eel.png"])
+    Assets.load<Pixi.Texture>([
+      { alias: "sky", src: skyAssetUrl },
+      { alias: "bird", src: birdAssetUrl },
+      { alias: "run", src: runAssetUrl },
+      { alias: "eel", src: eelAssetUrl },
+    ])
   );
 
   let birdRef: (Pixi.Sprite & JSX.Element) | undefined;
@@ -37,7 +46,7 @@ export const DemoApp = () => {
           <Show when={textureResource()}>
             <PixiStage>
               <Sprite
-                texture={Assets.get("/sky.png")}
+                texture={Assets.get("sky")}
                 ref={(sprite) => {
                   onResize((screen) => {
                     objectFit(sprite, screen, "cover");
@@ -51,11 +60,11 @@ export const DemoApp = () => {
                   });
                 }}
               >
-                <Sprite texture={Assets.get("/bird_05.png")} ref={birdRef} position={{ x: -50, y: -60 }} scale={3} />
-                <Sprite texture={Assets.get("/run_3.png")} ref={runRef} scale={3} />
+                <Sprite texture={Assets.get("bird")} ref={birdRef} position={{ x: -50, y: -60 }} scale={3} />
+                <Sprite texture={Assets.get("run")} ref={runRef} scale={3} />
               </Container>
               <Sprite
-                texture={Assets.get("/eel.png")}
+                texture={Assets.get("eel")}
                 ref={(sprite) => {
                   eelRef = sprite as Pixi.Sprite & JSX.Element;
                   onResize((screen) => {

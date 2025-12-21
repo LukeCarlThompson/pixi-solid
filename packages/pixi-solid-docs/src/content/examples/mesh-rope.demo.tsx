@@ -3,10 +3,11 @@ import { Assets, Point } from "pixi.js";
 import { MeshRope, onResize, onTick, PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, Show } from "solid-js";
+import assetUrl from "@/assets/eel.png";
 
 export const DemoApp = () => {
   // Create a resource to load the eel texture
-  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>("/eel.png"));
+  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>({ alias: "eel", src: assetUrl }));
 
   // Create the points we will use for our mesh
   const points: Point[] = [];
@@ -20,7 +21,7 @@ export const DemoApp = () => {
         <Show when={textureResource()}>
           <PixiStage>
             <MeshRope
-              texture={Assets.get("/eel.png")}
+              texture={Assets.get("eel")}
               points={points}
               ref={(mesh) => {
                 // Position the mesh contained in the center of the screen on resize

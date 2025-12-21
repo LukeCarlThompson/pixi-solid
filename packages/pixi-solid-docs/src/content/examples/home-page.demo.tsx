@@ -13,6 +13,14 @@ import {
 } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, Show } from "solid-js";
+import groundAssetUrl from "@/assets/ground-tile.png";
+import assetUrl_01 from "@/assets/run_01.png";
+import assetUrl_02 from "@/assets/run_02.png";
+import assetUrl_03 from "@/assets/run_03.png";
+import assetUrl_04 from "@/assets/run_04.png";
+import assetUrl_05 from "@/assets/run_05.png";
+import assetUrl_06 from "@/assets/run_06.png";
+import skyAssetUrl from "@/assets/sky.png";
 
 export const DemoApp = () => {
   // Create a resource to load the sky texture
@@ -20,15 +28,15 @@ export const DemoApp = () => {
     // Setting scale mode to nearest for crisp pixel art
     TextureStyle.defaultOptions.scaleMode = "nearest";
 
-    const skyTexture = await Assets.load<Pixi.Texture>("/sky.png");
-    const groundTexture = await Assets.load<Pixi.Texture>("/ground-tile.png");
+    const skyTexture = await Assets.load<Pixi.Texture>(skyAssetUrl);
+    const groundTexture = await Assets.load<Pixi.Texture>(groundAssetUrl);
     const runTextures = await Assets.load<Pixi.Texture>([
-      "/run_0.png",
-      "/run_1.png",
-      "/run_2.png",
-      "/run_3.png",
-      "/run_4.png",
-      "/run_5.png",
+      assetUrl_01,
+      assetUrl_02,
+      assetUrl_03,
+      assetUrl_04,
+      assetUrl_05,
+      assetUrl_06,
     ]);
 
     return { skyTexture, groundTexture, runTextures: Object.values(runTextures) };

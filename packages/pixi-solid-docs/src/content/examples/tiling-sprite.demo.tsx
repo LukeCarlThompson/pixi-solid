@@ -2,6 +2,7 @@ import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
 import { onResize, onTick, PixiApplication, PixiCanvas, PixiStage, TilingSprite } from "pixi-solid";
 import { createResource, Show } from "solid-js";
+import assetUrl from "@/assets/ground-tile.png";
 
 export const DemoApp = () => {
   // Setting scale mode to nearest for crisp pixel art
@@ -9,7 +10,7 @@ export const DemoApp = () => {
 
   // Create a resource to load the sky texture
   const [textureResource] = createResource(async () => {
-    const groundTexture = await Assets.load<Pixi.Texture>("/ground-tile.png");
+    const groundTexture = await Assets.load<Pixi.Texture>(assetUrl);
 
     return groundTexture;
   });
