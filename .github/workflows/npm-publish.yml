@@ -28,11 +28,16 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
-          # Pass the NPM_TOKEN directly to setup-node
-          token: ${{ secrets.NPM_TOKEN }}
 
       - name: Enable pnpm (Corepack)
         run: corepack enable && corepack prepare pnpm@latest --activate
+
+      # Add this step to explicitly configure pnpm auth
+      - name: Configure pnpm auth
+        if: steps.check_published.outputs.published == 'false'
+        run: |
+          pnpm config set registry https://registry.npmjs.org/
+          pnpm config set //registry.npmjs.org/:_authToken "${{ secrets.NPM_TOKEN }}"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -58,18 +63,13 @@ jobs:
         run: |
           echo "::warning::Package ${{ steps.check_published.outputs.name }}@${{ steps.check_published.outputs.version }} is already published to npm. Publish will be skipped."
 
-      # REMOVE this step:
-      # - name: Configure npm auth for pnpm
-      #   if: steps.check_published.outputs.published == 'false'
-      #   run: printf "//registry.npmjs.org/:_authToken=%s\n" "${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
-      - name: Debug .npmrc content # This step will now show the .npmrc created by setup-node
+      - name: Debug .npmrc content # This step will now show the .npmrc created by pnpm config set
         if: steps.check_published.outputs.published == 'false'
-        run: cat "$NPM_CONFIG_USERCONFIG" | grep "//registry.npmjs.org/:_authToken=" || echo ".npmrc line not found or token missing"
+        run: cat ~/.npmrc | grep "//registry.npmjs.org/:_authToken=" || echo ".npmrc line not found or token missing"
 
       - name: Verify npm auth (safe)
         if: steps.check_published.outputs.published == 'false'
-        run: npm whoami --registry=https://registry.npmjs.org/ || true
+        run: pnpm whoami --registry=https://registry.npmjs.org/ || true # Use pnpm whoami for consistency
 
       - name: Publish (dry-run for manual runs)
         if: github.event_name == 'workflow_dispatch' && steps.check_published.outputs.published == 'false'
