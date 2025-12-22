@@ -3,10 +3,15 @@
 import solidJs from "@astrojs/solid-js";
 import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
+import path from "path";
+
+// Get the current working directory to resolve paths correctly
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://github.com/LukeCarlThompson/pixi-solid",
+  site: "https://lukecarlthompson.github.io",
+  base: "/pixi-solid",
   integrations: [
     starlight({
       title: "Pixi Solid",
@@ -42,4 +47,11 @@ export default defineConfig({
     }),
     solidJs(),
   ],
+  vite: {
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+    },
+  },
 });

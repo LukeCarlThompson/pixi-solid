@@ -3,17 +3,18 @@ import { Assets } from "pixi.js";
 import { MeshPlane, onResize, onTick, PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, Show } from "solid-js";
+import assetUrl from "@/assets/sky.png";
 
 export const DemoApp = () => {
   // Create a resource to load the sky texture
-  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>("/sky.png"));
+  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>({ alias: "sky", src: assetUrl }));
   return (
     <PixiApplication>
       <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
         <Show when={textureResource()}>
           <PixiStage>
             <MeshPlane
-              texture={Assets.get("/sky.png")}
+              texture={Assets.get("sky")}
               verticesX={10}
               verticesY={10}
               ref={(mesh) => {

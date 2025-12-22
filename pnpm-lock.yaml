@@ -56,6 +56,9 @@ importers:
       astro:
         specifier: ^5.16.5
         version: 5.16.5(@types/node@25.0.0)(lightningcss@1.30.2)(rollup@4.53.3)(sass-embedded@1.93.3)(sass@1.93.3)(typescript@5.9.3)(yaml@2.8.2)
+      pixi-filters:
+        specifier: ^6.1.5
+        version: 6.1.5(pixi.js@8.14.3)
       pixi-solid:
         specifier: workspace:*
         version: link:../pixi-solid
@@ -937,6 +940,9 @@ packages:
 
   '@types/fontkit@2.0.8':
     resolution: {integrity: sha512-wN+8bYxIpJf+5oZdrdtaX04qUuWHcKxcDEgRS9Qm9ZClSHjzEn13SxUC+5eRM+4yXIeTYk8mTzLAWGF64847ew==}
+
+  '@types/gradient-parser@0.1.5':
+    resolution: {integrity: sha512-r7K3NkJz3A95WkVVmjs0NcchhHstC2C/VIYNX4JC6tieviUNo774FFeOHjThr3Vw/WCeMP9kAT77MKbIRlO/4w==}
 
   '@types/hast@3.0.4':
     resolution: {integrity: sha512-WPs+bbQw5aCj+x6laNGWLH3wviHtoCv/P3+otBhbOhJgG8qtpdAMlTCxLtsTWA7LH1Oh/bFCHsBn0TPS5m30EQ==}
@@ -2062,6 +2068,11 @@ packages:
   picomatch@4.0.3:
     resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
     engines: {node: '>=12'}
+
+  pixi-filters@6.1.5:
+    resolution: {integrity: sha512-Ewb/J+kxAbaNN+0/ATJbglAJG+skGJfh7BIDP3ILIDdD6wWk1p0pGa25pVf1T8hGBOQSUNVAmwwJBwkj+cyLLA==}
+    peerDependencies:
+      pixi.js: '>=8.0.0-0'
 
   pixi.js@8.14.3:
     resolution: {integrity: sha512-6xGYARV8D9E/fO1c2NmYn+k2dQ5oZldVm5tNlLQJ8obTlOQXdL5QpMc217qTpRyHVDFaw5eoFCLF1gr6p5ZcjQ==}
@@ -3718,6 +3729,8 @@ snapshots:
     dependencies:
       '@types/node': 25.0.0
 
+  '@types/gradient-parser@0.1.5': {}
+
   '@types/hast@3.0.4':
     dependencies:
       '@types/unist': 3.0.3
@@ -5324,6 +5337,11 @@ snapshots:
   picomatch@2.3.1: {}
 
   picomatch@4.0.3: {}
+
+  pixi-filters@6.1.5(pixi.js@8.14.3):
+    dependencies:
+      '@types/gradient-parser': 0.1.5
+      pixi.js: 8.14.3
 
   pixi.js@8.14.3:
     dependencies:

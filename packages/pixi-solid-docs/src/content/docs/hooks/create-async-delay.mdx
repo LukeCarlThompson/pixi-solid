@@ -1,11 +1,11 @@
 ---
-title: delay
-description: A Solid.js hook for running a callback function after a delay in sync with the Pixi.js Ticker.
+title: createAsyncDelay
+description: A Solid.js hook for creating an async delay function in sync with the Pixi.js Ticker.
 sidebar:
-  order: 4
+  order: 5
 ---
 
-The `delay` hook provides a way to create a function that will run a callback after a specified number of milliseconds of ticker time.
+The `createAsyncDelay` hook provides a way to create a async function that will delay execution for a specified number of milliseconds of ticker time.
 
 It ensures that the delay is in sync with the shared ticker's time units, making it ideal for animations or syncing with other actions based on ticker time.
 
@@ -13,21 +13,22 @@ The delay is synchronized with the shared ticker, so it will not progress if the
 
 This hook must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication` or `TickerProvider`.
 
-**Note**
-This function cannot be used in an async context because the Application and Ticker context providers aren't available.
-For that purpose you should use the alternative `createAsyncDelay` hook.
+The returned function can be called in an async context.
 
 ### Usage
 
 ```tsx
-import { delay, Text } from "pixi-solid";
+import { createAsyncDelay, Text } from "pixi-solid";
 
-const DelayedCallbackComponent = () => {
-  const handlePointerDown = () => {
+const DelayedActionComponent = () => {
+  // This must be called within a synchronous scope that is inside the `PixiApplication` or `TickerProvider` elements.
+  const delay = createAsyncDelay();
+
+  const handlePointerDown = async () => {
     console.log("Pointer down");
-    delay(1000, () => {
-      console.log("1 second has passed on the ticker");
-    });
+    // We can now use the delay in an async context
+    await delay(2000);
+    console.log("2 seconds have passed on the ticker");
   };
 
   return <Text text={"Click me"} onpointerdown={handlePointerDown} />;

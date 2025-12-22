@@ -14,6 +14,7 @@
     "@astrojs/solid-js": "5.1.3",
     "@astrojs/starlight": "^0.37.1",
     "astro": "^5.16.5",
+    "pixi-filters": "^6.1.5",
     "pixi-solid": "workspace:*",
     "pixi.js": "8.14.3",
     "sharp": "^0.34.5",

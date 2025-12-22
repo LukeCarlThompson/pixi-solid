@@ -3,6 +3,13 @@ import { Assets, TextureStyle } from "pixi.js";
 import { getPixiApp, onTick, PixiApplication, PixiCanvas, PixiStage, Text } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, createSignal, Show } from "solid-js";
+import birdAssetUrl_01 from "@/assets/bird_01.png";
+import birdAssetUrl_02 from "@/assets/bird_02.png";
+import birdAssetUrl_03 from "@/assets/bird_03.png";
+import birdAssetUrl_04 from "@/assets/bird_04.png";
+import birdAssetUrl_05 from "@/assets/bird_05.png";
+import birdAssetUrl_06 from "@/assets/bird_06.png";
+import skyAssetUrl from "@/assets/sky.png";
 import { Sky } from "./pass-through-props";
 
 export const DemoApp = () => {
@@ -13,13 +20,13 @@ export const DemoApp = () => {
     // Setting scale mode to nearest for crisp pixel art
     TextureStyle.defaultOptions.scaleMode = "nearest";
     const assets = await Assets.load<Pixi.Texture>([
-      "/sky.png",
-      "/bird_01.png",
-      "/bird_02.png",
-      "/bird_03.png",
-      "/bird_04.png",
-      "/bird_05.png",
-      "/bird_06.png",
+      { alias: "sky", src: skyAssetUrl },
+      { alias: "bird_01", src: birdAssetUrl_01 },
+      { alias: "bird_02", src: birdAssetUrl_02 },
+      { alias: "bird_03", src: birdAssetUrl_03 },
+      { alias: "bird_04", src: birdAssetUrl_04 },
+      { alias: "bird_05", src: birdAssetUrl_05 },
+      { alias: "bird_06", src: birdAssetUrl_06 },
     ]);
 
     return assets;
