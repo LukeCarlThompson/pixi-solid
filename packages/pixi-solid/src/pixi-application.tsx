@@ -1,10 +1,10 @@
-import type { ApplicationOptions, TickerCallback } from "pixi.js";
-import { Application, Ticker } from "pixi.js";
+import type { ApplicationOptions, Ticker, TickerCallback } from "pixi.js";
+import { Application } from "pixi.js";
 import type { JSX, ParentProps, Ref } from "solid-js";
 import { createContext, createEffect, createResource, onCleanup, Show, splitProps, useContext } from "solid-js";
 
 const PixiAppContext = createContext<Application>();
-const TickerContext = createContext<Ticker>(Ticker.shared);
+const TickerContext = createContext<Ticker>();
 
 /**
  * A custom SolidJS hook to access the root PIXI.Application instance.
@@ -146,32 +146,7 @@ export const onTick = (tickerCallback: TickerCallback<Ticker>): void => {
   });
 };
 
-/**
- * Delay until a given number of milliseconds has passed on the shared ticker.
- *
- * It is guaranteed to be in sync with the shared ticker and uses accumulated deltaMs not an external time measurement.
- *
- * Simply await for it to resolve if in an async context or pass in a callback function.
- * It's not recommended to use both techniques at once.
- *
- * @param delayMs - Number of milliseconds to wait (measured in the ticker's time units).
- *
- * @param callback - Optional callback function that will fire when the delayMs time has passed.
- *
- * @returns A Promise that resolves once the ticker's time has advanced by `delayMs`.
- *
- * @throws {Error} If called outside of a `PixiApplication` or `TickerProvider` context.
- *
- * @note It will not resolve or fire the callback if the ticker is paused or stopped.
- *
- */
-export const delay = async (delayMs: number, callback?: () => void): Promise<void> => {
-  const ticker = useContext(TickerContext);
-
-  if (!ticker) {
-    throw new Error("delay must be used within a PixiApplication or a TickerProvider");
-  }
-
+const asyncDelay = async (ticker: Ticker, delayMs: number) => {
   let timeDelayed = 0;
 
   let resolvePromise: (value: void | PromiseLike<void>) => void;
@@ -183,7 +158,6 @@ export const delay = async (delayMs: number, callback?: () => void): Promise<voi
   const internalCallback = () => {
     timeDelayed += ticker.deltaMS;
     if (timeDelayed < delayMs) return;
-    callback?.();
     resolvePromise();
   };
 
@@ -192,4 +166,64 @@ export const delay = async (delayMs: number, callback?: () => void): Promise<voi
   await promise;
 
   ticker.remove(internalCallback);
+};
+
+/**
+ * Create a delay function that waits until a given number of milliseconds has passed on the current Ticker context before resolving.
+ *
+ * This function must be called inside a `PixiApplication` or `TickerProvider` context.
+ *
+ * @returns An async function we can await to delay events in sync with time passed on the Ticker.
+ *
+ * Simply await for it to resolve in an async context.
+ *
+ * @note It will not resolve if the ticker is paused or stopped.
+ *
+ * @throws {Error} If called outside of a `PixiApplication` or `TickerProvider` context.
+ */
+export const createAsyncDelay = (): ((delayMs: number) => Promise<void>) => {
+  const ticker = useContext(TickerContext);
+
+  if (!ticker) {
+    throw new Error(
+      "`createDelay` must be used within a PixiApplication or a TickerProvider. The returned `delay` function can be called in an async context but `createDelay` must be called in a synchronous scope within a PixiApplication or a TickerProvider"
+    );
+  }
+  const delayWithTicker = (delayMs: number) => asyncDelay(ticker, delayMs);
+
+  return delayWithTicker;
+};
+
+/**
+ * Runs a callback when a given number of milliseconds has passed on the ticker.
+ *
+ * It is guaranteed to be in sync with the shared ticker and uses accumulated deltaMs not an external time measurement.
+ *
+ * @param delayMs - Number of milliseconds to wait (measured in the ticker's time units).
+ *
+ * @param callback - A callback function that will fire when the delayMs time has passed.
+ *
+ * @throws {Error} If called outside of a `PixiApplication` or `TickerProvider` context.
+ *
+ * @note It will not run the callback if the ticker is paused or stopped.
+ *
+ */
+export const delay = (delayMs: number, callback?: () => void): void => {
+  const ticker = useContext(TickerContext);
+  if (!ticker) {
+    throw new Error(
+      "`createDelay` must be used within a PixiApplication or a TickerProvider. The returned `delay` function can be called in an async context but `createDelay` must be called in a synchronous scope within a PixiApplication or a TickerProvider"
+    );
+  }
+
+  let timeDelayed = 0;
+
+  const internalCallback = () => {
+    timeDelayed += ticker.deltaMS;
+    if (timeDelayed < delayMs) return;
+    callback?.();
+    ticker.remove(internalCallback);
+  };
+
+  ticker.add(internalCallback);
 };

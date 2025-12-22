@@ -1,10 +1,11 @@
 {
   "name": "pixi-solid",
   "private": false,
-  "version": "0.0.19",
+  "version": "0.0.23",
   "description": "A library to write PixiJS applications with SolidJS",
   "author": "Luke Thompson",
   "license": "MIT",
+  "homepage": "https://lukecarlthompson.github.io/pixi-solid/",
   "repository": {
     "type": "git",
     "url": "https://github.com/LukeCarlThompson/pixi-solid"
@@ -33,7 +34,8 @@
     "build:docs": "typedoc --options typedoc.config.js",
     "prepublishOnly": "pnpm run build",
     "preview": "vite preview",
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "test": "echo \"A dummy test\""
   },
   "peerDependencies": {
     "pixi.js": "^8.14.3",
