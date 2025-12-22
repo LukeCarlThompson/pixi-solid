@@ -1,4 +1,4 @@
-import type { Container as PixiContainer } from "pixi.js";
+import type * as Pixi from "pixi.js";
 import { Text as PixiText } from "pixi.js";
 import { createRenderer } from "solid-js/universal";
 import type { PIXI_EVENT_NAMES, PixiEventHandlerMap } from "./pixi-events";
@@ -17,14 +17,14 @@ export const {
   use,
   render,
   spread,
-} = createRenderer<PixiContainer>({
+} = createRenderer<Pixi.Container>({
   createElement(name: string) {
     // This function is for lowercase string tags like `<container />`.
     // To support tree-shaking, we require users to import components
     // directly and use them with an uppercase name like `<Container />`,
     // which does not call this function.
     throw new Error(
-      `Cannot create element "${name}". Please import components directly from 'pixi-solid' and use them with a capital letter.`,
+      `Cannot create element "${name}". Please import components directly from 'pixi-solid' and use them with a capital letter.`
     );
   },
   createTextNode(value) {
@@ -59,11 +59,7 @@ export const {
       return;
     }
 
-    if (
-      !("addChildAt" in parent) ||
-      !("addChild" in parent) ||
-      typeof parent.addChild !== "function"
-    ) {
+    if (!("addChildAt" in parent) || !("addChild" in parent) || typeof parent.addChild !== "function") {
       throw new Error("Parent does not support children.");
     }
 
