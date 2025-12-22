@@ -62,8 +62,8 @@ export const DemoApp = () => {
                   movementSpeed={appStore.state.isRunning ? 1.3 : 0}
                   direction={appStore.state.direction}
                   width={sceneBounds.width}
-                  height={sceneBounds.height / 3}
-                  position={{ x: 0, y: (sceneBounds.height / 3) * 2 }}
+                  height={sceneBounds.height * 0.3}
+                  position={{ x: 0, y: sceneBounds.height * 0.7 }}
                 />
                 <Character
                   direction={appStore.state.direction}

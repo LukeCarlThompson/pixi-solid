@@ -10,11 +10,11 @@ export type ControlsProps = {
 export const Controls = (props: ControlsProps) => {
   return (
     <div class={style["controls-wrap"]}>
-      <button type="button" onClick={props.onToggleRunningClicked}>
+      <button type="button" class={style["controls-button"]} onClick={props.onToggleRunningClicked}>
         {props.isRunning ? "Click to stop" : "Click to run"}
       </button>
       <br />
-      <button type="button" onClick={props.onToggleDirectionClicked}>
+      <button type="button" class={style["controls-button"]} onClick={props.onToggleDirectionClicked}>
         {props.direction === "left" ? "Click to face right" : "Click to face left"}
       </button>
     </div>
