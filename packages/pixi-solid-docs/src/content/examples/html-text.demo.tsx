@@ -1,4 +1,3 @@
-import { Rectangle } from "pixi.js";
 import { HTMLText, onResize, PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
 
 export const DemoApp = () => {

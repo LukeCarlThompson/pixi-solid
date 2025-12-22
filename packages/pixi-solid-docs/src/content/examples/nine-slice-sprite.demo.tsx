@@ -2,10 +2,11 @@ import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
 import { getPixiApp, NineSliceSprite, onResize, onTick, PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
 import { createResource, Show } from "solid-js";
+import assetUrl from "@/assets/nine-slice.png";
 
 export const DemoApp = () => {
   // Create a resource to load the nine slice texture
-  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>("/nine-slice.png"));
+  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>({ alias: "nine-slice", src: assetUrl }));
 
   return (
     <PixiApplication background="pink">
@@ -13,7 +14,7 @@ export const DemoApp = () => {
         <Show when={textureResource()}>
           <PixiStage>
             <NineSliceSprite
-              texture={Assets.get("/nine-slice.png")}
+              texture={Assets.get("nine-slice")}
               // Add in the boundaries for scaling
               leftWidth={90}
               rightWidth={90}

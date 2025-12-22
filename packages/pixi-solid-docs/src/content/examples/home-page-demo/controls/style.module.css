@@ -1,0 +1,12 @@
+.controls-wrap {
+  position: absolute;
+  z-index: 1;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.controls-button {
+  margin: 0;
+}

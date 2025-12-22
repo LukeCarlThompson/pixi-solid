@@ -12,15 +12,8 @@ export type SkyProps = Omit<Pixi.ContainerOptions, "children"> & {
 };
 
 export const Sky = (props: SkyProps) => {
-  const skyTexture = Assets.get<Pixi.Texture>("/sky.png");
-  const birdTextures = Assets.get<Pixi.Texture>([
-    "/bird_01.png",
-    "/bird_02.png",
-    "/bird_03.png",
-    "/bird_04.png",
-    "/bird_05.png",
-    "/bird_06.png",
-  ]);
+  const skyTexture = Assets.get<Pixi.Texture>("sky");
+  const birdTextures = Assets.get<Pixi.Texture>(["bird_01", "bird_02", "bird_03", "bird_04", "bird_05", "bird_06"]);
 
   // Splitting out flyingSpeed so we pass only the valid Container props to our Container
   const [, containerProps] = splitProps(props, ["flyingSpeed"]);

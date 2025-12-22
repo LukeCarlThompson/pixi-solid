@@ -2,6 +2,7 @@ import type * as Pixi from "pixi.js";
 import { Assets, Particle } from "pixi.js";
 import { onResize, onTick, ParticleContainer, PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
 import { createResource, onMount, Show, Suspense } from "solid-js";
+import assetUrl from "@/assets/spark.webp";
 
 export type ParticleContainerProps = Omit<Pixi.ParticleContainerOptions, "children"> & {
   particleTexture: Pixi.Texture;
@@ -93,7 +94,7 @@ export const MyParticleContainerComponent = (props: ParticleContainerProps) => {
 
 export const DemoApp = () => {
   // Create a resource to load the sky texture
-  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>("/spark.webp"));
+  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>(assetUrl));
   return (
     <PixiApplication>
       <Suspense fallback={<div>Loading...</div>}>

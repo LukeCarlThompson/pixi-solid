@@ -3,10 +3,11 @@ import { Assets } from "pixi.js";
 import { onResize, PerspectiveMesh, PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, Show } from "solid-js";
+import assetUrl from "@/assets/ground.webp";
 
 export const DemoApp = () => {
   // Create a resource to load the nine slice texture
-  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>("/ground.webp"));
+  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>({ alias: "ground", src: assetUrl }));
 
   return (
     <PixiApplication background="transparent">
@@ -15,7 +16,7 @@ export const DemoApp = () => {
           <PixiStage>
             <PerspectiveMesh
               label="Ground"
-              texture={Assets.get("/ground.webp")}
+              texture={Assets.get("ground")}
               verticesX={20}
               verticesY={20}
               x0={50}

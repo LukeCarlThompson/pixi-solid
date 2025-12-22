@@ -2,10 +2,11 @@ import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
 import { PixiApplication, PixiCanvas, PixiStage, RenderContainer, Sprite } from "pixi-solid";
 import { createResource, Show, Suspense } from "solid-js";
+import assetUrl from "@/assets/sky.png";
 
 export const DemoApp = () => {
   // Create a resource to load the sky texture
-  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>("/sky.png"));
+  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>(assetUrl));
   return (
     <PixiApplication>
       <Suspense fallback={<div>Loading...</div>}>

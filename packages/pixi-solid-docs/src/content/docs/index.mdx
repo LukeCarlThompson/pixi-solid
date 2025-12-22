@@ -8,13 +8,27 @@ hero:
     file: ../../assets/pixi-solid-logo.png
   actions:
     - text: Go to the docs and examples
-      link: /getting-started/project-setup
+      link: /pixi-solid/getting-started/project-setup
       icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/LukeCarlThompson/pixi-solid
+      icon: external
+      variant: secondary
+      attrs:
+        target: _blank
+        rel: noopener noreferrer
 ---
 
 import { Card, CardGrid, Code, Tabs, TabItem } from "@astrojs/starlight/components";
-import demoCode from "../examples/home-page.demo.tsx?raw";
 import { ClientOnly } from "../examples/client-only";
+import demoIndex from "../examples/home-page-demo/index.tsx?raw";
+import demoCreateAppStore from "../examples/home-page-demo/create-app-store.ts?raw";
+import demoGround from "../examples/home-page-demo/ground.tsx?raw";
+import demoCharacter from "../examples/home-page-demo/character.tsx?raw";
+import demoGetAnimationTextures from "../examples/home-page-demo/get-animation-textures.ts?raw";
+import demoLoadSceneAssets from "../examples/home-page-demo/load-scene-assets.ts?raw";
+import demoControls from "../examples/home-page-demo/controls/index.tsx?raw";
+import demoControlsStyles from "../examples/home-page-demo/controls/style.module.css?raw";
 
 ### Features
 
@@ -74,4 +88,29 @@ Peer dependencies of
 
 ### Code example
 
-<Code code={demoCode} lang="tsx" />
+<Tabs>
+  <TabItem label="app.tsx">
+    <Code code={demoIndex} lang="tsx" />
+  </TabItem>
+  <TabItem label="create-app-store.ts">
+    <Code code={demoCreateAppStore} lang="tsx" />
+  </TabItem>
+  <TabItem label="ground.tsx">
+    <Code code={demoGround} lang="tsx" />
+  </TabItem>
+  <TabItem label="character.tsx">
+    <Code code={demoCharacter} lang="tsx" />
+  </TabItem>
+  <TabItem label="get-animation-textures.ts">
+    <Code code={demoGetAnimationTextures} lang="tsx" />
+  </TabItem>
+  <TabItem label="load-scene-assets.ts">
+    <Code code={demoLoadSceneAssets} lang="tsx" />
+  </TabItem>
+  <TabItem label="controls.tsx">
+    <Code code={demoControls} lang="tsx" />
+  </TabItem>
+  <TabItem label="style.module.css">
+    <Code code={demoControlsStyles} lang="tsx" />
+  </TabItem>
+</Tabs>
