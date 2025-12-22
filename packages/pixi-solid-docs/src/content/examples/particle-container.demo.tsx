@@ -2,7 +2,7 @@ import type * as Pixi from "pixi.js";
 import { Assets, Particle } from "pixi.js";
 import { onResize, onTick, ParticleContainer, PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
 import { createResource, onMount, Show, Suspense } from "solid-js";
-import assetUrl from "@/assets/spark.webp";
+import assetUrl from "@/assets/food-icons/fried-egg.png";
 
 export type ParticleContainerProps = Omit<Pixi.ParticleContainerOptions, "children"> & {
   particleTexture: Pixi.Texture;
@@ -15,6 +15,8 @@ export const MyParticleContainerComponent = (props: ParticleContainerProps) => {
 
   // Create an array to hold Pixi.Particle instances
   const particles: Pixi.Particle[] = [];
+  // Create an array of random offset values for each particle
+  const offsets: number[] = [];
 
   // Initialize particles with base properties
   for (let i = 0; i < 500; i++) {
@@ -28,16 +30,17 @@ export const MyParticleContainerComponent = (props: ParticleContainerProps) => {
         scaleY: 0.5,
       })
     );
+    offsets.push(Math.random());
   }
 
   let cumulativeTime = 0; // Track time passed to move particles smoothly
-  const baseOrbitRadius = 100; // Average distance from the center
-  const orbitAmplitude = 200; // How much the radius pulsates
-  const orbitSpeed = 0.005; // Speed of the circular motion
-  const scalePulsateSpeed = 0.05; // Speed of scale changes
+  const baseOrbitRadius = 150; // Average distance from the center
+  const orbitAmplitude = 150; // How much the radius pulsates
+  const orbitSpeed = 0.003; // Speed of the circular motion
+  const scalePulsateSpeed = 0.02; // Speed of scale changes
   const baseRotationSpeed = 0.05; // Base rotation speed
   const minScale = 0.25;
-  const maxScale = 1.0;
+  const maxScale = 1;
   const scaleRange = maxScale - minScale;
 
   // Update the particles imperatively in a onTick hook
@@ -45,7 +48,7 @@ export const MyParticleContainerComponent = (props: ParticleContainerProps) => {
     cumulativeTime += ticker.deltaTime;
 
     particles.forEach((particle, i) => {
-      const indexFactor = i * 0.1;
+      const indexFactor = offsets[i] * 100;
 
       // Smooth circular motion with pulsating radius
       const currentRadius =
