@@ -1,0 +1,75 @@
+# Build & publish pixi-solid-docs to the gh-pages branch (push deploy)
+# - Runs pnpm install at the repository root so `workspace:*` deps resolve
+# - Builds library packages (so pixi-solid has its built entry available)
+# - Builds the docs in packages/pixi-solid-docs and pushes the built site to gh-pages
+name: Build & publish docs to gh-pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      # path to your docs project relative to repo root
+      DOCS_DIR: "packages/pixi-solid-docs"
+      # output folder inside DOCS_DIR
+      BUILD_OUTPUT: "dist"
+      # package to verify build output for
+      LIB_PACKAGE: "packages/pixi-solid"
+      PUBLISH_BRANCH: "gh-pages"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable pnpm (Corepack)
+        run: corepack enable && corepack prepare pnpm@latest --activate
+
+      - name: Install workspace dependencies (root)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all workspace packages
+        run: pnpm -w -r run build
+
+      - name: Verify pixi-solid build output exists
+        run: |
+          if [ ! -d "${{ env.LIB_PACKAGE }}/dist" ]; then
+            echo "ERROR: Expected build output not found at ${{ env.LIB_PACKAGE }}/dist"
+            echo "Listing files in ${LIB_PACKAGE}:"
+            ls -la ${{ env.LIB_PACKAGE }} || true
+            exit 1
+          fi
+          echo "pixi-solid build output found:"
+          ls -la ${{ env.LIB_PACKAGE }}/dist || true
+
+      - name: Verify docs build output exists
+        run: |
+          if [ ! -d "${{ env.DOCS_DIR }}/${{ env.BUILD_OUTPUT }}" ]; then
+            echo "ERROR: Build output not found: $DOCS_DIR/$BUILD_OUTPUT"
+            ls -la $DOCS_DIR || true
+            exit 1
+          fi
+          ls -la $DOCS_DIR/$BUILD_OUTPUT
+
+      - name: Deploy to gh-pages (push)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          publish_dir: ${{ env.DOCS_DIR }}/${{ env.BUILD_OUTPUT }}
+          publish_branch: ${{ env.PUBLISH_BRANCH }}
+          # Use the automatically provided token; ensure workflow permissions allow write
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # optional: set commit metadata
+          commit_message: "chore(docs): update site from ${GITHUB_SHA}"
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"

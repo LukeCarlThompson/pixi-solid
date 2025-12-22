@@ -1,0 +1,59 @@
+# Publish pixi-solid to npm (pnpm). Skips publish if the package version is already published.
+# Triggers:
+#  - push to main (real publish)
+#  - manual run (workflow_dispatch) — does a dry-run by default
+name: Publish pixi-solid to NPM
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+          run_install: false # Prevents auto install, we will handle it later
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Or your desired version
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm' # Caches pnpm dependencies
+
+      - name: Install dependencies
+        run: pnpm --filter "pixi-solid" install
+
+      - name: Test
+        run: pnpm --filter "pixi-solid" test
+
+      - name: Check if version is already published
+        id: check_published
+        run: node .github/scripts/check-published-version.mjs
+
+      - name: Verify npm auth (safe)
+        if: steps.check_published.outputs.published == 'false'
+        run: pnpm whoami --registry=https://registry.npmjs.org/ || true
+
+      - name: Publish (dry-run for manual runs)
+        if: github.event_name == 'workflow_dispatch' && steps.check_published.outputs.published == 'false'
+        run: pnpm --filter "pixi-solid" publish --access public --dry-run
+
+      - name: Publish
+        if: github.event_name == 'push' && steps.check_published.outputs.published == 'false'
+        run: pnpm --filter "pixi-solid" publish --access public
+        
