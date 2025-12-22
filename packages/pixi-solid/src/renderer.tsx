@@ -34,6 +34,11 @@ export const {
     textNode.text = value;
   },
   setProperty(node, name, value, prev) {
+    if (name in node) {
+      (node as any)[name] = value;
+      return;
+    }
+
     // Check for event listeners and handle them appropriately.
     if (PIXI_EVENT_HANDLER_NAME_SET.has(name as keyof PixiEventHandlerMap)) {
       // Remove the 'on' prefix to get the actual event name.
@@ -43,11 +48,6 @@ export const {
         node.removeEventListener(eventName, prev as any);
       }
       node.addEventListener(eventName, value as any);
-      return;
-    }
-
-    if (name in node) {
-      (node as any)[name] = value;
       return;
     }
   },
@@ -73,6 +73,12 @@ export const {
     return node instanceof PixiText;
   },
   removeNode(_, node) {
+    // RenderLayer uses `detach` instead of `removeChild`.
+    if ("detach" in parent && typeof parent.detach === "function") {
+      parent.detach(node);
+      return;
+    }
+
     node.removeFromParent();
     node.destroy({ children: true });
   },
