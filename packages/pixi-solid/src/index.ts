@@ -2,6 +2,7 @@ export type { ContainerProps, LeafProps } from "./component-creation";
 export { onResize } from "./on-resize";
 export type { PixiApplicationProps } from "./pixi-application";
 export {
+  createAsyncDelay,
   delay,
   getPixiApp,
   getTicker,
