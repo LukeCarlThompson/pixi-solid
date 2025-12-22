@@ -4,11 +4,20 @@ description: An example of using masks in solid-pixi.
 ---
 
 import { Code } from "@astrojs/starlight/components";
-import { Tabs, TabItem } from "@astrojs/starlight/components";
-import demoCode from "../../examples/pass-through-props.demo.tsx?raw";
-import exampleCode from "../../examples/pass-through-props.tsx?raw";
+import demoCode from "../../examples/masks.demo.tsx?raw";
 import { ClientOnly } from "../../examples/client-only";
+
+Masks work the same way as in PixiJS.
+The object being used as a masks needs to be added to the `Stage` and set as a `mask` property on the object to be masked.
+
+Please see the [PixiJS docs](https://pixijs.com/8.x/guides/components/scene-objects#masking-scene-objects) for detailed information.
 
 ### Demo
 
-WIP.
+Move your mouse across the screen to change the mask position.
+
+<ClientOnly fileName="masks" client:only="solid-js" />
+
+### Code example
+
+<Code code={demoCode} lang="tsx" title="masks-demo.tsx" />
