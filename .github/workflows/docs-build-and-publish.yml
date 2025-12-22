@@ -10,7 +10,6 @@ on:
       - main
   workflow_dispatch:
 
-# Ensure the workflow token can push the gh-pages branch
 permissions:
   contents: write
 
@@ -41,8 +40,6 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build all workspace packages
-        # Build all workspace packages that have a "build" script.
-        # Replace with `pnpm --filter pixi-solid run build` if you only want to build the library package.
         run: pnpm -w -r run build
 
       - name: Verify pixi-solid build output exists

@@ -47,13 +47,13 @@ jobs:
 
       - name: Verify npm auth (safe)
         if: steps.check_published.outputs.published == 'false'
-        run: pnpm whoami --registry=https://registry.npmjs.org/ || true # Use pnpm whoami for consistency
+        run: pnpm whoami --registry=https://registry.npmjs.org/ || true
 
       - name: Publish (dry-run for manual runs)
         if: github.event_name == 'workflow_dispatch' && steps.check_published.outputs.published == 'false'
         run: pnpm --filter "pixi-solid" publish --access public --dry-run
 
-      - name: Publish (real on push to main)
+      - name: Publish
         if: github.event_name == 'push' && steps.check_published.outputs.published == 'false'
         run: pnpm --filter "pixi-solid" publish --access public
         
