@@ -24,16 +24,16 @@ export default defineConfig({
           autogenerate: { directory: "getting-started" },
         },
         {
-          label: "Asset loading",
-          autogenerate: { directory: "asset-loading" },
-        },
-        {
           label: "Components",
           autogenerate: { directory: "components" },
         },
         {
           label: "Events",
           autogenerate: { directory: "events" },
+        },
+        {
+          label: "Asset loading",
+          autogenerate: { directory: "asset-loading" },
         },
         {
           label: "Hooks",
