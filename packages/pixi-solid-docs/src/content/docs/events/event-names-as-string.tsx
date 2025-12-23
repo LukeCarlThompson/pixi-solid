@@ -10,8 +10,10 @@ export const EventNamesList = () => {
   return (
     <Show when={eventNamesResource()}>
       {(eventNames) => (
-        <ul>
-          <For each={eventNames()}>{(eventName) => <li>{eventName}</li>}</For>
+        <ul style={{ padding: "0 0 0 14px" }}>
+          <For each={eventNames()}>
+            {(eventName) => <li style={{ padding: "0", margin: "0", "line-height": "1.4" }}>{eventName}</li>}
+          </For>
         </ul>
       )}
     </Show>
