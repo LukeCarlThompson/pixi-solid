@@ -61,20 +61,62 @@ let spriteRef: Pixi.Sprite | undefined;
 //...
 ```
 
+### Accessing the instance with Refs
+
+Just like when using SolidJS with the DOM we can access the rendered object instance with a `ref`.
+In our case this is useful for calling methods on the PixiJS objects or interacting directly with PixiJS in an imperative way.
+
+We can use a variable or a callback function to access refs.
+
+Ref as a variable.
+
+```tsx
+import type * as Pixi from "pixi.js";
+import { Container, onTick } from "pixi-solid";
+
+export const ExampleComponent = () => {
+  // Get a ref to the Container
+  let containerRef: Pixi.Container | undefined;
+
+  onTick((ticker) => {
+    if (!containerRef) return;
+    containerRef.rotation += ticker.deltaTime;
+  });
+
+  return <Container ref={containerRef}>{/* ...any children */}</Container>;
+};
+```
+
+Ref as a callback.
+
+```tsx
+import type * as Pixi from "pixi.js";
+import { Container, onTick } from "pixi-solid";
+
+export const ExampleComponent = () => {
+  return (
+    <Container
+      ref={(instance) => {
+        onTick((ticker) => {
+          instance.rotation += ticker.deltaTime;
+        });
+      }}
+    >
+      {/* ...children */}
+    </Container>
+  );
+};
+```
+
 ### Omissions
 
 There's a few deliberate omossions of PixiJS classes from the components list because wrapping them in a SolidJS component doesn't add much value. These include:
 
 - `Particle`
-  Particles inside a `ParticleContainer` are intended for when you want to the maximum performance for a particle system so a dedicated component here is in opposition to that.
-  It's recommended to create and manage the particle instances imperatively with a `<ParticleContainer />` as a parent..
+  Particles inside a `ParticleContainer ` are intended for when you want to the maximum performance for a particle system so a dedicated component here is in opposition to that.
+  It's recommended to create and manage the particle instances imperatively with a `<ParticleContainer />` as a parent to try and go for maximum efficency.
 
-- `MeshGeometry`
-- `NineSliceGeometry`
-- `PerspectivePlaneGeometry`
-- `PlaneGeometry`
-- `RopeGeometry`
-  The geometry classes are pretty low level and generally used when creating custom meshes.
+  The `MeshGeometry`, `NineSliceGeometry`, `PerspectivePlaneGeometry`, `PlaneGeometry` and `RopeGeometry` classes are pretty low level and generally used when creating custom meshes.
   This kind of work is best created once imperatively with PixiJS directly and then wrapped in a custom `pixi-solid` component.
 
 - `Culler`
