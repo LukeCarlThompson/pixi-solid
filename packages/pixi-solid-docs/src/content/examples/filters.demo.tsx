@@ -1,12 +1,15 @@
 import type * as Pixi from "pixi.js";
-import { Assets, BlurFilter, NoiseFilter } from "pixi.js";
-import { onResize, onTick, PixiApplication, PixiCanvas, PixiStage, Sprite } from "pixi-solid";
+import { Assets, BlurFilter, TextureStyle } from "pixi.js";
+import { onResize, PixiApplication, PixiCanvas, PixiStage, Sprite } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createEffect, createResource, createSignal, onCleanup, Show } from "solid-js";
 import birdAssetUrl from "@/assets/bird_03.png";
 import skyAssetUrl from "@/assets/sky.png";
 
 export const DemoApp = () => {
+  // Set scale mode for crisp pixel art
+  TextureStyle.defaultOptions.scaleMode = "nearest";
+
   const [textureResource] = createResource(() =>
     Assets.load<Pixi.Texture>([
       { alias: "sky", src: skyAssetUrl },
@@ -14,8 +17,7 @@ export const DemoApp = () => {
     ])
   );
 
-  // Create the filters using Pixi classes
-  const noiseFilter = new NoiseFilter({ noise: 0.1, blendMode: "overlay" });
+  // Create the filter using the Pixi class
   const blurFilter = new BlurFilter({ strength: 0 });
 
   // Assign a signal and use a createEffect to bind it to the Pixi class.
@@ -26,7 +28,6 @@ export const DemoApp = () => {
 
   // Any time we create Pixi classes directly we need to remember to destroy them when our component is cleaned up.
   onCleanup(() => {
-    noiseFilter.destroy();
     blurFilter.destroy();
   });
 
@@ -45,17 +46,7 @@ export const DemoApp = () => {
       <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
         {/* Show our Stage when the assets are loaded */}
         <Show when={textureResource()}>
-          <PixiStage
-            onglobalpointermove={handlePointerMove}
-            eventMode="static"
-            filters={noiseFilter}
-            ref={() => {
-              // Change the seed every frame to make the noise dynamic
-              onTick(() => {
-                noiseFilter.seed = Math.random();
-              });
-            }}
-          >
+          <PixiStage onglobalpointermove={handlePointerMove} eventMode="static">
             <Sprite
               label="sky"
               texture={Assets.get<Pixi.Texture>("sky")}
