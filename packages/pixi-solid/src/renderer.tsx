@@ -80,7 +80,8 @@ export const {
     }
 
     node.removeFromParent();
-    node.destroy({ children: true });
+    // TODO: Do we need to destroy nodes? When can we do it?
+    // node.destroy({ children: true });
   },
   getParentNode(node) {
     return node?.parent ?? undefined;

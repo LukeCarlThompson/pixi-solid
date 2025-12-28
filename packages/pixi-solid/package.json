@@ -1,7 +1,7 @@
 {
   "name": "pixi-solid",
   "private": false,
-  "version": "0.0.24",
+  "version": "0.0.25",
   "description": "A library to write PixiJS applications with SolidJS",
   "author": "Luke Thompson",
   "license": "MIT",
