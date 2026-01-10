@@ -1,0 +1,45 @@
+---
+title: usePixiScreen
+description: Solid.js hook for accessing the dimensions of the Pixi application's screen.
+sidebar:
+  order: 6
+---
+
+The `usePixiScreen` hook provides a reactive object containing the current dimensions of the Pixi application's screen. This object's properties (width, height, x, y, etc.) automatically update when the renderer's screen size changes, allowing you to build responsive Pixi.js applications that react to resizing events.
+
+It must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication`.
+
+### Usage
+
+```tsx
+import { Sprite } from "pixi.js";
+import { createSignal } from "solid-js";
+import { PixiApplication, Sprite, usePixiScreen } from "pixi-solid";
+
+const ResponsiveSprite = (props: { texture: Pixi.Texture }) => {
+  const screen = usePixiScreen();
+
+  return (
+    <Sprite
+      texture={props.texture}
+      anchor={0.5}
+      x={screen.width / 2}
+      y={screen.height / 2}
+      scale={Math.min(screen.width / props.texture.width, screen.height / props.texture.height) * 0.5}
+    />
+  );
+};
+
+const App = () => (
+  <PixiApplication>
+    <ResponsiveSprite texture={Pixi.Texture.WHITE} />
+  </PixiApplication>
+);
+```
+
+### When to use it
+
+- When you need to get the current dimensions of the Pixi.js renderer screen.
+- When you want to create components that automatically adapt to changes in the Pixi application's size.
+- For positioning elements relative to the screen dimensions.
+- As a reactive source for calculations based on the application's viewport.
