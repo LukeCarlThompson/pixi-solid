@@ -42,9 +42,6 @@ jobs:
       - name: Build pixi-solid package
         run: pnpm --filter pixi-solid build
 
-      - name: Build pixi-solid-docs package
-        run: pnpm --filter pixi-solid-docs build
-
       - name: Verify pixi-solid build output exists
         run: |
           if [ ! -d "${{ env.LIB_PACKAGE }}/dist" ]; then
@@ -55,6 +52,9 @@ jobs:
           fi
           echo "pixi-solid build output found:"
           ls -la ${{ env.LIB_PACKAGE }}/dist || true
+
+      - name: Build pixi-solid-docs package
+        run: pnpm --filter pixi-solid-docs build
 
       - name: Verify docs build output exists
         run: |
