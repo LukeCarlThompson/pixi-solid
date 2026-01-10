@@ -1,10 +1,23 @@
-import type { ApplicationOptions, Ticker, TickerCallback } from "pixi.js";
+import type { ApplicationOptions, Rectangle, Ticker, TickerCallback } from "pixi.js";
 import { Application } from "pixi.js";
 import type { JSX, ParentProps, Ref } from "solid-js";
-import { createContext, createEffect, createResource, onCleanup, Show, splitProps, useContext } from "solid-js";
+import { batch, createContext, createEffect, createResource, onCleanup, Show, splitProps, useContext } from "solid-js";
+import { createMutable } from "solid-js/store";
+
+export type PixiScreenDimensions = {
+  width: number;
+  height: number;
+  left: number;
+  right: number;
+  bottom: number;
+  top: number;
+  x: number;
+  y: number;
+};
 
 const PixiAppContext = createContext<Application>();
 const TickerContext = createContext<Ticker>();
+const PixiScreenContext = createContext<Readonly<PixiScreenDimensions>>();
 
 /**
  * A custom SolidJS hook to access the root PIXI.Application instance.
@@ -43,6 +56,16 @@ export type PixiApplicationProps = Partial<Omit<ApplicationOptions, "children" |
  */
 export const PixiApplication = (props: PixiApplicationProps) => {
   const [, initialisationProps] = splitProps(props, ["ref", "children"]);
+  const pixiScreenDimensions = createMutable<PixiScreenDimensions>({
+    width: 800,
+    height: 600,
+    left: 0,
+    right: 800,
+    top: 0,
+    bottom: 600,
+    x: 0,
+    y: 0,
+  });
 
   // TODO: Split props into initialisation props and runtime props
 
@@ -58,6 +81,19 @@ export const PixiApplication = (props: PixiApplicationProps) => {
     return app;
   });
 
+  const updatePixiScreenStore = (screen: Rectangle) => {
+    batch(() => {
+      pixiScreenDimensions.width = screen.width;
+      pixiScreenDimensions.height = screen.height;
+      pixiScreenDimensions.left = screen.x;
+      pixiScreenDimensions.top = screen.y;
+      pixiScreenDimensions.right = screen.x + screen.width;
+      pixiScreenDimensions.bottom = screen.y + screen.height;
+      pixiScreenDimensions.x = screen.x;
+      pixiScreenDimensions.y = screen.y;
+    });
+  };
+
   createEffect(() => {
     const app = appResource();
     if (app) {
@@ -72,7 +108,16 @@ export const PixiApplication = (props: PixiApplicationProps) => {
       app.ticker.autoStart = false;
       app.ticker.start();
 
+      updatePixiScreenStore(app.renderer.screen);
+
+      const handleResize = () => {
+        updatePixiScreenStore(app.renderer.screen);
+      };
+
+      app.renderer.addListener("resize", handleResize);
+
       onCleanup(() => {
+        app.renderer.removeListener("resize", handleResize);
         app.destroy(true, { children: true });
       });
     }
@@ -82,7 +127,9 @@ export const PixiApplication = (props: PixiApplicationProps) => {
     <Show when={appResource()}>
       {(app) => (
         <PixiAppContext.Provider value={app()}>
-          <TickerContext.Provider value={app().ticker}>{props.children}</TickerContext.Provider>
+          <TickerContext.Provider value={app().ticker}>
+            <PixiScreenContext.Provider value={pixiScreenDimensions}>{props.children}</PixiScreenContext.Provider>
+          </TickerContext.Provider>
         </PixiAppContext.Provider>
       )}
     </Show>
@@ -226,4 +273,19 @@ export const delay = (delayMs: number, callback?: () => void): void => {
   };
 
   ticker.add(internalCallback);
+};
+
+/**
+ * A hook that provides the current dimensions of the Pixi application's screen as a reactive object.
+ * The properties of the returned object will update automatically when the screen size changes and can be subscribed to reactively.
+ *
+ * @returns An object containing the width and height of the Pixi screen.
+ * @throws Will throw an error if not used within a `<PixiApplication>` component.
+ */
+export const usePixiScreen = (): Readonly<PixiScreenDimensions> => {
+  const pixiScreen = useContext(PixiScreenContext);
+  if (!pixiScreen) {
+    throw new Error("usePixiScreen must be used within a PixiApplication");
+  }
+  return pixiScreen;
 };
