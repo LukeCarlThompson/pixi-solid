@@ -1,6 +1,6 @@
 export type { ContainerProps, LeafProps } from "./component-creation";
 export { onResize } from "./on-resize";
-export type { PixiApplicationProps } from "./pixi-application";
+export type { PixiApplicationProps, PixiScreenDimensions } from "./pixi-application";
 export {
   createAsyncDelay,
   delay,
@@ -9,6 +9,7 @@ export {
   onTick,
   PixiApplication,
   TickerProvider,
+  usePixiScreen,
 } from "./pixi-application";
 export { PixiCanvas } from "./pixi-canvas";
 export {
