@@ -15,7 +15,17 @@ export default defineConfig({
       formats: ["es"],
     },
     rollupOptions: {
-      external: ["solid-js", "solid-js/web", "solid-js/universal", "pixi.js"],
+      external: [
+        "solid-js",
+        "solid-js/web",
+        "solid-js/universal",
+        "solid-js/store",
+        "solid-js/h",
+        "solid-js/html",
+        "solid-js/jsx-runtime",
+        "solid-js/jsx-dev-runtime",
+        "pixi.js",
+      ],
       output: {
         preserveModules: true,
       },
