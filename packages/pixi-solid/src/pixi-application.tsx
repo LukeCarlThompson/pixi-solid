@@ -1,7 +1,17 @@
 import type { ApplicationOptions, Rectangle, Ticker, TickerCallback } from "pixi.js";
 import { Application } from "pixi.js";
 import type { JSX, ParentProps, Ref } from "solid-js";
-import { batch, createContext, createEffect, createResource, onCleanup, Show, splitProps, useContext } from "solid-js";
+import {
+  batch,
+  createContext,
+  createEffect,
+  createResource,
+  on,
+  onCleanup,
+  Show,
+  splitProps,
+  useContext,
+} from "solid-js";
 import { createMutable } from "solid-js/store";
 
 export type PixiScreenDimensions = {
@@ -67,16 +77,9 @@ export const PixiApplication = (props: PixiApplicationProps) => {
     y: 0,
   });
 
-  // TODO: Split props into initialisation props and runtime props
-
   const [appResource] = createResource(async () => {
     const app = new Application();
-    await app.init({
-      autoDensity: true,
-      resolution: Math.min(window.devicePixelRatio, 2),
-      sharedTicker: true,
-      ...initialisationProps,
-    });
+    await app.init(initialisationProps);
 
     return app;
   });
@@ -94,34 +97,33 @@ export const PixiApplication = (props: PixiApplicationProps) => {
     });
   };
 
-  createEffect(() => {
-    const app = appResource();
-    if (app) {
-      if (props.ref) {
-        // Solid converts the ref prop to a callback function
-        (props.ref as unknown as (arg: any) => void)(app);
-      }
+  createEffect(
+    on(appResource, () => {
+      const app = appResource();
+      if (app) {
+        if (props.ref) {
+          // Solid converts the ref prop to a callback function
+          (props.ref as unknown as (arg: any) => void)(app);
+        }
 
-      // TODO: Go through the other props that can be set at runtime and apply them here
-      // e.g. backgroundColor => app.renderer.backgroundColor, etc.
+        app.ticker.autoStart = false;
+        app.ticker.start();
 
-      app.ticker.autoStart = false;
-      app.ticker.start();
-
-      updatePixiScreenStore(app.renderer.screen);
-
-      const handleResize = () => {
         updatePixiScreenStore(app.renderer.screen);
-      };
 
-      app.renderer.addListener("resize", handleResize);
+        const handleResize = () => {
+          updatePixiScreenStore(app.renderer.screen);
+        };
 
-      onCleanup(() => {
-        app.renderer.removeListener("resize", handleResize);
-        app.destroy(true, { children: true });
-      });
-    }
-  });
+        app.renderer.addListener("resize", handleResize);
+
+        onCleanup(() => {
+          app.renderer.removeListener("resize", handleResize);
+          app.destroy(true, { children: true });
+        });
+      }
+    })
+  );
 
   return (
     <Show when={appResource()}>
@@ -194,6 +196,7 @@ export const onTick = (tickerCallback: TickerCallback<Ticker>): void => {
 };
 
 const asyncDelay = async (ticker: Ticker, delayMs: number) => {
+  // TODO: Make this abortable.
   let timeDelayed = 0;
 
   let resolvePromise: (value: void | PromiseLike<void>) => void;
