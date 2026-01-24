@@ -1,8 +1,8 @@
 import type * as Pixi from "pixi.js";
 import { Text as PixiText } from "pixi.js";
 import { createRenderer } from "solid-js/universal";
-import type { PIXI_EVENT_NAMES, PixiEventHandlerMap } from "./pixi-events";
-import { PIXI_EVENT_HANDLER_NAME_SET } from "./pixi-events";
+import { isEventProperty, setEventProperty } from "./set-event-property";
+import { isPointProperty, setPointProperty } from "./set-point-property";
 
 export const {
   effect,
@@ -34,21 +34,18 @@ export const {
     textNode.text = value;
   },
   setProperty(node, name, value, prev) {
+    if (isPointProperty(name)) {
+      setPointProperty(node, name, value);
+      return;
+    }
+
     if (name in node) {
       (node as any)[name] = value;
       return;
     }
 
-    // Check for event listeners and handle them appropriately.
-    if (PIXI_EVENT_HANDLER_NAME_SET.has(name as keyof PixiEventHandlerMap)) {
-      // Remove the 'on' prefix to get the actual event name.
-      const eventName = name.slice(2) as (typeof PIXI_EVENT_NAMES)[number];
-
-      if (prev) {
-        node.removeEventListener(eventName, prev as any);
-      }
-      node.addEventListener(eventName, value as any);
-      return;
+    if (isEventProperty(name)) {
+      setEventProperty(node, name, value, prev);
     }
   },
   insertNode(parent, node, anchor) {

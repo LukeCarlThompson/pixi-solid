@@ -1,8 +1,8 @@
 import type { Container, ContainerOptions } from "pixi.js";
 import type { JSX, Ref } from "solid-js";
 import { applyProps } from "./component-creation";
+import type { PixiEventHandlerMap } from "./event-names";
 import { getPixiApp } from "./pixi-application";
-import type { PixiEventHandlerMap } from "./pixi-events";
 
 export type PixiStageProps = PixiEventHandlerMap &
   Omit<ContainerOptions, "children"> & {
