@@ -1,4 +1,3 @@
-import type * as Pixi from "pixi.js";
 import type { FederatedEventEmitterTypes } from "pixi.js";
 
 export const PIXI_EVENT_NAMES: (keyof FederatedEventEmitterTypes)[] = [
