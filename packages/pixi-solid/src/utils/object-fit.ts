@@ -25,6 +25,7 @@ export const objectFit = (
   let scaleX = 1;
   let scaleY = 1;
 
+  // biome-ignore lint/nursery/noUnnecessaryConditions: <explanation>
   switch (fitMode) {
     case "cover": {
       const coverScale = Math.max(widthRatio, heightRatio);
