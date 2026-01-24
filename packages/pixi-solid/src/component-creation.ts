@@ -1,18 +1,23 @@
 import type * as Pixi from "pixi.js";
 import type { JSX, Ref } from "solid-js";
 import { createRenderEffect, on, splitProps } from "solid-js";
-import type { PixiEventHandlerMap } from "./pixi-events";
-import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./pixi-events";
+import type { PixiEventHandlerMap } from "./event-names";
+import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./event-names";
+import type { PointAxisPropName } from "./point-property-names";
+import { POINT_PROP_AXIS_NAMES } from "./point-property-names";
 import { insert, setProp } from "./renderer";
 
 /**
  * Prop definition for components that CAN have children
  */
-export type ContainerProps<Component> = PixiEventHandlerMap & {
-  ref?: Ref<Component>;
-  as?: Component;
-  children?: JSX.Element;
-};
+export type ContainerProps<Component> = PixiEventHandlerMap &
+  PointAxisProps & {
+    ref?: Ref<Component>;
+    as?: Component;
+    children?: JSX.Element;
+  };
+
+export type PointAxisProps = Partial<Record<PointAxisPropName, number>>;
 
 /**
  * Prop definition for components that CANNOT have children
@@ -92,6 +97,7 @@ export const createContainerComponent = <
     const [runtimeProps, initialisationProps] = splitProps(props, [
       ...SOLID_PROP_KEYS,
       ...PIXI_SOLID_EVENT_HANDLER_NAMES,
+      ...POINT_PROP_AXIS_NAMES,
     ]);
 
     const instance = props.as || new PixiClass(initialisationProps as any);
