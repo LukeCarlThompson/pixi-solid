@@ -61,23 +61,21 @@ const DraggingDemo = () => {
   });
 
   return (
-    <PixiStage>
-      <Graphics
-        ref={(graphics) => {
-          graphics.roundRect(-50, -50, 100, 100, 20).fill(gradient);
-        }}
-        eventMode={"static"}
-        cursor={isDragging() ? "grabbing" : "grab"}
-        onpointerdown={handlePointerDown}
-        onpointerup={handlePointerUp}
-        onpointerupoutside={handlePointerUp}
-        onglobalpointermove={handlePointerMove}
-        angle={dampedPositionX.velocity() * 0.05}
-        scale={dampedScale.value()}
-        x={dampedPositionX.value()}
-        y={dampedPositionY.value()}
-      />
-    </PixiStage>
+    <Graphics
+      ref={(graphics) => {
+        graphics.roundRect(-50, -50, 100, 100, 20).fill(gradient);
+      }}
+      eventMode={"static"}
+      cursor={isDragging() ? "grabbing" : "grab"}
+      onpointerdown={handlePointerDown}
+      onpointerup={handlePointerUp}
+      onpointerupoutside={handlePointerUp}
+      onglobalpointermove={handlePointerMove}
+      angle={dampedPositionX.velocity() * 0.05}
+      scale={dampedScale.value()}
+      x={dampedPositionX.value()}
+      y={dampedPositionY.value()}
+    />
   );
 };
 
@@ -85,7 +83,9 @@ export const DemoApp = () => {
   return (
     <PixiApplication antialias={true}>
       <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <DraggingDemo />
+        <PixiStage>
+          <DraggingDemo />
+        </PixiStage>
       </PixiCanvas>
     </PixiApplication>
   );

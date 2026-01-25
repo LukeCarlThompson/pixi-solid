@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { Container, onResize, PixiApplication, PixiCanvas, PixiStage, RenderLayer, Sprite } from "pixi-solid";
+import { Container, PixiApplication, PixiCanvas, PixiStage, RenderLayer, Sprite, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import type { JSX } from "solid-js";
 import { createResource, onCleanup, Show, Suspense } from "solid-js";
@@ -9,7 +9,8 @@ import eelAssetUrl from "@/assets/eel.png";
 import runAssetUrl from "@/assets/run_03.png";
 import skyAssetUrl from "@/assets/sky.png";
 
-export const DemoApp = () => {
+const DemoComponent = () => {
+  const pixiScreen = usePixiScreen();
   // Setting scale mode to nearest for crisp pixel art
   TextureStyle.defaultOptions.scaleMode = "nearest";
 
@@ -20,7 +21,7 @@ export const DemoApp = () => {
       { alias: "bird", src: birdAssetUrl },
       { alias: "run", src: runAssetUrl },
       { alias: "eel", src: eelAssetUrl },
-    ])
+    ]),
   );
 
   let birdRef: (Pixi.Sprite & JSX.Element) | undefined;
@@ -28,60 +29,61 @@ export const DemoApp = () => {
   let eelRef: (Pixi.Sprite & JSX.Element) | undefined;
 
   return (
-    <PixiApplication
-      ref={(app) => {
-        // @ts-expect-error
-        globalThis.__PIXI_DEVTOOLS__ = {
-          app,
-        };
-        onCleanup(() => {
-          // @ts-expect-error
-          globalThis.__PIXI_DEVTOOLS__ = undefined;
-        });
-      }}
-    >
-      <Suspense fallback={<div>Loading...</div>}>
-        <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-          {/* Show our Stage when the assets are loaded */}
-          <Show when={textureResource()}>
-            <PixiStage>
-              <Sprite
-                texture={Assets.get("sky")}
-                ref={(sprite) => {
-                  onResize((screen) => {
-                    objectFit(sprite, screen, "cover");
-                  });
-                }}
-              />
-              <Container
-                ref={(container) => {
-                  onResize((screen) => {
-                    objectFit(container, screen, "scale-down");
-                  });
-                }}
-              >
-                <Sprite texture={Assets.get("bird")} ref={birdRef} position={{ x: -50, y: -60 }} scale={3} />
-                <Sprite texture={Assets.get("run")} ref={runRef} scale={3} />
-              </Container>
-              <Sprite
-                texture={Assets.get("eel")}
-                ref={(sprite) => {
-                  eelRef = sprite as Pixi.Sprite & JSX.Element;
-                  onResize((screen) => {
-                    objectFit(sprite, screen, "scale-down");
-                  });
-                }}
-              />
-              {/* Set a custom render order by arranging out scene objects in a different order in the RenderLayer */}
-              <RenderLayer>
-                {eelRef}
-                {runRef}
-                {birdRef}
-              </RenderLayer>
-            </PixiStage>
-          </Show>
-        </PixiCanvas>
-      </Suspense>
-    </PixiApplication>
+    <Show when={textureResource()}>
+      {/* Show our Stage when the assets are loaded */}
+      <Sprite
+        texture={Assets.get("sky")}
+        ref={(sprite) => {
+          objectFit(sprite, pixiScreen, "cover");
+        }}
+      />
+      <Container
+        ref={(sprite) => {
+          eelRef = sprite as Pixi.Sprite & JSX.Element;
+        }}
+        x={pixiScreen.width * 0.5}
+        y={pixiScreen.height * 0.5}
+        scale={3}
+      >
+        <Sprite texture={Assets.get("bird")} ref={birdRef} anchor={0.5} x={-10} y={-20} />
+        <Sprite texture={Assets.get("run")} ref={runRef} anchor={0.5} />
+      </Container>
+      <Sprite
+        texture={Assets.get("eel")}
+        ref={(sprite) => {
+          eelRef = sprite as Pixi.Sprite & JSX.Element;
+          objectFit(sprite, pixiScreen, "scale-down");
+        }}
+      />
+      {/* Set a custom render order by arranging out scene objects in a different order in the RenderLayer */}
+      <RenderLayer>
+        {eelRef}
+        {runRef}
+        {birdRef}
+      </RenderLayer>
+    </Show>
   );
 };
+
+export const Demo = () => (
+  <PixiApplication
+    ref={(app) => {
+      // @ts-expect-error
+      globalThis.__PIXI_DEVTOOLS__ = {
+        app,
+      };
+      onCleanup(() => {
+        // @ts-expect-error
+        globalThis.__PIXI_DEVTOOLS__ = undefined;
+      });
+    }}
+  >
+    <Suspense fallback={<div>Loading...</div>}>
+      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
+        <PixiStage>
+          <DemoComponent />
+        </PixiStage>
+      </PixiCanvas>
+    </Suspense>
+  </PixiApplication>
+);

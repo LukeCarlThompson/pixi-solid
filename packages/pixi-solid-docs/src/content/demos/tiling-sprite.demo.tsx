@@ -1,10 +1,11 @@
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { onResize, onTick, PixiApplication, PixiCanvas, PixiStage, TilingSprite } from "pixi-solid";
+import { onTick, PixiApplication, PixiCanvas, PixiStage, TilingSprite, usePixiScreen } from "pixi-solid";
 import { createResource, Show } from "solid-js";
 import assetUrl from "@/assets/ground-tile.png";
 
-export const DemoApp = () => {
+const DemoComponent = () => {
+  const pixiScreen = usePixiScreen();
   // Setting scale mode to nearest for crisp pixel art
   TextureStyle.defaultOptions.scaleMode = "nearest";
 
@@ -15,30 +16,31 @@ export const DemoApp = () => {
     return groundTexture;
   });
   return (
-    <PixiApplication background="#1099bb">
-      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        {/* Show our Stage when the texture is loaded */}
-        <Show when={textureResource()}>
-          {(texture) => (
-            <PixiStage>
-              <TilingSprite
-                ref={(tileRef) => {
-                  onTick((ticker) => {
-                    tileRef.tilePosition.x -= 2 * ticker.deltaTime;
-                  });
-                  onResize((screen) => {
-                    tileRef.width = screen.width;
-                    tileRef.height = screen.height * 0.5;
-                    tileRef.position.y = screen.height * 0.5;
-                  });
-                }}
-                texture={texture()}
-                tileScale={{ x: 3, y: 3 }}
-              />
-            </PixiStage>
-          )}
-        </Show>
-      </PixiCanvas>
-    </PixiApplication>
+    <Show when={textureResource()}>
+      {(texture) => (
+        <TilingSprite
+          ref={(tileRef) => {
+            onTick((ticker) => {
+              tileRef.tilePosition.x -= 2 * ticker.deltaTime;
+            });
+            tileRef.width = pixiScreen.width;
+            tileRef.height = pixiScreen.height * 0.5;
+            tileRef.position.y = pixiScreen.height * 0.5;
+          }}
+          texture={texture()}
+          tileScale={{ x: 3, y: 3 }}
+        />
+      )}
+    </Show>
   );
 };
+
+export const Demo = () => (
+  <PixiApplication background="#1099bb">
+    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
+      <PixiStage>
+        <DemoComponent />
+      </PixiStage>
+    </PixiCanvas>
+  </PixiApplication>
+);

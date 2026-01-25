@@ -1,7 +1,8 @@
 import { BitmapFont } from "pixi.js";
-import { BitmapText, onResize, PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
+import { BitmapText, PixiApplication, PixiCanvas, PixiStage, usePixiScreen } from "pixi-solid";
 
-export const DemoApp = () => {
+const DemoComponent = () => {
+  const pixiScreen = usePixiScreen();
   // Creating a bitmap version of a built in font instead of loading a custom one.
   BitmapFont.install({
     name: "MyCustomBitmapFont",
@@ -23,29 +24,27 @@ export const DemoApp = () => {
   });
 
   return (
-    <PixiApplication background={"#b3fffbff"}>
-      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <PixiStage>
-          <BitmapText
-            text="Our cool custom bitmap font!"
-            style={{
-              fontFamily: "MyCustomBitmapFont",
-              fontSize: 32,
-              fill: 0xfff000,
-              align: "center",
-            }}
-            ref={(text) => {
-              // Position in the center of the screen
-              onResize((screen) => {
-                text.pivot.x = text.width * 0.5;
-                text.pivot.y = text.height * 0.5;
-                text.position.x = screen.width * 0.5;
-                text.position.y = screen.height * 0.5;
-              });
-            }}
-          />
-        </PixiStage>
-      </PixiCanvas>
-    </PixiApplication>
+    <BitmapText
+      text="Our cool custom bitmap font!"
+      style={{
+        fontFamily: "MyCustomBitmapFont",
+        fontSize: 32,
+        fill: 0xfff000,
+        align: "center",
+      }}
+      anchor={0.5}
+      x={pixiScreen.width * 0.5}
+      y={pixiScreen.height * 0.5}
+    />
   );
 };
+
+export const Demo = () => (
+  <PixiApplication background={"#b3fffbff"}>
+    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
+      <PixiStage>
+        <DemoComponent />
+      </PixiStage>
+    </PixiCanvas>
+  </PixiApplication>
+);
