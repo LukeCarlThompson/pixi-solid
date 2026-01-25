@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.0.33
+
+#### Changed
+
+- ⚙️ Added defaults for the `PixiApplication` back in. Set `autoDensity` to `true` and `resolution` to use `window.devicePixelRatio` by default.
+
 ## 0.0.32
 
 #### Added

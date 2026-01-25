@@ -79,7 +79,11 @@ export const PixiApplication = (props: PixiApplicationProps) => {
 
   const [appResource] = createResource(async () => {
     const app = new Application();
-    await app.init(initialisationProps);
+    await app.init({
+      resolution: window.devicePixelRatio,
+      autoDensity: true,
+      ...initialisationProps,
+    });
 
     return app;
   });
