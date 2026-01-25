@@ -62,6 +62,11 @@ export const PixiCanvas = (props: {
       ref={canvasWrapElement}
       style={{
         position: "relative",
+        /* Disables the callout/menu on long-press */
+        ["-webkit-touch-callout"]: "none",
+        /* Disables text selection */
+        ["-webkit-user-select"]: "none",
+        ["user-select"]: "none",
         ...(typeof props.style === "object" ? props.style : {}),
       }}
       class={props.className}
