@@ -25,6 +25,8 @@ export const smoothDamp = (
   deltaTime: number = 1 / 60,
   precision: number = 0.01, // Added precision parameter with a default
 ): number => {
+  if (current === target) return current;
+
   // Check precision and velocity before doing calculations
   if (Math.abs(current - target) < precision && Math.abs(velocity.value) < precision) {
     velocity.value = 0; // Reset velocity
@@ -76,15 +78,18 @@ export const useSmoothDamp = (props: UseSmoothDampProps): SmoothDamp => {
   const velocity = createMutable({ value: 0 });
 
   const update = (deltaTimeMS: number) => {
-    if (current() === props.to()) {
+    const currentValue = current();
+    const currentTarget = props.to();
+
+    if (currentValue === currentTarget) {
       velocity.value = 0;
       return;
     }
 
     const deltaTime = deltaTimeMS / 1000; // Convert milliseconds to seconds
     const newCurrent = smoothDamp(
-      current(),
-      props.to(),
+      currentValue,
+      currentTarget,
       velocity,
       props.smoothTimeMs?.(),
       props.maxSpeed?.(),
