@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { Graphics, PixiApplication, PixiCanvas, PixiStage, Sprite, usePixiScreen } from "pixi-solid";
+import { Container, Graphics, PixiApplication, PixiCanvas, PixiStage, Sprite, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, onCleanup, Show } from "solid-js";
 import skyAssetUrl from "@/assets/sky.png";
@@ -23,7 +23,7 @@ const DemoComponent = () => {
 
   return (
     <Show when={textureResource()}>
-      <PixiStage onglobalpointermove={handlePointerMove} eventMode="static">
+      <Container onglobalpointermove={handlePointerMove} eventMode="static">
         <Graphics
           ref={(instance) => {
             graphicsRef = instance;
@@ -38,7 +38,7 @@ const DemoComponent = () => {
             objectFit(instance, pixiScreen, "cover");
           }}
         />
-      </PixiStage>
+      </Container>
     </Show>
   );
 };
