@@ -1,0 +1,28 @@
+---
+title: useSmoothDamp
+description: Solid.js hook for smoothly dampening a numeric value towards a target over time, synchronized with the Pixi.js ticker.
+sidebar:
+  order: 7
+---
+
+import { Code } from "@astrojs/starlight/components";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import demoCode from "../../examples/use-smooth-damp.demo.tsx?raw";
+import { ClientOnly } from "../../examples/client-only";
+
+The `useSmoothDamp` hook provides a reactive SolidJS signal that smoothly interpolates a numeric value towards a target value over time.
+It internally manages the damping physics and keeps its updates synchronized with the Pixi.js application's ticker, ensuring smooth animations that sync with your application's frame rate.
+
+This hook is similar in functionality to Unity's `Mathf.SmoothDamp` which is based on Game Programming Gems 4, Chapter 1.10.
+
+It must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication`.
+
+### Demo
+
+Taking our earlier dragging demo and applying `useSmoothDamp` to the dragging motion.
+
+<ClientOnly fileName="use-smooth-damp" client:only="solid-js" />
+
+### Code example
+
+<Code code={demoCode} lang="tsx" title="demo-app.tsx" />

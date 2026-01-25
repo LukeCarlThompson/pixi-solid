@@ -5,10 +5,15 @@ description: An example of using events for dragging behaviour in solid-pixi.
 
 import { Code } from "@astrojs/starlight/components";
 import { Tabs, TabItem } from "@astrojs/starlight/components";
-import demoCode from "../../examples/pass-through-props.demo.tsx?raw";
-import exampleCode from "../../examples/pass-through-props.tsx?raw";
+import demoCode from "../../examples/dragging.demo.tsx?raw";
 import { ClientOnly } from "../../examples/client-only";
+
+An example of using event handlers and the smooth damp function to create dragging functionality.
 
 ### Demo
 
-WIP.
+<ClientOnly fileName="dragging" client:only="solid-js" />
+
+### Code example
+
+<Code code={demoCode} lang="tsx" title="demo-app.tsx" />
