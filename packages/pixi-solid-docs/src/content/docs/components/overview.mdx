@@ -61,6 +61,14 @@ let spriteRef: Pixi.Sprite | undefined;
 //...
 ```
 
+### Property names
+
+All standard PixiJS properties available on a display object instance (e.g., x, y, rotation, alpha, width, height, scale, position, pivot, anchor, skew etc.) are directly available as props on the pixi-solid components.
+
+In addition to this, pixi-solid enhances these point-based properties (like position, scale, pivot, anchor, and skew) by providing individual axis props.
+This means you can control position.x independently using positionX, position.y with positionY, and similarly for scaleX, scaleY, pivotX, pivotY, anchorX, anchorY, skewX, and skewY.
+This allows for more granular control over these properties directly through JSX props without needing to create a new object for every update.
+
 ### Accessing the instance with Refs
 
 Just like when using SolidJS with the DOM we can access the rendered object instance with a `ref`.

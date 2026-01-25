@@ -1,0 +1,27 @@
+---
+title: useSpring
+description: Solid.js hook for creating spring-based animations for numeric values, synchronized with the Pixi.js ticker.
+sidebar:
+  order: 8
+---
+
+import { Code } from "@astrojs/starlight/components";
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+import demoCode from "../../examples/use-spring.demo.tsx?raw";
+import { ClientOnly } from "../../examples/client-only";
+
+The `useSpring` hook provides reactive SolidJS signals for creating physically-based spring animations for numeric values. It returns both the `value` and `velocity` of the spring as signals.
+
+The hook internally manages the spring physics calculations and keeps its updates synchronized with the Pixi.js application's ticker, ensuring smooth and responsive animations that align with your application's frame rate.
+
+It must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication`.
+
+### Demo
+
+Taking our earlier `useSmoothDamp` demo and applying `useSpring` gives us an altogether different feeling motion.
+
+<ClientOnly fileName="use-spring" client:only="solid-js" />
+
+### Code example
+
+<Code code={demoCode} lang="tsx" title="demo-app.tsx" />

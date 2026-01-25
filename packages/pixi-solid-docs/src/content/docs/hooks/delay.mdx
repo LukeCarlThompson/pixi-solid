@@ -5,6 +5,8 @@ sidebar:
   order: 4
 ---
 
+import { Aside } from "@astrojs/starlight/components";
+
 The `delay` hook provides a way to create a function that will run a callback after a specified number of milliseconds of ticker time.
 
 It ensures that the delay is in sync with the shared ticker's time units, making it ideal for animations or syncing with other actions based on ticker time.
@@ -13,9 +15,10 @@ The delay is synchronized with the shared ticker, so it will not progress if the
 
 This hook must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication` or `TickerProvider`.
 
-**Note**
-This function cannot be used in an async context because the Application and Ticker context providers aren't available.
-For that purpose you should use the alternative `createAsyncDelay` hook.
+<Aside type="note">
+  This function cannot be used in an async context because the Application and Ticker context providers aren't available
+  in an async context. For that purpose you should use the alternative `createAsyncDelay` hook.
+</Aside>
 
 ### Usage
 

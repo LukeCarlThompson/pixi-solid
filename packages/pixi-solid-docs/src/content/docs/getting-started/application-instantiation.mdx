@@ -3,11 +3,40 @@ title: Creating a Pixi Application
 description: How to get started with pixi-solid.
 ---
 
+import { Aside } from "@astrojs/starlight/components";
+
 ### Instantiating the Pixi Application
 
-To start rending in PixiJS, you'll need to create a `PixiApplication` component that will instantiate the `PIXI.Application` instance and provide it to all child components via context.
+To start rendering in PixiJS, you'll need to create a `PixiApplication` component that will instantiate the `PIXI.Application` instance and provide it to all child components via context.
+It acts as the root of your Pixi Solid application and provider for all the pixi-solid hooks.
+It accepts all PixiJS application options as props.
+There should only be one of these per project.
 
-import { Aside } from "@astrojs/starlight/components";
+<Aside type="tip">
+  The `PixiApplication` component doesn't actually add any elements to the DOM, we need to use the `PixiCanvas` for
+  that. This means that if any HTML components need access to any of the pixi-solid hooks or application state they can
+  be rendered as children of `PixiApplication` but need to be outside of the `PixiCanvas` component.
+</Aside>
+
+### PixiCanvas
+
+The `PixiCanvas` component needs to be a child of `PixiApplication`.
+It's responsible for placing the the HTML `<canvas>` element that PixiJS uses into the HTML page.
+
+Some sensible defaults have been applied here to make responsive behaviour of the `canvas` a little easier to work with.
+
+The `canvas` element is wrapped in a `div` that it will automatically resize to fit inside of.
+This means that we can use any CSS styles we like to reposition or resize the wrapping `div` and our PixiJS `canvas` will respond automatically.
+You can apply standard HTML attributes and styling to the `canvas` wrapper `div` via component props.
+
+The `canvas` is set to listen for resizing of the wrapper `div` so it can adjust auotmatically if the page layout changes even if the `window` size didn't change.
+
+### PixiStage
+
+`PixiCanvas` only accepts one child, the `PixiStage` component.
+This provides the root `PIXI.Container` (the `app.stage` instance) for all your PixiJS display objects.
+All your visual `pixi-solid` components, such as `Sprite`, `Graphics`, or other `Container`s, should be placed as children of `PixiStage`.
+It handles the mounting and unmounting of your Pixi display object tree.
 
 ```tsx
 import { PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
@@ -28,7 +57,7 @@ export const DemoApp = () => {
 };
 ```
 
-<Aside>
+<Aside type={"caution"}>
   The `pixi-solid` library only supports client side rendering. So you may need to use the `lazy` function to
   dynamically import only on the client or use the `clientOnly` function if using Solid Start.
 </Aside>
