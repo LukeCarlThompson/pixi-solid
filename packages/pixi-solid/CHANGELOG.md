@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.0.32
+
+#### Added
+
+- ✅ Added default styles to the `canvas` element to stop select on long press on touch sreens.
+
 ## 0.0.31
 
 #### Added
