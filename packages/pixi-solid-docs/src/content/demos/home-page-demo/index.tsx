@@ -14,7 +14,7 @@ export const DemoApp = () => {
   const appStore = createAppStore();
 
   const [textureResource] = createResource(loadSceneAssets);
-  const sceneBounds = new Rectangle(0, 0, 200, 133);
+  const sceneBounds = new Rectangle(0, 0, 200 * 2, 133 * 2);
   const blurFilter = new BlurFilter({ strength: 8 });
   const crtFilter = new CRTFilter({
     curvature: 3,
@@ -57,7 +57,14 @@ export const DemoApp = () => {
                   });
                 }}
               >
-                <Sprite label="Sky" texture={Assets.get<Pixi.Texture>("sky")} filters={blurFilter} />
+                <Sprite
+                  label="Sky"
+                  texture={Assets.get<Pixi.Texture>("sky")}
+                  filters={blurFilter}
+                  ref={(ref) => {
+                    objectFit(ref, sceneBounds, "cover");
+                  }}
+                />
                 <Ground
                   movementSpeed={appStore.state.isRunning ? 1.3 : 0}
                   direction={appStore.state.direction}
@@ -68,7 +75,7 @@ export const DemoApp = () => {
                 <Character
                   direction={appStore.state.direction}
                   isRunning={appStore.state.isRunning}
-                  position={{ x: sceneBounds.width * 0.5, y: sceneBounds.height * 0.5 }}
+                  position={{ x: sceneBounds.width * 0.5, y: sceneBounds.height * 0.7 }}
                 />
               </Container>
             </PixiStage>
