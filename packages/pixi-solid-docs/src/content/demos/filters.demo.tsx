@@ -1,12 +1,13 @@
 import type * as Pixi from "pixi.js";
 import { Assets, BlurFilter, TextureStyle } from "pixi.js";
-import { onResize, PixiApplication, PixiCanvas, PixiStage, Sprite } from "pixi-solid";
+import { PixiApplication, PixiCanvas, PixiStage, Sprite, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createEffect, createResource, createSignal, onCleanup, Show } from "solid-js";
 import birdAssetUrl from "@/assets/bird_03.png";
 import skyAssetUrl from "@/assets/sky.png";
 
-export const DemoApp = () => {
+const DemoComponent = () => {
+  const pixiScreen = usePixiScreen();
   // Set scale mode for crisp pixel art
   TextureStyle.defaultOptions.scaleMode = "nearest";
 
@@ -14,7 +15,7 @@ export const DemoApp = () => {
     Assets.load<Pixi.Texture>([
       { alias: "sky", src: skyAssetUrl },
       { alias: "bird", src: birdAssetUrl },
-    ])
+    ]),
   );
 
   // Create the filter using the Pixi class
@@ -42,36 +43,38 @@ export const DemoApp = () => {
   };
 
   return (
-    <PixiApplication>
-      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        {/* Show our Stage when the assets are loaded */}
-        <Show when={textureResource()}>
-          <PixiStage onglobalpointermove={handlePointerMove} eventMode="static">
-            <Sprite
-              label="sky"
-              texture={Assets.get<Pixi.Texture>("sky")}
-              filters={blurFilter}
-              ref={(instance) => {
-                onResize((screen) => {
-                  objectFit(instance, screen, "cover");
-                });
-              }}
-            />
-            <Sprite
-              label="bird"
-              texture={Assets.get<Pixi.Texture>("bird")}
-              scale={2}
-              anchor={0.5}
-              ref={(instance) => {
-                onResize((screen) => {
-                  instance.x = screen.width * 0.5;
-                  instance.y = screen.height * 0.5;
-                });
-              }}
-            />
-          </PixiStage>
-        </Show>
-      </PixiCanvas>
-    </PixiApplication>
+    <Show when={textureResource()}>
+      {/* Show our Stage when the assets are loaded */}
+      <Sprite
+        label="sky"
+        texture={Assets.get<Pixi.Texture>("sky")}
+        filters={blurFilter}
+        eventMode="static"
+        onglobalpointermove={handlePointerMove}
+        ref={(instance) => {
+          objectFit(instance, pixiScreen, "cover");
+        }}
+      />
+      <Sprite
+        label="bird"
+        texture={Assets.get<Pixi.Texture>("bird")}
+        scale={2}
+        anchor={0.5}
+        ref={(instance) => {
+          instance.x = pixiScreen.width * 0.5;
+          instance.y = pixiScreen.height * 0.5;
+        }}
+      />
+    </Show>
   );
 };
+
+export const Demo = () => (
+  <PixiApplication antialias={true}>
+    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
+      <PixiStage>
+        <DemoComponent />
+      </PixiStage>
+    </PixiCanvas>
+  </PixiApplication>
+);

@@ -12,7 +12,7 @@ const ClickingDemo = () => {
   };
 
   return (
-    <PixiStage>
+    <>
       <Text
         text={textValue()}
         style={{ fill: "#ffffff", align: "center" }}
@@ -49,7 +49,7 @@ const ClickingDemo = () => {
         x={screen.width * 0.5}
         y={screen.height * 0.5}
       />
-    </PixiStage>
+    </>
   );
 };
 
@@ -57,7 +57,9 @@ export const DemoApp = () => {
   return (
     <PixiApplication antialias={true} resolution={window.devicePixelRatio}>
       <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <ClickingDemo />
+        <PixiStage>
+          <ClickingDemo />
+        </PixiStage>
       </PixiCanvas>
     </PixiApplication>
   );

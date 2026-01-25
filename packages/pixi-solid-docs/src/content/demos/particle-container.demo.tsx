@@ -1,15 +1,15 @@
 import type * as Pixi from "pixi.js";
 import { Assets, Particle } from "pixi.js";
-import { onResize, onTick, ParticleContainer, PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
+import { onTick, ParticleContainer, PixiApplication, PixiCanvas, PixiStage, usePixiScreen } from "pixi-solid";
 import { createResource, onMount, Show, Suspense } from "solid-js";
 import assetUrl from "@/assets/food-icons/fried-egg.png";
 
-export type ParticleContainerProps = Omit<Pixi.ParticleContainerOptions, "children"> & {
+type ParticleContainerProps = Omit<Pixi.ParticleContainerOptions, "children"> & {
   particleTexture: Pixi.Texture;
-  ref: (instance: Pixi.ParticleContainer) => void;
 };
 
-export const MyParticleContainerComponent = (props: ParticleContainerProps) => {
+const MyParticleContainer = (props: ParticleContainerProps) => {
+  const pixiScreen = usePixiScreen();
   // Get a ref to the ParticleContainer
   let particleContainerRef: Pixi.ParticleContainer | undefined;
 
@@ -28,7 +28,7 @@ export const MyParticleContainerComponent = (props: ParticleContainerProps) => {
         anchorY: 0.5,
         scaleX: 0.5,
         scaleY: 0.5,
-      })
+      }),
     );
     offsets.push(Math.random());
   }
@@ -56,8 +56,8 @@ export const MyParticleContainerComponent = (props: ParticleContainerProps) => {
         Math.sin(cumulativeTime * orbitSpeed * (1 + indexFactor * 0.1) + indexFactor) * orbitAmplitude;
       const currentAngle = cumulativeTime * orbitSpeed * (1 + indexFactor * 0.05) + indexFactor * Math.PI;
 
-      particle.x = currentRadius * Math.cos(currentAngle);
-      particle.y = currentRadius * Math.sin(currentAngle);
+      particle.x = pixiScreen.width * 0.5 + currentRadius * Math.cos(currentAngle);
+      particle.y = pixiScreen.height * 0.5 + currentRadius * Math.sin(currentAngle);
 
       // Calculate pulsating scale directly within the desired range
       const scaleValue =
@@ -87,39 +87,26 @@ export const MyParticleContainerComponent = (props: ParticleContainerProps) => {
         vertex: true,
       }}
       ref={(particleContainer) => {
-        // Bind the ref in this component and forward the ref to our propr.ref as well
         particleContainerRef = particleContainer;
-        props.ref(particleContainer);
       }}
     />
   );
 };
 
-export const DemoApp = () => {
+const DemoComponent = () => {
   // Create a resource to load the sky texture
   const [textureResource] = createResource(() => Assets.load<Pixi.Texture>(assetUrl));
-  return (
-    <PixiApplication>
-      <Suspense fallback={<div>Loading...</div>}>
-        <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-          {/* Show our Stage when the assets are loaded */}
-          <Show when={textureResource()}>
-            {(texture) => (
-              <PixiStage>
-                <MyParticleContainerComponent
-                  particleTexture={texture()}
-                  ref={(particleContainer) => {
-                    onResize((screen) => {
-                      particleContainer.position.x = screen.width * 0.5;
-                      particleContainer.position.y = screen.height * 0.5;
-                    });
-                  }}
-                />
-              </PixiStage>
-            )}
-          </Show>
-        </PixiCanvas>
-      </Suspense>
-    </PixiApplication>
-  );
+  return <Show when={textureResource()}>{(texture) => <MyParticleContainer particleTexture={texture()} />}</Show>;
 };
+
+export const Demo = () => (
+  <PixiApplication>
+    <Suspense fallback={<div>Loading...</div>}>
+      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
+        <PixiStage>
+          <DemoComponent />
+        </PixiStage>
+      </PixiCanvas>
+    </Suspense>
+  </PixiApplication>
+);
