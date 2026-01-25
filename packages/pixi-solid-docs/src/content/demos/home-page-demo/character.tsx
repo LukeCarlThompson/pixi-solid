@@ -27,18 +27,20 @@ export const Character = (props: CharacterProps) => {
               });
             }}
             textures={getRunAnimationTextures()}
-            scale={{ x: props.direction === "left" ? -1 : 1, y: 1 }}
+            scaleX={props.direction === "left" ? -1 : 1}
             animationSpeed={0.25}
-            anchor={{ x: 0.5, y: 0.5 }}
+            anchorX={0.5}
+            anchorY={0.92}
           />
         </Match>
         <Match when={!props.isRunning}>
           <AnimatedSprite
             autoPlay={true}
             textures={getIdleAnimationTextures()}
-            scale={{ x: props.direction === "left" ? -1 : 1, y: 1 }}
+            scaleX={props.direction === "left" ? -1 : 1}
             animationSpeed={0.25}
-            anchor={{ x: 0.5, y: 0.5 }}
+            anchorX={0.5}
+            anchorY={0.92}
           />
         </Match>
       </Switch>

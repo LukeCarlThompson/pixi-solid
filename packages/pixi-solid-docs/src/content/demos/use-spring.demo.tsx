@@ -85,7 +85,7 @@ const DraggingDemo = () => {
 
 export const DemoApp = () => {
   return (
-    <PixiApplication antialias={true} resolution={window.devicePixelRatio}>
+    <PixiApplication antialias={true}>
       <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
         <DraggingDemo />
       </PixiCanvas>
