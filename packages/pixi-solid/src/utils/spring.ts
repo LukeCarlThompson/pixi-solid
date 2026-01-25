@@ -34,10 +34,14 @@ export const useSpring = (props: UseSpringProps): Spring => {
 
   const update = (deltaTimeMS: number) => {
     const targetInput = props.to();
+    const currentValue = value();
+    const currentVelocity = velocity();
+
+    if (targetInput === currentValue) return;
 
     // Settling condition: if output is very close to input and velocity is negligible,
     // snap to input and stop calculations.
-    if (Math.abs(velocity()) < 0.1 && Math.abs(value() - targetInput) < 0.01) {
+    if (Math.abs(currentVelocity) < 0.1 && Math.abs(currentValue - targetInput) < 0.01) {
       setVelocity(0);
       setValue(targetInput);
       return;
@@ -50,12 +54,12 @@ export const useSpring = (props: UseSpringProps): Spring => {
     const damping = percentToValueBetweenRange(props.damping?.() ?? 30, -0.4, -20);
     const mass = percentToValueBetweenRange(props.mass?.() ?? 20, 0.1, 10);
 
-    const springX = stiffness * (value() - targetInput);
-    const damperX = damping * velocity();
+    const springX = stiffness * (currentValue - targetInput);
+    const damperX = damping * currentVelocity;
     const amplitude = (springX + damperX) / mass;
 
     setVelocity((prev) => prev + amplitude * deltaTime);
-    setValue(value() + velocity() * deltaTime);
+    setValue(currentValue + currentVelocity * deltaTime);
   };
 
   onTick((ticker) => {
