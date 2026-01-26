@@ -30,8 +30,8 @@ export const DemoApp = () => {
   });
 
   return (
-    <div style={{ position: "relative" }}>
-      <PixiApplication>
+    <PixiApplication>
+      <div style={{ position: "relative" }}>
         <Controls
           isRunning={appStore.state.isRunning}
           direction={appStore.state.direction}
@@ -81,7 +81,7 @@ export const DemoApp = () => {
             </PixiStage>
           </Show>
         </PixiCanvas>
-      </PixiApplication>
-    </div>
+      </div>
+    </PixiApplication>
   );
 };
