@@ -110,9 +110,6 @@ export const PixiApplication = (props: PixiApplicationProps) => {
           (props.ref as unknown as (arg: any) => void)(app);
         }
 
-        app.ticker.autoStart = false;
-        app.ticker.start();
-
         updatePixiScreenStore(app.renderer.screen);
 
         const handleResize = () => {
@@ -126,7 +123,7 @@ export const PixiApplication = (props: PixiApplicationProps) => {
           app.destroy(true, { children: true });
         });
       }
-    })
+    }),
   );
 
   return (
@@ -240,7 +237,7 @@ export const createAsyncDelay = (): ((delayMs: number) => Promise<void>) => {
 
   if (!ticker) {
     throw new Error(
-      "`createDelay` must be used within a PixiApplication or a TickerProvider. The returned `delay` function can be called in an async context but `createDelay` must be called in a synchronous scope within a PixiApplication or a TickerProvider"
+      "`createDelay` must be used within a PixiApplication or a TickerProvider. The returned `delay` function can be called in an async context but `createDelay` must be called in a synchronous scope within a PixiApplication or a TickerProvider",
     );
   }
   const delayWithTicker = (delayMs: number) => asyncDelay(ticker, delayMs);
@@ -266,7 +263,7 @@ export const delay = (delayMs: number, callback?: () => void): void => {
   const ticker = useContext(TickerContext);
   if (!ticker) {
     throw new Error(
-      "`createDelay` must be used within a PixiApplication or a TickerProvider. The returned `delay` function can be called in an async context but `createDelay` must be called in a synchronous scope within a PixiApplication or a TickerProvider"
+      "`createDelay` must be used within a PixiApplication or a TickerProvider. The returned `delay` function can be called in an async context but `createDelay` must be called in a synchronous scope within a PixiApplication or a TickerProvider",
     );
   }
 
