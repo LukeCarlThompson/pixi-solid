@@ -8,6 +8,17 @@ import { POINT_PROP_AXIS_NAMES } from "./point-property-names";
 import { insert, setProp } from "./renderer";
 
 /**
+ * This is a utility type useful for extending the props of custom components to allow props to be passed through to the underlying Pixi instance.
+ *
+ * If you don't require them all it's recommended to narrow the type by using Pick or Omit the props to only allow the ones you need.
+ *
+ * @example PixiComponentProps<Pixi.SpriteOptions>.
+ */
+export type PixiComponentProps<
+  ComponentOptions extends Pixi.ContainerOptions = Pixi.ContainerOptions,
+> = PixiEventHandlerMap & PointAxisProps & Omit<ComponentOptions, "children">;
+
+/**
  * Prop definition for components that CAN have children
  */
 export type ContainerProps<Component> = PixiEventHandlerMap &
@@ -56,17 +67,12 @@ export const applyProps = <
     if (key === "as") continue;
 
     if (key === "ref") {
-      createRenderEffect(() => {
-        // Solid converts the ref prop to a callback function
-        (props[key] as unknown as (arg: any) => void)(instance);
-      });
+      (props[key] as unknown as (arg: any) => void)(instance);
     } else if (key === "children") {
       if (!("addChild" in instance)) {
         throw new Error(`Cannot set children on non-container instance.`);
       }
-      createRenderEffect(() => {
-        insert(instance, () => props.children);
-      });
+      insert(instance, () => props.children);
     } else if (defer) {
       createRenderEffect(
         on(

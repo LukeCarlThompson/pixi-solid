@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets, Point } from "pixi.js";
-import { MeshRope, onTick, PixiApplication, PixiCanvas, PixiStage, usePixiScreen } from "pixi-solid";
+import { MeshRope, onTick, PixiApplication, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, Show } from "solid-js";
 import assetUrl from "@/assets/eel.png";
@@ -45,9 +45,7 @@ const DemoComponent = () => {
 export const Demo = () => (
   <PixiApplication>
     <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-      <PixiStage>
-        <DemoComponent />
-      </PixiStage>
+      <DemoComponent />
     </PixiCanvas>
   </PixiApplication>
 );

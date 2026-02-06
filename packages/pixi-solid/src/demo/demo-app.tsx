@@ -3,15 +3,14 @@ import type { FederatedPointerEvent } from "pixi.js";
 import { Texture } from "pixi.js";
 import type { JSX } from "solid-js";
 import { createSignal } from "solid-js";
-import { getPixiApp, PixiApplication } from "../pixi-application";
+import type { PixiComponentProps } from "../component-creation";
+import { getPixiApp, onTick, PixiApplication } from "../pixi-application";
 import { PixiCanvas } from "../pixi-canvas";
 import { Container, Sprite, Text } from "../pixi-components";
-import { PixiStage } from "../pixi-stage";
-import { onTick } from "../use-ticker";
 
 type FollowTextProps = {
   position: { x: number; y: number };
-};
+} & PixiComponentProps;
 const FollowText = (props: FollowTextProps): JSX.Element => {
   let spriteRef: Pixi.Sprite | undefined;
 
@@ -75,10 +74,8 @@ export const App = (): JSX.Element => {
       <h1 style={{ position: "relative" }}>Pixi.js SolidJS Example</h1>
       <PixiApplication background={"#1099bb"}>
         <PixiCanvas>
-          <PixiStage onglobalpointermove={handlePointerMove} eventMode={"static"}>
-            <FollowText position={position()} />
-            <CenteredText text="Centered" />
-          </PixiStage>
+          <FollowText position={position()} onglobalpointermove={handlePointerMove} eventMode="static" />
+          <CenteredText text="Centered" />
         </PixiCanvas>
       </PixiApplication>
     </div>

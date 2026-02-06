@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { onTick, PixiApplication, PixiCanvas, PixiStage, TilingSprite, usePixiScreen } from "pixi-solid";
+import { onTick, PixiApplication, PixiCanvas, TilingSprite, usePixiScreen } from "pixi-solid";
 import { createResource, Show } from "solid-js";
 import assetUrl from "@/assets/ground-tile.png";
 
@@ -38,9 +38,7 @@ const DemoComponent = () => {
 export const Demo = () => (
   <PixiApplication background="#1099bb">
     <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-      <PixiStage>
-        <DemoComponent />
-      </PixiStage>
+      <DemoComponent />
     </PixiCanvas>
   </PixiApplication>
 );

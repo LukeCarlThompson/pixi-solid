@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.0.36
+
+#### Removed
+
+- 💀 Removed the `PixiStage` component as it provided little value and was a bit of a nuisance.
+  The pixi stage component can be accessed from the `getPixiApp` context if required.
+
+#### Added
+
+- ✅ Added a utility type `PixiComponentProps` that is useful for extending custom component props that users want to pass through.
+
 ## 0.0.33
 
 #### Changed

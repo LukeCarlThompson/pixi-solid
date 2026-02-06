@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { Container, PixiApplication, PixiCanvas, PixiStage, RenderLayer, Sprite, usePixiScreen } from "pixi-solid";
+import { Container, PixiApplication, PixiCanvas, RenderLayer, Sprite, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import type { JSX } from "solid-js";
 import { createResource, onCleanup, Show, Suspense } from "solid-js";
@@ -80,9 +80,7 @@ export const Demo = () => (
   >
     <Suspense fallback={<div>Loading...</div>}>
       <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <PixiStage>
-          <DemoComponent />
-        </PixiStage>
+        <DemoComponent />
       </PixiCanvas>
     </Suspense>
   </PixiApplication>

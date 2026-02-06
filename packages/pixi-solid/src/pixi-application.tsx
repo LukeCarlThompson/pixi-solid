@@ -12,7 +12,7 @@ import {
   splitProps,
   useContext,
 } from "solid-js";
-import { createMutable } from "solid-js/store";
+import { createStore } from "solid-js/store";
 
 export type PixiScreenDimensions = {
   width: number;
@@ -55,9 +55,9 @@ export type PixiApplicationProps = Partial<Omit<ApplicationOptions, "children" |
 };
 
 /**
- * A SolidJS component that creates and manages a PIXI.Application instance.
+ * A SolidJS component that creates a PIXI.Application instance and works as a context provider.
  * It provides the application instance through context to be used by child components
- * and custom hooks like `getPixiApp`, `onTick`, and `getTicker`.
+ * and custom hooks like `getPixiApp`, `onTick`, `getTicker` and `usePixiScreen`.
  *
  * This component should only be used once in your application.
  *
@@ -66,7 +66,7 @@ export type PixiApplicationProps = Partial<Omit<ApplicationOptions, "children" |
  */
 export const PixiApplication = (props: PixiApplicationProps) => {
   const [, initialisationProps] = splitProps(props, ["ref", "children"]);
-  const pixiScreenDimensions = createMutable<PixiScreenDimensions>({
+  const [pixiScreenDimensions, setPixiScreenDimensions] = createStore<PixiScreenDimensions>({
     width: 800,
     height: 600,
     left: 0,
@@ -90,39 +90,34 @@ export const PixiApplication = (props: PixiApplicationProps) => {
 
   const updatePixiScreenStore = (screen: Rectangle) => {
     batch(() => {
-      pixiScreenDimensions.width = screen.width;
-      pixiScreenDimensions.height = screen.height;
-      pixiScreenDimensions.left = screen.x;
-      pixiScreenDimensions.top = screen.y;
-      pixiScreenDimensions.right = screen.x + screen.width;
-      pixiScreenDimensions.bottom = screen.y + screen.height;
-      pixiScreenDimensions.x = screen.x;
-      pixiScreenDimensions.y = screen.y;
+      setPixiScreenDimensions(screen);
+      setPixiScreenDimensions("left", screen.x);
+      setPixiScreenDimensions("top", screen.y);
+      setPixiScreenDimensions("right", screen.x + screen.width);
+      setPixiScreenDimensions("bottom", screen.y + screen.height);
     });
   };
 
   createEffect(
-    on(appResource, () => {
-      const app = appResource();
-      if (app) {
-        if (props.ref) {
-          // Solid converts the ref prop to a callback function
-          (props.ref as unknown as (arg: any) => void)(app);
-        }
-
-        updatePixiScreenStore(app.renderer.screen);
-
-        const handleResize = () => {
-          updatePixiScreenStore(app.renderer.screen);
-        };
-
-        app.renderer.addListener("resize", handleResize);
-
-        onCleanup(() => {
-          app.renderer.removeListener("resize", handleResize);
-          app.destroy(true, { children: true });
-        });
+    on(appResource, (app) => {
+      if (!app) return;
+      if (props.ref) {
+        // Solid converts the ref prop to a callback function
+        (props.ref as unknown as (arg: any) => void)(app);
       }
+
+      updatePixiScreenStore(app.renderer.screen);
+
+      const handleResize = () => {
+        updatePixiScreenStore(app.renderer.screen);
+      };
+
+      app.renderer.addListener("resize", handleResize);
+
+      onCleanup(() => {
+        app.renderer.removeListener("resize", handleResize);
+        app.destroy(true, { children: true });
+      });
     }),
   );
 

@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets, Particle } from "pixi.js";
-import { onTick, ParticleContainer, PixiApplication, PixiCanvas, PixiStage, usePixiScreen } from "pixi-solid";
+import { onTick, ParticleContainer, PixiApplication, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { createResource, onMount, Show, Suspense } from "solid-js";
 import assetUrl from "@/assets/food-icons/fried-egg.png";
 
@@ -103,9 +103,7 @@ export const Demo = () => (
   <PixiApplication>
     <Suspense fallback={<div>Loading...</div>}>
       <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <PixiStage>
-          <DemoComponent />
-        </PixiStage>
+        <DemoComponent />
       </PixiCanvas>
     </Suspense>
   </PixiApplication>

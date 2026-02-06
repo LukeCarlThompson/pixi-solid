@@ -31,15 +31,12 @@ You can apply standard HTML attributes and styling to the `canvas` wrapper `div`
 
 The `canvas` is set to listen for resizing of the wrapper `div` so it can adjust auotmatically if the page layout changes even if the `window` size didn't change.
 
-### PixiStage
-
-`PixiCanvas` only accepts one child, the `PixiStage` component.
-This provides the root `PIXI.Container` (the `app.stage` instance) for all your PixiJS display objects.
-All your visual `pixi-solid` components, such as `Sprite`, `Graphics`, or other `Container`s, should be placed as children of `PixiStage`.
+`PIXI.Container` (the `app.stage` instance) for all your PixiJS display objects.
+All your visual `pixi-solid` components, such as `Sprite`, `Graphics`, or other `Container`s, should be placed as children of `PixiCanvas`.
 It handles the mounting and unmounting of your Pixi display object tree.
 
 ```tsx
-import { PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
+import { PixiApplication, PixiCanvas } from "pixi-solid";
 
 /**
  * The DemoApp component sets up the Pixi Application
@@ -49,9 +46,7 @@ import { PixiApplication, PixiCanvas, PixiStage } from "pixi-solid";
 export const DemoApp = () => {
   return (
     <PixiApplication>
-      <PixiCanvas>
-        <PixiStage>{/* Your Pixi Solid components go here */}</PixiStage>
-      </PixiCanvas>
+      <PixiCanvas>{/* Your Pixi Solid components go here */}</PixiCanvas>
     </PixiApplication>
   );
 };

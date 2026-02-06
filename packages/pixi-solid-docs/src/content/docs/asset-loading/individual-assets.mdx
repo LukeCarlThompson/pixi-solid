@@ -14,7 +14,7 @@ Let's say you want to load a single background image for your scene.
 ```tsx
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { PixiApplication, PixiCanvas, PixiStage, Sprite } from "pixi-solid";
+import { PixiApplication, PixiCanvas, Sprite } from "pixi-solid";
 import { createResource, Show } from "solid-js";
 
 export const IndividualAssetLoadingDemo = () => {
@@ -32,11 +32,7 @@ export const IndividualAssetLoadingDemo = () => {
       <PixiCanvas>
         {/* Use the <Show> component to render the Sprite only when the asset is loaded */}
         <Show when={backgroundImage()}>
-          {(texture) => (
-            <PixiStage>
-              <Sprite texture={texture()} anchor={0.5} position={[400, 300]} scale={0.5} />
-            </PixiStage>
-          )}
+          {(texture) => <Sprite texture={texture()} anchor={0.5} position={[400, 300]} scale={0.5} />}
         </Show>
       </PixiCanvas>
     </PixiApplication>

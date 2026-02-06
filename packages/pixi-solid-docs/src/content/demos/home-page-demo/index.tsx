@@ -1,7 +1,7 @@
 import type * as Pixi from "pixi.js";
 import { Assets, BlurFilter, Rectangle } from "pixi.js";
 import { CRTFilter } from "pixi-filters";
-import { Container, getPixiApp, onTick, PixiApplication, PixiCanvas, PixiStage, Sprite } from "pixi-solid";
+import { Container, getPixiApp, onTick, PixiApplication, PixiCanvas, Sprite } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, onCleanup, Show } from "solid-js";
 import { Character } from "./character";
@@ -46,39 +46,38 @@ export const DemoApp = () => {
           }}
         >
           <Show when={textureResource()}>
-            <PixiStage filters={crtFilter}>
-              <Container
-                ref={(container) => {
-                  const app = getPixiApp();
-                  onTick((ticker) => {
-                    objectFit(container, app.renderer, "cover");
-                    crtFilter.seed = Math.random() * 10;
-                    crtFilter.time += ticker.deltaTime * 0.3;
-                  });
+            <Container
+              filters={crtFilter}
+              ref={(container) => {
+                const app = getPixiApp();
+                onTick((ticker) => {
+                  objectFit(container, app.renderer, "cover");
+                  crtFilter.seed = Math.random() * 10;
+                  crtFilter.time += ticker.deltaTime * 0.3;
+                });
+              }}
+            >
+              <Sprite
+                label="Sky"
+                texture={Assets.get<Pixi.Texture>("sky")}
+                filters={blurFilter}
+                ref={(ref) => {
+                  objectFit(ref, sceneBounds, "cover");
                 }}
-              >
-                <Sprite
-                  label="Sky"
-                  texture={Assets.get<Pixi.Texture>("sky")}
-                  filters={blurFilter}
-                  ref={(ref) => {
-                    objectFit(ref, sceneBounds, "cover");
-                  }}
-                />
-                <Ground
-                  movementSpeed={appStore.state.isRunning ? 1.3 : 0}
-                  direction={appStore.state.direction}
-                  width={sceneBounds.width}
-                  height={sceneBounds.height * 0.3}
-                  position={{ x: 0, y: sceneBounds.height * 0.7 }}
-                />
-                <Character
-                  direction={appStore.state.direction}
-                  isRunning={appStore.state.isRunning}
-                  position={{ x: sceneBounds.width * 0.5, y: sceneBounds.height * 0.7 }}
-                />
-              </Container>
-            </PixiStage>
+              />
+              <Ground
+                movementSpeed={appStore.state.isRunning ? 1.3 : 0}
+                direction={appStore.state.direction}
+                width={sceneBounds.width}
+                height={sceneBounds.height * 0.3}
+                position={{ x: 0, y: sceneBounds.height * 0.7 }}
+              />
+              <Character
+                direction={appStore.state.direction}
+                isRunning={appStore.state.isRunning}
+                position={{ x: sceneBounds.width * 0.5, y: sceneBounds.height * 0.7 }}
+              />
+            </Container>
           </Show>
         </PixiCanvas>
       </div>
