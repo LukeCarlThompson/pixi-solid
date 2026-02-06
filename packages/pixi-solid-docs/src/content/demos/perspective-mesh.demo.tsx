@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { PerspectiveMesh, PixiApplication, PixiCanvas, PixiStage, usePixiScreen } from "pixi-solid";
+import { PerspectiveMesh, PixiApplication, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, Show } from "solid-js";
 import assetUrl from "@/assets/ground.webp";
@@ -36,9 +36,7 @@ const DemoComponent = () => {
 export const Demo = () => (
   <PixiApplication background="transparent">
     <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-      <PixiStage>
-        <DemoComponent />
-      </PixiStage>
+      <DemoComponent />
     </PixiCanvas>
   </PixiApplication>
 );

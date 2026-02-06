@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { getPixiApp, NineSliceSprite, onTick, PixiApplication, PixiCanvas, PixiStage, usePixiScreen } from "pixi-solid";
+import { getPixiApp, NineSliceSprite, onTick, PixiApplication, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { createResource, Show } from "solid-js";
 import assetUrl from "@/assets/nine-slice.png";
 
@@ -42,9 +42,7 @@ const DemoComponent = () => {
 export const Demo = () => (
   <PixiApplication background="pink">
     <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-      <PixiStage>
-        <DemoComponent />
-      </PixiStage>
+      <DemoComponent />
     </PixiCanvas>
   </PixiApplication>
 );

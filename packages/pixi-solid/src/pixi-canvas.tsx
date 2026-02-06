@@ -1,6 +1,13 @@
 import type { JSX } from "solid-js";
-import { createRenderEffect, onCleanup, onMount } from "solid-js";
+import { onCleanup, onMount } from "solid-js";
+import { applyProps } from "./component-creation";
 import { getPixiApp } from "./pixi-application";
+
+export type PixiCanvasProps = {
+  children: JSX.Element;
+  style?: JSX.CSSProperties | undefined;
+  className?: string;
+};
 
 /**
  * PixiCanvas
@@ -9,17 +16,13 @@ import { getPixiApp } from "./pixi-application";
  * and automatically resizes it.
  *
  * - Requires a surrounding `PixiApplication` component.
- * - Requires a `PixiStage` component as a child.
+ * - Accepts pixi-solid components as children, which will be rendered inside the canvas.
  *
  * Props:
- * @param props.children - JSX content to render inside the canvas wrapper. Use `PixiStage` as the only child.
+ * @param props.children - JSX content to render inside the canvas wrapper.
  */
 
-export const PixiCanvas = (props: {
-  children: JSX.Element;
-  style?: JSX.CSSProperties | undefined;
-  className?: string;
-}): JSX.Element => {
+export const PixiCanvas = (props: PixiCanvasProps): JSX.Element => {
   let canvasWrapElement: HTMLDivElement | undefined;
 
   const pixiApp = getPixiApp();
@@ -30,11 +33,7 @@ export const PixiCanvas = (props: {
   pixiApp.canvas.style.width = "100%";
   pixiApp.canvas.style.height = "100%";
 
-  createRenderEffect(() => {
-    if (props.children === undefined) {
-      throw new Error("PixiCanvas requires the `PixiStage` component to render.");
-    }
-  });
+  applyProps(pixiApp.stage, props);
 
   let previousResizeTo: typeof pixiApp.resizeTo;
   let resizeObserver: ResizeObserver | undefined;
