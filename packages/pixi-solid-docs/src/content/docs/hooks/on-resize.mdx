@@ -14,7 +14,7 @@ This hook must be called from a component that is a descendant of the `<PixiAppl
 The `onResize` hook takes a single argument: a `resizeCallback` function. This callback receives a `Pixi.Rectangle` object, which contains the current `width`, `height`, `x`, and `y` of the renderer's screen. The callback is invoked immediately upon the hook's initialization and then again every time the renderer detects a resize event.
 
 ```tsx
-import { onResize, PixiApplication, PixiCanvas, PixiStage, Text } from "pixi-solid";
+import { onResize, PixiApplication, PixiCanvas, Text } from "pixi-solid";
 import { createSignal } from "solid-js";
 import type * as Pixi from "pixi.js";
 
@@ -45,9 +45,7 @@ export const DemoApp = () => {
   return (
     <PixiApplication background="#1099bb">
       <PixiCanvas>
-        <PixiStage>
-          <MyResponsiveComponent />
-        </PixiStage>
+        <MyResponsiveComponent />
       </PixiCanvas>
     </PixiApplication>
   );

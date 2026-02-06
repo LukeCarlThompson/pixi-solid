@@ -66,7 +66,7 @@ With `createResource`, you can easily load your manifest and then use Pixi.js's 
 ```tsx
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { PixiApplication, PixiCanvas, PixiStage, Sprite, Text } from "pixi-solid";
+import { PixiApplication, PixiCanvas, Sprite, Text } from "pixi-solid";
 import { createResource, Show, createSignal } from "solid-js";
 
 export const AssetManifestLoadingDemo = () => {
@@ -95,18 +95,16 @@ export const AssetManifestLoadingDemo = () => {
         <PixiCanvas>
           {/* Use <Show> to render components only after assets are loaded */}
           <Show when={assetsLoaded()}>
-            <PixiStage>
-              {/* Access assets using their alias defined in the manifest */}
-              <Sprite texture={Assets.get<Pixi.Texture>("background")} anchor={0.5} position={[400, 300]} scale={0.8} />
-              <Sprite texture={Assets.get<Pixi.Texture>("player_idle")} anchor={0.5} position={[400, 300]} />
-              <Sprite texture={Assets.get<Pixi.Texture>("coin")} anchor={0.5} position={[450, 250]} />
-              <Sprite texture={Assets.get<Pixi.Texture>("button_play")} anchor={0.5} position={[400, 450]} />
-              <Text
-                text="Game Loaded!"
-                style={{ fontFamily: "font_pixel", fontSize: 32, fill: 0xffffff }}
-                position={[200, 50]}
-              />
-            </PixiStage>
+            {/* Access assets using their alias defined in the manifest */}
+            <Sprite texture={Assets.get<Pixi.Texture>("background")} anchor={0.5} position={[400, 300]} scale={0.8} />
+            <Sprite texture={Assets.get<Pixi.Texture>("player_idle")} anchor={0.5} position={[400, 300]} />
+            <Sprite texture={Assets.get<Pixi.Texture>("coin")} anchor={0.5} position={[450, 250]} />
+            <Sprite texture={Assets.get<Pixi.Texture>("button_play")} anchor={0.5} position={[400, 450]} />
+            <Text
+              text="Game Loaded!"
+              style={{ fontFamily: "font_pixel", fontSize: 32, fill: 0xffffff }}
+              position={[200, 50]}
+            />
           </Show>
         </PixiCanvas>
       <Suspense>

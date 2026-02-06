@@ -14,7 +14,7 @@ This hook must be called from a component that is a descendant of the `<PixiAppl
 If used outside of this context, it will throw an error.
 
 ```tsx
-import { getPixiApp, Container } from "pixi-solid";
+import { getPixiApp, Container, PixiApplication, PixiCanvas } from "pixi-solid";
 import { createEffect } from "solid-js";
 
 const MyComponent = () => {
@@ -33,9 +33,7 @@ export const DemoApp = () => {
   return (
     <PixiApplication>
       <PixiCanvas>
-        <PixiStage>
-          <MyComponent />
-        </PixiStage>
+        <MyComponent />
       </PixiCanvas>
     </PixiApplication>
   );

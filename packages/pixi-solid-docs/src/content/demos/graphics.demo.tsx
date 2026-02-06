@@ -1,4 +1,4 @@
-import { Graphics, PixiApplication, PixiCanvas, PixiStage, usePixiScreen } from "pixi-solid";
+import { Graphics, PixiApplication, PixiCanvas, usePixiScreen } from "pixi-solid";
 
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
@@ -30,9 +30,7 @@ const DemoComponent = () => {
 export const Demo = () => (
   <PixiApplication>
     <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-      <PixiStage>
-        <DemoComponent />
-      </PixiStage>
+      <DemoComponent />
     </PixiCanvas>
   </PixiApplication>
 );
