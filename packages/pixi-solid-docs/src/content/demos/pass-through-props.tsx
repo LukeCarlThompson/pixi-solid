@@ -1,12 +1,12 @@
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
+import type { PixiComponentProps } from "pixi-solid";
 import { AnimatedSprite, Container, onTick, Sprite } from "pixi-solid";
 import type { Ref } from "solid-js";
 import { splitProps } from "solid-js";
 
-// Using the Pixi ContainerOptions type to allow passing through any ContainerOptions props as well as adding a ref type to forward the ref to an internal Container.
-// We omit the `children` prop because the Pixi `children` prop clashes with the `children` prop needed for our JSX.
-export type SkyProps = Omit<Pixi.ContainerOptions, "children"> & {
+// Using the utility PixiComponentProps type to allow passing through any ContainerOptions props as well as adding a ref type to forward the ref to an internal Container.
+export type SkyProps = PixiComponentProps & {
   ref?: Ref<Pixi.Container>;
   flyingSpeed: number;
 };

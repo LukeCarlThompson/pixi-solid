@@ -1,4 +1,4 @@
-import { Graphics, PixiApplication, PixiCanvas, PixiStage, usePixiScreen } from "pixi-solid";
+import { Graphics, PixiApplication, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { createSignal, For } from "solid-js";
 
 type ControlsProps = {
@@ -81,27 +81,25 @@ const DemoComponent = () => {
   return (
     <div style={{ position: "relative" }}>
       <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <PixiStage>
-          <For each={Array.from({ length: numSquares() })}>
-            {(_, index) => {
-              const spacing = 70;
-              const startX = 50;
-              const xPos = startX + index() * spacing;
+        <For each={Array.from({ length: numSquares() })}>
+          {(_, index) => {
+            const spacing = 70;
+            const startX = 50;
+            const xPos = startX + index() * spacing;
 
-              return (
-                <Graphics
-                  ref={(graphics) => {
-                    graphics.rect(-25, -25, 50, 50).fill("#ffd500ff");
-                  }}
-                  x={xPos}
-                  y={pixiScreen.height * 0.5}
-                  scale={scale()}
-                  angle={angle()}
-                />
-              );
-            }}
-          </For>
-        </PixiStage>
+            return (
+              <Graphics
+                ref={(graphics) => {
+                  graphics.rect(-25, -25, 50, 50).fill("#ffd500ff");
+                }}
+                x={xPos}
+                y={pixiScreen.height * 0.5}
+                scale={scale()}
+                angle={angle()}
+              />
+            );
+          }}
+        </For>
       </PixiCanvas>
       <Controls
         scale={scale()}

@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { AnimatedSprite, PixiApplication, PixiCanvas, PixiStage, usePixiScreen } from "pixi-solid";
+import { AnimatedSprite, PixiApplication, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { createResource, Show } from "solid-js";
 import assetUrl_01 from "@/assets/run_01.png";
 import assetUrl_02 from "@/assets/run_02.png";
@@ -50,9 +50,7 @@ const DemoComponent = () => {
 export const Demo = () => (
   <PixiApplication antialias={true}>
     <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-      <PixiStage>
-        <DemoComponent />
-      </PixiStage>
+      <DemoComponent />
     </PixiCanvas>
   </PixiApplication>
 );
