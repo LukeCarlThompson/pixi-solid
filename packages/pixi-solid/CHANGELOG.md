@@ -11,6 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.0
+
+#### Added
+
+- ✅ Added `PixiApplicationProvider` component that can be ued to instantiate the Pixi Application allowing the hooks and utilites to work within it's scope.
+- ✅ Added option to abort an async delay early by passing in an abort signal.
+
+#### Changed
+
+- ⚙️ Changed the `PixiCanvas` component to not require a `PixiApplication` as a wrapper.
+  It uses the context from the `PixiApplicationProvider` if available or it will instantiate it's own Pixi Application if an existing one isn't found.
+
+#### Removed
+
+- 💀 Removed the `PixiApplication` component as it's purpose can be solved in a more flexible way.
+
+#### Fixed
+
+- 🐞 Fixed the `RenderLayer` children from not being removed properly.
+
 ## 0.0.36
 
 #### Removed
