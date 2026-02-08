@@ -24,7 +24,7 @@ export const {
     // directly and use them with an uppercase name like `<Container />`,
     // which does not call this function.
     throw new Error(
-      `Cannot create element "${name}". Please import components directly from 'pixi-solid' and use them with a capital letter.`
+      `Cannot create element "${name}". Please import components directly from 'pixi-solid' and use them with a capital letter.`,
     );
   },
   createTextNode(value) {
@@ -69,7 +69,7 @@ export const {
   isTextNode(node) {
     return node instanceof PixiText;
   },
-  removeNode(_, node) {
+  removeNode(parent, node) {
     // RenderLayer uses `detach` instead of `removeChild`.
     if ("detach" in parent && typeof parent.detach === "function") {
       parent.detach(node);
