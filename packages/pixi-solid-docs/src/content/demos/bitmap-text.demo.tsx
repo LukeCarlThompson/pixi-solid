@@ -1,5 +1,5 @@
 import { BitmapFont } from "pixi.js";
-import { BitmapText, PixiApplication, PixiCanvas, usePixiScreen } from "pixi-solid";
+import { BitmapText, PixiCanvas, usePixiScreen } from "pixi-solid";
 
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
@@ -40,9 +40,7 @@ const DemoComponent = () => {
 };
 
 export const Demo = () => (
-  <PixiApplication background={"#b3fffbff"}>
-    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-      <DemoComponent />
-    </PixiCanvas>
-  </PixiApplication>
+  <PixiCanvas style={{ "aspect-ratio": "2/1.5" }} background={"#b3fffbff"}>
+    <DemoComponent />
+  </PixiCanvas>
 );

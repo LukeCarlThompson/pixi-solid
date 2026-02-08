@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets, BlurFilter, TextureStyle } from "pixi.js";
-import { PixiApplication, PixiCanvas, Sprite, usePixiScreen } from "pixi-solid";
+import { PixiCanvas, Sprite, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createEffect, createResource, createSignal, onCleanup, Show } from "solid-js";
 import birdAssetUrl from "@/assets/bird_03.png";
@@ -70,9 +70,7 @@ const DemoComponent = () => {
 };
 
 export const Demo = () => (
-  <PixiApplication antialias={true}>
-    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-      <DemoComponent />
-    </PixiCanvas>
-  </PixiApplication>
+  <PixiCanvas style={{ "aspect-ratio": "2/1.5" }} antialias={true}>
+    <DemoComponent />
+  </PixiCanvas>
 );
