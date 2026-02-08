@@ -1,4 +1,4 @@
-import { Graphics, PixiApplication, PixiCanvas, usePixiScreen } from "pixi-solid";
+import { Graphics, PixiApplicationProvider, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { createSignal, For } from "solid-js";
 
 type ControlsProps = {
@@ -114,7 +114,7 @@ const DemoComponent = () => {
 };
 
 export const Demo = () => (
-  <PixiApplication background="#2c2c2c">
+  <PixiApplicationProvider background="#2c2c2c">
     <DemoComponent />
-  </PixiApplication>
+  </PixiApplicationProvider>
 );
