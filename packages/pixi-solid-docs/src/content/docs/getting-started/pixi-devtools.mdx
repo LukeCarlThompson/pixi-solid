@@ -9,8 +9,23 @@ The [PixiJS Devtools](https://pixijs.io/devtools/) are very useful for debugging
 For the tools to find your application all you need to do it attach it to the window.
 
 ```tsx
-import { PixiApplication, PixiCanvas } from "pixi-solid";
+import { PixiApplication, PixiCanvas, getPixiApp, Container } from "pixi-solid";
 import { onCleanup } from "solid-js";
+
+const DemoComponent = () => {
+  // We have access to the Pixi Application instance using the `getPixiApp` function.
+  const pixiApp = getPixiApp();
+  // @ts-expect-error
+  globalThis.__PIXI_DEVTOOLS__ = {
+    app: pixiApp,
+  };
+  onCleanup(() => {
+    // @ts-expect-error
+    globalThis.__PIXI_DEVTOOLS__ = undefined;
+  });
+
+  return <Container>{/* Your pixi-solid content goes here */}</Container>;
+};
 
 /**
  * The DemoApp component sets up the Pixi Application
@@ -19,20 +34,9 @@ import { onCleanup } from "solid-js";
  */
 export const DemoApp = () => {
   return (
-    <PixiApplication
-      ref={(app) => {
-        // @ts-expect-error
-        globalThis.__PIXI_DEVTOOLS__ = {
-          app,
-        };
-        onCleanup(() => {
-          // @ts-expect-error
-          globalThis.__PIXI_DEVTOOLS__ = undefined;
-        });
-      }}
-    >
-      <PixiCanvas>{/* Your Pixi Solid components go here */}</PixiCanvas>
-    </PixiApplication>
+    <PixiCanvas>
+      <DemoComponent />
+    </PixiCanvas>
   );
 };
 ```

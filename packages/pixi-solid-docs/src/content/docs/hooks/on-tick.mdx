@@ -5,15 +5,15 @@ sidebar:
   order: 3
 ---
 
-The `onTick` hook is a more focused utility for registering a callback function to be executed on every frame of the `PIXI.Application`'s ticker.
+The `onTick` hook is a more focused utility for registering a callback function to be executed on every frame of the Pixi.js ticker.
 The callback is automatically added to the ticker when it first runs and removed when the hook's owning scope is cleaned up, ensuring proper resource management.
 
-It must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication`.
+It must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of either `<PixiApplicationProvider />` or `<PixiCanvas />`.
 
 ### Usage
 
 ```tsx
-import { onTick, Sprite } from "pixi-solid";
+import { onTick, PixiCanvas, Sprite } from "pixi-solid";
 import { createSignal } from "solid-js";
 import * as Pixi from "pixi.js";
 
@@ -41,6 +41,14 @@ const RotatingSprite = (props: { texture: Pixi.Texture }) => {
         });
       }}
     />
+  );
+};
+
+export const DemoApp = () => {
+  return (
+    <PixiCanvas>
+      <RotatingSpriteBySignal texture={Pixi.Texture.WHITE} />
+    </PixiCanvas>
   );
 };
 ```

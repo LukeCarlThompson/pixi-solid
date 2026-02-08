@@ -7,14 +7,14 @@ sidebar:
 
 The `onResize` hook provides a convenient way to react to changes in the Pixi.js renderer's dimensions. It executes a specified callback function whenever the renderer's screen size is updated, which occurs when the browser window is resized or when the HTML element containing the PixiCanvas changes dimensions.
 
-This hook must be called from a component that is a descendant of the `<PixiApplication />` component. If used outside of this context, it will throw an error.
+This hook must be called from a component that is a descendant of either `<PixiApplicationProvider />` or `<PixiCanvas />`. If used outside of this context, it will throw an error.
 
 ## Usage
 
 The `onResize` hook takes a single argument: a `resizeCallback` function. This callback receives a `Pixi.Rectangle` object, which contains the current `width`, `height`, `x`, and `y` of the renderer's screen. The callback is invoked immediately upon the hook's initialization and then again every time the renderer detects a resize event.
 
 ```tsx
-import { onResize, PixiApplication, PixiCanvas, Text } from "pixi-solid";
+import { onResize, PixiCanvas, Text } from "pixi-solid";
 import { createSignal } from "solid-js";
 import type * as Pixi from "pixi.js";
 
@@ -43,11 +43,9 @@ const MyResponsiveComponent = () => {
 
 export const DemoApp = () => {
   return (
-    <PixiApplication background="#1099bb">
-      <PixiCanvas>
-        <MyResponsiveComponent />
-      </PixiCanvas>
-    </PixiApplication>
+    <PixiCanvas background="#1099bb">
+      <MyResponsiveComponent />
+    </PixiCanvas>
   );
 };
 ```

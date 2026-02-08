@@ -13,7 +13,7 @@ It ensures that the delay is in sync with the shared ticker's time units, making
 
 The delay is synchronized with the shared ticker, so it will not progress if the ticker is paused or stopped.
 
-This hook must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication` or `TickerProvider`.
+This hook must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplicationProvider`, `PixiCanvas` or `TickerProvider`
 
 <Aside type="note">
   This function cannot be used in an async context because the Application and Ticker context providers aren't available
