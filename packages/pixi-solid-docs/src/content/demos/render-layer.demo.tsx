@@ -1,9 +1,9 @@
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { Container, PixiApplication, PixiCanvas, RenderLayer, Sprite, usePixiScreen } from "pixi-solid";
+import { Container, PixiCanvas, RenderLayer, Sprite, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import type { JSX } from "solid-js";
-import { createResource, onCleanup, Show, Suspense } from "solid-js";
+import { createResource, Show, Suspense } from "solid-js";
 import birdAssetUrl from "@/assets/bird_05.png";
 import eelAssetUrl from "@/assets/eel.png";
 import runAssetUrl from "@/assets/run_03.png";
@@ -66,22 +66,9 @@ const DemoComponent = () => {
 };
 
 export const Demo = () => (
-  <PixiApplication
-    ref={(app) => {
-      // @ts-expect-error
-      globalThis.__PIXI_DEVTOOLS__ = {
-        app,
-      };
-      onCleanup(() => {
-        // @ts-expect-error
-        globalThis.__PIXI_DEVTOOLS__ = undefined;
-      });
-    }}
-  >
-    <Suspense fallback={<div>Loading...</div>}>
-      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <DemoComponent />
-      </PixiCanvas>
-    </Suspense>
-  </PixiApplication>
+  <Suspense fallback={<div>Loading...</div>}>
+    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
+      <DemoComponent />
+    </PixiCanvas>
+  </Suspense>
 );

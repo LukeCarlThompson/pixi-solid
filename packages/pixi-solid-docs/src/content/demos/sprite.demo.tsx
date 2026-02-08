@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { PixiApplication, PixiCanvas, Sprite, usePixiScreen } from "pixi-solid";
+import { PixiCanvas, Sprite, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, Show } from "solid-js";
 import skyAssetUrl from "@/assets/sky.png";
@@ -24,9 +24,7 @@ const DemoComponent = () => {
 };
 
 export const Demo = () => (
-  <PixiApplication background="#1099bb">
-    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-      <DemoComponent />
-    </PixiCanvas>
-  </PixiApplication>
+  <PixiCanvas style={{ "aspect-ratio": "2/1.5" }} background="#1099bb">
+    <DemoComponent />
+  </PixiCanvas>
 );

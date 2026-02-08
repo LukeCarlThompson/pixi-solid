@@ -1,37 +1,24 @@
+import type * as Pixi from "pixi.js";
 import type { JSX } from "solid-js";
-import { onCleanup, onMount } from "solid-js";
+import { onCleanup, onMount, splitProps } from "solid-js";
 import { applyProps } from "./component-creation";
-import { getPixiApp } from "./pixi-application";
+import { getPixiApp, PixiApplicationProvider } from "./pixi-application";
 
 export type PixiCanvasProps = {
   children: JSX.Element;
   style?: JSX.CSSProperties | undefined;
-  className?: string;
-};
+  class?: string;
+} & Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">>;
 
-/**
- * PixiCanvas
- *
- * A small wrapper that mounts the PIXI application's canvas element into the DOM
- * and automatically resizes it.
- *
- * - Requires a surrounding `PixiApplication` component.
- * - Accepts pixi-solid components as children, which will be rendered inside the canvas.
- *
- * Props:
- * @param props.children - JSX content to render inside the canvas wrapper.
- */
-
-export const PixiCanvas = (props: PixiCanvasProps): JSX.Element => {
+const InnerPixiCanvas = (props: Pick<PixiCanvasProps, "children" | "style" | "class">): JSX.Element => {
   let canvasWrapElement: HTMLDivElement | undefined;
+  let pixiApp: Pixi.Application;
 
-  const pixiApp = getPixiApp();
-  pixiApp.canvas.style.display = "block";
-  pixiApp.canvas.style.position = "absolute";
-  pixiApp.canvas.style.top = "0";
-  pixiApp.canvas.style.left = "0";
-  pixiApp.canvas.style.width = "100%";
-  pixiApp.canvas.style.height = "100%";
+  try {
+    pixiApp = getPixiApp();
+  } catch {
+    throw new Error("InnerPixiCanvas must be used within a PixiApplicationProvider or a PixiCanvas");
+  }
 
   applyProps(pixiApp.stage, props);
 
@@ -68,9 +55,38 @@ export const PixiCanvas = (props: PixiCanvasProps): JSX.Element => {
         ["user-select"]: "none",
         ...(typeof props.style === "object" ? props.style : {}),
       }}
-      class={props.className}
+      class={props.class}
     >
       {pixiApp.canvas}
     </div>
+  );
+};
+
+/**
+ * PixiCanvas
+ *
+ * A small wrapper that mounts the PIXI application's canvas element into the DOM
+ * and automatically resizes it.
+ *
+ * - Works with or without a surrounding `PixiApplicationProvider` component.
+ * - If used inside `PixiApplicationProvider`, it will use the provided context.
+ * - If used standalone, it will create its own PixiApplication and provide context.
+ * - Accepts pixi-solid components as children, which will be rendered inside the canvas.
+ *
+ * Props:
+ * @param props.children - JSX content to render inside the canvas wrapper.
+ * @param props.style - CSS styles to apply to the canvas wrapper.
+ * @param props.class - CSS class to apply to the canvas wrapper.
+ * @param props - Additional Pixi ApplicationOptions (except 'children' and 'resizeTo').
+ */
+
+export const PixiCanvas = (props: PixiCanvasProps): JSX.Element => {
+  const [, applicationOptions] = splitProps(props, ["children", "style", "class"]);
+  return (
+    <PixiApplicationProvider {...applicationOptions}>
+      <InnerPixiCanvas style={props.style} class={props.class}>
+        {props.children}
+      </InnerPixiCanvas>
+    </PixiApplicationProvider>
   );
 };

@@ -1,7 +1,7 @@
 import type { Accessor } from "solid-js";
 import { createSignal } from "solid-js";
 import { createMutable } from "solid-js/store";
-import { onTick } from "../pixi-application";
+import { onTick } from "../on-tick";
 
 /**
  * Smoothly dampens a value towards a target over time.
