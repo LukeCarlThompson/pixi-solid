@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { getPixiApp, onTick, PixiApplication, PixiCanvas, Text } from "pixi-solid";
+import { getPixiApp, onTick, PixiCanvas, Text } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import { createResource, createSignal, Show } from "solid-js";
 import birdAssetUrl_01 from "@/assets/bird_01.png";
@@ -12,7 +12,7 @@ import birdAssetUrl_06 from "@/assets/bird_06.png";
 import skyAssetUrl from "@/assets/sky.png";
 import { Sky } from "./pass-through-props";
 
-export const DemoApp = () => {
+const DemoComponent = () => {
   const [flyingSpeed, setFlyingSpeed] = createSignal(1);
 
   const [texturesResource] = createResource(async () => {
@@ -41,32 +41,36 @@ export const DemoApp = () => {
     setFlyingSpeed(speed);
   };
   return (
-    <PixiApplication background="#1099bb">
-      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <Show when={texturesResource()}>
-          {/* Here on our `Sky` custom component we can also set any valid ContainerOptions and they will be passed through to the underlying Container */}
-          <Sky
-            flyingSpeed={flyingSpeed()}
-            onglobalpointermove={handlePointerMove}
-            eventMode="static"
-            tint={"#fff0a6"}
-            ref={(component) => {
-              const app = getPixiApp();
-              onTick(() => {
-                objectFit(component, app.renderer, "cover");
-              });
-            }}
-          />
-          <Text
-            text={`Flying Speed: ${flyingSpeed().toFixed(2)}`}
-            position={{ x: 10, y: 10 }}
-            style={{
-              fill: "#ffffff",
-              fontSize: 16,
-            }}
-          />
-        </Show>
-      </PixiCanvas>
-    </PixiApplication>
+    <Show when={texturesResource()}>
+      {/* Here on our `Sky` custom component we can also set any valid ContainerOptions and they will be passed through to the underlying Container */}
+      <Sky
+        flyingSpeed={flyingSpeed()}
+        onglobalpointermove={handlePointerMove}
+        eventMode="static"
+        tint={"#fff0a6"}
+        ref={(component) => {
+          const app = getPixiApp();
+          onTick(() => {
+            objectFit(component, app.renderer, "cover");
+          });
+        }}
+      />
+      <Text
+        text={`Flying Speed: ${flyingSpeed().toFixed(2)}`}
+        position={{ x: 10, y: 10 }}
+        style={{
+          fill: "#ffffff",
+          fontSize: 16,
+        }}
+      />
+    </Show>
+  );
+};
+
+export const DemoApp = () => {
+  return (
+    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
+      <DemoComponent />
+    </PixiCanvas>
   );
 };

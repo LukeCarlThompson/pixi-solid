@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { FillGradient } from "pixi.js";
-import { Graphics, PixiApplication, PixiCanvas } from "pixi-solid";
+import { Graphics, PixiCanvas } from "pixi-solid";
 import { useSmoothDamp } from "pixi-solid/utils";
 import { createSignal } from "solid-js";
 
@@ -81,10 +81,8 @@ const DraggingDemo = () => {
 
 export const DemoApp = () => {
   return (
-    <PixiApplication antialias={true}>
-      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <DraggingDemo />
-      </PixiCanvas>
-    </PixiApplication>
+    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }} antialias={true}>
+      <DraggingDemo />
+    </PixiCanvas>
   );
 };
