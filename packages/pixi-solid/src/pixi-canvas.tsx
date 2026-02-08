@@ -12,13 +12,12 @@ export type PixiCanvasProps = {
 
 const InnerPixiCanvas = (props: Pick<PixiCanvasProps, "children" | "style" | "class">): JSX.Element => {
   let canvasWrapElement: HTMLDivElement | undefined;
+  let pixiApp: Pixi.Application;
 
-  const pixiApp = getPixiApp();
-
-  if (!pixiApp) {
-    throw new Error(
-      "PixiCanvas must be used within a PixiApplicationProvider or with an existing Pixi Application context.",
-    );
+  try {
+    pixiApp = getPixiApp();
+  } catch {
+    throw new Error("InnerPixiCanvas must be used within a PixiApplicationProvider or a PixiCanvas");
   }
 
   applyProps(pixiApp.stage, props);
