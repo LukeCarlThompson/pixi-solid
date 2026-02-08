@@ -8,7 +8,12 @@ import { PixiAppContext } from "./context";
  *
  * @returns The Pixi.Application instance provided by the `PixiApplication` component.
  */
-export const getPixiApp = (): Pixi.Application | undefined => {
+export const getPixiApp = (): Pixi.Application => {
   const appContext = useContext(PixiAppContext);
-  return appContext?.app;
+
+  if (!appContext) {
+    throw new Error("getPixiApp must be used within a PixiApplicationProvider or a PixiCanvas");
+  }
+
+  return appContext.app;
 };
