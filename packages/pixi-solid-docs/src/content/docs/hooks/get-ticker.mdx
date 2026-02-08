@@ -7,14 +7,14 @@ sidebar:
 
 The `pixi-solid` library provides two hooks, `getTicker` and `onTick`, to interact with the Pixi.js `Ticker` instance.
 
-The `getTicker` hook provides direct access to the `PIXI.Application`'s shared `Ticker` instance.
+The `getTicker` hook provides direct access to the `PIXI.Ticker` instance from the current application context.
 This is useful when you need more control over the ticker, such as pausing, starting, or adjusting its speed globally.
-The hook must be called from a component that is a descendant of the `<PixiApplication />`component.
+The hook must be called from a component that is a descendant of either `<PixiApplicationProvider />` or `<PixiCanvas />`.
 
 ### Usage
 
 ```tsx
-import { getTicker, Container } from "pixi-solid";
+import { getTicker, onTick, Container, PixiCanvas } from "pixi-solid";
 import { createEffect, createSignal } from "solid-js";
 
 const MyComponent = () => {
@@ -25,7 +25,7 @@ const MyComponent = () => {
     // You can now safely use the Pixi.js Ticker instance
     console.log("Pixi.js Ticker instance:", ticker);
 
-    // Example start and stop the ticker based on a signal
+    // Example: start and stop the ticker based on a signal
     if (tickerRunning()) {
       ticker.start();
     } else {
@@ -34,6 +34,14 @@ const MyComponent = () => {
   });
 
   return <Container>{/* Your components here*/}</Container>;
+};
+
+export const DemoApp = () => {
+  return (
+    <PixiCanvas>
+      <MyComponent />
+    </PixiCanvas>
+  );
 };
 ```
 

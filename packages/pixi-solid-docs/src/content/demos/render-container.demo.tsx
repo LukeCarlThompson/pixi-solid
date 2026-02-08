@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { PixiApplication, PixiCanvas, RenderContainer, Sprite } from "pixi-solid";
+import { PixiCanvas, RenderContainer, Sprite } from "pixi-solid";
 import { createResource, Show, Suspense } from "solid-js";
 import assetUrl from "@/assets/sky.png";
 
@@ -26,12 +26,9 @@ const DemoComponent = () => {
 };
 
 export const Demo = () => (
-  <PixiApplication>
-    {/* Adding Suspense to wait for our component assets to load with a HTML loading fallback */}
-    <Suspense fallback={<div>Loading...</div>}>
-      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <DemoComponent />
-      </PixiCanvas>
-    </Suspense>
-  </PixiApplication>
+  <Suspense fallback={<div>Loading...</div>}>
+    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
+      <DemoComponent />
+    </PixiCanvas>
+  </Suspense>
 );

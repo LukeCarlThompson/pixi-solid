@@ -5,33 +5,77 @@ sidebar:
   order: 5
 ---
 
-The `createAsyncDelay` hook provides a way to create a async function that will delay execution for a specified number of milliseconds of ticker time.
+The `createAsyncDelay` hook provides a way to create an async function that will delay execution for a specified number of milliseconds of ticker time.
 
 It ensures that the delay is in sync with the shared ticker's time units, making it ideal for animations or syncing with other actions based on ticker time.
 
 The delay is synchronized with the shared ticker, so it will not progress if the ticker is paused or stopped.
 
-This hook must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication` or `TickerProvider`.
+You can optionally pass an `AbortSignal` to cancel the delay early, allowing you to interrupt waiting operations when needed.
+
+This hook must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplicationProvider` or `PixiCanvas`.
 
 The returned function can be called in an async context.
 
 ### Usage
 
 ```tsx
-import { createAsyncDelay, Text } from "pixi-solid";
+import { createAsyncDelay, PixiCanvas, Text } from "pixi-solid";
+import { createSignal } from "solid-js";
 
 const DelayedActionComponent = () => {
-  // This must be called within a synchronous scope that is inside the `PixiApplication` or `TickerProvider` elements.
+  // This must be called within a synchronous scope that is inside the `PixiApplicationProvider` or `PixiCanvas` elements.
   const delay = createAsyncDelay();
+  const [isWaiting, setIsWaiting] = createSignal(false);
 
   const handlePointerDown = async () => {
-    console.log("Pointer down");
-    // We can now use the delay in an async context
+    setIsWaiting(true);
+    console.log("Pointer down, waiting 2 seconds...");
     await delay(2000);
+    setIsWaiting(false);
     console.log("2 seconds have passed on the ticker");
   };
 
-  return <Text text={"Click me"} onpointerdown={handlePointerDown} />;
+  return <Text text={isWaiting() ? "Waiting..." : "Click me"} onpointerdown={handlePointerDown} />;
+};
+```
+
+#### With AbortSignal
+
+You can pass an `AbortSignal` to cancel the delay early:
+
+```tsx
+import { createAsyncDelay, PixiCanvas, Text } from "pixi-solid";
+import { createSignal } from "solid-js";
+
+const CancellableDelayComponent = () => {
+  const delay = createAsyncDelay();
+  const [isWaiting, setIsWaiting] = createSignal(false);
+  let abortController: AbortController | undefined = undefined;
+
+  const handlePointerDown = async () => {
+    setIsWaiting(true);
+    abortController = new AbortController();
+
+    console.log("Starting 5 second delay...");
+    await delay(5000, abortController.signal);
+    setIsWaiting(false);
+    console.log("Delay completed!");
+  };
+
+  const handleCancel = () => {
+    if (abortController) {
+      abortController.abort();
+      console.log("Delay cancelled!");
+    }
+  };
+
+  return (
+    <Text
+      text={isWaiting() ? "Waiting (click to cancel)..." : "Click me"}
+      onpointerdown={isWaiting() ? handleCancel : handlePointerDown}
+    />
+  );
 };
 ```
 
@@ -40,3 +84,4 @@ const DelayedActionComponent = () => {
 - When you need to delay execution in a way that is synchronized with the ticker.
 - For animations or other operations that depend on the ticker's timing.
 - To avoid using external time measurements like `setTimeout` in ticker-dependent contexts.
+- When you need the ability to cancel a delay early using an `AbortSignal`.

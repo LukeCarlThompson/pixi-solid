@@ -1,6 +1,6 @@
 import type { Accessor } from "solid-js";
 import { createSignal } from "solid-js";
-import { onTick } from "../pixi-application";
+import { onTick } from "../on-tick";
 
 /**
  * @typedef {Object} UseSpringProps

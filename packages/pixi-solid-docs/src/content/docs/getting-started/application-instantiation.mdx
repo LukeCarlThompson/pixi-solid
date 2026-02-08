@@ -5,52 +5,92 @@ description: How to get started with pixi-solid.
 
 import { Aside } from "@astrojs/starlight/components";
 
-### Pixi Application
-
-To start rendering in PixiJS, you'll need to create a `PixiApplication` component that will instantiate the `PIXI.Application` instance and provide it to all child components via context.
-It acts as the root of your Pixi Solid application and provider for all the pixi-solid hooks.
-It accepts all PixiJS application options as props.
-There should only be one of these per project.
-
-<Aside type="tip">
-  The `PixiApplication` component doesn't actually add any elements to the DOM, we need to use the `PixiCanvas` for
-  that. This means that if any HTML components need access to any of the pixi-solid hooks or application state they can
-  be rendered as children of `PixiApplication` but need to be outside of the `PixiCanvas` component.
-</Aside>
-
 ### PixiCanvas
 
-The `PixiCanvas` component needs to be a child of `PixiApplication`.
-It's responsible for placing the the HTML `<canvas>` element that PixiJS uses into the HTML page.
+The `PixiCanvas` component is responsible for placing the HTML `<canvas>` element that PixiJS uses into the HTML page.
+It can be used standalone or combined with `PixiApplicationProvider` for more control.
 
-Some sensible defaults have been applied here to make responsive behaviour of the `canvas` a little easier to work with.
+Some sensible defaults have been applied to make responsive behaviour of the `canvas` easier to work with:
 
-The `canvas` element is wrapped in a `div` that it will automatically resize to fit inside of.
-This means that we can use any CSS styles we like to reposition or resize the wrapping `div` and our PixiJS `canvas` will respond automatically.
-You can apply standard HTML attributes and styling to the `canvas` wrapper `div` via component props.
+- The `canvas` element is wrapped in a `div` that it automatically resizes to fit inside of it
+- Any CSS styles can be applied to the wrapping `div` to reposition or resize the canvas
+- The `canvas` listens for resizing of the wrapper `div` so it can adjust automatically if the page layout changes
+- PixiJS application options (like `background`, `antialias`, `resolution`) can be passed directly to `PixiCanvas`
 
-The `canvas` is set to listen for resizing of the wrapper `div` so it can adjust auotmatically if the page layout changes even if the `window` size didn't change.
-
-`PIXI.Container` (the `app.stage` instance) for all your PixiJS display objects.
 All your visual `pixi-solid` components, such as `Sprite`, `Graphics`, or other `Container`s, should be placed as children of `PixiCanvas`.
 It handles the mounting and unmounting of your Pixi display object tree.
 
-```tsx
-import { PixiApplication, PixiCanvas } from "pixi-solid";
+#### Simple Standalone Usage
 
-/**
- * The DemoApp component sets up the Pixi Application
- * and can be mounted anywhere in your SolidJS app.
- * It will render a Canvas element with a Pixi Stage inside it.
- */
+The simplest way to get started is to use `PixiCanvas` directly. It will automatically create and manage the Pixi Application for you:
+
+```tsx
+import { PixiCanvas, Sprite } from "pixi-solid";
+import { Texture } from "pixi.js";
+
+const DemoPixiComponent = () => {
+  return <Sprite texture={Texture.WHITE} scale={50} tint="#ff0000" />;
+};
+
 export const DemoApp = () => {
   return (
-    <PixiApplication>
-      <PixiCanvas>{/* Your Pixi Solid components go here */}</PixiCanvas>
-    </PixiApplication>
+    <PixiCanvas style={{ width: "100%", height: "100vh" }}>
+      <DemoPixiComponent />
+    </PixiCanvas>
   );
 };
 ```
+
+#### With PixiApplicationProvider
+
+For more advanced use cases where you need to access the Pixi application state from HTML components or use pixi-solid hooks outside of `PixiCanvas`, use `PixiApplicationProvider` as a wrapper:
+
+```tsx
+import { PixiApplicationProvider, PixiCanvas, usePixiScreen, getPixiApp, onTick, Text } from "pixi-solid";
+import { createSignal } from "solid-js";
+
+export const DemoApp = () => {
+  return (
+    <PixiApplicationProvider background="#1099bb">
+      {/* HTML components here can use pixi-solid hooks since they're inside the provider and will be rendered as siblings to the Pixi canvas element */}
+      <HtmlComponent />
+      <PixiCanvas style={{ width: "100%", height: "500px" }}>
+        <CanvasContent />
+      </PixiCanvas>
+    </PixiApplicationProvider>
+  );
+};
+
+const HtmlComponent = () => {
+  /* HTML components inside PixiApplicationProvider can access pixi-solid hooks */
+
+  const screen = usePixiScreen();
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <p>
+        Screen Size: {screen.width}x{screen.height}
+      </p>
+    </div>
+  );
+};
+
+const CanvasContent = () => {
+  /* Pixi components inside PixiCanvas can also use pixi-solid hooks */
+
+  const screen = usePixiScreen();
+
+  return (
+    <Text text="Hello from Pixi!" style={{ fill: "white", fontSize: 24 }} x={screen.width / 2} y={screen.height / 2} />
+  );
+};
+```
+
+<Aside type="tip">
+  When using `PixiApplicationProvider`, any HTML components placed between the provider and the canvas can access
+  pixi-solid hooks and the Pixi application context. This allows you to build UIs that react to Pixi app state, like
+  displaying canvas dimensions or rendering status.
+</Aside>
 
 <Aside type={"caution"}>
   The `pixi-solid` library only supports client side rendering. So you may need to use the `lazy` function to

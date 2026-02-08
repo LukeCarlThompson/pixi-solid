@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { FillGradient } from "pixi.js";
-import { Graphics, PixiApplication, PixiCanvas } from "pixi-solid";
+import { Graphics, PixiCanvas } from "pixi-solid";
 import { createSignal } from "solid-js";
 import { createMutable } from "solid-js/store";
 
@@ -59,10 +59,8 @@ const DraggingDemo = () => {
 
 export const DemoApp = () => {
   return (
-    <PixiApplication antialias={true} resolution={window.devicePixelRatio}>
-      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <DraggingDemo />
-      </PixiCanvas>
-    </PixiApplication>
+    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }} antialias={true} resolution={window.devicePixelRatio}>
+      <DraggingDemo />
+    </PixiCanvas>
   );
 };

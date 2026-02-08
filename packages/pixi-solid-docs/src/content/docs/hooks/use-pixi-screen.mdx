@@ -7,14 +7,14 @@ sidebar:
 
 The `usePixiScreen` hook provides a reactive object containing the current dimensions of the Pixi application's screen. This object's properties (width, height, x, y, etc.) automatically update when the renderer's screen size changes, allowing you to build responsive Pixi.js applications that react to resizing events.
 
-It must be called within a SolidJS tracking scope, such as a component or another hook, that is a descendant of `PixiApplication`.
+It must be called within a component or another hook, that is a descendant of either `<PixiApplicationProvider />` or `<PixiCanvas />`.
 
 ### Usage
 
 ```tsx
-import { Sprite } from "pixi.js";
+import type * as Pixi from "pixi.js";
 import { createSignal } from "solid-js";
-import { PixiApplication, Sprite, usePixiScreen } from "pixi-solid";
+import { PixiCanvas, Sprite, usePixiScreen } from "pixi-solid";
 
 const ResponsiveSprite = (props: { texture: Pixi.Texture }) => {
   const screen = usePixiScreen();
@@ -31,9 +31,9 @@ const ResponsiveSprite = (props: { texture: Pixi.Texture }) => {
 };
 
 const App = () => (
-  <PixiApplication>
+  <PixiCanvas>
     <ResponsiveSprite texture={Pixi.Texture.WHITE} />
-  </PixiApplication>
+  </PixiCanvas>
 );
 ```
 

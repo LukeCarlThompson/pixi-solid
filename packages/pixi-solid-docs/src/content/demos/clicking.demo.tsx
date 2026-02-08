@@ -1,5 +1,5 @@
 import { DEG_TO_RAD } from "pixi.js";
-import { Graphics, PixiApplication, PixiCanvas, Text, usePixiScreen } from "pixi-solid";
+import { Graphics, PixiCanvas, Text, usePixiScreen } from "pixi-solid";
 import { createSignal } from "solid-js";
 
 const ClickingDemo = () => {
@@ -55,10 +55,8 @@ const ClickingDemo = () => {
 
 export const DemoApp = () => {
   return (
-    <PixiApplication antialias={true} resolution={window.devicePixelRatio}>
-      <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-        <ClickingDemo />
-      </PixiCanvas>
-    </PixiApplication>
+    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }} antialias={true} resolution={window.devicePixelRatio}>
+      <ClickingDemo />
+    </PixiCanvas>
   );
 };
