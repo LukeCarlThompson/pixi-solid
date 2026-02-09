@@ -1,0 +1,16 @@
+{
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "require-await": "error",
+    "import/no-cycle": "warn",
+    "eqeqeq": "error",
+    "typescript/no-misused-promises": "error",
+    "typescript/consistent-type-definitions": ["error", "type"],
+    "typescript/consistent-type-imports": "error",
+    "prefer-const": "error",
+    "oxc/no-const-enum": "error",
+    "no-unassigned-vars": "warn"
+  }
+}
