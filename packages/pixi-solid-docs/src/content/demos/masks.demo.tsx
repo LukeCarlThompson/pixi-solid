@@ -7,7 +7,9 @@ import skyAssetUrl from "@/assets/sky.png";
 
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
-  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>([{ alias: "sky", src: skyAssetUrl }]));
+  const [textureResource] = createResource(() =>
+    Assets.load<Pixi.Texture>([{ alias: "sky", src: skyAssetUrl }]),
+  );
 
   let graphicsRef: Pixi.Graphics | undefined;
 

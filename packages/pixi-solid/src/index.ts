@@ -1,16 +1,11 @@
 export type { ContainerProps, LeafProps, PixiComponentProps } from "./component-creation";
-export { createAsyncDelay, delay } from "./delay";
 export type { PixiEventHandlerMap } from "./event-names";
 export { PIXI_EVENT_NAMES, PIXI_SOLID_EVENT_HANDLER_NAMES } from "./event-names";
 export { onResize } from "./on-resize";
 export { onTick } from "./on-tick";
 export type { PixiApplicationProps } from "./pixi-application";
-export {
-  getPixiApp,
-  getTicker,
-  PixiApplicationProvider,
-  TickerProvider,
-} from "./pixi-application";
+export { getPixiApp, getTicker, PixiApplicationProvider, TickerProvider } from "./pixi-application";
+export { createAsyncDelay, delay } from "./delay";
 export type { PixiCanvasProps } from "./pixi-canvas";
 export { PixiCanvas } from "./pixi-canvas";
 export {

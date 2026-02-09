@@ -57,10 +57,12 @@ const DraggingDemo = () => {
   );
 };
 
-export const DemoApp = () => {
-  return (
-    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }} antialias={true} resolution={window.devicePixelRatio}>
-      <DraggingDemo />
-    </PixiCanvas>
-  );
-};
+export const DemoApp = () => (
+  <PixiCanvas
+    style={{ "aspect-ratio": "2/1.5" }}
+    antialias={true}
+    resolution={window.devicePixelRatio}
+  >
+    <DraggingDemo />
+  </PixiCanvas>
+);

@@ -8,7 +8,9 @@ import assetUrl from "@/assets/eel.png";
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
   // Create a resource to load the eel texture
-  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>({ alias: "eel", src: assetUrl }));
+  const [textureResource] = createResource(() =>
+    Assets.load<Pixi.Texture>({ alias: "eel", src: assetUrl }),
+  );
 
   // Create the points we will use for our mesh
   const points: Point[] = [];

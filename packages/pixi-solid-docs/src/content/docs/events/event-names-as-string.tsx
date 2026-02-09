@@ -12,7 +12,9 @@ export const EventNamesList = () => {
       {(eventNames) => (
         <ul style={{ padding: "0 0 0 14px" }}>
           <For each={eventNames()}>
-            {(eventName) => <li style={{ padding: "0", margin: "0", "line-height": "1.4" }}>{eventName}</li>}
+            {(eventName) => (
+              <li style={{ padding: "0", margin: "0", "line-height": "1.4" }}>{eventName}</li>
+            )}
           </For>
         </ul>
       )}

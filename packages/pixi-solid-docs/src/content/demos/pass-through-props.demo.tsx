@@ -16,7 +16,7 @@ const DemoComponent = () => {
   const [flyingSpeed, setFlyingSpeed] = createSignal(1);
 
   const [texturesResource] = createResource(async () => {
-    Assets.init();
+    await Assets.init();
     // Setting scale mode to nearest for crisp pixel art
     TextureStyle.defaultOptions.scaleMode = "nearest";
     const assets = await Assets.load<Pixi.Texture>([
@@ -34,7 +34,10 @@ const DemoComponent = () => {
 
   const handlePointerMove = (e: Pixi.FederatedPointerEvent) => {
     const notInsideCanvas =
-      e.global.x < 0 || e.global.x > e.currentTarget.width || e.global.y < 0 || e.global.y > e.currentTarget.height;
+      e.global.x < 0 ||
+      e.global.x > e.currentTarget.width ||
+      e.global.y < 0 ||
+      e.global.y > e.currentTarget.height;
     if (notInsideCanvas) return;
 
     const speed = Math.min(Math.max((e.global.x / e.currentTarget.width) * 2, 0), 2);
@@ -67,10 +70,8 @@ const DemoComponent = () => {
   );
 };
 
-export const DemoApp = () => {
-  return (
-    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
-      <DemoComponent />
-    </PixiCanvas>
-  );
-};
+export const DemoApp = () => (
+  <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
+    <DemoComponent />
+  </PixiCanvas>
+);

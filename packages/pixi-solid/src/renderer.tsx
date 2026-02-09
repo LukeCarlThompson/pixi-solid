@@ -4,6 +4,8 @@ import { createRenderer } from "solid-js/universal";
 import { isEventProperty, setEventProperty } from "./set-event-property";
 import { isPointProperty, setPointProperty } from "./set-point-property";
 
+/* oxlint-disable unbound-method */
+
 export const {
   effect,
   memo,
@@ -56,7 +58,11 @@ export const {
       return;
     }
 
-    if (!("addChildAt" in parent) || !("addChild" in parent) || typeof parent.addChild !== "function") {
+    if (
+      !("addChildAt" in parent) ||
+      !("addChild" in parent) ||
+      typeof parent.addChild !== "function"
+    ) {
       throw new Error("Parent does not support children.");
     }
 
