@@ -8,7 +8,9 @@ import assetUrl from "@/assets/ground.webp";
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
   // Create a resource to load the nine slice texture
-  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>({ alias: "ground", src: assetUrl }));
+  const [textureResource] = createResource(() =>
+    Assets.load<Pixi.Texture>({ alias: "ground", src: assetUrl }),
+  );
 
   return (
     <Show when={textureResource()}>

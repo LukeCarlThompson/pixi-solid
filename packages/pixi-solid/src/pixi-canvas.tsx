@@ -10,19 +10,23 @@ export type PixiCanvasProps = {
   class?: string;
 } & Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">>;
 
-const InnerPixiCanvas = (props: Pick<PixiCanvasProps, "children" | "style" | "class">): JSX.Element => {
+const InnerPixiCanvas = (
+  props: Pick<PixiCanvasProps, "children" | "style" | "class">,
+): JSX.Element => {
   let canvasWrapElement: HTMLDivElement | undefined;
   let pixiApp: Pixi.Application;
 
   try {
     pixiApp = getPixiApp();
   } catch {
-    throw new Error("InnerPixiCanvas must be used within a PixiApplicationProvider or a PixiCanvas");
+    throw new Error(
+      "InnerPixiCanvas must be used within a PixiApplicationProvider or a PixiCanvas",
+    );
   }
 
   applyProps(pixiApp.stage, props);
 
-  let previousResizeTo: typeof pixiApp.resizeTo;
+  let previousResizeTo: HTMLElement | Window;
   let resizeObserver: ResizeObserver | undefined;
 
   onMount(() => {

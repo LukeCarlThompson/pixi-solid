@@ -24,7 +24,13 @@ const FollowText = (props: FollowTextProps): JSX.Element => {
   return (
     <Container position={props.position}>
       <Text text="Hello World" anchor={{ x: 0.5, y: 0.5 }} style={{ fill: "white" }} />
-      <Sprite ref={spriteRef} anchor={{ x: 0.5, y: 0.5 }} texture={Texture.WHITE} scale={100} tint={"#ff0000"} />
+      <Sprite
+        ref={spriteRef}
+        anchor={{ x: 0.5, y: 0.5 }}
+        texture={Texture.WHITE}
+        scale={100}
+        tint={"#ff0000"}
+      />
       <Sprite ref={spriteRef} texture={Texture.WHITE} scale={100} tint={"#00ff00"}></Sprite>
     </Container>
   );
@@ -66,23 +72,21 @@ const View = () => {
   );
 };
 
-export const App = (): JSX.Element => {
-  return (
-    <PixiApplicationProvider background={"#ebb100"}>
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          "flex-direction": "column",
-          overflow: "hidden",
-        }}
-      >
-        <h1 style={{ position: "relative" }}>Pixi.js SolidJS Example</h1>
-        <PixiCanvas background="#0a908e">
-          <View />
-        </PixiCanvas>
-      </div>
-    </PixiApplicationProvider>
-  );
-};
+export const App = (): JSX.Element => (
+  <PixiApplicationProvider background={"#ebb100"}>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        "flex-direction": "column",
+        overflow: "hidden",
+      }}
+    >
+      <h1 style={{ position: "relative" }}>Pixi.js SolidJS Example</h1>
+      <PixiCanvas background="#0a908e">
+        <View />
+      </PixiCanvas>
+    </div>
+  </PixiApplicationProvider>
+);

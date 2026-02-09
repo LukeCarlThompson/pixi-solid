@@ -15,7 +15,9 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Pixi Solid",
-      social: [{ icon: "github", label: "GitHub", href: "https://github.com/LukeCarlThompson/pixi-solid" }],
+      social: [
+        { icon: "github", label: "GitHub", href: "https://github.com/LukeCarlThompson/pixi-solid" },
+      ],
       sidebar: [
         {
           label: "Getting started",

@@ -25,7 +25,9 @@ const ResponsiveSprite = (props: { texture: Pixi.Texture }) => {
       anchor={0.5}
       x={screen.width / 2}
       y={screen.height / 2}
-      scale={Math.min(screen.width / props.texture.width, screen.height / props.texture.height) * 0.5}
+      scale={
+        Math.min(screen.width / props.texture.width, screen.height / props.texture.height) * 0.5
+      }
     />
   );
 };
