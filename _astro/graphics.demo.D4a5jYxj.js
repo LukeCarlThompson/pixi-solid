@@ -1,0 +1,3 @@
+import{P as o,G as t}from"./pixi-components.BbiR8JRG.js";import{u as s}from"./use-pixi-screen.DFaHO2Ms.js";import{a as r}from"./solid.BNQBajBB.js";import"./web.Cr4611hB.js";import"./store.BHICbBK7.js";import"./preload-helper.BXH4tTM1.js";const n=()=>{const i=s();return[r(t,{get x(){return i.width*.5},get y(){return i.height*.5},ref:e=>{e.rect(-50,-50,100,100).fill("#ffd500ff")}}),r(t,{ref:e=>{e.rect(50,50,100,200).fill(16711680).circle(200,200,50).stroke(65280)}}),r(t,{ref:e=>{e.svg(`<svg>
+                          <path d="M 100 300 q 150 200 300 100" stroke="blue" stroke-width="5" fill="pink" />
+                        </svg>`)}})]},g=()=>r(o,{style:{"aspect-ratio":"2/1.5"},get children(){return r(n,{})}});export{g as Demo};
