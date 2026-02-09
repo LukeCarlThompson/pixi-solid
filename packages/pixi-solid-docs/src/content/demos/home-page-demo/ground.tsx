@@ -16,7 +16,8 @@ export const Ground = (props: GroundProps) => {
       label="Ground"
       ref={(tileRef) => {
         onTick((ticker) => {
-          tileRef.tilePosition.x += props.movementSpeed * ticker.deltaTime * (props.direction === "left" ? 1 : -1);
+          tileRef.tilePosition.x +=
+            props.movementSpeed * ticker.deltaTime * (props.direction === "left" ? 1 : -1);
         });
       }}
       texture={Assets.get<Pixi.Texture>("ground")}

@@ -10,7 +10,9 @@ import { createPixiApplication } from "./pixi-application";
  * minus the `children` and `resizeTo` properties, which are handled by pixi-solid internally.
  * There is also an optional `existingApp` property to pass in an already created Pixi.Application instance, which will be used instead of creating a new one.
  */
-export type PixiApplicationProps = Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">> & {
+export type PixiApplicationProps = Partial<
+  Omit<Pixi.ApplicationOptions, "children" | "resizeTo">
+> & {
   children?: JSX.Element;
   existingApp?: Pixi.Application;
 };

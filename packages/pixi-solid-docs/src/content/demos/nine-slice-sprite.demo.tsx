@@ -7,7 +7,9 @@ import assetUrl from "@/assets/nine-slice.png";
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
   // Create a resource to load the nine slice texture
-  const [textureResource] = createResource(() => Assets.load<Pixi.Texture>({ alias: "nine-slice", src: assetUrl }));
+  const [textureResource] = createResource(() =>
+    Assets.load<Pixi.Texture>({ alias: "nine-slice", src: assetUrl }),
+  );
 
   return (
     <Show when={textureResource()}>
@@ -30,8 +32,12 @@ const DemoComponent = () => {
             cumulativeDeltaTime += ticker.deltaTime;
 
             // Change the width and height to show dynamic scaling with stable corner scale
-            sprite.width = (Math.abs(Math.sin(cumulativeDeltaTime * 0.01)) * 0.8 + 0.2) * app.renderer.screen.width;
-            sprite.height = (Math.abs(Math.sin(cumulativeDeltaTime * 0.003)) * 0.8 + 0.2) * app.renderer.screen.height;
+            sprite.width =
+              (Math.abs(Math.sin(cumulativeDeltaTime * 0.01)) * 0.8 + 0.2) *
+              app.renderer.screen.width;
+            sprite.height =
+              (Math.abs(Math.sin(cumulativeDeltaTime * 0.003)) * 0.8 + 0.2) *
+              app.renderer.screen.height;
           });
         }}
       />

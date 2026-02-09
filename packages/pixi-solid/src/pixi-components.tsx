@@ -21,7 +21,9 @@ import { createContainerComponent, createLeafComponent } from "./component-creat
 /**
  * A SolidJS component that renders a `PIXI.AnimatedSprite`.
  */
-export const AnimatedSprite = createLeafComponent<PixiAnimatedSprite, Pixi.AnimatedSpriteOptions>(PixiAnimatedSprite);
+export const AnimatedSprite = createLeafComponent<PixiAnimatedSprite, Pixi.AnimatedSpriteOptions>(
+  PixiAnimatedSprite,
+);
 /**
  * A SolidJS component that renders a `PIXI.BitmapText`.
  */
@@ -29,7 +31,9 @@ export const BitmapText = createLeafComponent<PixiBitmapText, Pixi.TextOptions>(
 /**
  * A SolidJS component that renders a `PIXI.Container`.
  */
-export const Container = createContainerComponent<PixiContainer, Pixi.ContainerOptions>(PixiContainer);
+export const Container = createContainerComponent<PixiContainer, Pixi.ContainerOptions>(
+  PixiContainer,
+);
 /**
  * A SolidJS component that renders a `PIXI.Graphics`.
  * Use a ref to access the underlying graphics instance and draw with it.
@@ -53,37 +57,43 @@ export const MeshRope = createLeafComponent<PixiMeshRope, Pixi.MeshRopeOptions>(
 /**
  * A SolidJS component that renders a `PIXI.NineSliceSprite`.
  */
-export const NineSliceSprite = createLeafComponent<PixiNineSliceSprite, Pixi.NineSliceSpriteOptions>(
-  PixiNineSliceSprite
-);
+export const NineSliceSprite = createLeafComponent<
+  PixiNineSliceSprite,
+  Pixi.NineSliceSpriteOptions
+>(PixiNineSliceSprite);
 
 /**
  * A SolidJS component that renders a `PIXI.ParticleContainer`.
  *
  * Particles should be added and removed from this component imperatively. Please see the docs for a reference example.
  */
-export const ParticleContainer = createLeafComponent<PixiParticleContainer, Pixi.ParticleContainerOptions>(
-  PixiParticleContainer
-);
+export const ParticleContainer = createLeafComponent<
+  PixiParticleContainer,
+  Pixi.ParticleContainerOptions
+>(PixiParticleContainer);
 
 /**
  * A SolidJS component that renders a `PIXI.PerspectiveMesh`.
  */
-export const PerspectiveMesh = createLeafComponent<PixiPerspectiveMesh, Pixi.PerspectivePlaneOptions>(
-  PixiPerspectiveMesh
-);
+export const PerspectiveMesh = createLeafComponent<
+  PixiPerspectiveMesh,
+  Pixi.PerspectivePlaneOptions
+>(PixiPerspectiveMesh);
 
 /**
  * A SolidJS component that renders a `PIXI.RenderContainer`.
  */
-export const RenderContainer = createContainerComponent<PixiRenderContainer, Pixi.RenderContainerOptions>(
-  PixiRenderContainer
-);
+export const RenderContainer = createContainerComponent<
+  PixiRenderContainer,
+  Pixi.RenderContainerOptions
+>(PixiRenderContainer);
 
 /**
  * A SolidJS component that renders a `PIXI.RenderLayer`.
  */
-export const RenderLayer = createContainerComponent<PixiRenderLayer, Pixi.RenderLayerOptions>(PixiRenderLayer);
+export const RenderLayer = createContainerComponent<PixiRenderLayer, Pixi.RenderLayerOptions>(
+  PixiRenderLayer,
+);
 
 /**
  * A SolidJS component that renders a `PIXI.Sprite`.
@@ -97,7 +107,9 @@ export const Text = createLeafComponent<PixiText, Pixi.CanvasTextOptions>(PixiTe
 /**
  * A SolidJS component that renders a `PIXI.TilingSprite`.
  */
-export const TilingSprite = createLeafComponent<PixiTilingSprite, Pixi.TilingSpriteOptions>(PixiTilingSprite);
+export const TilingSprite = createLeafComponent<PixiTilingSprite, Pixi.TilingSpriteOptions>(
+  PixiTilingSprite,
+);
 
 // export const MeshGeometry = createLeafComponent<PixiMeshGeometry, Pixi.MeshGeometryOptions>(PixiMeshGeometry);
 

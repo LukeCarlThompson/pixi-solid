@@ -53,8 +53,10 @@ const MyParticleContainer = (props: ParticleContainerProps) => {
       // Smooth circular motion with pulsating radius
       const currentRadius =
         baseOrbitRadius +
-        Math.sin(cumulativeTime * orbitSpeed * (1 + indexFactor * 0.1) + indexFactor) * orbitAmplitude;
-      const currentAngle = cumulativeTime * orbitSpeed * (1 + indexFactor * 0.05) + indexFactor * Math.PI;
+        Math.sin(cumulativeTime * orbitSpeed * (1 + indexFactor * 0.1) + indexFactor) *
+          orbitAmplitude;
+      const currentAngle =
+        cumulativeTime * orbitSpeed * (1 + indexFactor * 0.05) + indexFactor * Math.PI;
 
       particle.x = pixiScreen.width * 0.5 + currentRadius * Math.cos(currentAngle);
       particle.y = pixiScreen.height * 0.5 + currentRadius * Math.sin(currentAngle);
@@ -64,7 +66,10 @@ const MyParticleContainer = (props: ParticleContainerProps) => {
         minScale +
         scaleRange *
           0.5 *
-          (1 + Math.sin(cumulativeTime * scalePulsateSpeed * (1 + indexFactor * 0.02) + indexFactor * 0.5));
+          (1 +
+            Math.sin(
+              cumulativeTime * scalePulsateSpeed * (1 + indexFactor * 0.02) + indexFactor * 0.5,
+            ));
       particle.scaleX = scaleValue;
       particle.scaleY = scaleValue;
 
@@ -96,7 +101,11 @@ const MyParticleContainer = (props: ParticleContainerProps) => {
 const DemoComponent = () => {
   // Create a resource to load the sky texture
   const [textureResource] = createResource(() => Assets.load<Pixi.Texture>(assetUrl));
-  return <Show when={textureResource()}>{(texture) => <MyParticleContainer particleTexture={texture()} />}</Show>;
+  return (
+    <Show when={textureResource()}>
+      {(texture) => <MyParticleContainer particleTexture={texture()} />}
+    </Show>
+  );
 };
 
 export const Demo = () => (

@@ -35,7 +35,10 @@ const DemoComponent = () => {
   // Listen to pointer and set the blur amoutn signal to demonstrate binding PixiJS classes with signals
   const handlePointerMove = (e: Pixi.FederatedPointerEvent) => {
     const notInsideCanvas =
-      e.global.x < 0 || e.global.x > e.currentTarget.width || e.global.y < 0 || e.global.y > e.currentTarget.height;
+      e.global.x < 0 ||
+      e.global.x > e.currentTarget.width ||
+      e.global.y < 0 ||
+      e.global.y > e.currentTarget.height;
     if (notInsideCanvas) return;
 
     const newBlurAmount = Math.min(Math.max((e.global.x / e.currentTarget.width) * 10, 0), 10);

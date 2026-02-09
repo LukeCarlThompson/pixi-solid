@@ -53,10 +53,12 @@ const ClickingDemo = () => {
   );
 };
 
-export const DemoApp = () => {
-  return (
-    <PixiCanvas style={{ "aspect-ratio": "2/1.5" }} antialias={true} resolution={window.devicePixelRatio}>
-      <ClickingDemo />
-    </PixiCanvas>
-  );
-};
+export const DemoApp = () => (
+  <PixiCanvas
+    style={{ "aspect-ratio": "2/1.5" }}
+    antialias={true}
+    resolution={window.devicePixelRatio}
+  >
+    <ClickingDemo />
+  </PixiCanvas>
+);

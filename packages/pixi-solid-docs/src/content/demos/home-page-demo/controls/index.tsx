@@ -14,7 +14,11 @@ export const Controls = (props: ControlsProps) => {
         {props.isRunning ? "Click to stop" : "Click to run"}
       </button>
       <br />
-      <button type="button" class={style["controls-button"]} onClick={props.onToggleDirectionClicked}>
+      <button
+        type="button"
+        class={style["controls-button"]}
+        onClick={props.onToggleDirectionClicked}
+      >
         {props.direction === "left" ? "Click to face right" : "Click to face left"}
       </button>
     </div>
