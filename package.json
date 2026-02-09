@@ -1,7 +1,7 @@
 {
   "name": "pixi-solid-monorepo",
-  "private": true,
   "version": "0.0.1",
+  "private": true,
   "workspaces": [
     "packages/*"
   ],
@@ -9,14 +9,18 @@
     "build": "pnpm -r run build",
     "dev": "pnpm -r run dev",
     "test": "pnpm -r run test",
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "lint": "oxlint",
+    "fmt:check": "oxfmt --check",
+    "fmt": "oxfmt"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.8",
     "@types/node": "^24.10.1",
     "jsdom": "27.2.0",
+    "oxfmt": "^0.28.0",
+    "oxlint": "^1.43.0",
+    "oxlint-tsgolint": "^0.11.5",
     "sass-embedded": "1.93.3",
-    "typedoc": "0.28.15",
     "typescript": "~5.9.3",
     "vite": "7.2.7",
     "vite-plugin-solid": "2.11.10",
