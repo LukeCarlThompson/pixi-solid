@@ -31,9 +31,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Or your desired version
-          registry-url: 'https://registry.npmjs.org'
-          cache: 'pnpm' # Caches pnpm dependencies
+          node-version: "20" # Or your desired version
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm" # Caches pnpm dependencies
 
       - name: Install dependencies
         run: pnpm --filter "pixi-solid" install
@@ -56,4 +56,3 @@ jobs:
       - name: Publish
         if: github.event_name == 'push' && steps.check_published.outputs.published == 'false'
         run: pnpm --filter "pixi-solid" publish --access public
-        

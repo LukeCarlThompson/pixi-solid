@@ -46,7 +46,14 @@ export const DemoApp = () => {
 For more advanced use cases where you need to access the Pixi application state from HTML components or use pixi-solid hooks outside of `PixiCanvas`, use `PixiApplicationProvider` as a wrapper:
 
 ```tsx
-import { PixiApplicationProvider, PixiCanvas, usePixiScreen, getPixiApp, onTick, Text } from "pixi-solid";
+import {
+  PixiApplicationProvider,
+  PixiCanvas,
+  usePixiScreen,
+  getPixiApp,
+  onTick,
+  Text,
+} from "pixi-solid";
 import { createSignal } from "solid-js";
 
 export const DemoApp = () => {
@@ -81,18 +88,24 @@ const CanvasContent = () => {
   const screen = usePixiScreen();
 
   return (
-    <Text text="Hello from Pixi!" style={{ fill: "white", fontSize: 24 }} x={screen.width / 2} y={screen.height / 2} />
+    <Text
+      text="Hello from Pixi!"
+      style={{ fill: "white", fontSize: 24 }}
+      x={screen.width / 2}
+      y={screen.height / 2}
+    />
   );
 };
 ```
 
 <Aside type="tip">
-  When using `PixiApplicationProvider`, any HTML components placed between the provider and the canvas can access
-  pixi-solid hooks and the Pixi application context. This allows you to build UIs that react to Pixi app state, like
-  displaying canvas dimensions or rendering status.
+  When using `PixiApplicationProvider`, any HTML components placed between the provider and the
+  canvas can access pixi-solid hooks and the Pixi application context. This allows you to build UIs
+  that react to Pixi app state, like displaying canvas dimensions or rendering status.
 </Aside>
 
 <Aside type={"caution"}>
-  The `pixi-solid` library only supports client side rendering. So you may need to use the `lazy` function to
-  dynamically import only on the client or use the `clientOnly` function if using Solid Start.
+  The `pixi-solid` library only supports client side rendering. So you may need to use the `lazy`
+  function to dynamically import only on the client or use the `clientOnly` function if using Solid
+  Start.
 </Aside>
