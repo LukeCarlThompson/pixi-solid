@@ -14,11 +14,7 @@ export const addChildren = (parent: Pixi.Container | Pixi.RenderLayer, children?
         return;
       }
 
-      if (
-        !("addChildAt" in parent) ||
-        !("addChild" in parent) ||
-        typeof parent.addChild !== "function"
-      ) {
+      if (!("addChild" in parent) || typeof parent.addChild !== "function") {
         throw new Error("Parent does not support children.");
       }
 

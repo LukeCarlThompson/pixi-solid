@@ -27,10 +27,6 @@ export const applyProps = <
     if (key === "ref") {
       (props[key] as unknown as (arg: any) => void)(instance);
     } else if (key === "children") {
-      if (!("addChild" in instance)) {
-        throw new Error(`Cannot set children on non-container instance.`);
-      }
-
       addChildren(instance, props.children);
       continue;
     }
