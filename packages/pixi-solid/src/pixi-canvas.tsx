@@ -1,7 +1,7 @@
 import type * as Pixi from "pixi.js";
 import type { JSX } from "solid-js";
 import { onCleanup, onMount, splitProps } from "solid-js";
-import { applyProps } from "./component-creation";
+import { applyProps } from "./components/apply-props";
 import { getPixiApp, PixiApplicationProvider } from "./pixi-application";
 
 export type PixiCanvasProps = {

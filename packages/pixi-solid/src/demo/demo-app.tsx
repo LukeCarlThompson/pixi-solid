@@ -3,11 +3,11 @@ import type { FederatedPointerEvent } from "pixi.js";
 import { Texture } from "pixi.js";
 import type { JSX } from "solid-js";
 import { createSignal, For } from "solid-js";
-import type { PixiComponentProps } from "../component-creation";
 import { onTick } from "../on-tick";
 import { PixiApplicationProvider } from "../pixi-application";
 import { PixiCanvas } from "../pixi-canvas";
-import { Container, Sprite, Text } from "../pixi-components";
+import { Container, Sprite, Text } from "../components";
+import type { PixiComponentProps } from "../components";
 import { usePixiScreen } from "../use-pixi-screen";
 
 type FollowTextProps = {
@@ -83,7 +83,7 @@ export const App = (): JSX.Element => (
         overflow: "hidden",
       }}
     >
-      <h1 style={{ position: "relative" }}>Pixi.js SolidJS Example</h1>
+      <h1 style={{ position: "relative" }}>Pixi-Solid Example</h1>
       <PixiCanvas background="#0a908e">
         <View />
       </PixiCanvas>
