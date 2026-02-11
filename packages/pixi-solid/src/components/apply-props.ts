@@ -11,7 +11,7 @@ import { createRenderEffect, on } from "solid-js";
  * @param props The props object.
  * @param defer Defers the createRenderEffect so the props aren't set on the first run.
  * This is useful because setting initialisation props can have unintended side effects.
- * Notibly in AnimatedSprite, if we set the textures property after instantiation it will stop the instance from playing.
+ * Notably in AnimatedSprite, if we set the textures property after instantiation it will stop the instance from playing.
  */
 export const applyProps = <
   InstanceType extends Pixi.Container,
