@@ -5,13 +5,13 @@ import { setProp } from "./set-prop";
 import { createRenderEffect, on } from "solid-js";
 
 /**
- * Applies the props to a Pixi instance with subsriptions to maintain reactivity.
+ * Applies the props to a Pixi instance with subscriptions to maintain reactivity.
  *
  * @param instance The Pixi instance we want to apply props to.
  * @param props The props object.
  * @param defer Defers the createRenderEffect so the props aren't set on the first run.
  * This is useful because setting initialisation props can have unintended side effects.
- * Notibly in AnimatedSprite, if we set the textures roperty after instantiation it will stop the instance from playing.
+ * Notibly in AnimatedSprite, if we set the textures property after instantiation it will stop the instance from playing.
  */
 export const applyProps = <
   InstanceType extends Pixi.Container,
