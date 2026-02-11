@@ -5,7 +5,7 @@ import { setProp } from "./set-prop";
 import { createRenderEffect, on } from "solid-js";
 
 /**
- * Apply's the props to a Pixi instance with subsriptions to maintain reactivity.
+ * Applies the props to a Pixi instance with subsriptions to maintain reactivity.
  *
  * @param instance The Pixi instance we want to apply props to.
  * @param props The props object.
