@@ -1,9 +1,14 @@
 import path from "node:path";
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 import solidPlugin from "vite-plugin-solid";
 
 export default defineConfig({
   plugins: [solidPlugin()],
+  test: {
+    environment: "jsdom",
+    globals: true,
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+  },
   build: {
     minify: false,
     emptyOutDir: true,

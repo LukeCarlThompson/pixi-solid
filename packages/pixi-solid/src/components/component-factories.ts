@@ -1,11 +1,11 @@
 import type * as Pixi from "pixi.js";
 import type { JSX, Ref } from "solid-js";
-import { createRenderEffect, on, splitProps, onCleanup } from "solid-js";
-import type { PixiEventHandlerMap } from "./event-names";
-import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./event-names";
-import type { PointAxisPropName } from "./point-property-names";
-import { POINT_PROP_AXIS_NAMES } from "./point-property-names";
-import { applyProps } from "./apply-props";
+import { createRenderEffect, on, splitProps } from "solid-js";
+import type { PixiEventHandlerMap } from "./bind-props/event-names";
+import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./bind-props/event-names";
+import type { PointAxisPropName } from "./bind-props/point-property-names";
+import { POINT_PROP_AXIS_NAMES } from "./bind-props/point-property-names";
+import { bindProps } from "./bind-props";
 
 /**
  * This is a utility type useful for extending the props of custom components to allow props to be passed through to the underlying Pixi instance.
@@ -51,10 +51,10 @@ export const createContainerComponent = <
   OptionsType extends object,
 >(
   PixiClass: new (props: OptionsType) => InstanceType,
-) => {
-  return (
-    props: Omit<OptionsType, "children"> & ContainerProps<InstanceType>,
-  ): InstanceType & JSX.Element => {
+): ((
+  props: Omit<OptionsType, "children"> & ContainerProps<InstanceType>,
+) => InstanceType & JSX.Element) => {
+  return (props): InstanceType & JSX.Element => {
     const [runtimeProps, initialisationProps] = splitProps(props, [
       ...SOLID_PROP_KEYS,
       ...PIXI_SOLID_EVENT_HANDLER_NAMES,
@@ -63,12 +63,8 @@ export const createContainerComponent = <
 
     const instance = props.as || new PixiClass(initialisationProps as any);
 
-    applyProps(instance, initialisationProps, true);
-    applyProps(instance, runtimeProps);
-
-    onCleanup(() => {
-      instance.destroy({ children: true });
-    });
+    bindProps(instance, initialisationProps, true);
+    bindProps(instance, runtimeProps);
 
     return instance as InstanceType & JSX.Element;
   };

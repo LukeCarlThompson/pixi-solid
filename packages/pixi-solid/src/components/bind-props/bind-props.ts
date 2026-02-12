@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
-import type { ContainerProps } from "./component-factories";
-import { addChildren } from "./add-children";
+import type { ContainerProps } from "../component-factories";
+import { bindChildrenToContainer, bindChildrenToRenderLayer } from "./bind-children";
 import { setProp } from "./set-prop";
 import { createRenderEffect, on } from "solid-js";
 
@@ -13,7 +13,7 @@ import { createRenderEffect, on } from "solid-js";
  * This is useful because setting initialisation props can have unintended side effects.
  * Notably in AnimatedSprite, if we set the textures property after instantiation it will stop the instance from playing.
  */
-export const applyProps = <
+export const bindProps = <
   InstanceType extends Pixi.Container,
   OptionsType extends ContainerProps<InstanceType>,
 >(
@@ -27,7 +27,11 @@ export const applyProps = <
     if (key === "ref") {
       (props[key] as unknown as (arg: any) => void)(instance);
     } else if (key === "children") {
-      addChildren(instance, props.children);
+      if ("attach" in instance && "detach" in instance) {
+        bindChildrenToRenderLayer(instance as unknown as Pixi.RenderLayer, props.children);
+      } else {
+        bindChildrenToContainer(instance, props.children);
+      }
       continue;
     }
 
@@ -36,9 +40,7 @@ export const applyProps = <
         on<OptionsType[keyof OptionsType], OptionsType[keyof OptionsType] | undefined>(
           () => props[key as keyof typeof props],
           (_input, _prevInput, prevValue) => {
-            const currentValue = props[key as keyof typeof props];
-            setProp(instance, key, currentValue, prevValue);
-            return currentValue;
+            return setProp(instance, key, props[key as keyof typeof props], prevValue);
           },
           { defer },
         ),
@@ -46,10 +48,8 @@ export const applyProps = <
       continue;
     }
 
-    createRenderEffect<OptionsType[keyof OptionsType]>((prevValue) => {
-      const currentValue = props[key as keyof typeof props];
-      setProp(instance, key, currentValue, prevValue);
-      return currentValue;
-    });
+    createRenderEffect((prevValue) =>
+      setProp(instance, key, props[key as keyof typeof props], prevValue),
+    );
   }
 };

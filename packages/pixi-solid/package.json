@@ -34,7 +34,7 @@
     "prepublishOnly": "pnpm run build",
     "preview": "vite preview",
     "preinstall": "npx only-allow pnpm",
-    "test": "echo \"A dummy test\""
+    "test": "vitest"
   },
   "peerDependencies": {
     "pixi.js": "^8.14.3",

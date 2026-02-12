@@ -7,18 +7,19 @@ export const setProp = <T = unknown>(
   key: string,
   value: T,
   prevValue?: T,
-) => {
+): T | undefined => {
   if (isPointProperty(key)) {
     setPointProperty(instance, key, value as number);
-    return;
+    return value;
   }
 
   if (key in instance) {
     (instance as any)[key] = value;
-    return;
+    return value;
   }
 
   if (isEventProperty(key)) {
     setEventProperty(instance, key, value, prevValue);
+    return value;
   }
 };
