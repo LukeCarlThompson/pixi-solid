@@ -14,8 +14,6 @@ export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.E
   createRenderEffect((prevChildren: Pixi.Container[] | undefined) => {
     const nextChildren = resolvedChildren.toArray() as unknown as Pixi.Container[];
 
-    if (prevChildren === nextChildren) return nextChildren;
-
     if (prevChildren) {
       for (let i = 0; i < prevChildren.length; i += 1) {
         const child = prevChildren[i];
@@ -26,7 +24,7 @@ export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.E
     }
 
     for (let i = 0; i < nextChildren.length; i += 1) {
-      (parent as Pixi.Container).addChildAt(nextChildren[i], i);
+      parent.addChildAt(nextChildren[i], i);
     }
 
     return nextChildren;
@@ -38,8 +36,6 @@ export const bindChildrenToRenderLayer = (parent: Pixi.RenderLayer, children?: J
 
   createRenderEffect((prevChildren: Pixi.Container[] | undefined) => {
     const nextChildren = resolvedChildren.toArray() as unknown as Pixi.Container[];
-
-    if (prevChildren === nextChildren) return nextChildren;
 
     if (prevChildren) {
       for (let i = 0; i < prevChildren.length; i += 1) {
