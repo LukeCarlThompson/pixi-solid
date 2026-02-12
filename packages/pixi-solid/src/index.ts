@@ -1,6 +1,6 @@
-export type { ContainerProps, LeafProps, PixiComponentProps } from "./component-creation";
-export type { PixiEventHandlerMap } from "./event-names";
-export { PIXI_EVENT_NAMES, PIXI_SOLID_EVENT_HANDLER_NAMES } from "./event-names";
+export type { ContainerProps, LeafProps, PixiComponentProps } from "./components";
+export type { PixiEventHandlerMap } from "./components";
+export { PIXI_EVENT_NAMES, PIXI_SOLID_EVENT_HANDLER_NAMES } from "./components";
 export { onResize } from "./on-resize";
 export { onTick } from "./on-tick";
 export type { PixiApplicationProps } from "./pixi-application";
@@ -24,7 +24,7 @@ export {
   Sprite,
   Text,
   TilingSprite,
-} from "./pixi-components";
-export type { PointAxisPropName } from "./point-property-names";
+} from "./components/components";
+export type { PointAxisPropName } from "./components";
 export { usePixiScreen } from "./use-pixi-screen";
-export type { PixiScreenDimensions } from "./use-pixi-screen/pixi-screen-store";
+export type { PixiScreenDimensions } from "./use-pixi-screen";

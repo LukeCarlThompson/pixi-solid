@@ -1,7 +1,7 @@
 import type * as Pixi from "pixi.js";
 import type { JSX } from "solid-js";
 import { onCleanup, onMount, splitProps } from "solid-js";
-import { applyProps } from "./component-creation";
+import { bindProps } from "./components/bind-props";
 import { getPixiApp, PixiApplicationProvider } from "./pixi-application";
 
 export type PixiCanvasProps = {
@@ -24,7 +24,7 @@ const InnerPixiCanvas = (
     );
   }
 
-  applyProps(pixiApp.stage, props);
+  bindProps(pixiApp.stage, props);
 
   let previousResizeTo: HTMLElement | Window;
   let resizeObserver: ResizeObserver | undefined;

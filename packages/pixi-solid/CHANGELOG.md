@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.1
+
+- Internal refactor to remove the universal renderer
+
 ## 0.1.0
 
 #### ✅ Added

@@ -1,11 +1,11 @@
 import type * as Pixi from "pixi.js";
 import type { JSX, Ref } from "solid-js";
 import { createRenderEffect, on, splitProps } from "solid-js";
-import type { PixiEventHandlerMap } from "./event-names";
-import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./event-names";
-import type { PointAxisPropName } from "./point-property-names";
-import { POINT_PROP_AXIS_NAMES } from "./point-property-names";
-import { insert, setProp } from "./renderer";
+import type { PixiEventHandlerMap } from "./bind-props/event-names";
+import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./bind-props/event-names";
+import type { PointAxisPropName } from "./bind-props/point-property-names";
+import { POINT_PROP_AXIS_NAMES } from "./bind-props/point-property-names";
+import { bindProps } from "./bind-props";
 
 /**
  * This is a utility type useful for extending the props of custom components to allow props to be passed through to the underlying Pixi instance.
@@ -46,60 +46,15 @@ export type FilterProps<Component> = {
 // Keys that are specific to Solid components and not Pixi props
 export const SOLID_PROP_KEYS = ["ref", "as", "children"] as const;
 
-/**
- * Apply's the props to a Pixi instance with subsriptions to maintain reactivity.
- *
- * @param instance The Pixi instance we want to apply props to.
- * @param props The props object.
- * @param defer Defers the createRenderEffect so the props aren't set on the first run.
- * This is useful because setting initialisation props can have unintended side effects.
- * Notibly in AnimatedSprite, if we set the textures roperty after instantiation it will stop the instance from playing.
- */
-export const applyProps = <
-  InstanceType extends Pixi.Container,
-  OptionsType extends ContainerProps<InstanceType>,
->(
-  instance: InstanceType,
-  props: OptionsType,
-  defer?: boolean,
-) => {
-  for (const key in props) {
-    if (key === "as") continue;
-
-    if (key === "ref") {
-      (props[key] as unknown as (arg: any) => void)(instance);
-    } else if (key === "children") {
-      if (!("addChild" in instance)) {
-        throw new Error(`Cannot set children on non-container instance.`);
-      }
-      insert(instance, () => props.children);
-    } else if (defer) {
-      createRenderEffect(
-        on(
-          () => props[key as keyof typeof props],
-          () => {
-            setProp(instance, key, props[key as keyof typeof props]);
-          },
-          { defer },
-        ),
-      );
-    } else {
-      createRenderEffect(() => {
-        setProp(instance, key, props[key as keyof typeof props]);
-      });
-    }
-  }
-};
-
 export const createContainerComponent = <
   InstanceType extends Pixi.Container,
   OptionsType extends object,
 >(
   PixiClass: new (props: OptionsType) => InstanceType,
-) => {
-  return (
-    props: Omit<OptionsType, "children"> & ContainerProps<InstanceType>,
-  ): InstanceType & JSX.Element => {
+): ((
+  props: Omit<OptionsType, "children"> & ContainerProps<InstanceType>,
+) => InstanceType & JSX.Element) => {
+  return (props): InstanceType & JSX.Element => {
     const [runtimeProps, initialisationProps] = splitProps(props, [
       ...SOLID_PROP_KEYS,
       ...PIXI_SOLID_EVENT_HANDLER_NAMES,
@@ -108,8 +63,8 @@ export const createContainerComponent = <
 
     const instance = props.as || new PixiClass(initialisationProps as any);
 
-    applyProps(instance, initialisationProps, true);
-    applyProps(instance, runtimeProps);
+    bindProps(instance, initialisationProps, true);
+    bindProps(instance, runtimeProps);
 
     return instance as InstanceType & JSX.Element;
   };
