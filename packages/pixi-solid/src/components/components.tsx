@@ -16,7 +16,7 @@ import {
   Text as PixiText,
   TilingSprite as PixiTilingSprite,
 } from "pixi.js";
-import { createContainerComponent, createLeafComponent } from "./component-creation";
+import { createContainerComponent, createLeafComponent } from "./component-factories";
 
 /**
  * A SolidJS component that renders a `PIXI.AnimatedSprite`.
