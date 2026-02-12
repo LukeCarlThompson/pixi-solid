@@ -28,7 +28,10 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm --filter "pixi-solid" install
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm lint
 
       - name: Test
-        run: pnpm --filter "pixi-solid" test
+        run: pnpm test
