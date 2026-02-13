@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { createRoot, createSignal } from "solid-js";
-import { bindChildrenToContainer, bindChildrenToRenderLayer } from "./bind-children";
+import {
+  bindChildrenToContainer,
+  bindChildrenToRenderLayer,
+  InvalidChildTypeError,
+} from "./bind-children";
 import type * as Pixi from "pixi.js";
 
 // oxlint-disable typescript/unbound-method
@@ -100,6 +104,40 @@ describe("bindChildrenToContainer()", () => {
       expect(parent.addChildAt).toHaveBeenNthCalledWith(6, childA, 2);
     });
   });
+
+  it("GIVEN children with undefined values WHEN bindChildrenToContainer runs THEN it filters out undefined children", async () => {
+    await createRoot(async () => {
+      const parent = createMockContainer() as unknown as Pixi.Container;
+      const childA = createMockContainer() as unknown as Pixi.Container;
+      const childB = createMockContainer() as unknown as Pixi.Container;
+      const [children] = createSignal([childA, undefined, childB]);
+
+      bindChildrenToContainer(parent, (() => children()) as any);
+
+      await Promise.resolve();
+      expect(parent.addChildAt).toHaveBeenCalledTimes(2);
+      expect(parent.addChildAt).toHaveBeenNthCalledWith(1, childA, 0);
+      expect(parent.addChildAt).toHaveBeenNthCalledWith(2, childB, 1);
+    });
+  });
+
+  it("GIVEN invalid children WHEN addChildAt throws THEN it throws InvalidChildTypeError", async () => {
+    const fn = () =>
+      createRoot(async () => {
+        const parent = createMockContainer() as unknown as Pixi.Container;
+        const childA = { invalid: true } as unknown as Pixi.Container;
+        const [children] = createSignal([childA]);
+
+        parent.addChildAt = vi.fn().mockImplementation(() => {
+          throw new Error("Cannot read properties of undefined (reading 'parent')");
+        });
+
+        bindChildrenToContainer(parent, (() => children()) as any);
+        await Promise.resolve();
+      });
+
+    await expect(fn()).rejects.toThrow(InvalidChildTypeError);
+  });
 });
 
 describe("bindChildrenToRenderLayer()", () => {
@@ -158,5 +196,39 @@ describe("bindChildrenToRenderLayer()", () => {
       expect(parent.attach).toHaveBeenNthCalledWith(5, childB);
       expect(parent.attach).toHaveBeenNthCalledWith(6, childA);
     });
+  });
+
+  it("GIVEN children with undefined values WHEN bindChildrenToRenderLayer runs THEN it filters out undefined children", async () => {
+    await createRoot(async () => {
+      const parent = createMockRenderLayer() as unknown as Pixi.RenderLayer;
+      const childA = createMockContainer() as unknown as Pixi.Container;
+      const childB = createMockContainer() as unknown as Pixi.Container;
+      const [children] = createSignal([childA, undefined, childB]);
+
+      bindChildrenToRenderLayer(parent, (() => children()) as any);
+
+      await Promise.resolve();
+      expect(parent.attach).toHaveBeenCalledTimes(2);
+      expect(parent.attach).toHaveBeenNthCalledWith(1, childA);
+      expect(parent.attach).toHaveBeenNthCalledWith(2, childB);
+    });
+  });
+
+  it("GIVEN invalid children WHEN attach throws THEN it throws InvalidChildTypeError", async () => {
+    const fn = () =>
+      createRoot(async () => {
+        const parent = createMockRenderLayer() as unknown as Pixi.RenderLayer;
+        const childA = { invalid: true } as unknown as Pixi.Container;
+        const [children] = createSignal([childA]);
+
+        parent.attach = vi.fn().mockImplementation(() => {
+          throw new Error("Invalid child");
+        });
+
+        bindChildrenToRenderLayer(parent, (() => children()) as any);
+        await Promise.resolve();
+      });
+
+    await expect(fn()).rejects.toThrow(InvalidChildTypeError);
   });
 });
