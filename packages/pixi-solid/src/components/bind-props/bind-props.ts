@@ -25,7 +25,12 @@ export const bindProps = <
     if (key === "as") continue;
 
     if (key === "ref") {
-      (props[key] as unknown as (arg: any) => void)(instance);
+      /**
+       * Use queueMicrotask for ref callback to ensure it runs after all current render effects are complete. The parent will have added this instance as a child so that `ref.parent` is available in the ref callback.
+       */
+      queueMicrotask(() => {
+        (props[key] as unknown as (arg: any) => void)(instance);
+      });
     } else if (key === "children") {
       if ("attach" in instance && "detach" in instance) {
         bindChildrenToRenderLayer(instance as unknown as Pixi.RenderLayer, props.children);
