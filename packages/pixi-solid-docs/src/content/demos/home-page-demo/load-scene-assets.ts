@@ -1,4 +1,5 @@
 import { Assets, TextureStyle } from "pixi.js";
+
 import groundAssetUrl from "@/assets/ground-tile.png";
 import idleAssetUrl_01 from "@/assets/idle_01.png";
 import idleAssetUrl_02 from "@/assets/idle_02.png";

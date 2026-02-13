@@ -1,6 +1,6 @@
-import type * as Pixi from "pixi.js";
 import { PixiCanvas, Text } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
+import type * as Pixi from "pixi.js";
 
 const DemoComponent = () => {
   let textRef: Pixi.Text | undefined;

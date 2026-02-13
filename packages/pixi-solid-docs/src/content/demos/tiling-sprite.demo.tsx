@@ -1,7 +1,8 @@
+import { onTick, PixiCanvas, TilingSprite, usePixiScreen } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { onTick, PixiCanvas, TilingSprite, usePixiScreen } from "pixi-solid";
 import { createResource, Show } from "solid-js";
+
 import assetUrl from "@/assets/ground-tile.png";
 
 const DemoComponent = () => {

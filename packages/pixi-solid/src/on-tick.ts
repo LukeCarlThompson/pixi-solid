@@ -1,5 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { onCleanup, useContext } from "solid-js";
+
 import { TickerContext } from "./pixi-application";
 
 /**

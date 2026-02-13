@@ -1,9 +1,10 @@
-import type * as Pixi from "pixi.js";
-import { Assets, TextureStyle } from "pixi.js";
 import { Container, PixiCanvas, RenderLayer, Sprite, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
+import type * as Pixi from "pixi.js";
+import { Assets, TextureStyle } from "pixi.js";
 import type { JSX } from "solid-js";
 import { createResource, Show, Suspense } from "solid-js";
+
 import birdAssetUrl from "@/assets/bird_05.png";
 import eelAssetUrl from "@/assets/eel.png";
 import runAssetUrl from "@/assets/run_03.png";

@@ -1,7 +1,8 @@
+import { PixiCanvas, RenderContainer, Sprite } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { PixiCanvas, RenderContainer, Sprite } from "pixi-solid";
 import { createResource, Show, Suspense } from "solid-js";
+
 import assetUrl from "@/assets/sky.png";
 
 const DemoComponent = () => {

@@ -1,4 +1,5 @@
 import type * as Pixi from "pixi.js";
+
 import type { PIXI_EVENT_NAMES } from "./event-names";
 import { PIXI_EVENT_HANDLER_NAME_SET } from "./event-names";
 

@@ -1,6 +1,6 @@
+import { onTick, TilingSprite } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { onTick, TilingSprite } from "pixi-solid";
 import { splitProps } from "solid-js";
 
 export type GroundProps = Omit<Pixi.TilingSpriteOptions, "children"> & {

@@ -1,7 +1,8 @@
+import { AnimatedSprite, PixiCanvas, usePixiScreen } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { AnimatedSprite, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { createResource, Show } from "solid-js";
+
 import assetUrl_01 from "@/assets/run_01.png";
 import assetUrl_02 from "@/assets/run_02.png";
 import assetUrl_03 from "@/assets/run_03.png";
