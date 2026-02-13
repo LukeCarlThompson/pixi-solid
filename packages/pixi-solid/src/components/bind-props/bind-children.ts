@@ -3,10 +3,12 @@ import { children as resolveChildren, createRenderEffect } from "solid-js";
 import type { JSX } from "solid-js";
 
 export class InvalidChildTypeError extends Error {
-  constructor() {
+  constructor(cause: Error) {
     super(
       "Invalid pixi-solid child type. Children must be pixi-solid or PixiJS element. Did you accidentally pass an invalid child to a pixi-solid parent?",
+      { cause },
     );
+    this.name = "InvalidChildTypeError";
   }
 }
 
@@ -38,7 +40,7 @@ export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.E
     } catch (error) {
       if (error instanceof Error) {
         console.error("Invalid children", nextChildren);
-        throw new InvalidChildTypeError();
+        throw new InvalidChildTypeError(error);
       } else {
         throw error;
       }
@@ -70,7 +72,7 @@ export const bindChildrenToRenderLayer = (parent: Pixi.RenderLayer, children?: J
     } catch (error) {
       if (error instanceof Error) {
         console.error("Invalid children", nextChildren);
-        throw new InvalidChildTypeError();
+        throw new InvalidChildTypeError(error);
       } else {
         throw error;
       }
