@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, createContext, useContext } from "solid-js";
 import { bindProps } from ".";
 
 class MockContainer {
@@ -73,6 +73,42 @@ describe("bindProps()", () => {
       expect(childRef).toHaveBeenCalledWith(child);
       // And the parent should be set when the ref is called
       expect(childParentAtRefTime).toBe(parent);
+    });
+  });
+
+  it("GIVEN a ref callback that uses a context provider WHEN bindProps is called THEN the ref can access the context", async () => {
+    await createRoot(async () => {
+      const TestContext = createContext<string>();
+      const instance = new MockContainer();
+      let contextValue: string | undefined;
+
+      const ref = vi.fn(() => {
+        // Try to access the context in the ref callback
+        contextValue = useContext(TestContext);
+      });
+
+      // Create a context provider
+      const Provider = TestContext.Provider;
+
+      await createRoot(async (_dispose) => {
+        await Promise.resolve();
+        // Bind props within the context
+        return Provider({
+          value: "test-value",
+          get children() {
+            bindProps(instance as any, { ref } as any);
+            return null;
+          },
+        });
+      });
+
+      // Wait for queueMicrotask to run
+      await Promise.resolve();
+
+      // The ref should have been called
+      expect(ref).toHaveBeenCalledWith(instance);
+      // And it should have access to the context
+      expect(contextValue).toBe("test-value");
     });
   });
 
