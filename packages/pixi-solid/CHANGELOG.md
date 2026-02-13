@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.4
+
+- 🐞 Fixed timing of ref callback to make sure the object is added to the scene before the ref is set.
+
 ## 0.1.3
 
 - ✅ Improved error handling for invalid children.

@@ -5,8 +5,11 @@ import { bindProps } from ".";
 class MockContainer {
   x = 0;
   y = 0;
+  parent: MockContainer | null = null;
   addChild = vi.fn();
-  addChildAt = vi.fn();
+  addChildAt = vi.fn((child: MockContainer) => {
+    child.parent = this;
+  });
   addEventListener = vi.fn();
   removeEventListener = vi.fn();
 }
@@ -32,14 +35,44 @@ describe("bindProps()", () => {
     });
   });
 
-  it("GIVEN an instance and a ref callback WHEN bindProps is called THEN the ref is called with the instance", () => {
-    createRoot(() => {
+  it("GIVEN an instance and a ref callback WHEN bindProps is called THEN the ref is called with the instance", async () => {
+    await createRoot(async () => {
       const instance = new MockContainer();
       const ref = vi.fn();
 
       bindProps(instance as any, { ref } as any);
 
+      // Wait for createRenderEffect to run
+      await Promise.resolve();
+
       expect(ref).toHaveBeenCalledWith(instance);
+    });
+  });
+
+  it("GIVEN a parent with a child that has a ref WHEN bindProps is called THEN the ref is called after the child is added to the parent", async () => {
+    await createRoot(async () => {
+      const parent = new MockContainer();
+      const child = new MockContainer();
+      let childParentAtRefTime: any = undefined;
+
+      const childRef = vi.fn((instance: any) => {
+        // Capture what the parent property is when the ref is called
+        childParentAtRefTime = instance.parent;
+      });
+
+      // First bind the child with a ref
+      bindProps(child as any, { ref: childRef } as any);
+
+      // Then bind the parent with the child
+      bindProps(parent as any, { children: [child] } as any);
+
+      // Wait for all effects to run
+      await Promise.resolve();
+
+      // The ref should have been called
+      expect(childRef).toHaveBeenCalledWith(child);
+      // And the parent should be set when the ref is called
+      expect(childParentAtRefTime).toBe(parent);
     });
   });
 
