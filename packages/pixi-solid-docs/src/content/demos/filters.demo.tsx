@@ -1,8 +1,9 @@
-import type * as Pixi from "pixi.js";
-import { Assets, BlurFilter, TextureStyle } from "pixi.js";
 import { PixiCanvas, Sprite, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
+import type * as Pixi from "pixi.js";
+import { Assets, BlurFilter, TextureStyle } from "pixi.js";
 import { createEffect, createResource, createSignal, onCleanup, Show } from "solid-js";
+
 import birdAssetUrl from "@/assets/bird_03.png";
 import skyAssetUrl from "@/assets/sky.png";
 

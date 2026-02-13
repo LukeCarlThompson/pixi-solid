@@ -1,4 +1,5 @@
 import type * as Pixi from "pixi.js";
+
 import {
   ALL_VALID_PROP_NAMES_SET,
   POINT_PROP_AXIS_NAMES_SET,

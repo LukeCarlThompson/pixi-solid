@@ -8,9 +8,18 @@
     "eqeqeq": "error",
     "typescript/no-misused-promises": "error",
     "typescript/consistent-type-definitions": ["error", "type"],
-    "typescript/consistent-type-imports": "error",
+    "typescript/consistent-type-imports": [
+      "error",
+      { "prefer": "type-imports", "fixStyle": "separate-type-imports" }
+    ],
     "prefer-const": "error",
     "oxc/no-const-enum": "error",
-    "no-unassigned-vars": "warn"
+    "no-unassigned-vars": "warn",
+    "typescript/explicit-module-boundary-types": "warn",
+    "typescript/no-non-null-assertion": "error",
+    "no-empty-object-type": "error",
+    "typescript/consistent-type-exports": ["error", { "fixStyle": "separate-type-exports" }],
+    "typescript/prefer-readonly": "error",
+    "import/no-unused-modules": ["error", { "unusedExports": true }]
   }
 }

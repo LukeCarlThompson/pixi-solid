@@ -1,9 +1,10 @@
-import type * as Pixi from "pixi.js";
-import { Assets, BlurFilter, Rectangle } from "pixi.js";
 import { CRTFilter } from "pixi-filters";
 import { Container, getPixiApp, onTick, PixiCanvas, Sprite } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
+import type * as Pixi from "pixi.js";
+import { Assets, BlurFilter, Rectangle } from "pixi.js";
 import { createResource, onCleanup, Show } from "solid-js";
+
 import { Character } from "./character";
 import { Controls } from "./controls";
 import { createAppStore } from "./create-app-store";

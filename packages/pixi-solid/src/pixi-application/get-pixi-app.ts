@@ -1,5 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { useContext } from "solid-js";
+
 import { PixiAppContext } from "./context";
 
 /**

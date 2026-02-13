@@ -1,5 +1,7 @@
 import { useContext } from "solid-js";
+
 import { PixiAppContext } from "../pixi-application";
+
 import type { PixiScreenDimensions } from "./pixi-screen-store";
 
 /**

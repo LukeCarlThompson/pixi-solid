@@ -1,8 +1,9 @@
-import type * as Pixi from "pixi.js";
-import { Assets, Point } from "pixi.js";
 import { MeshRope, onTick, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
+import type * as Pixi from "pixi.js";
+import { Assets, Point } from "pixi.js";
 import { createResource, Show } from "solid-js";
+
 import assetUrl from "@/assets/eel.png";
 
 const DemoComponent = () => {

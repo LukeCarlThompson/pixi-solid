@@ -1,6 +1,6 @@
+import { Graphics, PixiCanvas } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { FillGradient } from "pixi.js";
-import { Graphics, PixiCanvas } from "pixi-solid";
 import { createSignal } from "solid-js";
 import { createMutable } from "solid-js/store";
 

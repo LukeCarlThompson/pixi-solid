@@ -1,6 +1,7 @@
+import type * as Pixi from "pixi.js";
+
 import { isEventProperty, setEventProperty } from "./set-event-property";
 import { isPointProperty, setPointProperty } from "./set-point-property";
-import type * as Pixi from "pixi.js";
 
 export const setProp = <T = unknown>(
   instance: Pixi.Container,

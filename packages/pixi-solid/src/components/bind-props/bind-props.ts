@@ -1,8 +1,10 @@
 import type * as Pixi from "pixi.js";
+import { createRenderEffect, on, getOwner, runWithOwner } from "solid-js";
+
 import type { ContainerProps } from "../component-factories";
+
 import { bindChildrenToContainer, bindChildrenToRenderLayer } from "./bind-children";
 import { setProp } from "./set-prop";
-import { createRenderEffect, on, getOwner, runWithOwner } from "solid-js";
 
 /**
  * Applies the props to a Pixi instance with subscriptions to maintain reactivity.
@@ -20,7 +22,7 @@ export const bindProps = <
   instance: InstanceType,
   props: OptionsType,
   defer?: boolean,
-) => {
+): void => {
   const owner = getOwner();
 
   for (const key in props) {

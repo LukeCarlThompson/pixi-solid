@@ -1,5 +1,5 @@
-import { DEG_TO_RAD } from "pixi.js";
 import { Graphics, PixiCanvas, Text, usePixiScreen } from "pixi-solid";
+import { DEG_TO_RAD } from "pixi.js";
 import { createSignal } from "solid-js";
 
 const ClickingDemo = () => {
