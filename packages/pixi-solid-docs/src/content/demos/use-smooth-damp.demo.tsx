@@ -1,7 +1,7 @@
-import type * as Pixi from "pixi.js";
-import { FillGradient } from "pixi.js";
 import { Graphics, PixiCanvas } from "pixi-solid";
 import { useSmoothDamp } from "pixi-solid/utils";
+import type * as Pixi from "pixi.js";
+import { FillGradient } from "pixi.js";
 import { createSignal } from "solid-js";
 
 const DraggingDemo = () => {

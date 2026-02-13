@@ -1,7 +1,8 @@
+import { getPixiApp, NineSliceSprite, onTick, PixiCanvas, usePixiScreen } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { getPixiApp, NineSliceSprite, onTick, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { createResource, Show } from "solid-js";
+
 import assetUrl from "@/assets/nine-slice.png";
 
 const DemoComponent = () => {

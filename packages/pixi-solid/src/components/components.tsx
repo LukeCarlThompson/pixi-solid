@@ -16,6 +16,7 @@ import {
   Text as PixiText,
   TilingSprite as PixiTilingSprite,
 } from "pixi.js";
+
 import { createContainerComponent, createLeafComponent } from "./component-factories";
 
 /**

@@ -1,6 +1,7 @@
 import type * as Pixi from "pixi.js";
 import type { JSX } from "solid-js";
 import { onCleanup, onMount, splitProps } from "solid-js";
+
 import { bindProps } from "./components/bind-props";
 import { getPixiApp, PixiApplicationProvider } from "./pixi-application";
 

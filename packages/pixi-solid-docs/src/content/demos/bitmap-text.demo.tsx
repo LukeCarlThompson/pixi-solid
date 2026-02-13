@@ -1,5 +1,5 @@
-import { BitmapFont } from "pixi.js";
 import { BitmapText, PixiCanvas, usePixiScreen } from "pixi-solid";
+import { BitmapFont } from "pixi.js";
 
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();

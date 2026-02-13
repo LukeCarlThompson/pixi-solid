@@ -1,6 +1,7 @@
 import type * as Pixi from "pixi.js";
 import { useContext } from "solid-js";
-import { TickerContext } from "./pixi-application/context";
+
+import { TickerContext } from "./pixi-application";
 
 /**
  * Runs a callback when a given number of milliseconds has passed on the ticker.

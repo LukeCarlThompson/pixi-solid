@@ -1,8 +1,9 @@
-import type * as Pixi from "pixi.js";
-import { Assets, TextureStyle } from "pixi.js";
 import { getPixiApp, onTick, PixiCanvas, Text } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
+import type * as Pixi from "pixi.js";
+import { Assets, TextureStyle } from "pixi.js";
 import { createResource, createSignal, Show } from "solid-js";
+
 import birdAssetUrl_01 from "@/assets/bird_01.png";
 import birdAssetUrl_02 from "@/assets/bird_02.png";
 import birdAssetUrl_03 from "@/assets/bird_03.png";
@@ -10,6 +11,7 @@ import birdAssetUrl_04 from "@/assets/bird_04.png";
 import birdAssetUrl_05 from "@/assets/bird_05.png";
 import birdAssetUrl_06 from "@/assets/bird_06.png";
 import skyAssetUrl from "@/assets/sky.png";
+
 import { Sky } from "./pass-through-props";
 
 const DemoComponent = () => {

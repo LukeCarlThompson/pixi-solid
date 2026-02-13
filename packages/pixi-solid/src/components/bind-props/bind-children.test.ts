@@ -1,11 +1,12 @@
-import { describe, expect, it, vi } from "vitest";
+import type * as Pixi from "pixi.js";
 import { createRoot, createSignal } from "solid-js";
+import { describe, expect, it, vi } from "vitest";
+
 import {
   bindChildrenToContainer,
   bindChildrenToRenderLayer,
   InvalidChildTypeError,
 } from "./bind-children";
-import type * as Pixi from "pixi.js";
 
 // oxlint-disable typescript/unbound-method
 

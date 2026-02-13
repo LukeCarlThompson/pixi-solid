@@ -1,6 +1,7 @@
-import type * as Pixi from "pixi.js";
 import { AnimatedSprite, Container } from "pixi-solid";
+import type * as Pixi from "pixi.js";
 import { createEffect, Match, Switch, splitProps } from "solid-js";
+
 import { getIdleAnimationTextures, getRunAnimationTextures } from "./get-animation-textures";
 
 export type CharacterProps = Omit<Pixi.ContainerOptions, "children"> & {

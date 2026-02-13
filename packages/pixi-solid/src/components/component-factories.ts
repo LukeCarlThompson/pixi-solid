@@ -1,11 +1,12 @@
 import type * as Pixi from "pixi.js";
 import type { JSX, Ref } from "solid-js";
 import { createRenderEffect, on, splitProps } from "solid-js";
+
+import { bindProps } from "./bind-props";
 import type { PixiEventHandlerMap } from "./bind-props/event-names";
 import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./bind-props/event-names";
 import type { PointAxisPropName } from "./bind-props/point-property-names";
 import { POINT_PROP_AXIS_NAMES } from "./bind-props/point-property-names";
-import { bindProps } from "./bind-props";
 
 /**
  * This is a utility type useful for extending the props of custom components to allow props to be passed through to the underlying Pixi instance.

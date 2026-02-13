@@ -1,7 +1,7 @@
-import type * as Pixi from "pixi.js";
-import { Assets } from "pixi.js";
 import type { PixiComponentProps } from "pixi-solid";
 import { AnimatedSprite, Container, onTick, Sprite } from "pixi-solid";
+import type * as Pixi from "pixi.js";
+import { Assets } from "pixi.js";
 import type { Ref } from "solid-js";
 import { splitProps } from "solid-js";
 

@@ -12,7 +12,7 @@ export class InvalidChildTypeError extends Error {
   }
 }
 
-export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.Element) => {
+export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.Element): void => {
   const resolvedChildren = resolveChildren(() => children);
 
   const canAddChild = "addChildAt" in parent;
@@ -50,7 +50,10 @@ export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.E
   });
 };
 
-export const bindChildrenToRenderLayer = (parent: Pixi.RenderLayer, children?: JSX.Element) => {
+export const bindChildrenToRenderLayer = (
+  parent: Pixi.RenderLayer,
+  children?: JSX.Element,
+): void => {
   const resolvedChildren = resolveChildren(() => children);
 
   createRenderEffect((prevChildren: Pixi.Container[] | undefined) => {

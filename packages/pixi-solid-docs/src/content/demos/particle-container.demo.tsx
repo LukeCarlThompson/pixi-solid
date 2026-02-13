@@ -1,7 +1,8 @@
+import { onTick, ParticleContainer, PixiCanvas, usePixiScreen } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets, Particle } from "pixi.js";
-import { onTick, ParticleContainer, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { createResource, onMount, Show, Suspense } from "solid-js";
+
 import assetUrl from "@/assets/food-icons/fried-egg.png";
 
 type ParticleContainerProps = Omit<Pixi.ParticleContainerOptions, "children"> & {

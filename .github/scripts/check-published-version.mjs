@@ -1,6 +1,6 @@
+import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { execSync } from "child_process";
 
 // Determine the package.json path based on the working directory
 const packageJsonPath = path.join(process.cwd(), "packages", "pixi-solid", "package.json");

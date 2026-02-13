@@ -3,11 +3,12 @@ import type { FederatedPointerEvent } from "pixi.js";
 import { Texture } from "pixi.js";
 import type { JSX } from "solid-js";
 import { createSignal, For } from "solid-js";
+
+import { Container, Sprite, Text } from "../components";
+import type { PixiComponentProps } from "../components";
 import { onTick } from "../on-tick";
 import { PixiApplicationProvider } from "../pixi-application";
 import { PixiCanvas } from "../pixi-canvas";
-import { Container, Sprite, Text } from "../components";
-import type { PixiComponentProps } from "../components";
 import { usePixiScreen } from "../use-pixi-screen";
 
 type FollowTextProps = {

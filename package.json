@@ -15,15 +15,15 @@
     "fmt": "oxfmt"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
-    "jsdom": "27.2.0",
-    "oxfmt": "^0.28.0",
-    "oxlint": "^1.43.0",
-    "oxlint-tsgolint": "^0.11.5",
-    "sass-embedded": "1.93.3",
+    "@types/node": "^25.2.3",
+    "jsdom": "28.0.0",
+    "oxfmt": "^0.32.0",
+    "oxlint": "^1.47.0",
+    "oxlint-tsgolint": "^0.12.1",
+    "sass-embedded": "1.97.3",
     "typescript": "~5.9.3",
-    "vite": "7.2.7",
+    "vite": "7.3.1",
     "vite-plugin-solid": "2.11.10",
-    "vitest": "4.0.15"
+    "vitest": "4.0.18"
   }
 }

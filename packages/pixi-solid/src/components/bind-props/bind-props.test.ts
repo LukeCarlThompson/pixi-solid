@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
 import { createRoot, createSignal, createContext, useContext } from "solid-js";
+import { describe, expect, it, vi } from "vitest";
+
 import { bindProps } from ".";
 
 class MockContainer {

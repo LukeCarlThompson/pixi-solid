@@ -1,5 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { onCleanup } from "solid-js";
+
 import { getPixiApp } from "./pixi-application";
 
 /**
