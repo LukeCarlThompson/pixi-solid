@@ -34,7 +34,10 @@
     "prepublishOnly": "pnpm run build",
     "preview": "vite preview",
     "preinstall": "npx only-allow pnpm",
-    "test": "vitest"
+    "test": "vitest",
+    "test:bench": "vitest bench",
+    "test:bench:save": "vitest bench --outputJson=src/benchmarks/results/baseline.json",
+    "test:bench:compare": "vitest bench --compare=src/benchmarks/results/baseline.json"
   },
   "peerDependencies": {
     "pixi.js": "^8.14.3",
