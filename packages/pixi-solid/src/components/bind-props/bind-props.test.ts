@@ -1,4 +1,4 @@
-import { createRoot, createSignal, createContext, useContext } from "solid-js";
+import { createRoot, createSignal, createContext, useContext, onMount } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import { bindInitialisationProps, bindRuntimeProps } from ".";
@@ -51,7 +51,7 @@ describe("bindProps()", () => {
     });
   });
 
-  it("GIVEN a parent with a child that has a ref WHEN bindProps is called THEN the ref is called after the child is added to the parent", async () => {
+  it("GIVEN a parent with a child that has a ref WHEN bindProps is called THEN the ref is called before the child is added to the parent", async () => {
     await createRoot(async () => {
       const parent = new MockContainer();
       const child = new MockContainer();
@@ -74,7 +74,7 @@ describe("bindProps()", () => {
       // The ref should have been called
       expect(childRef).toHaveBeenCalledWith(child);
       // And the parent should be set when the ref is called
-      expect(childParentAtRefTime).toBe(parent);
+      expect(childParentAtRefTime).toBe(null);
     });
   });
 
@@ -111,6 +111,29 @@ describe("bindProps()", () => {
       expect(ref).toHaveBeenCalledWith(instance);
       // And it should have access to the context
       expect(contextValue).toBe("test-value");
+    });
+  });
+
+  it("GIVEN a ref callback WHEN onMount runs THEN the ref value is available", async () => {
+    await createRoot(async () => {
+      const instance = new MockContainer();
+      let refValue: MockContainer | undefined;
+      let refValueAtMount: MockContainer | undefined;
+
+      const ref = vi.fn((value: MockContainer) => {
+        refValue = value;
+      });
+
+      onMount(() => {
+        refValueAtMount = refValue;
+      });
+
+      bindProps(instance as any, { ref } as any);
+
+      await Promise.resolve();
+
+      expect(ref).toHaveBeenCalledWith(instance);
+      expect(refValueAtMount).toBe(instance);
     });
   });
 
