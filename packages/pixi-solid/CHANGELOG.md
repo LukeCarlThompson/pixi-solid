@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.7
+
+- 🐞 Fix timing of ref assignment to be consistent with SolidJS.
+  Ref's are meant to be assigned before the element is added to the scene and `onMount` should be used to reference elements after they are added to the scene.
+  Reverts the change in `0.1.4`.
+
 ## 0.1.5
 
 - 🐞 Fix context loss in ref callback function scope.
