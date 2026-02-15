@@ -70,6 +70,8 @@ export const PIXI_SOLID_EVENT_HANDLER_NAMES = PIXI_EVENT_NAMES.map(
   (eventName) => `on${eventName}` as const,
 );
 
+export type PixiEventHandlerName = (typeof PIXI_SOLID_EVENT_HANDLER_NAMES)[number];
+
 export type PixiEventHandlerMap = {
   [K in (typeof PIXI_EVENT_NAMES)[number] as `on${K}`]?:
     | null

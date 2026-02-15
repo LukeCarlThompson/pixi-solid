@@ -29,7 +29,7 @@ export type PixiApplicationProps = Partial<
  * @param props The properties to configure the Pixi.js Application.
  *
  */
-export const PixiApplicationProvider = (props: PixiApplicationProps) => {
+export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Element => {
   const [appResource] = createResource(async () => {
     const existingContext = useContext(PixiAppContext);
     if (existingContext?.app) {
@@ -70,6 +70,6 @@ export type TickerProviderProps = ParentProps<{ ticker: Pixi.Ticker }>;
  *
  * The ticker instance you want to use needs to be passed in as a prop so it can be manually controlled from the outside for testing.
  */
-export const TickerProvider = (props: TickerProviderProps) => {
+export const TickerProvider = (props: TickerProviderProps): JSX.Element => {
   return <TickerContext.Provider value={props.ticker}>{props.children}</TickerContext.Provider>;
 };
