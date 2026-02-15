@@ -1,5 +1,5 @@
 import type * as Pixi from "pixi.js";
-import { createRenderEffect, on, getOwner, runWithOwner } from "solid-js";
+import { createRenderEffect, on } from "solid-js";
 
 import type { ContainerProps } from "../component-factories";
 
@@ -23,22 +23,13 @@ export const bindProps = <
   props: OptionsType,
   defer?: boolean,
 ): void => {
-  const owner = getOwner();
-
   for (const key in props) {
     if (key === "as") continue;
 
     if (key === "ref") {
-      /**
-       * Use queueMicrotask for ref callback to ensure it runs after all current render effects are complete.
-       * The parent will have added this instance as a child so that `ref.parent` is available in the ref callback.
-       * We use runWithOwner to preserve the reactive context so hooks and providers are accessible.
-       */
-      queueMicrotask(() => {
-        runWithOwner(owner, () => {
-          (props[key] as unknown as (arg: any) => void)(instance);
-        });
-      });
+      (props[key] as unknown as (arg: any) => void)(instance);
+
+      continue;
     } else if (key === "children") {
       if ("attach" in instance && "detach" in instance) {
         bindChildrenToRenderLayer(instance as unknown as Pixi.RenderLayer, props.children);
