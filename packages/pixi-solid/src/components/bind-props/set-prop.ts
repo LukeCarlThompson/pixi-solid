@@ -14,13 +14,11 @@ export const setProp = <T = unknown>(
     return value;
   }
 
-  if (key in instance) {
-    (instance as any)[key] = value;
-    return value;
-  }
-
   if (isEventProperty(key)) {
     setEventProperty(instance, key, value, prevValue);
     return value;
   }
+
+  (instance as any)[key] = value;
+  return value;
 };

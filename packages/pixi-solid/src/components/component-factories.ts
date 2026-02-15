@@ -2,7 +2,7 @@ import type * as Pixi from "pixi.js";
 import type { JSX, Ref } from "solid-js";
 import { createRenderEffect, on, splitProps } from "solid-js";
 
-import { bindProps } from "./bind-props";
+import { bindInitialisationProps, bindRuntimeProps } from "./bind-props";
 import type { PixiEventHandlerMap } from "./bind-props/event-names";
 import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./bind-props/event-names";
 import type { PointAxisPropName } from "./bind-props/point-property-names";
@@ -64,8 +64,8 @@ export const createContainerComponent = <
 
     const instance = props.as || new PixiClass(initialisationProps as any);
 
-    bindProps(instance, initialisationProps, true);
-    bindProps(instance, runtimeProps);
+    bindInitialisationProps(instance, initialisationProps);
+    bindRuntimeProps(instance, runtimeProps);
 
     return instance as InstanceType & JSX.Element;
   };
@@ -84,6 +84,7 @@ export const createLeafComponent = <
   };
 };
 
+// TODO: Optimisae and refactor this as well
 export const createFilterComponent = <InstanceType extends Pixi.Filter, OptionsType extends object>(
   PixiClass: new (props: OptionsType) => InstanceType,
 ) => {

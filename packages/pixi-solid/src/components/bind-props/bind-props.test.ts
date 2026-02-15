@@ -1,8 +1,9 @@
 import { createRoot, createSignal, createContext, useContext } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { bindProps } from ".";
+import { bindInitialisationProps, bindRuntimeProps } from ".";
 
+// TODO: Add in better tests to differentiate between the initialisation and runtime props
 class MockContainer {
   x = 0;
   y = 0;
@@ -22,7 +23,7 @@ describe("bindProps()", () => {
       const childA = new MockContainer();
       const childB = new MockContainer();
 
-      bindProps(instance as any, {
+      bindRuntimeProps(instance as any, {
         x: 10,
         y: 20,
         children: [childA, childB] as any,
@@ -41,7 +42,7 @@ describe("bindProps()", () => {
       const instance = new MockContainer();
       const ref = vi.fn();
 
-      bindProps(instance as any, { ref } as any);
+      bindRuntimeProps(instance as any, { ref } as any);
 
       // Wait for createRenderEffect to run
       await Promise.resolve();
@@ -62,10 +63,10 @@ describe("bindProps()", () => {
       });
 
       // First bind the child with a ref
-      bindProps(child as any, { ref: childRef } as any);
+      bindRuntimeProps(child as any, { ref: childRef } as any);
 
       // Then bind the parent with the child
-      bindProps(parent as any, { children: [child] } as any);
+      bindRuntimeProps(parent as any, { children: [child] } as any);
 
       // Wait for all effects to run
       await Promise.resolve();
@@ -97,7 +98,7 @@ describe("bindProps()", () => {
         return Provider({
           value: "test-value",
           get children() {
-            bindProps(instance as any, { ref } as any);
+            bindRuntimeProps(instance as any, { ref } as any);
             return null;
           },
         });
@@ -124,7 +125,7 @@ describe("bindProps()", () => {
         },
       };
 
-      bindProps(instance as any, props as any, true);
+      bindInitialisationProps(instance as any, props as any);
 
       // Wait for call stack to flush so the createRenderEffect has a chance to run
       await Promise.resolve();
@@ -144,7 +145,7 @@ describe("bindProps()", () => {
         },
       };
 
-      bindProps(instance as any, props as any, true);
+      bindInitialisationProps(instance as any, props as any);
 
       await Promise.resolve();
       expect(instance.x).toBe(0);
@@ -159,9 +160,9 @@ describe("bindProps()", () => {
       const instance = new MockContainer();
       const handler = vi.fn();
 
-      bindProps(instance as any, { onclick: handler } as any);
-
+      bindRuntimeProps(instance as any, { onclick: handler } as any);
       await Promise.resolve();
+
       expect(instance.addEventListener).toHaveBeenCalledTimes(1);
       expect(instance.addEventListener).toHaveBeenCalledWith("click", handler);
     });
@@ -180,9 +181,9 @@ describe("bindProps()", () => {
         },
       };
 
-      bindProps(instance as any, props as any);
-
+      bindRuntimeProps(instance as any, props as any);
       await Promise.resolve();
+
       setHandler(() => handlerB);
 
       expect(instance.removeEventListener).toHaveBeenCalledTimes(1);

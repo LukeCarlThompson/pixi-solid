@@ -6,6 +6,7 @@ export type PixiApplicationProps = Partial<Omit<Pixi.ApplicationOptions, "childr
 export const createPixiApplication = async (
   props?: PixiApplicationProps,
 ): Promise<Pixi.Application> => {
+  // TODO: We should probably make as many of these props reactive as possible. We can use runWithOwner to get the context of the caller and make them reactive.
   const app = new Application();
   await app.init({
     resolution: window.devicePixelRatio,
