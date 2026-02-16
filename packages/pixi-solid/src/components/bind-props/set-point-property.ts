@@ -1,27 +1,34 @@
 import type * as Pixi from "pixi.js";
 
 import {
-  ALL_VALID_PROP_NAMES_SET,
-  POINT_PROP_AXIS_NAMES_SET,
   POINT_PROP_NAMES_SET,
+  POINT_PROP_AXIS_MAP,
+  POINT_PROP_AXIS_NAMES_SET,
 } from "./point-property-names";
+import type { PointAxisPropName, PointPropName } from "./point-property-names";
 
-export const isPointProperty = (propName: string): boolean =>
-  ALL_VALID_PROP_NAMES_SET.has(propName);
+export const isPointProperty = (propName: string): propName is PointPropName =>
+  POINT_PROP_NAMES_SET.has(propName);
 
-export const setPointProperty = <T>(node: Pixi.Container, name: string, value: T): void => {
-  if (typeof value === "object" && value !== null) {
-    (node as any)[name].set((value as any).x, (value as any).y);
+export const setPointProperty = <T>(node: Pixi.Container, name: PointPropName, value: T): void => {
+  if (typeof value === "number") {
+    (node as any)[name].set(value);
     return;
   }
 
-  if (typeof value === "number") {
-    if (POINT_PROP_NAMES_SET.has(name)) {
-      (node as any)[name].set(value);
-    } else if (POINT_PROP_AXIS_NAMES_SET.has(name)) {
-      const axisName = name[name.length - 1].toLowerCase();
-      const propertyName = name.slice(0, -1);
-      (node as any)[propertyName][axisName] = value;
-    }
+  (node as any)[name].set((value as any).x, (value as any).y);
+};
+
+export const isPointAxisProperty = (propName: string): propName is PointAxisPropName =>
+  POINT_PROP_AXIS_NAMES_SET.has(propName);
+
+export const setPointAxisProperty = <T>(
+  node: Pixi.Container,
+  name: PointAxisPropName,
+  value: T,
+): void => {
+  const axisInfo = POINT_PROP_AXIS_MAP.get(name);
+  if (axisInfo) {
+    (node as any)[axisInfo.propertyName][axisInfo.axisName] = value;
   }
 };

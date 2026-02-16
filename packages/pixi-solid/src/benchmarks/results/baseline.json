@@ -1,0 +1,231 @@
+{
+  "files": [
+    {
+      "filepath": "/Users/lukecarlthompson/Code/pixi-solid/packages/pixi-solid/src/benchmarks/container-prop-updates/container-prop-updates.bench.tsx",
+      "groups": [
+        {
+          "fullName": "src/benchmarks/container-prop-updates/container-prop-updates.bench.tsx > Container",
+          "benchmarks": [
+            {
+              "id": "1126950766_0_0",
+              "name": "mixed props updates",
+              "rank": 1,
+              "rme": 0.1492160225855034,
+              "samples": [],
+              "totalTime": 500.00000199999386,
+              "min": 0,
+              "max": 0.20466700000008586,
+              "hz": 15064005.939744161,
+              "period": 0.00006638340452068246,
+              "mean": 0.00006638340452068246,
+              "variance": 1.9237485439427446e-8,
+              "sd": 0.000138699262577086,
+              "sem": 5.0538099940105934e-8,
+              "df": 7532002,
+              "critical": 1.96,
+              "moe": 9.905467588260762e-8,
+              "p75": 0.00008300000013150566,
+              "p99": 0.00008400000001529406,
+              "p995": 0.00012500000002546585,
+              "p999": 0.0003329999999550637,
+              "sampleCount": 7532003,
+              "median": 0.00008299999990413198
+            }
+          ]
+        },
+        {
+          "fullName": "src/benchmarks/container-prop-updates/container-prop-updates.bench.tsx > Container",
+          "benchmarks": [
+            {
+              "id": "1126950766_1_0",
+              "name": "creation only",
+              "rank": 1,
+              "rme": 0,
+              "samples": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filepath": "/Users/lukecarlthompson/Code/pixi-solid/packages/pixi-solid/src/benchmarks/point-property-lookup/point-property-lookup.bench.ts",
+      "groups": [
+        {
+          "fullName": "src/benchmarks/point-property-lookup/point-property-lookup.bench.ts > isPointProperty - mixed hits and misses",
+          "benchmarks": [
+            {
+              "id": "-720183586_0_0",
+              "name": "array includes variant",
+              "rank": 1,
+              "rme": 0.19214969519492567,
+              "samples": [],
+              "totalTime": 500.0000360000465,
+              "min": 0,
+              "max": 0.21900000000005093,
+              "hz": 14144732.981577909,
+              "period": 0.00007069769371414783,
+              "mean": 0.00007069769371414783,
+              "variance": 3.397367588496374e-8,
+              "sd": 0.00018431949404488864,
+              "sem": 6.930887907223326e-8,
+              "df": 7072366,
+              "critical": 1.96,
+              "moe": 1.3584540298157718e-7,
+              "p75": 0.00008300000013150566,
+              "p99": 0.00008400000001529406,
+              "p995": 0.00008400000001529406,
+              "p999": 0.00016600000003563764,
+              "sampleCount": 7072367,
+              "median": 0.00008299999990413198
+            },
+            {
+              "id": "-720183586_0_1",
+              "name": "set has variant",
+              "rank": 2,
+              "rme": 0.1771547911461509,
+              "samples": [],
+              "totalTime": 500.0000370002276,
+              "min": 0,
+              "max": 0.17254100000036487,
+              "hz": 14051588.96017602,
+              "period": 0.00007116632879271707,
+              "mean": 0.00007116632879271707,
+              "variance": 2.906954680370484e-8,
+              "sd": 0.00017049793782830582,
+              "sem": 6.432375568322498e-8,
+              "df": 7025794,
+              "critical": 1.96,
+              "moe": 1.2607456113912097e-7,
+              "p75": 0.00008300000035887933,
+              "p99": 0.00008400000024266774,
+              "p995": 0.00008400000024266774,
+              "p999": 0.00016600000026301132,
+              "sampleCount": 7025795,
+              "median": 0.00008299999990413198
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filepath": "/Users/lukecarlthompson/Code/pixi-solid/packages/pixi-solid/src/benchmarks/set-prop-assignment/set-prop-assignment.bench.ts",
+      "groups": [
+        {
+          "fullName": "src/benchmarks/set-prop-assignment/set-prop-assignment.bench.ts > setProp - key in instance vs try/catch",
+          "benchmarks": [
+            {
+              "id": "659002864_0_0",
+              "name": "key in instance (existing key)",
+              "rank": 2,
+              "rme": 0.12344634080983853,
+              "samples": [],
+              "totalTime": 500.0000849999973,
+              "min": 0,
+              "max": 0.16295800000000327,
+              "hz": 11449292.053620413,
+              "period": 0.00008734164482106884,
+              "mean": 0.00008734164482106884,
+              "variance": 1.7323504132903424e-8,
+              "sd": 0.00013161878335900018,
+              "sem": 5.501023700751802e-8,
+              "df": 5724646,
+              "critical": 1.96,
+              "moe": 1.0782006453473532e-7,
+              "p75": 0.00008400000001529406,
+              "p99": 0.00012500000002546585,
+              "p995": 0.00012500000002546585,
+              "p999": 0.00016700000003311288,
+              "sampleCount": 5724647,
+              "median": 0.00008300000013150566
+            },
+            {
+              "id": "659002864_0_1",
+              "name": "try/catch assignment (existing key)",
+              "rank": 1,
+              "rme": 0.22912625171480194,
+              "samples": [],
+              "totalTime": 500.0000610001366,
+              "min": 0,
+              "max": 0.28074999999989814,
+              "hz": 14812658.192851653,
+              "period": 0.00006750982753943405,
+              "mean": 0.00006750982753943405,
+              "variance": 4.6129060996507e-8,
+              "sd": 0.00021477677015102682,
+              "sem": 7.891976396950631e-8,
+              "df": 7406329,
+              "critical": 1.96,
+              "moe": 1.5468273738023236e-7,
+              "p75": 0.00008300000035887933,
+              "p99": 0.00008400000024266774,
+              "p995": 0.00008400000024266774,
+              "p999": 0.00016599999980826396,
+              "sampleCount": 7406330,
+              "median": 0.00008299999990413198
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "filepath": "/Users/lukecarlthompson/Code/pixi-solid/packages/pixi-solid/src/benchmarks/set-event-property/set-event-property.bench.ts",
+      "groups": [
+        {
+          "fullName": "src/benchmarks/set-event-property/set-event-property.bench.ts > setEventProperty - slice vs map",
+          "benchmarks": [
+            {
+              "id": "1782384170_0_0",
+              "name": "slice(2) event name",
+              "rank": 1,
+              "rme": 0.2277704683529477,
+              "samples": [],
+              "totalTime": 500.00000999979886,
+              "min": 0,
+              "max": 0.2587499999999636,
+              "hz": 15843413.6831381,
+              "period": 0.00006311771061461865,
+              "mean": 0.00006311771061461865,
+              "variance": 4.2619066976197955e-8,
+              "sd": 0.00020644385913898711,
+              "sem": 7.334872708192607e-8,
+              "df": 7921706,
+              "critical": 1.96,
+              "moe": 1.437635050805751e-7,
+              "p75": 0.00008300000013150566,
+              "p99": 0.00008400000001529406,
+              "p995": 0.00008400000001529406,
+              "p999": 0.00016699999991942605,
+              "sampleCount": 7921707,
+              "median": 0.00004200000012133387
+            },
+            {
+              "id": "1782384170_0_1",
+              "name": "map lookup event name",
+              "rank": 2,
+              "rme": 0.3874097389790352,
+              "samples": [],
+              "totalTime": 500.00004499974784,
+              "min": 0,
+              "max": 0.5205830000004426,
+              "hz": 13472958.787440503,
+              "period": 0.00007422274615225575,
+              "mean": 0.00007422274615225575,
+              "variance": 1.4498931152440585e-7,
+              "sd": 0.0003807746203785198,
+              "sem": 1.467072179242479e-7,
+              "df": 6736479,
+              "critical": 1.96,
+              "moe": 2.875461471315259e-7,
+              "p75": 0.00008399999933317304,
+              "p99": 0.00008400000024266774,
+              "p995": 0.0001250000004802132,
+              "p999": 0.0002919999997175182,
+              "sampleCount": 6736480,
+              "median": 0.00008299999990413198
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
