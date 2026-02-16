@@ -1,19 +1,53 @@
 import type * as Pixi from "pixi.js";
 import type { JSX } from "solid-js";
-import { onCleanup, onMount, splitProps } from "solid-js";
+import { onCleanup, onMount } from "solid-js";
 
-import { bindProps } from "./components/bind-props";
+import { bindRuntimeProps } from "./components";
+import type { ContainerProps } from "./components";
 import { getPixiApp, PixiApplicationProvider } from "./pixi-application";
+
+// Helper type to remove colon event handlers from JSX attributes
+type OmitColonEvents<T> = {
+  [K in keyof T as K extends `on:${string}` ? never : K]: T[K];
+};
 
 export type PixiCanvasProps = {
   children: JSX.Element;
-  style?: JSX.CSSProperties | undefined;
-  class?: string;
-} & Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">>;
+  ref?: (el: HTMLDivElement) => void;
+} & OmitColonEvents<Omit<JSX.HTMLAttributes<HTMLDivElement>, "children" | "ref">> &
+  Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">>;
 
-const InnerPixiCanvas = (
-  props: Pick<PixiCanvasProps, "children" | "style" | "class">,
-): JSX.Element => {
+const isDomPropKey = (key: string): boolean => {
+  if (key === "class" || key === "classList" || key === "style") return true;
+  if (key === "id" || key === "title" || key === "role" || key === "tabIndex") return true;
+  if (key.startsWith("aria-") || key.startsWith("data-")) return true;
+  if (/^on[A-Z]/.test(key)) return true;
+
+  return false;
+};
+
+const splitPixiCanvasProps = (props: PixiCanvasProps) => {
+  const wrapperProps: JSX.HTMLAttributes<HTMLDivElement> = {};
+  const applicationOptions: Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">> = {};
+
+  for (const key in props) {
+    if (key === "children") continue;
+    const value = props[key as keyof PixiCanvasProps];
+
+    if (key === "ref" || isDomPropKey(key)) {
+      (wrapperProps as Record<string, unknown>)[key] = value;
+    } else {
+      (applicationOptions as Record<string, unknown>)[key] = value;
+    }
+  }
+
+  return { applicationOptions, wrapperProps };
+};
+
+const InnerPixiCanvas = (props: {
+  children: JSX.Element;
+  wrapperProps?: JSX.HTMLAttributes<HTMLDivElement>;
+}): JSX.Element => {
   let canvasWrapElement: HTMLDivElement | undefined;
   let pixiApp: Pixi.Application;
 
@@ -25,7 +59,9 @@ const InnerPixiCanvas = (
     );
   }
 
-  bindProps(pixiApp.stage, props);
+  bindRuntimeProps(pixiApp.stage, {
+    children: props.children,
+  } as ContainerProps<Pixi.Container>);
 
   let previousResizeTo: HTMLElement | Window;
   let resizeObserver: ResizeObserver | undefined;
@@ -50,7 +86,14 @@ const InnerPixiCanvas = (
 
   return (
     <div
-      ref={canvasWrapElement}
+      {...props.wrapperProps}
+      ref={(el) => {
+        canvasWrapElement = el;
+        const userRef = props.wrapperProps?.ref;
+        if (typeof userRef === "function") {
+          userRef(el);
+        }
+      }}
       style={{
         position: "relative",
         /* Disables the callout/menu on long-press */
@@ -58,9 +101,8 @@ const InnerPixiCanvas = (
         /* Disables text selection */
         ["-webkit-user-select"]: "none",
         ["user-select"]: "none",
-        ...(typeof props.style === "object" ? props.style : {}),
+        ...(typeof props.wrapperProps?.style === "object" ? props.wrapperProps.style : {}),
       }}
-      class={props.class}
     >
       {pixiApp.canvas}
     </div>
@@ -80,18 +122,14 @@ const InnerPixiCanvas = (
  *
  * Props:
  * @param props.children - JSX content to render inside the canvas wrapper.
- * @param props.style - CSS styles to apply to the canvas wrapper.
- * @param props.class - CSS class to apply to the canvas wrapper.
- * @param props - Additional Pixi ApplicationOptions (except 'children' and 'resizeTo').
+ * @param props - DOM props for the wrapper and Pixi ApplicationOptions (except 'children' and 'resizeTo').
  */
 
 export const PixiCanvas = (props: PixiCanvasProps): JSX.Element => {
-  const [, applicationOptions] = splitProps(props, ["children", "style", "class"]);
+  const { applicationOptions, wrapperProps } = splitPixiCanvasProps(props);
   return (
     <PixiApplicationProvider {...applicationOptions}>
-      <InnerPixiCanvas style={props.style} class={props.class}>
-        {props.children}
-      </InnerPixiCanvas>
+      <InnerPixiCanvas wrapperProps={wrapperProps}>{props.children}</InnerPixiCanvas>
     </PixiApplicationProvider>
   );
 };
