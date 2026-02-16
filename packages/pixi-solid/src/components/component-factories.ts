@@ -84,7 +84,6 @@ export const createLeafComponent = <
   };
 };
 
-// TODO: Optimisae and refactor this as well
 export const createFilterComponent = <InstanceType extends Pixi.Filter, OptionsType extends object>(
   PixiClass: new (props: OptionsType) => InstanceType,
 ) => {
