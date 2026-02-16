@@ -4,7 +4,7 @@ import { createRenderEffect, on } from "solid-js";
 import type { ContainerProps } from "../component-factories";
 
 import { bindChildrenToContainer, bindChildrenToRenderLayer } from "./bind-children";
-import { isEventProperty, setEventProperty } from "./set-event-property";
+import { isEventProperty } from "./is-event-property";
 import {
   isPointProperty,
   setPointProperty,
@@ -44,7 +44,6 @@ export const bindRuntimeProps = <
       continue;
     }
 
-    // TODO: Now that we check the prop names before creatign the effects can we have stricter typing on the props and avoid the need for type assertions in the setPointProperty and setEventProperty functions?
     if (isPointProperty(key)) {
       createRenderEffect(() => setPointProperty(instance, key, props[key]));
 
@@ -57,7 +56,20 @@ export const bindRuntimeProps = <
     }
 
     if (isEventProperty(key)) {
-      createRenderEffect((prevValue) => setEventProperty(instance, key, props[key], prevValue));
+      createRenderEffect((prevEventHandler) => {
+        // Remove the 'on' prefix to get the actual event name.
+        const eventName = key.slice(2);
+        const eventHandler = props[key];
+
+        if (prevEventHandler) {
+          instance.removeEventListener(eventName, prevEventHandler as any);
+        }
+        if (eventHandler) {
+          instance.addEventListener(eventName, eventHandler as any);
+        }
+
+        return eventHandler;
+      });
 
       continue;
     }
