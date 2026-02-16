@@ -78,8 +78,6 @@ export const bindRuntimeProps = <
       createRenderEffect(() => ((instance as any)[key] = props[key]));
       continue;
     }
-
-    throw new InvalidPropNameError(`Invalid prop name: ${key}`);
   }
 };
 
@@ -123,20 +121,10 @@ export const bindInitialisationProps = <
           { defer: true },
         ),
       );
-
-      continue;
     }
-
-    throw new InvalidPropNameError(`Invalid prop name: ${key}`);
   }
+
+  /**
+   * Do not throw an error here for invalide prop names because there are some initialisation props that are not available ast public properties. We want to allow users to pass these props but not try to set them on the instance.
+   */
 };
-
-export class InvalidPropNameError extends Error {
-  constructor(reason?: string) {
-    super(
-      "Invalid pixi-solid prop name. Did you accidentally pass an invalid prop to a pixi-solid component?" +
-        (reason ? ` Reason: ${reason}` : ""),
-    );
-    this.name = "InvalidPropNameError";
-  }
-}

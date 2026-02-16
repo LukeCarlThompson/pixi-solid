@@ -37,7 +37,7 @@ const DemoComponent = () => {
 };
 
 export const Demo = () => (
-  <PixiCanvas style={{ "aspect-ratio": "2/1.5" }} background="transparent">
+  <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
     <DemoComponent />
   </PixiCanvas>
 );
