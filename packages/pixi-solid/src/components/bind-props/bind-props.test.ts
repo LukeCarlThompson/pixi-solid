@@ -1,8 +1,6 @@
 import { createRoot, createSignal, createContext, useContext, onMount } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { InvalidPropNameError } from "./bind-props";
-
 import { bindInitialisationProps, bindRuntimeProps } from ".";
 
 // TODO: Add in better tests to differentiate between the initialisation and runtime props
@@ -301,18 +299,17 @@ describe("bindRuntimeProps()", () => {
     dispose();
   });
 
-  it("GIVEN an invalid prop WHEN bindRuntimeProps is called THEN it throws InvalidPropNameError", () => {
-    const instance = new MockContainer();
-    let dispose: (() => void) | undefined;
+  it("GIVEN an invalid prop WHEN bindRuntimeProps is called THEN it does not throw and does not set the property", () => {
+    const { value, dispose } = withTestRoot(() => {
+      const instance = new MockContainer();
 
-    expect(() => {
-      dispose = createRoot(() => {
-        bindRuntimeProps(instance as any, { notAProp: 1 } as any);
-        return () => {};
-      });
-    }).toThrow(InvalidPropNameError);
+      bindRuntimeProps(instance as any, { notAProp: 1 } as any);
 
-    dispose?.();
+      return { instance };
+    });
+
+    expect((value.instance as any).notAProp).toBeUndefined();
+    dispose();
   });
 });
 
@@ -383,17 +380,26 @@ describe("bindInitialisationProps()", () => {
     dispose();
   });
 
-  it("GIVEN an invalid prop WHEN bindInitialisationProps is called THEN it throws InvalidPropNameError", () => {
-    const instance = new MockContainer();
-    let dispose: (() => void) | undefined;
+  it("GIVEN an invalid prop WHEN bindInitialisationProps is called THEN it does not throw and does not set the property after changes", () => {
+    const { value, dispose } = withTestRoot(() => {
+      const instance = new MockContainer();
+      const [prop, setProp] = createSignal(1);
 
-    expect(() => {
-      dispose = createRoot(() => {
-        bindInitialisationProps(instance as any, { notAProp: 1 } as any);
-        return () => {};
-      });
-    }).toThrow(InvalidPropNameError);
+      const props = {
+        get notAProp() {
+          return prop();
+        },
+      };
 
-    dispose?.();
+      bindInitialisationProps(instance as any, props as any);
+
+      return { instance, setProp };
+    });
+
+    expect((value.instance as any).notAProp).toBeUndefined();
+
+    value.setProp(2);
+    expect((value.instance as any).notAProp).toBeUndefined();
+    dispose();
   });
 });

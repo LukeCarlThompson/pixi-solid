@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.9
+
+- 🐞 Fixed components that have initial arguments that aren't exposed as public properties on the instance.
+
+## 0.1.8
+
+- Refactored prop binding to improve performance and added benchmark tests.
+
 ## 0.1.7
 
 - 🐞 Fix timing of ref assignment to be consistent with SolidJS.
