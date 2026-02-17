@@ -12,8 +12,8 @@ class MockContainer {
   addChildAt = vi.fn((child: MockContainer) => {
     child.parent = this;
   });
-  addEventListener = vi.fn();
-  removeEventListener = vi.fn();
+  on = vi.fn();
+  off = vi.fn();
 }
 
 const createMockPoint = () => {
@@ -189,8 +189,8 @@ describe("bindRuntimeProps()", () => {
       return { instance, handler };
     });
 
-    expect(value.instance.addEventListener).toHaveBeenCalledTimes(1);
-    expect(value.instance.addEventListener).toHaveBeenCalledWith("click", value.handler);
+    expect(value.instance.on).toHaveBeenCalledTimes(1);
+    expect(value.instance.on).toHaveBeenCalledWith("click", value.handler);
     dispose();
   });
 
@@ -214,10 +214,10 @@ describe("bindRuntimeProps()", () => {
 
     value.setHandler(() => value.handlerB);
 
-    expect(value.instance.removeEventListener).toHaveBeenCalledTimes(1);
-    expect(value.instance.removeEventListener).toHaveBeenCalledWith("click", value.handlerA);
-    expect(value.instance.addEventListener).toHaveBeenCalledTimes(2);
-    expect(value.instance.addEventListener).toHaveBeenLastCalledWith("click", value.handlerB);
+    expect(value.instance.off).toHaveBeenCalledTimes(1);
+    expect(value.instance.off).toHaveBeenCalledWith("click", value.handlerA);
+    expect(value.instance.on).toHaveBeenCalledTimes(2);
+    expect(value.instance.on).toHaveBeenLastCalledWith("click", value.handlerB);
     dispose();
   });
 
@@ -240,9 +240,9 @@ describe("bindRuntimeProps()", () => {
 
     value.setHandler(undefined);
 
-    expect(value.instance.removeEventListener).toHaveBeenCalledTimes(1);
-    expect(value.instance.removeEventListener).toHaveBeenCalledWith("click", value.handlerA);
-    expect(value.instance.addEventListener).toHaveBeenCalledTimes(1);
+    expect(value.instance.off).toHaveBeenCalledTimes(1);
+    expect(value.instance.off).toHaveBeenCalledWith("click", value.handlerA);
+    expect(value.instance.on).toHaveBeenCalledTimes(1);
     dispose();
   });
 
