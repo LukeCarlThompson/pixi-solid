@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.10
+
+- 🐞 Fixed event handler reactivity where handlers bound through spread props were not properly unregistered when updated.
+- 🐞 Fixed component prop reactivity if a signal is spread into a component with dynamic properties.
+
 ## 0.1.9
 
 - 🐞 Fixed components that have initial arguments that aren't exposed as public properties on the instance.
