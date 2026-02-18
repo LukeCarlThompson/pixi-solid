@@ -1,5 +1,5 @@
 import type * as Pixi from "pixi.js";
-import { createRenderEffect, on } from "solid-js";
+import { createRenderEffect, onCleanup, on } from "solid-js";
 
 import type { ContainerProps } from "../component-factories";
 
@@ -27,58 +27,57 @@ export const bindRuntimeProps = <
   instance: InstanceType,
   props: OptionsType,
 ): void => {
-  for (const key in props) {
-    if (key === "as") continue;
+  createRenderEffect(() => {
+    for (const key in props) {
+      if (key === "as") continue;
 
-    if (key === "ref") {
-      (props[key] as unknown as (arg: any) => void)(instance);
+      if (key === "ref") {
+        (props[key] as unknown as (arg: any) => void)(instance);
 
-      continue;
-    } else if (key === "children") {
-      if ("attach" in instance && "detach" in instance) {
-        bindChildrenToRenderLayer(instance as unknown as Pixi.RenderLayer, props.children);
-      } else {
-        bindChildrenToContainer(instance, props.children);
+        continue;
+      } else if (key === "children") {
+        if ("attach" in instance && "detach" in instance) {
+          bindChildrenToRenderLayer(instance as unknown as Pixi.RenderLayer, props.children);
+        } else {
+          bindChildrenToContainer(instance, props.children);
+        }
+
+        continue;
       }
 
-      continue;
+      if (isPointProperty(key)) {
+        createRenderEffect(() => setPointProperty(instance, key, props[key]));
+
+        continue;
+      }
+
+      if (isPointAxisProperty(key)) {
+        createRenderEffect(() => setPointAxisProperty(instance, key, props[key]));
+        continue;
+      }
+
+      if (isEventProperty(key)) {
+        createRenderEffect(() => {
+          const eventName = key.slice(2);
+          const eventHandler = props[key];
+
+          if (eventHandler) {
+            instance.on(eventName, eventHandler as any);
+            onCleanup(() => {
+              instance.off(eventName, eventHandler as any);
+            });
+          }
+        });
+
+        continue;
+      }
+
+      if (key in instance) {
+        createRenderEffect(() => ((instance as any)[key] = props[key]));
+        continue;
+      }
     }
-
-    if (isPointProperty(key)) {
-      createRenderEffect(() => setPointProperty(instance, key, props[key]));
-
-      continue;
-    }
-
-    if (isPointAxisProperty(key)) {
-      createRenderEffect(() => setPointAxisProperty(instance, key, props[key]));
-      continue;
-    }
-
-    if (isEventProperty(key)) {
-      createRenderEffect((prevEventHandler) => {
-        // Remove the 'on' prefix to get the actual event name.
-        const eventName = key.slice(2);
-        const eventHandler = props[key];
-
-        if (prevEventHandler) {
-          instance.removeEventListener(eventName, prevEventHandler as any);
-        }
-        if (eventHandler) {
-          instance.addEventListener(eventName, eventHandler as any);
-        }
-
-        return eventHandler;
-      });
-
-      continue;
-    }
-
-    if (key in instance) {
-      createRenderEffect(() => ((instance as any)[key] = props[key]));
-      continue;
-    }
-  }
+  });
 };
 
 /**
@@ -96,35 +95,39 @@ export const bindInitialisationProps = <
   instance: InstanceType,
   props: OptionsType,
 ): void => {
-  for (const key in props) {
-    if (isPointProperty(key)) {
-      createRenderEffect(
-        on(
-          () => props[key as keyof typeof props],
-          () => {
-            return setPointProperty(instance, key, props[key]);
-          },
-          { defer: true },
-        ),
-      );
+  createRenderEffect<boolean>((defer) => {
+    for (const key in props) {
+      if (isPointProperty(key)) {
+        createRenderEffect(
+          on(
+            () => props[key],
+            () => {
+              return setPointProperty(instance, key, props[key]);
+            },
+            { defer },
+          ),
+        );
 
-      continue;
+        continue;
+      }
+
+      if (key in instance) {
+        createRenderEffect(
+          on(
+            () => props[key],
+            () => {
+              (instance as any)[key] = props[key];
+            },
+            { defer },
+          ),
+        );
+      }
     }
 
-    if (key in instance) {
-      createRenderEffect(
-        on(
-          () => props[key as keyof typeof props],
-          () => {
-            (instance as any)[key] = props[key];
-          },
-          { defer: true },
-        ),
-      );
-    }
-  }
+    return false;
+  }, true);
 
   /**
-   * Do not throw an error here for invalide prop names because there are some initialisation props that are not available ast public properties. We want to allow users to pass these props but not try to set them on the instance.
+   * Do not throw an error here for invalid prop names because there are some initialisation props that are not available as public properties. We want to allow users to pass these props but not try to set them on the instance.
    */
 };
