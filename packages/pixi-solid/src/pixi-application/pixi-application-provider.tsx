@@ -30,16 +30,26 @@ export type PixiApplicationProps = Partial<
  *
  */
 export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Element => {
+  let externallyProvidedApp: Pixi.Application | undefined = props.existingApp;
+
   const [appResource] = createResource(async () => {
+    if (externallyProvidedApp) {
+      return externallyProvidedApp;
+    }
+
     const existingContext = useContext(PixiAppContext);
     if (existingContext?.app) {
+      externallyProvidedApp = existingContext.app;
       return existingContext.app;
     }
+
     const [, initialisationProps] = splitProps(props, ["children", "existingApp"]);
     return await createPixiApplication(initialisationProps);
   });
 
   onCleanup(() => {
+    // Only destory the app if it was created here.
+    if (externallyProvidedApp) return;
     appResource()?.destroy(true, { children: true });
   });
 
