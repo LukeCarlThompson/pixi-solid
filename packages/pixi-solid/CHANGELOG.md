@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.11
+
+- 🐞 `ApplicationProvider` now only destroys the app instance on unmount if it created it.
+
 ## 0.1.10
 
 - 🐞 Fixed event handler reactivity where handlers bound through spread props were not properly unregistered when updated.
