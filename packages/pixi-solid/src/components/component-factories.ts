@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import type { JSX, Ref } from "solid-js";
-import { createRenderEffect, on, splitProps } from "solid-js";
+import { createRenderEffect, on, splitProps, onCleanup } from "solid-js";
 
 import { bindInitialisationProps, bindRuntimeProps } from "./bind-props";
 import type { PixiEventHandlerMap } from "./bind-props/event-names";
@@ -66,6 +66,15 @@ export const createContainerComponent = <
 
     bindInitialisationProps(instance, initialisationProps);
     bindRuntimeProps(instance, runtimeProps);
+
+    onCleanup(() => {
+      if ("attach" in instance) {
+        // Means it's a render layer so we don't want to destroy children as they are managed elsewhere in the tree.
+        instance.destroy({ children: false });
+      } else {
+        instance.destroy({ children: true });
+      }
+    });
 
     return instance as InstanceType & JSX.Element;
   };
