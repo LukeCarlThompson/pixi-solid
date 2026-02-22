@@ -14,6 +14,7 @@ export {
   RenderContainer,
   RenderLayer,
   TilingSprite,
+  BlurFilter,
 } from "./components";
 export {
   PIXI_EVENT_NAMES,
