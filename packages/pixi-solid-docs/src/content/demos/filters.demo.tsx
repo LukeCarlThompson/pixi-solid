@@ -1,8 +1,8 @@
-import { PixiCanvas, Sprite, usePixiScreen } from "pixi-solid";
+import { PixiCanvas, Sprite, usePixiScreen, BlurFilter } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
-import { Assets, BlurFilter, TextureStyle } from "pixi.js";
-import { createEffect, createResource, createSignal, onCleanup, Show } from "solid-js";
+import { Assets, TextureStyle } from "pixi.js";
+import { createResource, createSignal, Show } from "solid-js";
 
 import birdAssetUrl from "@/assets/bird_03.png";
 import skyAssetUrl from "@/assets/sky.png";
@@ -19,19 +19,8 @@ const DemoComponent = () => {
     ]),
   );
 
-  // Create the filter using the Pixi class
-  const blurFilter = new BlurFilter({ strength: 0 });
-
   // Assign a signal and use a createEffect to bind it to the Pixi class.
   const [blurAmount, setBlurAmount] = createSignal(1);
-  createEffect(() => {
-    blurFilter.strength = blurAmount();
-  });
-
-  // Any time we create Pixi classes directly we need to remember to destroy them when our component is cleaned up.
-  onCleanup(() => {
-    blurFilter.destroy();
-  });
 
   // Listen to pointer and set the blur amoutn signal to demonstrate binding PixiJS classes with signals
   const handlePointerMove = (e: Pixi.FederatedPointerEvent) => {
@@ -52,7 +41,7 @@ const DemoComponent = () => {
       <Sprite
         label="sky"
         texture={Assets.get<Pixi.Texture>("sky")}
-        filters={blurFilter}
+        filters={<BlurFilter strength={blurAmount()} />}
         eventMode="static"
         onglobalpointermove={handlePointerMove}
         ref={(instance) => {

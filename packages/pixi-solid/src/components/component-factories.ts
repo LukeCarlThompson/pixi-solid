@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import type { JSX, Ref } from "solid-js";
-import { createRenderEffect, on, splitProps } from "solid-js";
+import { createRenderEffect, on, onCleanup, splitProps } from "solid-js";
 
 import { bindInitialisationProps, bindRuntimeProps } from "./bind-props";
 import type { PixiEventHandlerMap } from "./bind-props/event-names";
@@ -23,7 +23,8 @@ export type PixiComponentProps<
  * Prop definition for components that CAN have children
  */
 export type ContainerProps<Component> = PixiEventHandlerMap &
-  PointAxisProps & {
+  PointAxisProps &
+  FilterProperty & {
     ref?: Ref<Component>;
     as?: Component;
     children?: JSX.Element;
@@ -35,6 +36,10 @@ export type PointAxisProps = Partial<Record<PointAxisPropName, number>>;
  * Prop definition for components that CANNOT have children
  */
 export type LeafProps<Component> = Omit<ContainerProps<Component>, "children">;
+
+type FilterProperty = {
+  filters?: Pixi.Filter | JSX.Element | (Pixi.Filter | JSX.Element)[];
+};
 
 /**
  * Prop definition for filter components
@@ -53,9 +58,9 @@ export const createContainerComponent = <
 >(
   PixiClass: new (props: OptionsType) => InstanceType,
 ): ((
-  props: Omit<OptionsType, "children"> & ContainerProps<InstanceType>,
-) => InstanceType & JSX.Element) => {
-  return (props): InstanceType & JSX.Element => {
+  props: Omit<OptionsType, "children" | "filters"> & ContainerProps<InstanceType>,
+) => InstanceType & JSX.Element & FilterProperty) => {
+  return (props): InstanceType & JSX.Element & FilterProperty => {
     const [runtimeProps, initialisationProps] = splitProps(props, [
       ...SOLID_PROP_KEYS,
       ...PIXI_SOLID_EVENT_HANDLER_NAMES,
@@ -67,7 +72,7 @@ export const createContainerComponent = <
     bindInitialisationProps(instance, initialisationProps);
     bindRuntimeProps(instance, runtimeProps);
 
-    return instance as InstanceType & JSX.Element;
+    return instance as InstanceType & JSX.Element & FilterProperty;
   };
 };
 
@@ -78,8 +83,8 @@ export const createLeafComponent = <
   PixiClass: new (props: OptionsType) => InstanceType,
 ) => {
   return (
-    props: Omit<OptionsType, "children"> & LeafProps<InstanceType>,
-  ): InstanceType & JSX.Element => {
+    props: Omit<OptionsType, "children" | "filters"> & LeafProps<InstanceType>,
+  ): InstanceType & JSX.Element & FilterProperty => {
     return createContainerComponent<InstanceType, OptionsType>(PixiClass)(props);
   };
 };
@@ -92,39 +97,53 @@ export const createFilterComponent = <InstanceType extends Pixi.Filter, OptionsT
 
     const instance = props.as || new PixiClass(initialisationProps as any);
 
-    for (const key in initialisationProps) {
-      if (key === "as") continue;
-
-      if (key === "ref") {
-        createRenderEffect(() => {
-          // Solid converts the ref prop to a callback function
-          (props[key] as unknown as (arg: any) => void)(instance);
-        });
-      } else if (key === "children") {
-        throw new Error(`Cannot set children on non-container instance.`);
-      } else {
-        createRenderEffect(
-          on(
-            () => props[key as keyof typeof initialisationProps],
-            () => {
-              (instance as any)[key] = initialisationProps[key];
-            },
-            { defer: true },
-          ),
-        );
+    // Handle initialisation props
+    createRenderEffect<boolean>((defer) => {
+      for (const key in initialisationProps) {
+        if (key === "children") {
+          throw new Error(`Cannot set children on non-container instance.`);
+        } else {
+          createRenderEffect(
+            on(
+              () => initialisationProps[key],
+              () => {
+                (instance as any)[key] = initialisationProps[key];
+              },
+              { defer },
+            ),
+          );
+        }
       }
-    }
 
-    for (const key in runtimeProps) {
-      if (key === "as") continue;
+      return false;
+    }, true);
 
-      if (key === "ref") {
-        createRenderEffect(() => {
-          // Solid converts the ref prop to a callback function
-          (props[key] as unknown as (arg: any) => void)(instance);
-        });
+    // Handle runtime props
+    createRenderEffect(() => {
+      for (const key in runtimeProps) {
+        if (key === "as") continue;
+
+        if (key === "ref") {
+          if (typeof runtimeProps[key] === "function") {
+            (runtimeProps[key] as (arg: any) => void)(instance);
+          } else {
+            (runtimeProps[key] as any) = instance;
+          }
+
+          continue;
+        }
+
+        if (key in instance) {
+          createRenderEffect(() => ((instance as any)[key] = (runtimeProps as any)[key]));
+          continue;
+        }
       }
-    }
+    });
+
+    // Destroy the filter here because filters aren't children of the component they are applied to, so they won't be destroyed through normal Pixi parent-child destruction.
+    onCleanup(() => {
+      instance.destroy(true);
+    });
 
     return instance as InstanceType & JSX.Element;
   };

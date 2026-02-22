@@ -15,9 +15,14 @@ import {
   Sprite as PixiSprite,
   Text as PixiText,
   TilingSprite as PixiTilingSprite,
+  BlurFilter as PixiBlurFilter,
 } from "pixi.js";
 
-import { createContainerComponent, createLeafComponent } from "./component-factories";
+import {
+  createContainerComponent,
+  createFilterComponent,
+  createLeafComponent,
+} from "./component-factories";
 
 /**
  * A SolidJS component that renders a `PIXI.AnimatedSprite`.
@@ -110,6 +115,10 @@ export const Text = createLeafComponent<PixiText, Pixi.CanvasTextOptions>(PixiTe
  */
 export const TilingSprite = createLeafComponent<PixiTilingSprite, Pixi.TilingSpriteOptions>(
   PixiTilingSprite,
+);
+
+export const BlurFilter = createFilterComponent<Pixi.BlurFilter, Pixi.BlurFilterOptions>(
+  PixiBlurFilter,
 );
 
 // export const MeshGeometry = createLeafComponent<PixiMeshGeometry, Pixi.MeshGeometryOptions>(PixiMeshGeometry);
