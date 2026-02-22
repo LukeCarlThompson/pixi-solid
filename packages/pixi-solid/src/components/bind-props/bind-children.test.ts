@@ -66,25 +66,6 @@ describe("bindChildrenToContainer()", () => {
     });
   });
 
-  it("GIVEN three children WHEN one is removed THEN it removes and destroys the child", async () => {
-    await createRoot(async () => {
-      const parent = createMockContainer() as unknown as Pixi.Container;
-      const childA = createMockContainer() as unknown as Pixi.Container;
-      const childB = createMockContainer() as unknown as Pixi.Container;
-      const childC = createMockContainer() as unknown as Pixi.Container;
-      const [children, setChildren] = createSignal([childA, childB, childC]);
-
-      bindChildrenToContainer(parent, (() => children()) as any);
-      await Promise.resolve();
-
-      setChildren([childA, childB]);
-
-      expect(parent.removeChild).toHaveBeenCalledTimes(1);
-      expect(parent.removeChild).toHaveBeenCalledWith(childC);
-      expect(childC.destroy).toHaveBeenCalledWith({ children: true });
-    });
-  });
-
   it("GIVEN three children WHEN they are re-oredered THEN it re-adds children in new order", async () => {
     await createRoot(async () => {
       const parent = createMockContainer() as unknown as Pixi.Container;

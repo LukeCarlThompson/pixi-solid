@@ -11,9 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.12
+
+- 🐞 Fixed component destroy behaviour to be managed by the components own lifecycle rather than in the bind children function.
+  Fixes a bug where children would not be destroyed if a `PixiCanvas` was unmounted.
+
 ## 0.1.11
 
-- 🐞 `ApplicationProvider` now only destroys the app instance on unmount if it created it.
+- 🐞 `PixiApplicationProvider` now only destroys the app instance on unmount if it created it.
 
 ## 0.1.10
 
