@@ -21,19 +21,10 @@ export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.E
     throw new Error("Parent does not support children.");
   }
 
-  createRenderEffect((prevChildren: Pixi.Container[] | undefined) => {
+  createRenderEffect(() => {
     const nextChildren = resolvedChildren.toArray().filter(Boolean) as unknown as Pixi.Container[];
 
     try {
-      if (prevChildren) {
-        for (let i = 0; i < prevChildren.length; i += 1) {
-          const child = prevChildren[i];
-          if (nextChildren.includes(child)) continue;
-          parent.removeChild(child);
-          child.destroy({ children: true });
-        }
-      }
-
       for (let i = 0; i < nextChildren.length; i += 1) {
         parent.addChildAt(nextChildren[i], i);
       }
@@ -45,8 +36,6 @@ export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.E
         throw error;
       }
     }
-
-    return nextChildren;
   });
 };
 
