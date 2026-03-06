@@ -1,5 +1,5 @@
 import type * as Pixi from "pixi.js";
-import { onCleanup } from "solid-js";
+import { batch, onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
 
 export type PixiScreenDimensions = {
@@ -34,7 +34,12 @@ export const createPixiScreenStore = (renderer: Pixi.Renderer): Readonly<PixiScr
   });
 
   const handleResize = () => {
-    setPixiScreen(renderer.screen);
+    batch(() => {
+      setPixiScreen("width", renderer.screen.width);
+      setPixiScreen("height", renderer.screen.height);
+      setPixiScreen("x", renderer.screen.x);
+      setPixiScreen("y", renderer.screen.y);
+    });
   };
 
   renderer.addListener("resize", handleResize);
