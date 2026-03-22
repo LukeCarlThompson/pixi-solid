@@ -5,8 +5,31 @@ import { createRenderEffect, on, splitProps, onCleanup } from "solid-js";
 import { bindInitialisationProps, bindRuntimeProps } from "./bind-props";
 import type { PixiEventHandlerMap } from "./bind-props/event-names";
 import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./bind-props/event-names";
-import type { PointAxisPropName } from "./bind-props/point-property-names";
-import { POINT_PROP_AXIS_NAMES } from "./bind-props/point-property-names";
+import type {
+  CommonPointAxisPropName,
+  AnchorPointAxisPropName,
+  TilingPointAxisPropName,
+} from "./bind-props/point-property-names";
+import {
+  COMMON_POINT_PROP_AXIS_NAMES,
+  ANCHOR_POINT_PROP_AXIS_NAMES,
+  TILING_POINT_PROP_AXIS_NAMES,
+} from "./bind-props/point-property-names";
+
+/**
+ * Common point axis properties available on all Container-based components
+ */
+export type CommonPointAxisProps = Partial<Record<CommonPointAxisPropName, number>>;
+
+/**
+ * Anchor point axis properties available on Sprite-like components
+ */
+export type AnchorPointAxisProps = Partial<Record<AnchorPointAxisPropName, number>>;
+
+/**
+ * Tiling point axis properties available on TilingSprite
+ */
+export type TilingPointAxisProps = Partial<Record<TilingPointAxisPropName, number>>;
 
 /**
  * This is a utility type useful for extending the props of custom components to allow props to be passed through to the underlying Pixi instance.
@@ -17,24 +40,43 @@ import { POINT_PROP_AXIS_NAMES } from "./bind-props/point-property-names";
  */
 export type PixiComponentProps<
   ComponentOptions extends Pixi.ContainerOptions = Pixi.ContainerOptions,
-> = PixiEventHandlerMap & PointAxisProps & Omit<ComponentOptions, "children">;
+> = PixiEventHandlerMap & CommonPointAxisProps & Omit<ComponentOptions, "children">;
 
 /**
- * Prop definition for components that CAN have children
+ * Prop definition for basic Container components (position, scale, pivot, skew only)
  */
 export type ContainerProps<Component> = PixiEventHandlerMap &
-  PointAxisProps & {
+  CommonPointAxisProps & {
     ref?: Ref<Component>;
     as?: Component;
     children?: JSX.Element;
   };
 
-export type PointAxisProps = Partial<Record<PointAxisPropName, number>>;
-
 /**
- * Prop definition for components that CANNOT have children
+ * Prop definition for components that cannot have children
  */
 export type LeafProps<Component> = Omit<ContainerProps<Component>, "children">;
+
+/**
+ * Prop definition for Sprite-like components (includes anchor properties)
+ */
+export type SpriteProps<Component> = PixiEventHandlerMap &
+  CommonPointAxisProps &
+  AnchorPointAxisProps & {
+    ref?: Ref<Component>;
+    as?: Component;
+  };
+
+/**
+ * Prop definition for TilingSprite (includes anchor and tiling properties)
+ */
+export type TilingSpriteProps<Component> = PixiEventHandlerMap &
+  CommonPointAxisProps &
+  AnchorPointAxisProps &
+  TilingPointAxisProps & {
+    ref?: Ref<Component>;
+    as?: Component;
+  };
 
 /**
  * Prop definition for filter components
@@ -47,6 +89,31 @@ export type FilterProps<Component> = {
 // Keys that are specific to Solid components and not Pixi props
 export const SOLID_PROP_KEYS = ["ref", "as", "children"] as const;
 
+// Combined keys for splitting props
+const CONTAINER_RUNTIME_KEYS = [
+  ...SOLID_PROP_KEYS,
+  ...PIXI_SOLID_EVENT_HANDLER_NAMES,
+  ...COMMON_POINT_PROP_AXIS_NAMES,
+] as const;
+
+// Sprite components don't accept "children" since they can't have children
+const SPRITE_RUNTIME_KEYS = [
+  "ref",
+  "as",
+  ...PIXI_SOLID_EVENT_HANDLER_NAMES,
+  ...COMMON_POINT_PROP_AXIS_NAMES,
+  ...ANCHOR_POINT_PROP_AXIS_NAMES,
+] as const;
+
+const TILING_SPRITE_RUNTIME_KEYS = [
+  "ref",
+  "as",
+  ...PIXI_SOLID_EVENT_HANDLER_NAMES,
+  ...COMMON_POINT_PROP_AXIS_NAMES,
+  ...ANCHOR_POINT_PROP_AXIS_NAMES,
+  ...TILING_POINT_PROP_AXIS_NAMES,
+] as const;
+
 export const createContainerComponent = <
   InstanceType extends Pixi.Container,
   OptionsType extends object,
@@ -56,11 +123,7 @@ export const createContainerComponent = <
   props: Omit<OptionsType, "children"> & ContainerProps<InstanceType>,
 ) => InstanceType & JSX.Element) => {
   return (props): InstanceType & JSX.Element => {
-    const [runtimeProps, initialisationProps] = splitProps(props, [
-      ...SOLID_PROP_KEYS,
-      ...PIXI_SOLID_EVENT_HANDLER_NAMES,
-      ...POINT_PROP_AXIS_NAMES,
-    ]);
+    const [runtimeProps, initialisationProps] = splitProps(props, CONTAINER_RUNTIME_KEYS);
 
     const instance = props.as || new PixiClass(initialisationProps as any);
 
@@ -90,6 +153,64 @@ export const createLeafComponent = <
     props: Omit<OptionsType, "children"> & LeafProps<InstanceType>,
   ): InstanceType & JSX.Element => {
     return createContainerComponent<InstanceType, OptionsType>(PixiClass)(props);
+  };
+};
+
+export const createSpriteComponent = <
+  InstanceType extends Pixi.Container,
+  OptionsType extends object,
+>(
+  PixiClass: new (props: OptionsType) => InstanceType,
+) => {
+  return (
+    props: Omit<OptionsType, "children"> & SpriteProps<InstanceType>,
+  ): InstanceType & JSX.Element => {
+    const [runtimeProps, initialisationProps] = splitProps(props, SPRITE_RUNTIME_KEYS);
+
+    const instance = props.as || new PixiClass(initialisationProps as any);
+
+    bindInitialisationProps(instance, initialisationProps);
+    bindRuntimeProps(instance, runtimeProps);
+
+    onCleanup(() => {
+      if ("attach" in instance) {
+        // Means it's a render layer so we don't want to destroy children as they are managed elsewhere in the tree.
+        instance.destroy({ children: false });
+      } else {
+        instance.destroy({ children: true });
+      }
+    });
+
+    return instance as InstanceType & JSX.Element;
+  };
+};
+
+export const createTilingSpriteComponent = <
+  InstanceType extends Pixi.Container,
+  OptionsType extends object,
+>(
+  PixiClass: new (props: OptionsType) => InstanceType,
+) => {
+  return (
+    props: Omit<OptionsType, "children"> & TilingSpriteProps<InstanceType>,
+  ): InstanceType & JSX.Element => {
+    const [runtimeProps, initialisationProps] = splitProps(props, TILING_SPRITE_RUNTIME_KEYS);
+
+    const instance = props.as || new PixiClass(initialisationProps as any);
+
+    bindInitialisationProps(instance, initialisationProps);
+    bindRuntimeProps(instance, runtimeProps);
+
+    onCleanup(() => {
+      if ("attach" in instance) {
+        // Means it's a render layer so we don't want to destroy children as they are managed elsewhere in the tree.
+        instance.destroy({ children: false });
+      } else {
+        instance.destroy({ children: true });
+      }
+    });
+
+    return instance as InstanceType & JSX.Element;
   };
 };
 

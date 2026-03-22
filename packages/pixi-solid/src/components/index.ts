@@ -21,5 +21,27 @@ export {
   bindRuntimeProps,
   bindInitialisationProps,
 } from "./bind-props";
-export type { PixiEventHandlerMap, PointAxisPropName } from "./bind-props";
-export type { ContainerProps, LeafProps, PixiComponentProps } from "./component-factories";
+export type {
+  PixiEventHandlerMap,
+  PointAxisPropName,
+  CommonPointAxisPropName,
+  AnchorPointAxisPropName,
+  TilingPointAxisPropName,
+} from "./bind-props";
+export type {
+  ContainerProps,
+  LeafProps,
+  SpriteProps,
+  TilingSpriteProps,
+  PixiComponentProps,
+  CommonPointAxisProps,
+  AnchorPointAxisProps,
+  TilingPointAxisProps,
+} from "./component-factories";
+export {
+  createContainerComponent,
+  createLeafComponent,
+  createSpriteComponent,
+  createTilingSpriteComponent,
+  createFilterComponent,
+} from "./component-factories";
