@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.14
+
+- ✅ Adds an optional ticker priority argument to the `onTick` hook.
+
 ## 0.1.13
 
 - 🐞 Fix usePixiScreen hook not being reactive on all values.

@@ -1,4 +1,5 @@
 import type * as Pixi from "pixi.js";
+import { UPDATE_PRIORITY } from "pixi.js";
 import { onCleanup, useContext } from "solid-js";
 
 import { TickerContext } from "./pixi-application";
@@ -15,9 +16,13 @@ import { TickerContext } from "./pixi-application";
  *
  * @param tickerCallback - The function to call on each ticker update. It receives
  * the `Pixi.Ticker` instance as its argument.
+ * @param priority - An optional priority level for the ticker callback.
  *
  */
-export const onTick = (tickerCallback: Pixi.TickerCallback<Pixi.Ticker>): void => {
+export const onTick = (
+  tickerCallback: Pixi.TickerCallback<Pixi.Ticker>,
+  priority: Pixi.UPDATE_PRIORITY = UPDATE_PRIORITY.NORMAL,
+): void => {
   const ticker = useContext(TickerContext);
 
   if (!ticker) {
@@ -26,9 +31,9 @@ export const onTick = (tickerCallback: Pixi.TickerCallback<Pixi.Ticker>): void =
     );
   }
 
-  ticker.add(tickerCallback);
+  ticker.add(tickerCallback, ticker, priority);
 
   onCleanup(() => {
-    ticker.remove(tickerCallback);
+    ticker.remove(tickerCallback, ticker);
   });
 };

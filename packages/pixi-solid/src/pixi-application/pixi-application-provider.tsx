@@ -75,7 +75,8 @@ export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Elemen
 export type TickerProviderProps = ParentProps<{ ticker: Pixi.Ticker }>;
 
 /**
- * This is only required if you want a ticker without the Pixi Application, usually for testing a store that relies on the ticker related utilities.
+ * This is only required if you want a ticker without the Pixi Application.
+ * For applications that want to use multiple tickers or for testing a store that relies on the ticker related utilities.
  * It provides context for the `onTick`, `delay`, `createAsyncDelay` and `getTicker` utilities.
  *
  * The ticker instance you want to use needs to be passed in as a prop so it can be manually controlled from the outside for testing.
