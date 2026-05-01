@@ -65,10 +65,18 @@ export type LeafProps<Component> = Omit<ContainerProps<Component>, "children">;
  */
 export type SpriteProps<Component> = PixiEventHandlerMap &
   CommonPointAxisProps &
-  AnchorPointAxisProps & { autoUpdate?: boolean } & {
+  AnchorPointAxisProps & {
     ref?: Ref<Component>;
     as?: Component;
   };
+
+export type AnimatedSpriteProps<Component> = SpriteProps<Component> &
+  Pick<Pixi.AnimatedSpriteOptions, "autoUpdate">;
+
+type AnimatedSpriteLike = Pixi.Container & {
+  autoUpdate: boolean;
+  update: (ticker: Pixi.Ticker) => void;
+};
 
 /**
  * Prop definition for TilingSprite (includes anchor and tiling properties)
@@ -168,52 +176,68 @@ export const createSpriteComponent = <
   return (
     props: Omit<OptionsType, "children"> & SpriteProps<InstanceType>,
   ): InstanceType & JSX.Element => {
-    // Specifically don't include `autoUpdate` as we handle it manually below.
+    const [runtimeProps, initialisationProps] = splitProps(props, SPRITE_RUNTIME_KEYS);
+
+    const instance = props.as || new PixiClass(initialisationProps as any);
+
+    bindInitialisationProps(instance, initialisationProps);
+    bindRuntimeProps(instance, runtimeProps);
+
+    onCleanup(() => {
+      instance.destroy({ children: true });
+    });
+
+    return instance as InstanceType & JSX.Element;
+  };
+};
+
+export const createAnimatedSpriteComponent = <
+  InstanceType extends AnimatedSpriteLike,
+  OptionsType extends object,
+>(
+  PixiClass: new (props: OptionsType) => InstanceType,
+) => {
+  return (
+    props: Omit<OptionsType, "children"> & AnimatedSpriteProps<InstanceType>,
+  ): InstanceType & JSX.Element => {
+    // Specifically separate `autoUpdate` as we handle it manually below.
     const [runtimeProps, update, initialisationProps] = splitProps(props, SPRITE_RUNTIME_KEYS, [
       "autoUpdate",
     ]);
 
     const instance = props.as || new PixiClass(initialisationProps as any);
 
-    // Handle autoUpdate manually so it uses the ticker from the context provider by default instead of the shared ticker.
-    if ("autoUpdate" in instance && "update" in instance) {
-      // Set this to false to override the default behaviour
-      instance.autoUpdate = false;
+    // Set this to false to override Pixi's default shared ticker behaviour.
+    instance.autoUpdate = false;
 
-      createRenderEffect(
-        on(
-          () => update.autoUpdate,
-          (autoUpdate) => {
-            const ticker = getTicker();
+    createRenderEffect(
+      on(
+        () => update.autoUpdate,
+        (autoUpdate) => {
+          const ticker = getTicker();
 
-            const updateInstance = (ticker: Pixi.Ticker) => {
-              (instance as unknown as Pixi.AnimatedSprite).update(ticker);
-            };
+          const updateInstance = (ticker: Pixi.Ticker) => {
+            instance.update(ticker);
+          };
 
-            if (autoUpdate === false) {
-              ticker.remove(updateInstance);
-            } else {
-              ticker.add(updateInstance);
-            }
+          if (autoUpdate === false) {
+            ticker.remove(updateInstance);
+          } else {
+            ticker.add(updateInstance);
+          }
 
-            onCleanup(() => {
-              ticker.remove(updateInstance);
-            });
-          },
-        ),
-      );
-    }
+          onCleanup(() => {
+            ticker.remove(updateInstance);
+          });
+        },
+      ),
+    );
 
     bindInitialisationProps(instance, initialisationProps);
     bindRuntimeProps(instance, runtimeProps);
 
     onCleanup(() => {
-      if ("attach" in instance) {
-        // Means it's a render layer so we don't want to destroy children as they are managed elsewhere in the tree.
-        instance.destroy({ children: false });
-      } else {
-        instance.destroy({ children: true });
-      }
+      instance.destroy({ children: true });
     });
 
     return instance as InstanceType & JSX.Element;
@@ -237,12 +261,7 @@ export const createTilingSpriteComponent = <
     bindRuntimeProps(instance, runtimeProps);
 
     onCleanup(() => {
-      if ("attach" in instance) {
-        // Means it's a render layer so we don't want to destroy children as they are managed elsewhere in the tree.
-        instance.destroy({ children: false });
-      } else {
-        instance.destroy({ children: true });
-      }
+      instance.destroy({ children: true });
     });
 
     return instance as InstanceType & JSX.Element;
@@ -290,6 +309,10 @@ export const createFilterComponent = <InstanceType extends Pixi.Filter, OptionsT
         });
       }
     }
+
+    onCleanup(() => {
+      instance.destroy();
+    });
 
     return instance as InstanceType & JSX.Element;
   };

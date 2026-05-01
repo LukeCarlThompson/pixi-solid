@@ -18,6 +18,7 @@ import {
 } from "pixi.js";
 
 import {
+  createAnimatedSpriteComponent,
   createContainerComponent,
   createLeafComponent,
   createSpriteComponent,
@@ -27,9 +28,10 @@ import {
 /**
  * A SolidJS component that renders a `PIXI.AnimatedSprite`.
  */
-export const AnimatedSprite = createSpriteComponent<PixiAnimatedSprite, Pixi.AnimatedSpriteOptions>(
+export const AnimatedSprite = createAnimatedSpriteComponent<
   PixiAnimatedSprite,
-);
+  Pixi.AnimatedSpriteOptions
+>(PixiAnimatedSprite);
 /**
  * A SolidJS component that renders a `PIXI.BitmapText`.
  */

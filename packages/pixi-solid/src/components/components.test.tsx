@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { TickerProvider } from "../pixi-application";
 import { NoMount } from "../testing";
 
-import { AnimatedSprite, Container, RenderLayer } from "./components";
+import { AnimatedSprite, Container, RenderLayer, Sprite, TilingSprite } from "./components";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -285,6 +285,115 @@ describe("AnimatedSprite ticker integration", () => {
 
       expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
       expect(sharedTickerRemoveSpy).not.toHaveBeenCalled();
+    });
+  });
+});
+
+describe("Sprite-like component cleanup", () => {
+  it("GIVEN a Sprite WHEN root is disposed THEN instance is destroyed", () => {
+    let spriteRef: Pixi.Sprite | undefined;
+    let destroyCalled = false;
+
+    createRoot((dispose) => {
+      const TestComponent = () => {
+        return (
+          <NoMount>
+            <Sprite
+              texture={Texture.WHITE}
+              ref={(el) => {
+                spriteRef = el;
+                const originalDestroy = el.destroy.bind(el);
+                el.destroy = vi.fn((options) => {
+                  destroyCalled = true;
+                  expect(options).toEqual({ children: true });
+                  originalDestroy(options);
+                });
+              }}
+            />
+          </NoMount>
+        );
+      };
+
+      TestComponent();
+
+      expect(spriteRef).toBeDefined();
+
+      dispose();
+
+      expect(destroyCalled).toBe(true);
+    });
+  });
+
+  it("GIVEN an AnimatedSprite WHEN root is disposed THEN instance is destroyed", () => {
+    let animatedSpriteRef: Pixi.AnimatedSprite | undefined;
+    let destroyCalled = false;
+    const contextTicker = new Ticker();
+
+    createRoot((dispose) => {
+      const TestComponent = () => {
+        return (
+          <TickerProvider ticker={contextTicker}>
+            <NoMount>
+              <AnimatedSprite
+                textures={[Texture.WHITE]}
+                ref={(el) => {
+                  animatedSpriteRef = el;
+                  const originalDestroy = el.destroy.bind(el);
+                  el.destroy = vi.fn((options) => {
+                    destroyCalled = true;
+                    expect(options).toEqual({ children: true });
+                    originalDestroy(options);
+                  });
+                }}
+              />
+            </NoMount>
+          </TickerProvider>
+        );
+      };
+
+      TestComponent();
+
+      expect(animatedSpriteRef).toBeDefined();
+
+      dispose();
+
+      expect(destroyCalled).toBe(true);
+    });
+  });
+
+  it("GIVEN a TilingSprite WHEN root is disposed THEN instance is destroyed", () => {
+    let tilingSpriteRef: Pixi.TilingSprite | undefined;
+    let destroyCalled = false;
+
+    createRoot((dispose) => {
+      const TestComponent = () => {
+        return (
+          <NoMount>
+            <TilingSprite
+              texture={Texture.WHITE}
+              width={100}
+              height={100}
+              ref={(el) => {
+                tilingSpriteRef = el;
+                const originalDestroy = el.destroy.bind(el);
+                el.destroy = vi.fn((options) => {
+                  destroyCalled = true;
+                  expect(options).toEqual({ children: true });
+                  originalDestroy(options);
+                });
+              }}
+            />
+          </NoMount>
+        );
+      };
+
+      TestComponent();
+
+      expect(tilingSpriteRef).toBeDefined();
+
+      dispose();
+
+      expect(destroyCalled).toBe(true);
     });
   });
 });

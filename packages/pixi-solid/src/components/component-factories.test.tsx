@@ -1,13 +1,13 @@
 import { render } from "@solidjs/testing-library";
 import type * as Pixi from "pixi.js";
-import { Container, Ticker } from "pixi.js";
-import { createSignal } from "solid-js";
+import { Container, Filter, Ticker } from "pixi.js";
+import { createRoot, createSignal } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TickerProvider } from "../pixi-application";
 import { NoMount } from "../testing";
 
-import { createSpriteComponent } from "./component-factories";
+import { createAnimatedSpriteComponent, createFilterComponent } from "./component-factories";
 
 type TestSpriteOptions = {
   label?: string;
@@ -25,7 +25,7 @@ class TestAnimatedSpriteLike extends Container {
   }
 }
 
-const TestSprite = createSpriteComponent<TestAnimatedSpriteLike, TestSpriteOptions>(
+const TestSprite = createAnimatedSpriteComponent<TestAnimatedSpriteLike, TestSpriteOptions>(
   TestAnimatedSpriteLike,
 );
 
@@ -33,8 +33,8 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("createSpriteComponent ticker behavior", () => {
-  it("GIVEN an AnimatedSprite-like component WHEN mounted THEN update loop uses ticker from context and cleans up on unmount", () => {
+describe("createAnimatedSpriteComponent ticker behavior", () => {
+  it("GIVEN an AnimatedSprite component WHEN mounted THEN update loop uses ticker from context and cleans up on unmount", () => {
     const contextTicker = new Ticker();
 
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
@@ -137,5 +137,41 @@ describe("createSpriteComponent ticker behavior", () => {
     expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
 
     mounted.unmount();
+  });
+});
+
+describe("createFilterComponent cleanup", () => {
+  it("GIVEN a filter component WHEN root is disposed THEN instance is destroyed", () => {
+    const TestFilter = createFilterComponent<Filter, object>(Filter);
+
+    let filterRef: Filter | undefined;
+    let destroyCalled = false;
+
+    createRoot((dispose) => {
+      const TestComponent = () => {
+        return (
+          <NoMount>
+            <TestFilter
+              ref={(el) => {
+                filterRef = el;
+                const originalDestroy = el.destroy.bind(el);
+                el.destroy = vi.fn(() => {
+                  destroyCalled = true;
+                  originalDestroy();
+                });
+              }}
+            />
+          </NoMount>
+        );
+      };
+
+      TestComponent();
+
+      expect(filterRef).toBeDefined();
+
+      dispose();
+
+      expect(destroyCalled).toBe(true);
+    });
   });
 });

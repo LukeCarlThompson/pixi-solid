@@ -29,6 +29,7 @@ export type {
   TilingPointAxisPropName,
 } from "./bind-props";
 export type {
+  AnimatedSpriteProps,
   ContainerProps,
   LeafProps,
   SpriteProps,
@@ -39,6 +40,7 @@ export type {
   TilingPointAxisProps,
 } from "./component-factories";
 export {
+  createAnimatedSpriteComponent,
   createContainerComponent,
   createLeafComponent,
   createSpriteComponent,
