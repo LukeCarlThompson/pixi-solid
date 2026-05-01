@@ -138,3 +138,12 @@ export const TilingSprite = createTilingSpriteComponent<PixiTilingSprite, Pixi.T
 
 // TODO: Do we need a component for the Culler. It needs to interact with the stage directly.
 // export const Culler = createLeafComponent<PixiCuller, Pixi.Culler>(PixiCuller);
+
+// TODO: Should we export the built in filters as component?
+/**
+ * AlphaFilter	Applies uniform transparency
+ * BlurFilter	Gaussian blur
+ * ColorMatrixFilter	Color transformations via a 5x4 matrix
+ * DisplacementFilter	Distorts using a displacement map texture
+ * NoiseFilter	Adds random noise for a grainy look
+ * */

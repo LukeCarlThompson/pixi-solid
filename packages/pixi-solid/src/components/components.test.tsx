@@ -1,3 +1,4 @@
+import { render } from "@solidjs/testing-library";
 import type * as Pixi from "pixi.js";
 import { Texture, Ticker } from "pixi.js";
 import { createRoot, createSignal } from "solid-js";
@@ -286,6 +287,93 @@ describe("AnimatedSprite ticker integration", () => {
       expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
       expect(sharedTickerRemoveSpy).not.toHaveBeenCalled();
     });
+  });
+
+  it("GIVEN autoUpdate is false WHEN mounted THEN update loop is not added to the context ticker", () => {
+    const contextTicker = new Ticker();
+    const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
+
+    render(() => (
+      <TickerProvider ticker={contextTicker}>
+        <NoMount>
+          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
+        </NoMount>
+      </TickerProvider>
+    ));
+
+    expect(contextTickerAddSpy).toHaveBeenCalledTimes(0);
+  });
+
+  it("GIVEN autoUpdate is true WHEN mounted THEN update loop is added to context ticker and cleaned up on unmount", () => {
+    const contextTicker = new Ticker();
+    const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
+    const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
+
+    const mounted = render(() => (
+      <TickerProvider ticker={contextTicker}>
+        <NoMount>
+          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={true} />
+        </NoMount>
+      </TickerProvider>
+    ));
+
+    expect(contextTickerAddSpy).toHaveBeenCalledTimes(1);
+
+    const updateCallback = contextTickerAddSpy.mock.calls[0]?.[0];
+    expect(updateCallback).toBeTypeOf("function");
+
+    mounted.unmount();
+
+    expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
+  });
+
+  it("GIVEN autoUpdate changes reactively WHEN toggled from false to true and back THEN ticker subscription follows latest value", () => {
+    const contextTicker = new Ticker();
+    const [autoUpdate, setAutoUpdate] = createSignal(false);
+
+    const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
+    const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
+
+    const mounted = render(() => (
+      <TickerProvider ticker={contextTicker}>
+        <NoMount>
+          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={autoUpdate()} />
+        </NoMount>
+      </TickerProvider>
+    ));
+
+    expect(contextTickerAddSpy).toHaveBeenCalledTimes(0);
+
+    setAutoUpdate(true);
+    expect(contextTickerAddSpy).toHaveBeenCalledTimes(1);
+
+    const updateCallback = contextTickerAddSpy.mock.calls[0]?.[0];
+    expect(updateCallback).toBeTypeOf("function");
+
+    setAutoUpdate(false);
+    expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
+
+    mounted.unmount();
+  });
+
+  it("GIVEN no TickerProvider WHEN mounted with autoUpdate={false} THEN it does not throw", () => {
+    expect(() => {
+      render(() => (
+        <NoMount>
+          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
+        </NoMount>
+      ));
+    }).not.toThrow();
+  });
+
+  it("GIVEN no TickerProvider WHEN mounted with autoUpdate enabled THEN it throws", () => {
+    expect(() => {
+      render(() => (
+        <NoMount>
+          <AnimatedSprite textures={[Texture.WHITE]} />
+        </NoMount>
+      ));
+    }).toThrow();
   });
 });
 
