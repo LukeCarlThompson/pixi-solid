@@ -11,6 +11,27 @@ A SolidJS component that renders a PixiJS `AnimatedSprite`.
 
 Please see the [PixiJS docs](https://pixijs.download/release/docs/scene.AnimatedSprite.html) for detailed information.
 
+### autoUpdate behaviour
+
+`AnimatedSprite` in `pixi-solid` `autoUpdate` behaviour intentionally differs from PixiJS defaults to integrate with the `pixi-solid` ticker context providers.
+
+In PixiJS:
+
+- `AnimatedSprite` default behaviour or with with `autoUpdate: true` updates itself with the `Ticker.shared`.
+
+In `pixi-solid`:
+
+- `AnimatedSprite` default behaviour or with with `autoUpdate={true}` updates itself with the ticker in the nearest parent `Ticker` context provider.
+  Either `PixiApplicationProvider` or `TickerProvider`.
+
+This avoids accidentally mixing multiple tickers and makes `AnimatedSprite` behaviour consistent with the rest of the `pixi-solid` lifecycle utilities.
+
+### Practical guidance
+
+- Use the default behaviour (omit `autoUpdate`) for most apps.
+  This keeps animation timing bound to your app's configured ticker.
+- Set `autoUpdate={false}` and access the instance via a `ref` and manually call the `update` method if you want full manual control over frame updates.
+
 ### Demo
 
 <ClientOnly fileName="animated-sprite" client:only="solid-js" />
