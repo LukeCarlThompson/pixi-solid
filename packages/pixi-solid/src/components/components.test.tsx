@@ -1,12 +1,16 @@
 import type * as Pixi from "pixi.js";
 import { Texture, Ticker } from "pixi.js";
 import { createRoot, createSignal } from "solid-js";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TickerProvider } from "../pixi-application";
 import { NoMount } from "../testing";
 
 import { AnimatedSprite, Container, RenderLayer } from "./components";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Component Factory Cleanup on Unmount", () => {
   it("GIVEN a Container component WHEN the root is disposedTHEN the instance is destroyed with children flag", () => {

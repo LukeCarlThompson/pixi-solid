@@ -2,7 +2,7 @@ import { render } from "@solidjs/testing-library";
 import type * as Pixi from "pixi.js";
 import { Container, Ticker } from "pixi.js";
 import { createSignal } from "solid-js";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TickerProvider } from "../pixi-application";
 import { NoMount } from "../testing";
@@ -28,6 +28,10 @@ class TestAnimatedSpriteLike extends Container {
 const TestSprite = createSpriteComponent<TestAnimatedSpriteLike, TestSpriteOptions>(
   TestAnimatedSpriteLike,
 );
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("createSpriteComponent ticker behavior", () => {
   it("GIVEN an AnimatedSprite-like component WHEN mounted THEN update loop uses ticker from context and cleans up on unmount", () => {
