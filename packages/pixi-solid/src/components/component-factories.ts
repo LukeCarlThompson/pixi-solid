@@ -214,21 +214,17 @@ export const createAnimatedSpriteComponent = <
       on(
         () => update.autoUpdate,
         (autoUpdate) => {
-          const ticker = getTicker();
-
           const updateInstance = (ticker: Pixi.Ticker) => {
             instance.update(ticker);
           };
 
-          if (autoUpdate === false) {
-            ticker.remove(updateInstance);
-          } else {
+          if (autoUpdate !== false) {
+            const ticker = getTicker();
             ticker.add(updateInstance);
+            onCleanup(() => {
+              ticker.remove(updateInstance);
+            });
           }
-
-          onCleanup(() => {
-            ticker.remove(updateInstance);
-          });
         },
       ),
     );

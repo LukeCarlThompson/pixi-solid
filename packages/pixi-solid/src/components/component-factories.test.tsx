@@ -69,7 +69,6 @@ describe("createAnimatedSpriteComponent ticker behavior", () => {
     const contextTicker = new Ticker();
 
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
-    const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
 
     render(() => (
       <TickerProvider ticker={contextTicker}>
@@ -80,7 +79,6 @@ describe("createAnimatedSpriteComponent ticker behavior", () => {
     ));
 
     expect(contextTickerAddSpy).toHaveBeenCalledTimes(0);
-    expect(contextTickerRemoveSpy).toHaveBeenCalledTimes(1);
   });
 
   it("GIVEN autoUpdate is true WHEN mounted THEN update loop is added to context ticker and cleaned up on unmount", () => {
@@ -123,7 +121,6 @@ describe("createAnimatedSpriteComponent ticker behavior", () => {
     ));
 
     expect(contextTickerAddSpy).toHaveBeenCalledTimes(0);
-    expect(contextTickerRemoveSpy).toHaveBeenCalledTimes(1);
 
     setAutoUpdate(true);
 
