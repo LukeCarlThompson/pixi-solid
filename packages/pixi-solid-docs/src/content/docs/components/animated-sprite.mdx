@@ -17,11 +17,11 @@ Please see the [PixiJS docs](https://pixijs.download/release/docs/scene.Animated
 
 In PixiJS:
 
-- `AnimatedSprite` default behaviour or with with `autoUpdate: true` updates itself with the `Ticker.shared`.
+- `AnimatedSprite` default behaviour or with `autoUpdate: true` updates itself with the `Ticker.shared`.
 
 In `pixi-solid`:
 
-- `AnimatedSprite` default behaviour or with with `autoUpdate={true}` updates itself with the ticker in the nearest parent `Ticker` context provider.
+- `AnimatedSprite` default behaviour or with `autoUpdate={true}` updates itself with the ticker in the nearest parent `Ticker` context provider.
   Either `PixiApplicationProvider` or `TickerProvider`.
 
 This avoids accidentally mixing multiple tickers and makes `AnimatedSprite` behaviour consistent with the rest of the `pixi-solid` lifecycle utilities.
