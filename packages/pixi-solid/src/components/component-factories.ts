@@ -2,6 +2,8 @@ import type * as Pixi from "pixi.js";
 import type { JSX, Ref } from "solid-js";
 import { createRenderEffect, on, splitProps, onCleanup } from "solid-js";
 
+import { getTicker } from "../pixi-application";
+
 import { bindInitialisationProps, bindRuntimeProps } from "./bind-props";
 import type { PixiEventHandlerMap } from "./bind-props/event-names";
 import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./bind-props/event-names";
@@ -46,7 +48,8 @@ export type PixiComponentProps<
  * Prop definition for basic Container components (position, scale, pivot, skew only)
  */
 export type ContainerProps<Component> = PixiEventHandlerMap &
-  CommonPointAxisProps & {
+  CommonPointAxisProps &
+  Record<string, unknown> & {
     ref?: Ref<Component>;
     as?: Component;
     children?: JSX.Element;
@@ -62,7 +65,7 @@ export type LeafProps<Component> = Omit<ContainerProps<Component>, "children">;
  */
 export type SpriteProps<Component> = PixiEventHandlerMap &
   CommonPointAxisProps &
-  AnchorPointAxisProps & {
+  AnchorPointAxisProps & { autoUpdate?: boolean } & {
     ref?: Ref<Component>;
     as?: Component;
   };
@@ -165,9 +168,41 @@ export const createSpriteComponent = <
   return (
     props: Omit<OptionsType, "children"> & SpriteProps<InstanceType>,
   ): InstanceType & JSX.Element => {
-    const [runtimeProps, initialisationProps] = splitProps(props, SPRITE_RUNTIME_KEYS);
+    // Specifically don't include `autoUpdate` as we handle it manually below.
+    const [runtimeProps, update, initialisationProps] = splitProps(props, SPRITE_RUNTIME_KEYS, [
+      "autoUpdate",
+    ]);
 
     const instance = props.as || new PixiClass(initialisationProps as any);
+
+    // Handle autoUpdate manually so it uses the ticker from the context provider by default instead of the shared ticker.
+    if ("autoUpdate" in instance && "update" in instance) {
+      // Set this to false to override the default behaviour
+      instance.autoUpdate = false;
+
+      createRenderEffect(
+        on(
+          () => update.autoUpdate,
+          (autoUpdate) => {
+            const ticker = getTicker();
+
+            const updateInstance = (ticker: Pixi.Ticker) => {
+              (instance as unknown as Pixi.AnimatedSprite).update(ticker);
+            };
+
+            if (autoUpdate === false) {
+              ticker.remove(updateInstance);
+            } else {
+              ticker.add(updateInstance);
+            }
+
+            onCleanup(() => {
+              ticker.remove(updateInstance);
+            });
+          },
+        ),
+      );
+    }
 
     bindInitialisationProps(instance, initialisationProps);
     bindRuntimeProps(instance, runtimeProps);
