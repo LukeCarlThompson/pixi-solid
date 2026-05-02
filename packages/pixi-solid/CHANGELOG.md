@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.17
+
+- 🐞 Fixed a race condition which could cause inconsistent screen dimensions when the `onResize` hook and the `usePixiScreen` hook are used together.
+
 ## 0.1.16
 
 - ⚙️ Changed the `AnimatedSprite` component to use the nearest ticker context instead of the Pixi `Ticker.shared` for the `autoUpdate` functionality.
