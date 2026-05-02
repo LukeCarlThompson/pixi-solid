@@ -1,5 +1,11 @@
 {
   "extends": ["astro/tsconfigs/strict", "../../tsconfig.json"],
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "paths": {
+      "pixi-solid": ["../pixi-solid/src/index.ts"],
+      "pixi-solid/utils": ["../pixi-solid/src/utils/index.ts"]
+    }
+  }
 }
