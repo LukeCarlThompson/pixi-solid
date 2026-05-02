@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.18
+
+- Renamed internal event types.
+- Removed `PixiEventHandlerMap` type from exports.
+- Added `PixiSolidEventHandlerName` union type to exports.
+
 ## 0.1.17
 
 - 🐞 Fixed a race condition which could cause inconsistent screen dimensions when the `onResize` hook and the `usePixiScreen` hook are used together.

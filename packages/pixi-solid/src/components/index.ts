@@ -22,7 +22,8 @@ export {
   bindInitialisationProps,
 } from "./bind-props";
 export type {
-  PixiEventHandlerMap,
+  PixiSolidEventHandlerMap,
+  PixiSolidEventHandlerName,
   PointAxisPropName,
   CommonPointAxisPropName,
   AnchorPointAxisPropName,
