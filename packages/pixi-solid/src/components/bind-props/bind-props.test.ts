@@ -1,6 +1,7 @@
 import { createRoot, createSignal, createContext, useContext, onMount } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
+import { withTestRoot } from "../../testing";
 import { bindInitialisationProps, bindRuntimeProps } from ".";
 
 // TODO: Add in better tests to differentiate between the initialisation and runtime props
@@ -49,16 +50,6 @@ class MockRenderLayer extends MockContainer {
   attach = vi.fn();
   detach = vi.fn();
 }
-
-const withTestRoot = <T>(setup: () => T): { value: T; dispose: () => void } => {
-  let value!: T;
-  const dispose = createRoot((disposeRoot) => {
-    value = setup();
-    return disposeRoot;
-  });
-
-  return { value, dispose };
-};
 
 describe("bindRuntimeProps()", () => {
   it("GIVEN an instance and props with position and children WHEN bindRuntimeProps is called THEN instance is updated and children are added", () => {

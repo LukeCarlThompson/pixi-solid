@@ -1,9 +1,8 @@
-import { render } from "@solidjs/testing-library";
 import type * as Pixi from "pixi.js";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { NoMount } from "../testing";
+import { mountHeadless } from "../testing";
 
 import type { PixiComponentProps } from "./component-factories";
 import { Container } from "./components";
@@ -20,15 +19,13 @@ describe("Container with spread signal props", () => {
     let containerRef: Pixi.Container | undefined;
 
     // WHEN: Render a Container with spread props from the signal
-    render(() => (
-      <NoMount>
-        <Container
-          ref={(el) => {
-            containerRef = el;
-          }}
-          {...propsSignal()}
-        />
-      </NoMount>
+    const dispose = mountHeadless(() => (
+      <Container
+        ref={(el) => {
+          containerRef = el;
+        }}
+        {...propsSignal()}
+      />
     ));
 
     if (!containerRef) {
@@ -56,6 +53,8 @@ describe("Container with spread signal props", () => {
     expect(containerRef.alpha).toBe(0.5);
     expect(containerRef.x).toBe(1);
     expect(containerRef.y).toBe(1);
+
+    dispose();
   });
 
   it("GIVEN a Container with spread signal props WHEN a property is removed from the signal THEN the property retains its previous value", () => {
@@ -67,15 +66,13 @@ describe("Container with spread signal props", () => {
 
     let containerRef: Pixi.Container | undefined;
 
-    render(() => (
-      <NoMount>
-        <Container
-          ref={(el) => {
-            containerRef = el;
-          }}
-          {...propsSignal()}
-        />
-      </NoMount>
+    const dispose = mountHeadless(() => (
+      <Container
+        ref={(el) => {
+          containerRef = el;
+        }}
+        {...propsSignal()}
+      />
     ));
 
     if (!containerRef) {
@@ -95,6 +92,8 @@ describe("Container with spread signal props", () => {
     expect(containerRef.x).toBe(20);
     expect(containerRef.alpha).toBe(0.8);
     expect(containerRef.visible).toBe(true);
+
+    dispose();
   });
 
   it("GIVEN a Container with spread signal props WHEN only some props in the signal change THEN only those props are updated", () => {
@@ -107,15 +106,13 @@ describe("Container with spread signal props", () => {
 
     let containerRef: Pixi.Container | undefined;
 
-    render(() => (
-      <NoMount>
-        <Container
-          ref={(el) => {
-            containerRef = el;
-          }}
-          {...propsSignal()}
-        />
-      </NoMount>
+    const dispose = mountHeadless(() => (
+      <Container
+        ref={(el) => {
+          containerRef = el;
+        }}
+        {...propsSignal()}
+      />
     ));
 
     if (!containerRef) {
@@ -136,6 +133,8 @@ describe("Container with spread signal props", () => {
     expect(containerRef.alpha).toBe(0.5);
     expect(containerRef.y).toBe(0);
     expect(containerRef.rotation).toBe(initialRotation);
+
+    dispose();
   });
 
   it("GIVEN a Container with point props WHEN updating x separately from y THEN each updates independently", () => {
@@ -146,15 +145,13 @@ describe("Container with spread signal props", () => {
 
     let containerRef: Pixi.Container | undefined;
 
-    render(() => (
-      <NoMount>
-        <Container
-          ref={(el) => {
-            containerRef = el;
-          }}
-          {...propsSignal()}
-        />
-      </NoMount>
+    const dispose = mountHeadless(() => (
+      <Container
+        ref={(el) => {
+          containerRef = el;
+        }}
+        {...propsSignal()}
+      />
     ));
 
     if (!containerRef) {
@@ -183,6 +180,8 @@ describe("Container with spread signal props", () => {
     // THEN: Only y changes
     expect(containerRef.x).toBe(50);
     expect(containerRef.y).toBe(100);
+
+    dispose();
   });
 
   it("GIVEN a Container with spread signal props including event handlers WHEN the handler in the signal changes THEN the old handler is removed and new handler is bound", () => {
@@ -195,15 +194,13 @@ describe("Container with spread signal props", () => {
 
     let containerRef: Pixi.Container | undefined;
 
-    render(() => (
-      <NoMount>
-        <Container
-          ref={(el) => {
-            containerRef = el;
-          }}
-          {...propsSignal()}
-        />
-      </NoMount>
+    const dispose = mountHeadless(() => (
+      <Container
+        ref={(el) => {
+          containerRef = el;
+        }}
+        {...propsSignal()}
+      />
     ));
 
     if (!containerRef) {
@@ -224,5 +221,7 @@ describe("Container with spread signal props", () => {
     containerRef.emit("click", {} as Pixi.FederatedPointerEvent);
     expect(handler1).toHaveBeenCalledTimes(1);
     expect(handler2).toHaveBeenCalledTimes(1);
+
+    dispose();
   });
 });

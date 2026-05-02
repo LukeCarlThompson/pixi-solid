@@ -1,6 +1,6 @@
 {
   "name": "pixi-solid",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "private": false,
   "description": "A library to write PixiJS applications with SolidJS",
   "homepage": "https://lukecarlthompson.github.io/pixi-solid/",
@@ -40,7 +40,7 @@
     "test:bench:compare": "vitest bench --compare=src/benchmarks/results/baseline.json"
   },
   "peerDependencies": {
-    "pixi.js": "^8.14.3",
-    "solid-js": "^1.9.10"
+    "pixi.js": ">=8.14.3 <9",
+    "solid-js": ">=1.9.10 <2"
   }
 }
