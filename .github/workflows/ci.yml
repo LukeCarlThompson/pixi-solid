@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build pixi-solid
+        run: pnpm --filter pixi-solid build
+
       - name: Lint
         run: pnpm lint
 
