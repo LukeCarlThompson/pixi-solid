@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - ⚙️ Use more specific peer dependency range
 - Improved test helpers and refactored tests
-- Use dependency overrides for the mono repo instead of having per package versions
+- Use dependency overrides for the monorepo instead of having per package versions
 
 ## 0.1.18
 
