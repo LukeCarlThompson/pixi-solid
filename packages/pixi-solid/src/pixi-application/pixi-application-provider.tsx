@@ -48,7 +48,7 @@ export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Elemen
   });
 
   onCleanup(() => {
-    // Only destory the app if it was created here.
+    // Only destroy the app if it was created here.
     if (externallyProvidedApp) return;
     appResource()?.destroy(true, { children: true });
   });
