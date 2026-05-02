@@ -8,7 +8,7 @@ import type { PixiComponentProps } from "./component-factories";
 import { Container } from "./components";
 
 describe("Container with spread signal props", () => {
-  it("GIVEN a Container with spread signal props WHEN a property is added to the signal object after initialization THEN the new property is applied to the instance", async () => {
+  it("GIVEN a Container with spread signal props WHEN a property is added to the signal object after initialization THEN the new property is applied to the instance", () => {
     // GIVEN: Create a signal with an object containing initial properties
     const [propsSignal, setPropsSignal] = createSignal<PixiComponentProps>({
       x: 10,
@@ -57,7 +57,7 @@ describe("Container with spread signal props", () => {
     dispose();
   });
 
-  it("GIVEN a Container with spread signal props WHEN a property is removed from the signal THEN the property retains its previous value", async () => {
+  it("GIVEN a Container with spread signal props WHEN a property is removed from the signal THEN the property retains its previous value", () => {
     const [propsSignal, setPropsSignal] = createSignal<PixiComponentProps>({
       x: 10,
       alpha: 0.8,
@@ -96,7 +96,7 @@ describe("Container with spread signal props", () => {
     dispose();
   });
 
-  it("GIVEN a Container with spread signal props WHEN only some props in the signal change THEN only those props are updated", async () => {
+  it("GIVEN a Container with spread signal props WHEN only some props in the signal change THEN only those props are updated", () => {
     const [propsSignal, setPropsSignal] = createSignal<PixiComponentProps>({
       x: 0,
       y: 0,
@@ -137,7 +137,7 @@ describe("Container with spread signal props", () => {
     dispose();
   });
 
-  it("GIVEN a Container with point props WHEN updating x separately from y THEN each updates independently", async () => {
+  it("GIVEN a Container with point props WHEN updating x separately from y THEN each updates independently", () => {
     const [propsSignal, setPropsSignal] = createSignal<PixiComponentProps>({
       x: 10,
       y: 20,
@@ -184,7 +184,7 @@ describe("Container with spread signal props", () => {
     dispose();
   });
 
-  it("GIVEN a Container with spread signal props including event handlers WHEN the handler in the signal changes THEN the old handler is removed and new handler is bound", async () => {
+  it("GIVEN a Container with spread signal props including event handlers WHEN the handler in the signal changes THEN the old handler is removed and new handler is bound", () => {
     const handler1 = vi.fn();
     const handler2 = vi.fn();
 
