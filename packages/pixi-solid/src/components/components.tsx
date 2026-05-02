@@ -18,6 +18,7 @@ import {
 } from "pixi.js";
 
 import {
+  createAnimatedSpriteComponent,
   createContainerComponent,
   createLeafComponent,
   createSpriteComponent,
@@ -27,9 +28,10 @@ import {
 /**
  * A SolidJS component that renders a `PIXI.AnimatedSprite`.
  */
-export const AnimatedSprite = createSpriteComponent<PixiAnimatedSprite, Pixi.AnimatedSpriteOptions>(
+export const AnimatedSprite = createAnimatedSpriteComponent<
   PixiAnimatedSprite,
-);
+  Pixi.AnimatedSpriteOptions
+>(PixiAnimatedSprite);
 /**
  * A SolidJS component that renders a `PIXI.BitmapText`.
  */
@@ -136,3 +138,12 @@ export const TilingSprite = createTilingSpriteComponent<PixiTilingSprite, Pixi.T
 
 // TODO: Do we need a component for the Culler. It needs to interact with the stage directly.
 // export const Culler = createLeafComponent<PixiCuller, Pixi.Culler>(PixiCuller);
+
+// TODO: Should we export the built in filters as component?
+/**
+ * AlphaFilter	Applies uniform transparency
+ * BlurFilter	Gaussian blur
+ * ColorMatrixFilter	Color transformations via a 5x4 matrix
+ * DisplacementFilter	Distorts using a displacement map texture
+ * NoiseFilter	Adds random noise for a grainy look
+ * */

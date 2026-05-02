@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.16
+
+- ⚙️ Changed the `AnimatedSprite` component to use the nearest ticker context instead of the Pixi `Ticker.shared` for the `autoUpdate` functionality.
+
 ## 0.1.15
 
 - 🐞 Fixed the types for leaf components by removing the `TilingSprite` specific props `tilePosition` and `tileScale` from the prop types.
