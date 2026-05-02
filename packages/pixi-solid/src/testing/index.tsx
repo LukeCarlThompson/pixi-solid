@@ -5,8 +5,22 @@ import { afterEach } from "vitest";
 const activeDisposers = new Set<() => void>();
 
 afterEach(() => {
+  const errors: unknown[] = [];
+
   for (const dispose of activeDisposers) {
-    dispose();
+    try {
+      dispose();
+    } catch (error) {
+      errors.push(error);
+    }
+  }
+
+  if (errors.length === 1) {
+    throw errors[0];
+  }
+
+  if (errors.length > 1) {
+    throw new AggregateError(errors, `${errors.length} disposers threw during test cleanup.`);
   }
 });
 
@@ -20,28 +34,45 @@ const trackDisposer = (dispose: () => void): (() => void) => {
   return trackedDispose;
 };
 
-export const withTestRoot = <T,>(setup: () => T): { value: T; dispose: () => void } => {
-  let value!: T;
-  const dispose = trackDisposer(
-    createRoot((disposeRoot) => {
-      value = setup();
-      return disposeRoot;
-    }),
-  );
+const createTrackedRoot = <T,>(setup: () => T): { value: T; dispose: () => void } => {
+  let disposeRoot: (() => void) | undefined;
+  const dispose = trackDisposer(() => {
+    disposeRoot?.();
+  });
 
-  return { value, dispose };
+  try {
+    const value = createRoot((nextDisposeRoot) => {
+      disposeRoot = nextDisposeRoot;
+      return setup();
+    });
+
+    return { value, dispose };
+  } catch (setupError) {
+    try {
+      dispose();
+    } catch (cleanupError) {
+      throw new AggregateError(
+        [setupError, cleanupError],
+        "Root setup threw and cleanup also failed.",
+      );
+    }
+
+    throw setupError;
+  }
+};
+
+export const withTestRoot = <T,>(setup: () => T): { value: T; dispose: () => void } => {
+  return createTrackedRoot(setup);
 };
 
 /**
  * Calls pixi solid components in a pure Solid root without mounting to the Canvas.
  */
 export const mountHeadless = (component: () => JSX.Element): (() => void) => {
-  const dispose = createRoot((disposeRoot) => {
+  const { dispose } = createTrackedRoot(() => {
     const c = children(component);
     c();
-
-    return disposeRoot;
   });
 
-  return trackDisposer(dispose);
+  return dispose;
 };
