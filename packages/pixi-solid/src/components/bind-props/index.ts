@@ -1,5 +1,5 @@
 export { bindRuntimeProps, bindInitialisationProps } from "./bind-props";
-export type { PixiEventHandlerMap } from "./event-names";
+export type { PixiSolidEventHandlerMap, PixiSolidEventHandlerName } from "./event-names";
 export type {
   PointAxisPropName,
   CommonPointAxisPropName,

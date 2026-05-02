@@ -70,15 +70,17 @@ export const PIXI_SOLID_EVENT_HANDLER_NAMES = PIXI_EVENT_NAMES.map(
   (eventName) => `on${eventName}` as const,
 );
 
-export type PixiEventHandlerName = (typeof PIXI_SOLID_EVENT_HANDLER_NAMES)[number];
+export type PixiSolidEventHandlerName = (typeof PIXI_SOLID_EVENT_HANDLER_NAMES)[number];
 
-export type PixiEventHandlerMap = {
+export type PixiSolidEventHandlerMap = {
   [K in (typeof PIXI_EVENT_NAMES)[number] as `on${K}`]?:
     | null
     | ((...args: FederatedEventEmitterTypes[K]) => void);
 };
 
-export const PIXI_EVENT_HANDLER_NAME_SET: Set<string> = new Set(PIXI_SOLID_EVENT_HANDLER_NAMES);
+export const PIXI_SOLID_EVENT_HANDLER_NAME_SET: Set<string> = new Set(
+  PIXI_SOLID_EVENT_HANDLER_NAMES,
+);
 
 /**
  * This is a type-safe check that ensures `PIXI_EVENT_NAMES` includes every key from Pixi's `AllFederatedEventMap` type.

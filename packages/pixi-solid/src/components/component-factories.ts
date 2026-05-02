@@ -5,7 +5,7 @@ import { createRenderEffect, on, splitProps, onCleanup } from "solid-js";
 import { getTicker } from "../pixi-application";
 
 import { bindInitialisationProps, bindRuntimeProps } from "./bind-props";
-import type { PixiEventHandlerMap } from "./bind-props/event-names";
+import type { PixiSolidEventHandlerMap } from "./bind-props/event-names";
 import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./bind-props/event-names";
 import type {
   CommonPointAxisPropName,
@@ -42,12 +42,12 @@ export type TilingPointAxisProps = Partial<Record<TilingPointAxisPropName, numbe
  */
 export type PixiComponentProps<
   ComponentOptions extends Pixi.ContainerOptions = Pixi.ContainerOptions,
-> = PixiEventHandlerMap & CommonPointAxisProps & Omit<ComponentOptions, "children">;
+> = PixiSolidEventHandlerMap & CommonPointAxisProps & Omit<ComponentOptions, "children">;
 
 /**
  * Prop definition for basic Container components (position, scale, pivot, skew only)
  */
-export type ContainerProps<Component> = PixiEventHandlerMap &
+export type ContainerProps<Component> = PixiSolidEventHandlerMap &
   CommonPointAxisProps &
   Record<string, unknown> & {
     ref?: Ref<Component>;
@@ -63,7 +63,7 @@ export type LeafProps<Component> = Omit<ContainerProps<Component>, "children">;
 /**
  * Prop definition for Sprite-like components (includes anchor properties)
  */
-export type SpriteProps<Component> = PixiEventHandlerMap &
+export type SpriteProps<Component> = PixiSolidEventHandlerMap &
   CommonPointAxisProps &
   AnchorPointAxisProps & {
     ref?: Ref<Component>;
@@ -81,7 +81,7 @@ type AnimatedSpriteLike = Pixi.Container & {
 /**
  * Prop definition for TilingSprite (includes anchor and tiling properties)
  */
-export type TilingSpriteProps<Component> = PixiEventHandlerMap &
+export type TilingSpriteProps<Component> = PixiSolidEventHandlerMap &
   CommonPointAxisProps &
   AnchorPointAxisProps &
   TilingPointAxisProps & {
