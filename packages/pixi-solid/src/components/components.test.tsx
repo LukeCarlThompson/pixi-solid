@@ -1,10 +1,17 @@
+import { render } from "@solidjs/testing-library";
 import type * as Pixi from "pixi.js";
+import { Texture, Ticker } from "pixi.js";
 import { createRoot, createSignal } from "solid-js";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { TickerProvider } from "../pixi-application";
 import { NoMount } from "../testing";
 
-import { Container, RenderLayer } from "./components";
+import { AnimatedSprite, Container, RenderLayer, Sprite, TilingSprite } from "./components";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("Component Factory Cleanup on Unmount", () => {
   it("GIVEN a Container component WHEN the root is disposedTHEN the instance is destroyed with children flag", () => {
@@ -243,6 +250,238 @@ describe("RenderLayer Component Cleanup", () => {
       expect(detachedChildren.length).toBe(0);
 
       dispose();
+    });
+  });
+});
+
+describe("AnimatedSprite ticker integration", () => {
+  it("GIVEN an AnimatedSprite WHEN mounted in TickerProvider THEN context ticker is used and cleaned up", () => {
+    const contextTicker = new Ticker();
+
+    const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
+    const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
+    const sharedTickerAddSpy = vi.spyOn(Ticker.shared, "add");
+    const sharedTickerRemoveSpy = vi.spyOn(Ticker.shared, "remove");
+
+    createRoot((dispose) => {
+      const TestComponent = () => {
+        return (
+          <TickerProvider ticker={contextTicker}>
+            <NoMount>
+              <AnimatedSprite textures={[Texture.WHITE]} />
+            </NoMount>
+          </TickerProvider>
+        );
+      };
+
+      TestComponent();
+
+      expect(contextTickerAddSpy).toHaveBeenCalledTimes(1);
+      expect(sharedTickerAddSpy).not.toHaveBeenCalled();
+
+      const updateCallback = contextTickerAddSpy.mock.calls[0]?.[0];
+      expect(updateCallback).toBeTypeOf("function");
+
+      dispose();
+
+      expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
+      expect(sharedTickerRemoveSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  it("GIVEN autoUpdate is false WHEN mounted THEN update loop is not added to the context ticker", () => {
+    const contextTicker = new Ticker();
+    const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
+
+    render(() => (
+      <TickerProvider ticker={contextTicker}>
+        <NoMount>
+          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
+        </NoMount>
+      </TickerProvider>
+    ));
+
+    expect(contextTickerAddSpy).toHaveBeenCalledTimes(0);
+  });
+
+  it("GIVEN autoUpdate is true WHEN mounted THEN update loop is added to context ticker and cleaned up on unmount", () => {
+    const contextTicker = new Ticker();
+    const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
+    const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
+
+    const mounted = render(() => (
+      <TickerProvider ticker={contextTicker}>
+        <NoMount>
+          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={true} />
+        </NoMount>
+      </TickerProvider>
+    ));
+
+    expect(contextTickerAddSpy).toHaveBeenCalledTimes(1);
+
+    const updateCallback = contextTickerAddSpy.mock.calls[0]?.[0];
+    expect(updateCallback).toBeTypeOf("function");
+
+    mounted.unmount();
+
+    expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
+  });
+
+  it("GIVEN autoUpdate changes reactively WHEN toggled from false to true and back THEN ticker subscription follows latest value", () => {
+    const contextTicker = new Ticker();
+    const [autoUpdate, setAutoUpdate] = createSignal(false);
+
+    const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
+    const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
+
+    const mounted = render(() => (
+      <TickerProvider ticker={contextTicker}>
+        <NoMount>
+          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={autoUpdate()} />
+        </NoMount>
+      </TickerProvider>
+    ));
+
+    expect(contextTickerAddSpy).toHaveBeenCalledTimes(0);
+
+    setAutoUpdate(true);
+    expect(contextTickerAddSpy).toHaveBeenCalledTimes(1);
+
+    const updateCallback = contextTickerAddSpy.mock.calls[0]?.[0];
+    expect(updateCallback).toBeTypeOf("function");
+
+    setAutoUpdate(false);
+    expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
+
+    mounted.unmount();
+  });
+
+  it("GIVEN no TickerProvider WHEN mounted with autoUpdate={false} THEN it does not throw", () => {
+    expect(() => {
+      render(() => (
+        <NoMount>
+          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
+        </NoMount>
+      ));
+    }).not.toThrow();
+  });
+
+  it("GIVEN no TickerProvider WHEN mounted with autoUpdate enabled THEN it throws", () => {
+    expect(() => {
+      render(() => (
+        <NoMount>
+          <AnimatedSprite textures={[Texture.WHITE]} />
+        </NoMount>
+      ));
+    }).toThrow();
+  });
+});
+
+describe("Sprite-like component cleanup", () => {
+  it("GIVEN a Sprite WHEN root is disposed THEN instance is destroyed", () => {
+    let spriteRef: Pixi.Sprite | undefined;
+    let destroyCalled = false;
+
+    createRoot((dispose) => {
+      const TestComponent = () => {
+        return (
+          <NoMount>
+            <Sprite
+              texture={Texture.WHITE}
+              ref={(el) => {
+                spriteRef = el;
+                const originalDestroy = el.destroy.bind(el);
+                el.destroy = vi.fn((options) => {
+                  destroyCalled = true;
+                  expect(options).toEqual({ children: true });
+                  originalDestroy(options);
+                });
+              }}
+            />
+          </NoMount>
+        );
+      };
+
+      TestComponent();
+
+      expect(spriteRef).toBeDefined();
+
+      dispose();
+
+      expect(destroyCalled).toBe(true);
+    });
+  });
+
+  it("GIVEN an AnimatedSprite WHEN root is disposed THEN instance is destroyed", () => {
+    let animatedSpriteRef: Pixi.AnimatedSprite | undefined;
+    let destroyCalled = false;
+    const contextTicker = new Ticker();
+
+    createRoot((dispose) => {
+      const TestComponent = () => {
+        return (
+          <TickerProvider ticker={contextTicker}>
+            <NoMount>
+              <AnimatedSprite
+                textures={[Texture.WHITE]}
+                ref={(el) => {
+                  animatedSpriteRef = el;
+                  const originalDestroy = el.destroy.bind(el);
+                  el.destroy = vi.fn((options) => {
+                    destroyCalled = true;
+                    expect(options).toEqual({ children: true });
+                    originalDestroy(options);
+                  });
+                }}
+              />
+            </NoMount>
+          </TickerProvider>
+        );
+      };
+
+      TestComponent();
+
+      expect(animatedSpriteRef).toBeDefined();
+
+      dispose();
+
+      expect(destroyCalled).toBe(true);
+    });
+  });
+
+  it("GIVEN a TilingSprite WHEN root is disposed THEN instance is destroyed", () => {
+    let tilingSpriteRef: Pixi.TilingSprite | undefined;
+    let destroyCalled = false;
+
+    createRoot((dispose) => {
+      const TestComponent = () => {
+        return (
+          <NoMount>
+            <TilingSprite
+              texture={Texture.WHITE}
+              width={100}
+              height={100}
+              ref={(el) => {
+                tilingSpriteRef = el;
+                const originalDestroy = el.destroy.bind(el);
+                el.destroy = vi.fn((options) => {
+                  destroyCalled = true;
+                  expect(options).toEqual({ children: true });
+                  originalDestroy(options);
+                });
+              }}
+            />
+          </NoMount>
+        );
+      };
+
+      TestComponent();
+
+      expect(tilingSpriteRef).toBeDefined();
+
+      dispose();
+
+      expect(destroyCalled).toBe(true);
     });
   });
 });
