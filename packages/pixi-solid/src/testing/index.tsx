@@ -1,16 +1,27 @@
-import type { JSX, ParentProps } from "solid-js";
-import { children } from "solid-js";
+import type { JSX } from "solid-js";
+import { children, createRoot } from "solid-js";
+
+export const withTestRoot = <T,>(setup: () => T): { value: T; dispose: () => void } => {
+  let value!: T;
+  const dispose = createRoot((disposeRoot) => {
+    value = setup();
+    return disposeRoot;
+  });
+
+  return { value, dispose };
+};
 
 /**
- * This calls the children components but doesn't mount to anything.
- * This is useful for testing components using SolidJS testing library
- * without needing to worry about the Pixi Application or rendering at all.
- * It can be used as a wrapper around the component you want to test in
- * the render function of the testing library.
+ * Calls pixi solid components in a pure Solid root without mounting to the Canvas.
  */
-export const NoMount = (props: ParentProps): JSX.Element => {
-  const c = children(() => props.children);
-  c();
+export const mountHeadless = (component: () => JSX.Element): (() => void) => {
+  let disposeRoot: (() => void) | undefined;
 
-  return <></>;
+  createRoot((dispose) => {
+    disposeRoot = dispose;
+    const c = children(component);
+    c();
+  });
+
+  return () => disposeRoot?.();
 };
