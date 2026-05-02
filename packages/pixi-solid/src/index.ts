@@ -8,13 +8,12 @@ export type {
   CommonPointAxisProps,
   AnchorPointAxisProps,
   TilingPointAxisProps,
-  PixiEventHandlerMap,
   PointAxisPropName,
   CommonPointAxisPropName,
   AnchorPointAxisPropName,
   TilingPointAxisPropName,
+  PixiSolidEventHandlerName,
 } from "./components";
-export { PIXI_EVENT_NAMES, PIXI_SOLID_EVENT_HANDLER_NAMES } from "./components";
 export { onResize } from "./on-resize";
 export { onTick } from "./on-tick";
 export type { PixiApplicationProps } from "./pixi-application";
