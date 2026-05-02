@@ -2,7 +2,7 @@ import type * as Pixi from "pixi.js";
 import type { JSX, ParentProps } from "solid-js";
 import { createResource, onCleanup, Show, splitProps, useContext } from "solid-js";
 
-import { createPixiScreenStore } from "../use-pixi-screen/pixi-screen-store";
+import { createPixiScreenStore } from "../use-pixi-screen";
 
 import { PixiAppContext, TickerContext } from "./context";
 import { createPixiApplication } from "./pixi-application";
@@ -48,7 +48,7 @@ export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Elemen
   });
 
   onCleanup(() => {
-    // Only destory the app if it was created here.
+    // Only destroy the app if it was created here.
     if (externallyProvidedApp) return;
     appResource()?.destroy(true, { children: true });
   });

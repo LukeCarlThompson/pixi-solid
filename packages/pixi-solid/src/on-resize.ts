@@ -1,7 +1,8 @@
 import type * as Pixi from "pixi.js";
-import { onCleanup } from "solid-js";
+import { createEffect, on } from "solid-js";
 
 import { getPixiApp } from "./pixi-application";
+import { usePixiScreen } from "./use-pixi-screen";
 
 /**
  *
@@ -23,15 +24,20 @@ export const onResize = (resizeCallback: (screen: Pixi.Rectangle) => void): void
     throw new Error("onResize must be used within a PixiApplicationProvider or a PixiCanvas");
   }
 
-  const handleResize = () => {
-    resizeCallback(pixiApp.renderer.screen);
-  };
+  const screen = usePixiScreen();
 
-  handleResize();
-
-  pixiApp.renderer.addListener("resize", handleResize);
-
-  onCleanup(() => {
-    pixiApp.renderer.removeListener("resize", handleResize);
-  });
+  /**
+   * We derive from the reactive screen store so this hook always fires after `usePixiScreen()` has
+   * been updated.
+   * This avoids a race condition and guarantees consistent values when both are used together.
+   */
+  createEffect(
+    on(
+      () => [screen.width, screen.height, screen.x, screen.y],
+      () => {
+        resizeCallback(pixiApp.renderer.screen);
+      },
+      { defer: false },
+    ),
+  );
 };
