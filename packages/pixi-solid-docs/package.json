@@ -11,13 +11,13 @@
     "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
-    "@astrojs/solid-js": "5.1.3",
-    "@astrojs/starlight": "^0.37.1",
-    "astro": "^5.16.5",
-    "pixi-filters": "^6.1.5",
+    "@astrojs/solid-js": "6.0.1",
+    "@astrojs/starlight": "0.38.4",
+    "astro": "6.2.1",
+    "pixi-filters": "6.1.5",
     "pixi-solid": "workspace:*",
-    "pixi.js": "8.14.3",
-    "sharp": "^0.34.5",
-    "solid-js": "1.9.10"
+    "pixi.js": "*",
+    "sharp": "0.34.5",
+    "solid-js": "*"
   }
 }

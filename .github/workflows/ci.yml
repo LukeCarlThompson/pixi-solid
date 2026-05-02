@@ -24,11 +24,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 22.21.1
           cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Build pixi-solid
+        run: pnpm --filter pixi-solid build
 
       - name: Lint
         run: pnpm lint

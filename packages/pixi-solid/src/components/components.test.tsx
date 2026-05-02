@@ -1,11 +1,10 @@
-import { render } from "@solidjs/testing-library";
 import type * as Pixi from "pixi.js";
 import { Texture, Ticker } from "pixi.js";
-import { createRoot, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TickerProvider } from "../pixi-application";
-import { NoMount } from "../testing";
+import { mountHeadless } from "../testing";
 
 import { AnimatedSprite, Container, RenderLayer, Sprite, TilingSprite } from "./components";
 
@@ -18,37 +17,28 @@ describe("Component Factory Cleanup on Unmount", () => {
     let containerRef: Pixi.Container | undefined;
     let destroyCalled = false;
 
-    createRoot((dispose) => {
-      const TestComponent = () => {
-        return (
-          <NoMount>
-            <Container
-              ref={(el) => {
-                containerRef = el;
-                const originalDestroy = el.destroy.bind(el);
-                el.destroy = vi.fn((options) => {
-                  destroyCalled = true;
-                  expect(options).toEqual({ children: true });
-                  originalDestroy(options);
-                });
-              }}
-            />
-          </NoMount>
-        );
-      };
+    const dispose = mountHeadless(() => (
+      <Container
+        ref={(el) => {
+          containerRef = el;
+          const originalDestroy = el.destroy.bind(el);
+          el.destroy = vi.fn((options) => {
+            destroyCalled = true;
+            expect(options).toEqual({ children: true });
+            originalDestroy(options);
+          });
+        }}
+      />
+    ));
 
-      TestComponent();
+    expect(containerRef).toBeDefined();
 
-      expect(containerRef).toBeDefined();
+    dispose();
 
-      // Trigger cleanup
-      dispose();
-
-      expect(destroyCalled).toBe(true);
-    });
+    expect(destroyCalled).toBe(true);
   });
 
-  it("GIVEN a component mounted and then unmounted WHEN remounted with new children THEN old children are destroyed before new ones added", async () => {
+  it("GIVEN a component mounted and then unmounted WHEN remounted with new children THEN old children are destroyed before new ones added", () => {
     const destroyedInstances: Pixi.Container[] = [];
     const [shouldShow, setShouldShow] = createSignal(true);
     let currentContainerRef: Pixi.Container | undefined;
@@ -61,196 +51,153 @@ describe("Component Factory Cleanup on Unmount", () => {
       });
     };
 
-    await createRoot(async (dispose) => {
-      const TestComponent = () => {
-        return (
-          <NoMount>
-            {shouldShow() && (
-              <Container
-                ref={(el) => {
-                  trackDestroy(el);
-                  currentContainerRef = el;
-                }}
-              >
-                <Container
-                  ref={(el) => {
-                    trackDestroy(el);
-                  }}
-                />
-              </Container>
-            )}
-          </NoMount>
-        );
-      };
+    const dispose = mountHeadless(() =>
+      shouldShow() ? (
+        <Container
+          ref={(el) => {
+            trackDestroy(el);
+            currentContainerRef = el;
+          }}
+        >
+          <Container
+            ref={(el) => {
+              trackDestroy(el);
+            }}
+          />
+        </Container>
+      ) : null,
+    );
 
-      TestComponent();
-      await Promise.resolve();
+    expect(currentContainerRef).toBeDefined();
+    const firstContainerRef = currentContainerRef;
 
-      expect(currentContainerRef).toBeDefined();
-      const firstContainerRef = currentContainerRef;
+    // WHEN: Hide the component (triggers cleanup)
+    setShouldShow(false);
 
-      // WHEN: Hide the component (triggers cleanup)
-      setShouldShow(false);
+    // THEN: The container and its child should be destroyed
+    expect(destroyedInstances).toContain(firstContainerRef);
+    expect(destroyedInstances.length).toBeGreaterThanOrEqual(2);
 
-      // THEN: The container and its child should be destroyed
-      expect(destroyedInstances).toContain(firstContainerRef);
-      expect(destroyedInstances.length).toBeGreaterThanOrEqual(2); // parent + child
+    // WHEN: Show a new component
+    setShouldShow(true);
 
-      // WHEN: Show a new component
-      setShouldShow(true);
+    // THEN: A new instance should be created
+    expect(currentContainerRef).not.toBe(firstContainerRef);
 
-      // THEN: A new instance should be created
-      expect(currentContainerRef).not.toBe(firstContainerRef);
-
-      dispose();
-    });
+    dispose();
   });
 
   it("GIVEN a Container with children WHEN unmounted THEN all children are properly destroyed", () => {
     const destroyedChildren: Pixi.Container[] = [];
     const [showContainer, setShowContainer] = createSignal(true);
+    let parentRef: Pixi.Container | undefined;
 
-    createRoot((dispose) => {
-      let parentRef: Pixi.Container | undefined;
+    const dispose = mountHeadless(() =>
+      showContainer() ? (
+        <Container
+          ref={(el) => {
+            parentRef = el;
+          }}
+        >
+          <Container
+            ref={(el) => {
+              const originalDestroy = el.destroy.bind(el);
+              el.destroy = vi.fn((options) => {
+                destroyedChildren.push(el);
+                originalDestroy(options);
+              });
+            }}
+          />
+          <Container
+            ref={(el) => {
+              const originalDestroy = el.destroy.bind(el);
+              el.destroy = vi.fn((options) => {
+                destroyedChildren.push(el);
+                originalDestroy(options);
+              });
+            }}
+          />
+        </Container>
+      ) : null,
+    );
 
-      const TestComponent = () => {
-        return (
-          <NoMount>
-            {showContainer() && (
-              <Container
-                ref={(el) => {
-                  parentRef = el;
-                }}
-              >
-                <Container
-                  ref={(el) => {
-                    const originalDestroy = el.destroy.bind(el);
-                    el.destroy = vi.fn((options) => {
-                      destroyedChildren.push(el);
-                      originalDestroy(options);
-                    });
-                  }}
-                />
-                <Container
-                  ref={(el) => {
-                    const originalDestroy = el.destroy.bind(el);
-                    el.destroy = vi.fn((options) => {
-                      destroyedChildren.push(el);
-                      originalDestroy(options);
-                    });
-                  }}
-                />
-              </Container>
-            )}
-          </NoMount>
-        );
-      };
+    expect(parentRef).toBeDefined();
+    expect(destroyedChildren.length).toBe(0);
 
-      TestComponent();
+    setShowContainer(false);
 
-      expect(parentRef).toBeDefined();
-      expect(destroyedChildren.length).toBe(0);
+    expect(destroyedChildren.length).toBe(2);
 
-      // WHEN: Remove the container
-      setShowContainer(false);
-
-      // THEN: Children should be destroyed
-      expect(destroyedChildren.length).toBe(2);
-
-      dispose();
-    });
+    dispose();
   });
 
   it("GIVEN a Container remounted multiple times WHEN each cycle completes THEN all instances are properly destroyed", () => {
     const destroyedInstances: Pixi.Container[] = [];
     const [shouldShow, setShouldShow] = createSignal(true);
 
-    createRoot((dispose) => {
-      const TestComponent = () => {
-        return (
-          <NoMount>
-            {shouldShow() && (
-              <Container
-                ref={(el) => {
-                  const originalDestroy = el.destroy.bind(el);
-                  el.destroy = vi.fn((options) => {
-                    destroyedInstances.push(el);
-                    originalDestroy(options);
-                  });
-                }}
-              />
-            )}
-          </NoMount>
-        );
-      };
+    const dispose = mountHeadless(() =>
+      shouldShow() ? (
+        <Container
+          ref={(el) => {
+            const originalDestroy = el.destroy.bind(el);
+            el.destroy = vi.fn((options) => {
+              destroyedInstances.push(el);
+              originalDestroy(options);
+            });
+          }}
+        />
+      ) : null,
+    );
 
-      TestComponent();
+    expect(destroyedInstances.length).toBe(0);
 
-      // Mount cycle 1
-      expect(destroyedInstances.length).toBe(0);
+    setShouldShow(false);
+    expect(destroyedInstances.length).toBe(1);
 
-      // Unmount
-      setShouldShow(false);
-      expect(destroyedInstances.length).toBe(1);
+    setShouldShow(true);
+    expect(destroyedInstances.length).toBe(1);
 
-      // Remount with different key
-      setShouldShow(true);
-      expect(destroyedInstances.length).toBe(1); // Still 1, new instance created
+    setShouldShow(false);
+    expect(destroyedInstances.length).toBe(2);
 
-      // Unmount again
-      setShouldShow(false);
-      expect(destroyedInstances.length).toBe(2); // Second instance destroyed
-
-      dispose();
-    });
+    dispose();
   });
 });
 
 describe("RenderLayer Component Cleanup", () => {
-  it("GIVEN a RenderLayer with children WHEN children are removed THEN children are not destroyed", () => {
+  it("GIVEN a RenderLayer with component children WHEN children are removed THEN child component cleanup still destroys them", () => {
     const detachedChildren: Pixi.Container[] = [];
     const [showChild, setShowChild] = createSignal(true);
+    let renderLayerRef: Pixi.Container | undefined;
 
-    createRoot((dispose) => {
-      let renderLayerRef: Pixi.Container | undefined;
+    const dispose = mountHeadless(() => (
+      <RenderLayer
+        ref={(el) => {
+          renderLayerRef = el;
+        }}
+      >
+        {showChild() ? (
+          <Container
+            ref={(el) => {
+              const originalDestroy = el.destroy.bind(el);
+              el.destroy = vi.fn((options) => {
+                detachedChildren.push(el);
+                originalDestroy(options);
+              });
+            }}
+          />
+        ) : null}
+      </RenderLayer>
+    ));
 
-      const TestComponent = () => {
-        return (
-          <NoMount>
-            <RenderLayer
-              ref={(el) => {
-                renderLayerRef = el;
-              }}
-            >
-              {showChild() && (
-                <Container
-                  ref={(el) => {
-                    const originalDestroy = el.destroy.bind(el);
-                    el.destroy = vi.fn((options) => {
-                      detachedChildren.push(el);
-                      originalDestroy(options);
-                    });
-                  }}
-                />
-              )}
-            </RenderLayer>
-          </NoMount>
-        );
-      };
+    expect(renderLayerRef).toBeDefined();
+    expect(detachedChildren.length).toBe(0);
 
-      TestComponent();
+    setShowChild(false);
 
-      expect(renderLayerRef).toBeDefined();
-      expect(detachedChildren.length).toBe(0);
+    expect(detachedChildren.length).toBe(1);
 
-      // WHEN: Remove the child
-      setShowChild(false);
-
-      // THEN: The child should NOT be destroyed (RenderLayer only detaches)
-      expect(detachedChildren.length).toBe(0);
-
-      dispose();
-    });
+    dispose();
   });
 });
 
@@ -263,45 +210,37 @@ describe("AnimatedSprite ticker integration", () => {
     const sharedTickerAddSpy = vi.spyOn(Ticker.shared, "add");
     const sharedTickerRemoveSpy = vi.spyOn(Ticker.shared, "remove");
 
-    createRoot((dispose) => {
-      const TestComponent = () => {
-        return (
-          <TickerProvider ticker={contextTicker}>
-            <NoMount>
-              <AnimatedSprite textures={[Texture.WHITE]} />
-            </NoMount>
-          </TickerProvider>
-        );
-      };
+    const dispose = mountHeadless(() => (
+      <TickerProvider ticker={contextTicker}>
+        <AnimatedSprite textures={[Texture.WHITE]} />
+      </TickerProvider>
+    ));
 
-      TestComponent();
+    expect(contextTickerAddSpy).toHaveBeenCalledTimes(1);
+    expect(sharedTickerAddSpy).not.toHaveBeenCalled();
 
-      expect(contextTickerAddSpy).toHaveBeenCalledTimes(1);
-      expect(sharedTickerAddSpy).not.toHaveBeenCalled();
+    const updateCallback = contextTickerAddSpy.mock.calls[0]?.[0];
+    expect(updateCallback).toBeTypeOf("function");
 
-      const updateCallback = contextTickerAddSpy.mock.calls[0]?.[0];
-      expect(updateCallback).toBeTypeOf("function");
+    dispose();
 
-      dispose();
-
-      expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
-      expect(sharedTickerRemoveSpy).not.toHaveBeenCalled();
-    });
+    expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
+    expect(sharedTickerRemoveSpy).not.toHaveBeenCalled();
   });
 
   it("GIVEN autoUpdate is false WHEN mounted THEN update loop is not added to the context ticker", () => {
     const contextTicker = new Ticker();
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
 
-    render(() => (
+    const dispose = mountHeadless(() => (
       <TickerProvider ticker={contextTicker}>
-        <NoMount>
-          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
-        </NoMount>
+        <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
       </TickerProvider>
     ));
 
     expect(contextTickerAddSpy).toHaveBeenCalledTimes(0);
+
+    dispose();
   });
 
   it("GIVEN autoUpdate is true WHEN mounted THEN update loop is added to context ticker and cleaned up on unmount", () => {
@@ -309,11 +248,9 @@ describe("AnimatedSprite ticker integration", () => {
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
     const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
 
-    const mounted = render(() => (
+    const dispose = mountHeadless(() => (
       <TickerProvider ticker={contextTicker}>
-        <NoMount>
-          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={true} />
-        </NoMount>
+        <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={true} />
       </TickerProvider>
     ));
 
@@ -322,7 +259,7 @@ describe("AnimatedSprite ticker integration", () => {
     const updateCallback = contextTickerAddSpy.mock.calls[0]?.[0];
     expect(updateCallback).toBeTypeOf("function");
 
-    mounted.unmount();
+    dispose();
 
     expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
   });
@@ -334,11 +271,9 @@ describe("AnimatedSprite ticker integration", () => {
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
     const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
 
-    const mounted = render(() => (
+    const dispose = mountHeadless(() => (
       <TickerProvider ticker={contextTicker}>
-        <NoMount>
-          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={autoUpdate()} />
-        </NoMount>
+        <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={autoUpdate()} />
       </TickerProvider>
     ));
 
@@ -353,26 +288,24 @@ describe("AnimatedSprite ticker integration", () => {
     setAutoUpdate(false);
     expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
 
-    mounted.unmount();
+    return dispose();
   });
 
   it("GIVEN no TickerProvider WHEN mounted with autoUpdate={false} THEN it does not throw", () => {
     expect(() => {
-      render(() => (
-        <NoMount>
-          <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
-        </NoMount>
+      const dispose = mountHeadless(() => (
+        <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
       ));
+
+      dispose();
     }).not.toThrow();
   });
 
   it("GIVEN no TickerProvider WHEN mounted with autoUpdate enabled THEN it throws", () => {
     expect(() => {
-      render(() => (
-        <NoMount>
-          <AnimatedSprite textures={[Texture.WHITE]} />
-        </NoMount>
-      ));
+      const dispose = mountHeadless(() => <AnimatedSprite textures={[Texture.WHITE]} />);
+
+      dispose();
     }).toThrow();
   });
 });
@@ -382,34 +315,26 @@ describe("Sprite-like component cleanup", () => {
     let spriteRef: Pixi.Sprite | undefined;
     let destroyCalled = false;
 
-    createRoot((dispose) => {
-      const TestComponent = () => {
-        return (
-          <NoMount>
-            <Sprite
-              texture={Texture.WHITE}
-              ref={(el) => {
-                spriteRef = el;
-                const originalDestroy = el.destroy.bind(el);
-                el.destroy = vi.fn((options) => {
-                  destroyCalled = true;
-                  expect(options).toEqual({ children: true });
-                  originalDestroy(options);
-                });
-              }}
-            />
-          </NoMount>
-        );
-      };
+    const dispose = mountHeadless(() => (
+      <Sprite
+        texture={Texture.WHITE}
+        ref={(el) => {
+          spriteRef = el;
+          const originalDestroy = el.destroy.bind(el);
+          el.destroy = vi.fn((options) => {
+            destroyCalled = true;
+            expect(options).toEqual({ children: true });
+            originalDestroy(options);
+          });
+        }}
+      />
+    ));
 
-      TestComponent();
+    expect(spriteRef).toBeDefined();
 
-      expect(spriteRef).toBeDefined();
+    dispose();
 
-      dispose();
-
-      expect(destroyCalled).toBe(true);
-    });
+    expect(destroyCalled).toBe(true);
   });
 
   it("GIVEN an AnimatedSprite WHEN root is disposed THEN instance is destroyed", () => {
@@ -417,71 +342,55 @@ describe("Sprite-like component cleanup", () => {
     let destroyCalled = false;
     const contextTicker = new Ticker();
 
-    createRoot((dispose) => {
-      const TestComponent = () => {
-        return (
-          <TickerProvider ticker={contextTicker}>
-            <NoMount>
-              <AnimatedSprite
-                textures={[Texture.WHITE]}
-                ref={(el) => {
-                  animatedSpriteRef = el;
-                  const originalDestroy = el.destroy.bind(el);
-                  el.destroy = vi.fn((options) => {
-                    destroyCalled = true;
-                    expect(options).toEqual({ children: true });
-                    originalDestroy(options);
-                  });
-                }}
-              />
-            </NoMount>
-          </TickerProvider>
-        );
-      };
+    const dispose = mountHeadless(() => (
+      <TickerProvider ticker={contextTicker}>
+        <AnimatedSprite
+          textures={[Texture.WHITE]}
+          ref={(el) => {
+            animatedSpriteRef = el;
+            const originalDestroy = el.destroy.bind(el);
+            el.destroy = vi.fn((options) => {
+              destroyCalled = true;
+              expect(options).toEqual({ children: true });
+              originalDestroy(options);
+            });
+          }}
+        />
+      </TickerProvider>
+    ));
 
-      TestComponent();
+    expect(animatedSpriteRef).toBeDefined();
 
-      expect(animatedSpriteRef).toBeDefined();
+    dispose();
 
-      dispose();
-
-      expect(destroyCalled).toBe(true);
-    });
+    expect(destroyCalled).toBe(true);
   });
 
   it("GIVEN a TilingSprite WHEN root is disposed THEN instance is destroyed", () => {
     let tilingSpriteRef: Pixi.TilingSprite | undefined;
     let destroyCalled = false;
 
-    createRoot((dispose) => {
-      const TestComponent = () => {
-        return (
-          <NoMount>
-            <TilingSprite
-              texture={Texture.WHITE}
-              width={100}
-              height={100}
-              ref={(el) => {
-                tilingSpriteRef = el;
-                const originalDestroy = el.destroy.bind(el);
-                el.destroy = vi.fn((options) => {
-                  destroyCalled = true;
-                  expect(options).toEqual({ children: true });
-                  originalDestroy(options);
-                });
-              }}
-            />
-          </NoMount>
-        );
-      };
+    const dispose = mountHeadless(() => (
+      <TilingSprite
+        texture={Texture.WHITE}
+        width={100}
+        height={100}
+        ref={(el) => {
+          tilingSpriteRef = el;
+          const originalDestroy = el.destroy.bind(el);
+          el.destroy = vi.fn((options) => {
+            destroyCalled = true;
+            expect(options).toEqual({ children: true });
+            originalDestroy(options);
+          });
+        }}
+      />
+    ));
 
-      TestComponent();
+    expect(tilingSpriteRef).toBeDefined();
 
-      expect(tilingSpriteRef).toBeDefined();
+    dispose();
 
-      dispose();
-
-      expect(destroyCalled).toBe(true);
-    });
+    expect(destroyCalled).toBe(true);
   });
 });

@@ -1,16 +1,78 @@
-import type { JSX, ParentProps } from "solid-js";
-import { children } from "solid-js";
+import type { JSX } from "solid-js";
+import { children, createRoot } from "solid-js";
+import { afterEach } from "vitest";
+
+const activeDisposers = new Set<() => void>();
+
+afterEach(() => {
+  const errors: unknown[] = [];
+
+  for (const dispose of activeDisposers) {
+    try {
+      dispose();
+    } catch (error) {
+      errors.push(error);
+    }
+  }
+
+  if (errors.length === 1) {
+    throw errors[0];
+  }
+
+  if (errors.length > 1) {
+    throw new AggregateError(errors, `${errors.length} disposers threw during test cleanup.`);
+  }
+});
+
+const trackDisposer = (dispose: () => void): (() => void) => {
+  const trackedDispose = () => {
+    if (!activeDisposers.delete(trackedDispose)) return;
+    dispose();
+  };
+
+  activeDisposers.add(trackedDispose);
+  return trackedDispose;
+};
+
+const createTrackedRoot = <T,>(setup: () => T): { value: T; dispose: () => void } => {
+  let disposeRoot: (() => void) | undefined;
+  const dispose = trackDisposer(() => {
+    disposeRoot?.();
+  });
+
+  try {
+    const value = createRoot((nextDisposeRoot) => {
+      disposeRoot = nextDisposeRoot;
+      return setup();
+    });
+
+    return { value, dispose };
+  } catch (setupError) {
+    try {
+      dispose();
+    } catch (cleanupError) {
+      throw new AggregateError(
+        [setupError, cleanupError],
+        "Root setup threw and cleanup also failed.",
+      );
+    }
+
+    throw setupError;
+  }
+};
+
+export const withTestRoot = <T,>(setup: () => T): { value: T; dispose: () => void } => {
+  return createTrackedRoot(setup);
+};
 
 /**
- * This calls the children components but doesn't mount to anything.
- * This is useful for testing components using SolidJS testing library
- * without needing to worry about the Pixi Application or rendering at all.
- * It can be used as a wrapper around the component you want to test in
- * the render function of the testing library.
+ * Calls pixi solid components in a pure Solid root without mounting to the Canvas.
  */
-export const NoMount = (props: ParentProps): JSX.Element => {
-  const c = children(() => props.children);
-  c();
+export const mountHeadless = (component: () => JSX.Element): (() => void) => {
+  const { dispose } = createTrackedRoot(() => {
+    const c = children(component);
+    c();
+  });
 
-  return <></>;
+  return dispose;
 };

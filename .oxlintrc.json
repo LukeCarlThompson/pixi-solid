@@ -1,4 +1,7 @@
 {
+  "options": {
+    "typeAware": true
+  },
   "categories": {
     "correctness": "error"
   },
@@ -19,7 +22,6 @@
     "typescript/no-non-null-assertion": "error",
     "no-empty-object-type": "error",
     "typescript/consistent-type-exports": "error",
-    "typescript/prefer-readonly": "error",
-    "import/no-unused-modules": ["error", { "unusedExports": true }]
+    "typescript/prefer-readonly": "error"
   }
 }

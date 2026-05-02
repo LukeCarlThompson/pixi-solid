@@ -15,16 +15,21 @@
     "fmt": "oxfmt"
   },
   "devDependencies": {
-    "@solidjs/testing-library": "^0.8.10",
-    "@types/node": "^25.2.3",
+    "@types/node": "25.6.0",
     "jsdom": "28.0.0",
-    "oxfmt": "^0.32.0",
-    "oxlint": "^1.47.0",
-    "oxlint-tsgolint": "^0.12.1",
-    "sass-embedded": "1.97.3",
-    "typescript": "~5.9.3",
-    "vite": "7.3.1",
-    "vite-plugin-solid": "2.11.10",
-    "vitest": "4.0.18"
+    "oxfmt": "0.47.0",
+    "oxlint": "1.62.0",
+    "oxlint-tsgolint": "0.22.1",
+    "sass-embedded": "1.99.0",
+    "typescript": "6.0.3",
+    "vite": "8.0.10",
+    "vite-plugin-solid": "2.11.12",
+    "vitest": "4.1.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "pixi.js": "8.18.1",
+      "solid-js": "1.9.12"
+    }
   }
 }
