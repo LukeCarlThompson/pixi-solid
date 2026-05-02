@@ -13,9 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.1.18
 
+- ✅ Added `PixiSolidEventHandlerName` union type to exports.
+- 💀 Removed `PixiEventHandlerMap` type from exports.
+- 💀 Removed `PIXI_EVENT_NAMES` and `PIXI_SOLID_EVENT_HANDLER_NAMES` constants from exports.
 - Renamed internal event types.
-- Removed `PixiEventHandlerMap` type from exports.
-- Added `PixiSolidEventHandlerName` union type to exports.
 
 ## 0.1.17
 
