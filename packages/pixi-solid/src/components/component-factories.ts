@@ -44,31 +44,36 @@ export type PixiComponentProps<
   ComponentOptions extends Pixi.ContainerOptions = Pixi.ContainerOptions,
 > = PixiSolidEventHandlerMap & CommonPointAxisProps & Omit<ComponentOptions, "children">;
 
+type RefAsProps<Component> = {
+  ref?: Ref<Component>;
+  as?: Component;
+};
+
+type PixiComponent<Props, Instance> = (props: Props) => Instance & JSX.Element;
+
 /**
  * Prop definition for basic Container components (position, scale, pivot, skew only)
  */
 export type ContainerProps<Component> = PixiSolidEventHandlerMap &
   CommonPointAxisProps &
-  Record<string, unknown> & {
-    ref?: Ref<Component>;
-    as?: Component;
+  RefAsProps<Component> & {
     children?: JSX.Element;
   };
 
 /**
  * Prop definition for components that cannot have children
  */
-export type LeafProps<Component> = Omit<ContainerProps<Component>, "children">;
+export type LeafProps<Component> = PixiSolidEventHandlerMap &
+  CommonPointAxisProps &
+  RefAsProps<Component>;
 
 /**
  * Prop definition for Sprite-like components (includes anchor properties)
  */
 export type SpriteProps<Component> = PixiSolidEventHandlerMap &
   CommonPointAxisProps &
-  AnchorPointAxisProps & {
-    ref?: Ref<Component>;
-    as?: Component;
-  };
+  AnchorPointAxisProps &
+  RefAsProps<Component>;
 
 export type AnimatedSpriteProps<Component> = SpriteProps<Component> &
   Pick<Pixi.AnimatedSpriteOptions, "autoUpdate">;
@@ -84,18 +89,13 @@ type AnimatedSpriteLike = Pixi.Container & {
 export type TilingSpriteProps<Component> = PixiSolidEventHandlerMap &
   CommonPointAxisProps &
   AnchorPointAxisProps &
-  TilingPointAxisProps & {
-    ref?: Ref<Component>;
-    as?: Component;
-  };
+  TilingPointAxisProps &
+  RefAsProps<Component>;
 
 /**
  * Prop definition for filter components
  */
-export type FilterProps<Component> = {
-  ref?: Ref<Component>;
-  as?: Component;
-};
+export type FilterProps<Component> = RefAsProps<Component>;
 
 // Keys that are specific to Solid components and not Pixi props
 export const SOLID_PROP_KEYS = ["ref", "as", "children"] as const;
@@ -130,9 +130,7 @@ export const createContainerComponent = <
   OptionsType extends object,
 >(
   PixiClass: new (props: OptionsType) => InstanceType,
-): ((
-  props: Omit<OptionsType, "children"> & ContainerProps<InstanceType>,
-) => InstanceType & JSX.Element) => {
+): PixiComponent<Omit<OptionsType, "children"> & ContainerProps<InstanceType>, InstanceType> => {
   return (props): InstanceType & JSX.Element => {
     const [runtimeProps, initialisationProps] = splitProps(props, CONTAINER_RUNTIME_KEYS);
 
@@ -159,7 +157,7 @@ export const createLeafComponent = <
   OptionsType extends object,
 >(
   PixiClass: new (props: OptionsType) => InstanceType,
-) => {
+): PixiComponent<Omit<OptionsType, "children"> & LeafProps<InstanceType>, InstanceType> => {
   return (
     props: Omit<OptionsType, "children"> & LeafProps<InstanceType>,
   ): InstanceType & JSX.Element => {
@@ -172,7 +170,7 @@ export const createSpriteComponent = <
   OptionsType extends object,
 >(
   PixiClass: new (props: OptionsType) => InstanceType,
-) => {
+): PixiComponent<Omit<OptionsType, "children"> & SpriteProps<InstanceType>, InstanceType> => {
   return (
     props: Omit<OptionsType, "children"> & SpriteProps<InstanceType>,
   ): InstanceType & JSX.Element => {
@@ -196,7 +194,10 @@ export const createAnimatedSpriteComponent = <
   OptionsType extends object,
 >(
   PixiClass: new (props: OptionsType) => InstanceType,
-) => {
+): PixiComponent<
+  Omit<OptionsType, "children"> & AnimatedSpriteProps<InstanceType>,
+  InstanceType
+> => {
   return (
     props: Omit<OptionsType, "children"> & AnimatedSpriteProps<InstanceType>,
   ): InstanceType & JSX.Element => {
@@ -245,7 +246,7 @@ export const createTilingSpriteComponent = <
   OptionsType extends object,
 >(
   PixiClass: new (props: OptionsType) => InstanceType,
-) => {
+): PixiComponent<Omit<OptionsType, "children"> & TilingSpriteProps<InstanceType>, InstanceType> => {
   return (
     props: Omit<OptionsType, "children"> & TilingSpriteProps<InstanceType>,
   ): InstanceType & JSX.Element => {
@@ -266,7 +267,7 @@ export const createTilingSpriteComponent = <
 
 export const createFilterComponent = <InstanceType extends Pixi.Filter, OptionsType extends object>(
   PixiClass: new (props: OptionsType) => InstanceType,
-) => {
+): PixiComponent<OptionsType & FilterProps<InstanceType>, InstanceType> => {
   return (props: OptionsType & FilterProps<InstanceType>): InstanceType & JSX.Element => {
     const [runtimeProps, initialisationProps] = splitProps(props, ["ref", "as"]);
 
