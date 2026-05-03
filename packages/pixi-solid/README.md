@@ -24,14 +24,14 @@ Peer dependencies of
 
 ```json
 {
-  "pixi.js": "^8.14.3",
-  "solid-js": "^1.9.10"
+  "pixi.js": ">=8.14.3 <9",
+  "solid-js": ">=1.9.10 <2"
 }
 ```
 
 ## Basic usage
 
-```ts
+```tsx
 import { PixiCanvas, Sprite } from "pixi-solid";
 import { createSignal } from "solid-js";
 import { Texture } from "pixi.js";
@@ -45,7 +45,12 @@ export const DemoApp = () => {
 
   return (
     <PixiCanvas style={{ width: "100%", height: "100vh" }}>
-      <Sprite texture={Texture.WHITE} scale={scale()} onpointertap={handleSpriteTap} tint="#ff0000" />
+      <Sprite
+        texture={Texture.WHITE}
+        scale={scale()}
+        onpointertap={handleSpriteTap}
+        tint="#ff0000"
+      />
     </PixiCanvas>
   );
 };
@@ -57,7 +62,7 @@ Check out the [documentation site 🧑‍💻](https://lukecarlthompson.github.i
 
 ## Why combine SolidJS with PixiJS?
 
-- **Declarative PixiJS scene graph**: Using SolidJS's JSX templating means we get declarative control over the scene graph. For improved separation of concerns, simpler views and more scalable
+- **Declarative PixiJS scene graph**: Using SolidJS's JSX templating means we get declarative control over the scene graph. For improved separation of concerns, simpler views and more scalable projects.
 
 - **SolidJS hooks in our PixiJS components**: SolidJS rendering PixiJS components means we can take advantage of the built in lifecycle methods in SolidJS `onMount`, `onCleanup` as well as extra custom hooks for responsive behaviour and ticker subscriptions.
 
@@ -69,7 +74,7 @@ Check out the [documentation site 🧑‍💻](https://lukecarlthompson.github.i
 
 - **SolidJS is a thin wrapper**: While Pixi Solid provides a nice abstraction over PixiJS it provides access to all the properties and events of PixiJS objects.
 
-- **SolidJS is really fast**: SolidJS is on of the fastest front-end frameworks out there so the overhead is very minimal.
+- **SolidJS is really fast**: SolidJS is one of the fastest front-end frameworks out there so the overhead is very minimal.
 
 - **SolidJS is fully featured**: It has stores, signals, suspense, error boundaries, resource fetching and more. It's a great feature set for simple or complex applications and you won't have to reach for other libraries to manage templating or state.
 
