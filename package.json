@@ -8,7 +8,9 @@
   "scripts": {
     "build": "pnpm -r run build",
     "dev": "pnpm -r run dev",
-    "test": "pnpm -r run test",
+    "test": "pnpm readme:verify && pnpm -r run test",
+    "readme:sync": "node scripts/sync-readme.mjs",
+    "readme:verify": "node scripts/sync-readme.mjs --check",
     "preinstall": "npx only-allow pnpm",
     "lint": "oxlint",
     "fmt:check": "oxfmt --check",

@@ -1,3 +1,6 @@
+<!-- AUTO-GENERATED FILE. DO NOT EDIT DIRECTLY. -->
+<!-- Source: packages/pixi-solid/README.md -->
+
 # Pixi-Solid
 
 A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your scene with [SolidJS](https://www.solidjs.com/) JSX components and its fine-grained signals based reactivity.
@@ -14,11 +17,7 @@ A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your sce
 - 💫 Useful helper utilities included.
 - 🤩 Full Typescript support for type safety and auto completion.
 
-Take a look at the [docs site 🧑‍💻](https://lukecarlthompson.github.io/pixi-solid/) for more information.
-
----
-
-### Install
+## Install
 
 ```bash
 npm i pixi-solid pixi.js solid-js
@@ -28,32 +27,59 @@ Peer dependencies of
 
 ```json
 {
-  "pixi.js": "^8.14.3",
-  "solid-js": "^1.9.10"
+  "pixi.js": ">=8.14.3 <9",
+  "solid-js": ">=1.9.10 <2"
 }
 ```
 
----
+## Basic usage
 
-### Why combine SolidJS with PixiJS?
+```tsx
+import { PixiCanvas, Sprite } from "pixi-solid";
+import { createSignal } from "solid-js";
+import { Texture } from "pixi.js";
 
-- **Declarative PixiJS scene graph**: Using SolidJS's JSX templating means we get declarative control over the scene graph. No longer necessary to imperatively add and remove children.
+export const DemoApp = () => {
+  const [scale, setScale] = createSignal(10);
 
-- **Lifecycle hooks in our PixiJS components**: SolidJS rendering PixiJS components means we can take advantage of the built in lifecycle methods in SolidJS `onMount` and `onCleanup` as well as few extra custom hooks so we can automatically subscribe and unsubscribe from the ticker.
+  const handleSpriteTap = () => {
+    setScale((currentScale) => currentScale + 1);
+  };
 
-- **Shared State and Reactivity**: Pixi Solid leverages SolidJS's reactivity system to automatically update PixiJS components when SolidJS signals or stores change. So your HTML and PixiJS graphics can stay in sync effortlessly.
+  return (
+    <PixiCanvas style={{ width: "100%", height: "100vh" }}>
+      <Sprite
+        texture={Texture.WHITE}
+        scale={scale()}
+        onpointertap={handleSpriteTap}
+        tint="#ff0000"
+      />
+    </PixiCanvas>
+  );
+};
+```
 
-- **Combine the best of both worlds**: Pixi Solid makes it easy to use HTML elements alongside a PixiJS canvas, allowing you to create rich user interfaces that combine the strengths of both technologies.
+## Documentation and examples
+
+Check out the [documentation site 🧑‍💻](https://lukecarlthompson.github.io/pixi-solid/) for more comprehensive information and live examples.
+
+## Why combine SolidJS with PixiJS?
+
+- **Declarative PixiJS scene graph**: Using SolidJS's JSX templating means we get declarative control over the scene graph. For improved separation of concerns, simpler views and more scalable projects.
+
+- **SolidJS hooks in our PixiJS components**: SolidJS rendering PixiJS components means we can take advantage of the built in lifecycle methods in SolidJS `onMount`, `onCleanup` as well as extra custom hooks for responsive behaviour and ticker subscriptions.
+
+- **Shared State and Reactivity**: HTML and PixiJS graphics can stay in sync effortlessly because they can subscribe to the same state.
+
+- **Combine the best of both worlds**: Pixi Solid makes it easy to use HTML elements alongside or on top of a PixiJS canvas, allowing you to create rich user interfaces that combine the strengths of both technologies.
 
 - **Composability**: Pixi Solid components can be easily composed together to create complex scenes and animations out of reusable components.
 
 - **SolidJS is a thin wrapper**: While Pixi Solid provides a nice abstraction over PixiJS it provides access to all the properties and events of PixiJS objects.
 
-- **SolidJS is really fast**: SolidJs is on of the fastest front-end frameworks out there so the overhead is very minimal.
+- **SolidJS is really fast**: SolidJS is one of the fastest front-end frameworks out there so the overhead is very minimal.
 
 - **SolidJS is fully featured**: It has stores, signals, suspense, error boundaries, resource fetching and more. It's a great feature set for simple or complex applications and you won't have to reach for other libraries to manage templating or state.
-
----
 
 ## Contributing
 
