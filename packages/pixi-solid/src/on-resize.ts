@@ -1,8 +1,7 @@
 import type * as Pixi from "pixi.js";
-import { createEffect, on } from "solid-js";
+import { onCleanup } from "solid-js";
 
 import { getPixiApp } from "./pixi-application";
-import { usePixiScreen } from "./use-pixi-screen";
 
 /**
  *
@@ -24,20 +23,21 @@ export const onResize = (resizeCallback: (screen: Pixi.Rectangle) => void): void
     throw new Error("onResize must be used within a PixiApplicationProvider or a PixiCanvas");
   }
 
-  const screen = usePixiScreen();
+  // Ensure initial callback happens during setup.
+  resizeCallback(pixiApp.renderer.screen);
 
-  /**
-   * We derive from the reactive screen store so this hook always fires after `usePixiScreen()` has
-   * been updated.
-   * This avoids a race condition and guarantees consistent values when both are used together.
-   */
-  createEffect(
-    on(
-      () => [screen.width, screen.height, screen.x, screen.y],
-      () => {
-        resizeCallback(pixiApp.renderer.screen);
-      },
-      { defer: false },
-    ),
-  );
+  const handleResize = () => {
+    // Keep onResize event-driven (fires for every renderer resize event), but schedule the
+    // callback after the current emit cycle so usePixiScreen listeners have already synchronized
+    // their reactive values. This avoids stale reads when both hooks are used together.
+    queueMicrotask(() => {
+      resizeCallback(pixiApp.renderer.screen);
+    });
+  };
+
+  pixiApp.renderer.addListener("resize", handleResize);
+
+  onCleanup(() => {
+    pixiApp.renderer.removeListener("resize", handleResize);
+  });
 };

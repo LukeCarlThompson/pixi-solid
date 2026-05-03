@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.22
+
+- 🐞 Fixed a the behaviour in `onResize` to make it always fire at the expected times.
+
 ## 0.1.21
 
 - 🐞 Fixed a regression where type inference was broken for the `Graphics` `ref` prop.
