@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.1.20
+
+- ⚙️ Updated README structure with dedicated install, basic usage, and docs sections.
+- ⚙️ Added an expanded TSX usage example in README.
+- ⚙️ Updated README peer dependency examples to explicit compatible ranges.
+
 ## 0.1.19
 
 - ⚙️ Use more specific peer dependency range
