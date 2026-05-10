@@ -178,6 +178,7 @@ export const ObjectFitContainer = (props: ObjectFitContainerProps): JSX.Element 
     void local.height;
     void local.fitMode;
     void local.objectPosition;
+    void resolvedChildren();
 
     for (const child of innerContainerSet) {
       objectFit(child, local, local.fitMode, local.objectPosition);
