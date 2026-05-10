@@ -14,7 +14,7 @@ The `useSpring` function provides reactive SolidJS signals for creating physical
 
 The function internally manages the spring physics calculations and keeps its updates synchronized with the Pixi.js application's ticker, ensuring smooth and responsive animations that align with your application's frame rate.
 
-It must be called within a SolidJS tracking scope, such as a component or another function, that is a descendant of `PixiApplication`.
+It must be called within a SolidJS tracking scope, such as a component or another function, that is a descendant of `PixiApplicationProvider` or `PixiCanvas`.
 
 ### Demo
 
