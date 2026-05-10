@@ -1,7 +1,7 @@
 import type * as Pixi from "pixi.js";
 import type { JSX, ParentProps } from "solid-js";
 
-import { PixiAppContext } from "../pixi-application";
+import { PixiAppContext, ScreenStoreContext } from "../pixi-application";
 import { createPixiScreenStore } from "../use-pixi-screen";
 
 export type MockRenderer = {
@@ -62,13 +62,10 @@ export const TestPixiProvider = (
   const pixiScreenStore = createPixiScreenStore(props.renderer as unknown as Pixi.Renderer);
 
   return (
-    <PixiAppContext.Provider
-      value={{
-        app: props.app,
-        pixiScreenStore,
-      }}
-    >
-      {props.children}
+    <PixiAppContext.Provider value={props.app}>
+      <ScreenStoreContext.Provider value={pixiScreenStore}>
+        {props.children}
+      </ScreenStoreContext.Provider>
     </PixiAppContext.Provider>
   );
 };

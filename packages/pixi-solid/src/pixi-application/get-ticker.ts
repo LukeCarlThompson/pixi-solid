@@ -4,19 +4,17 @@ import { useContext } from "solid-js";
 import { TickerContext } from "./context";
 
 /**
- * getTicker
+ * A custom SolidJS hook that provides access to the Pixi Ticker instance.
+ * This hook must be called from a component that is a descendant of `PixiApplicationProvider`, `PixiCanvas` or `TickerProvider`.
  *
- * A custom SolidJS hook that provides access to the PIXI.Application's shared Ticker instance.
- * This hook must be called from a component that is a descendant of `PixiApplication`.
- * Or a descendant of `TickerProvider` if being used for testing without an application.
- *
- * @returns The PIXI.Ticker instance from the application context.
- * @throws Will throw an error if used outside of a `PixiApplication` or `TickerProvider` context.
+ * @returns The Pixi.Ticker instance from the nearest context provider.
  */
 export const getTicker = (): Pixi.Ticker => {
   const ticker = useContext(TickerContext);
   if (!ticker) {
-    throw new Error("getTicker must be used within a PixiApplication or a TickerProvider");
+    throw new Error(
+      "getTicker must be used within a PixiApplicationProvider, PixiCanvas, or TickerProvider",
+    );
   }
   return ticker;
 };

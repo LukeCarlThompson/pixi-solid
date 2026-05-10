@@ -16,5 +16,5 @@ export const getPixiApp = (): Pixi.Application => {
     throw new Error("getPixiApp must be used within a PixiApplicationProvider or a PixiCanvas");
   }
 
-  return appContext.app;
+  return appContext;
 };
