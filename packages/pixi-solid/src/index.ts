@@ -17,7 +17,13 @@ export type {
 export { onResize } from "./on-resize";
 export { onTick } from "./on-tick";
 export type { PixiApplicationProps } from "./pixi-application";
-export { getPixiApp, getTicker, PixiApplicationProvider, TickerProvider } from "./pixi-application";
+export {
+  getPixiApp,
+  getTicker,
+  getRenderer,
+  PixiApplicationProvider,
+  TickerProvider,
+} from "./pixi-application";
 export type { PixiCanvasProps } from "./pixi-canvas";
 export { PixiCanvas } from "./pixi-canvas";
 export {
