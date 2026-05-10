@@ -26,7 +26,7 @@ const DemoComponent = () => {
         points={points}
         ref={(mesh) => {
           // Position the mesh contained in the center of the screen
-          objectFit(mesh, { width: pixiScreen.width, height: pixiScreen.height }, "contain");
+          objectFit(mesh, pixiScreen, "contain");
 
           let cumulativeDeltaTime = 0;
 

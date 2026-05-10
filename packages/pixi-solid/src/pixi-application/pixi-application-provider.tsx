@@ -4,7 +4,7 @@ import { createResource, onCleanup, Show, splitProps, useContext } from "solid-j
 
 import { createPixiScreenStore } from "../use-pixi-screen/pixi-screen-store";
 
-import { PixiAppContext, TickerContext } from "./context";
+import { PixiAppContext, TickerContext, ScreenStoreContext } from "./context";
 import { createPixiApplication } from "./pixi-application";
 
 /**
@@ -38,9 +38,9 @@ export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Elemen
     }
 
     const existingContext = useContext(PixiAppContext);
-    if (existingContext?.app) {
-      externallyProvidedApp = existingContext.app;
-      return existingContext.app;
+    if (existingContext) {
+      externallyProvidedApp = existingContext;
+      return existingContext;
     }
 
     const [, initialisationProps] = splitProps(props, ["children", "existingApp"]);
@@ -57,14 +57,12 @@ export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Elemen
     <Show when={appResource()}>
       {(app) => {
         const pixiScreenStore = createPixiScreenStore(app().renderer);
-        const contextValue = {
-          app: app(),
-          pixiScreenStore,
-        };
 
         return (
-          <PixiAppContext.Provider value={contextValue}>
-            <TickerContext.Provider value={app().ticker}>{props.children}</TickerContext.Provider>
+          <PixiAppContext.Provider value={app()}>
+            <ScreenStoreContext.Provider value={pixiScreenStore}>
+              <TickerContext.Provider value={app().ticker}>{props.children}</TickerContext.Provider>
+            </ScreenStoreContext.Provider>
           </PixiAppContext.Provider>
         );
       }}
