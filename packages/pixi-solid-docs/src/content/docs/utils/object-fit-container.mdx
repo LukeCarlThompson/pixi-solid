@@ -1,0 +1,49 @@
+---
+title: ObjectFitContainer
+description: A utility component that scales and aligns children to fit a fixed rectangular area.
+---
+
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/object-fit-container.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
+`ObjectFitContainer` is a utility component from `pixi-solid/utils` that applies object-fit style scaling and positioning to its children inside a fixed width and height region.
+
+It is useful for when you want to declare a responsive area and have the children fit within that space.
+
+It supports these fit modes:
+
+- `contain`
+- `cover`
+- `fill`
+- `scale-down`
+- `none`
+
+It also supports these positions:
+
+- `center` (default)
+- `top`, `right`, `bottom`, `left`
+- `top-left`, `top-right`, `bottom-left`, `bottom-right`
+- `{ x: number, y: number }` where `0` is start, `0.5` is center, and `1` is end
+
+Use the `objectPosition` prop to set alignment.
+
+`observeBounds` is an optional prop that, when set to `true`, checks the bounds on every tick to watch the container's dimensions and update the layout reactively.
+This has a higher performance cost due to calculating the bounds on every tick so should only be used when specifically required.
+If `false`, the layout will only be calculated on initial render.
+
+Import it from utils:
+
+```ts
+import { ObjectFitContainer } from "pixi-solid/utils";
+```
+
+### Demo
+
+Use the controls to switch fit mode and position and compare the behaviour.
+
+<ClientOnly fileName="object-fit-container" client:only="solid-js" />
+
+### Code example
+
+<Code code={demoCode} lang="tsx" title="demo-app.tsx" />

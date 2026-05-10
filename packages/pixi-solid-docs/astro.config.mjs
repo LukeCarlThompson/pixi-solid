@@ -41,6 +41,10 @@ export default defineConfig({
           autogenerate: { directory: "hooks" },
         },
         {
+          label: "Utils",
+          autogenerate: { directory: "utils" },
+        },
+        {
           label: "Examples",
           autogenerate: { directory: "examples" },
         },

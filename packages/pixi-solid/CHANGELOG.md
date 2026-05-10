@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 0.2.0
+
+- ⚙️ Moved `delay` and `createAsyncDelay` exports from main `pixi-solid` package to `pixi-solid/utils`. Update imports from `import { delay, createAsyncDelay } from "pixi-solid"` to `import { delay, createAsyncDelay } from "pixi-solid/utils"`.
+- ✅ Added `ObjectFitContainer` component for scaling and positioning children with object-fit style layout control.
+- ✅ Added `getRenderer` hook to access the root Pixi Renderer instance.
+- ✅ Enhanced `objectFit` function to add support for custom positioning, local bounds handling, and additional fit modes including `"none"`.
+
 ## 0.1.22
 
 - 🐞 Fixed a the behaviour in `onResize` to make it always fire at the expected times.

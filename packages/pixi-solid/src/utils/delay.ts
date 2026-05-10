@@ -1,12 +1,14 @@
 import type * as Pixi from "pixi.js";
 import { useContext } from "solid-js";
 
-import { TickerContext } from "./pixi-application";
+import { TickerContext } from "../pixi-application";
+
+export type AsyncDelayFunction = (delayMs: number, signal?: AbortSignal) => Promise<void>;
 
 /**
  * Runs a callback when a given number of milliseconds has passed on the ticker.
  *
- * It is guaranteed to be in sync with the shared ticker and uses accumulated deltaMs not an external time measurement.
+ * It is guaranteed to be in sync with the current Ticker context and uses accumulated deltaMs not an external time measurement.
  *
  * @param delayMs - Number of milliseconds to wait (measured in the ticker's time units).
  *
@@ -81,7 +83,7 @@ const asyncDelay = async (ticker: Pixi.Ticker, delayMs: number, signal?: AbortSi
  *
  * @throws {Error} If called outside of a `PixiApplicationProvider` or `TickerProvider` context.
  */
-export const createAsyncDelay = (): ((delayMs: number, signal?: AbortSignal) => Promise<void>) => {
+export const createAsyncDelay = (): AsyncDelayFunction => {
   const ticker = useContext(TickerContext);
 
   if (!ticker) {

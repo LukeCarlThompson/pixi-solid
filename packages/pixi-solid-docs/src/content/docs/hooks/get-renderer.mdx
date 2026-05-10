@@ -1,0 +1,54 @@
+---
+title: getRenderer
+description: A Solid.js hook to access the root Pixi Renderer instance.
+sidebar:
+  order: 2
+---
+
+The `getRenderer` hook provides a way to access the root `Pixi.Renderer` instance created by the `PixiApplicationProvider` or `PixiCanvas` component.
+This is useful when you need to interact directly with the Pixi.js renderer, for example, to access renderer properties or perform low-level rendering operations.
+
+### Usage
+
+This hook must be called from a component that is a descendant of the `<PixiApplicationProvider />` or `<PixiCanvas />` component.
+If used outside of this context, it will throw an error.
+
+```tsx
+import { getRenderer, Container, PixiCanvas } from "pixi-solid";
+import { createEffect } from "solid-js";
+
+const MyComponent = () => {
+  const renderer = getRenderer();
+
+  createEffect(() => {
+    // You can now safely use the Pixi.js Renderer instance
+    console.log("Renderer resolution:", renderer.resolution);
+    console.log("Renderer view size:", renderer.width, renderer.height);
+  });
+
+  return <Container>{/* Your components here*/}</Container>;
+};
+
+export const DemoApp = () => {
+  return (
+    <PixiCanvas>
+      <MyComponent />
+    </PixiCanvas>
+  );
+};
+```
+
+## When to use it
+
+- When you need direct access to the `Pixi.Renderer` instance for advanced rendering operations.
+- To query renderer properties such as resolution, or rendering context.
+- When you need to perform operations that are specific to the renderer and not covered by other `pixi-solid` utilities.
+
+## Relationship to other hooks
+
+- `getPixiApp` gives you access to the `Pixi.Application` instance, which contains the renderer as a property. You can access the renderer via `getPixiApp().renderer`.
+- `getRenderer` is a convenience hook that directly accesses the renderer without needing to go through the application instance.
+
+## Further reading
+
+- Read more about the [`Pixi.Renderer` class](https://pixijs.com/8.x/guides/components/renderers) in the PixiJS documentation.
