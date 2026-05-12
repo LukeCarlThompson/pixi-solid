@@ -1,11 +1,16 @@
-# Pixi-Solid
-
-A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your scene with [SolidJS](https://www.solidjs.com/) JSX components and its fine-grained signals based reactivity.
+<div align="center">
+  <img src="./pixi-solid-logo.png" alt="Pixi-Solid Logo" width="200" />
 
 [![NPM Version](https://img.shields.io/npm/v/pixi-solid.svg)](https://www.npmjs.com/package/pixi-solid)
 [![License](https://img.shields.io/npm/l/pixi-solid.svg)](https://github.com/LukeCarlThompson/pixi-solid/blob/main/LICENSE)
 [![CI](https://github.com/LukeCarlThompson/pixi-solid/actions/workflows/ci.yml/badge.svg)](https://github.com/LukeCarlThompson/pixi-solid/actions)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue)](https://www.typescriptlang.org/)
+
+</div>
+
+# Pixi-Solid
+
+A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your scene with [SolidJS](https://www.solidjs.com/) JSX components and its fine-grained signals based reactivity.
 
 - 💙 Lightweight and flexible SolidJS library for creating PixiJS applications.
 - 🎁 Provides a set of custom SolidJS components that create PixiJS objects instead of HTML elements.
