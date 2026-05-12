@@ -1,0 +1,145 @@
+---
+title: PixiApplicationProvider
+description: A Solid.js component that creates and provides a Pixi.js Application instance to child components.
+sidebar:
+  order: 3
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The `PixiApplicationProvider` component creates a `Pixi.Application` instance and provides it through context to descendant components.
+Unlike `PixiCanvas`, it does not mount the canvas to the DOM—you must use `PixiCanvas` as a child component to render the canvas.
+
+This component is useful for scenarios where you need to:
+
+- Use pixi-solid hooks in HTML components outside the canvas
+- Manually control application creation and initialization
+
+### Usage
+
+#### Basic Setup with PixiCanvas
+
+In most use cases, you would wrap `PixiCanvas` with `PixiApplicationProvider` to allow HTML components to access pixi-solid hooks or application state:
+
+```tsx
+import { PixiApplicationProvider, PixiCanvas, usePixiScreen, onTick, Text } from "pixi-solid";
+import { createSignal } from "solid-js";
+
+export const App = () => {
+  return (
+    <PixiApplicationProvider background="#1099bb">
+      {/* HTML components here can use pixi-solid hooks */}
+      <HtmlComponent />
+      <PixiCanvas style={{ width: "100%", height: "500px" }}>
+        <CanvasContent />
+      </PixiCanvas>
+    </PixiApplicationProvider>
+  );
+};
+
+const HtmlComponent = () => {
+  const screen = usePixiScreen();
+  return (
+    <div style={{ padding: "20px" }}>
+      <p>
+        Canvas Size: {screen.width}x{screen.height}
+      </p>
+    </div>
+  );
+};
+
+const CanvasContent = () => {
+  const [rotation, setRotation] = createSignal(0);
+
+  onTick((ticker) => {
+    setRotation((r) => r + 0.01 * ticker.deltaTime);
+  });
+
+  return (
+    <Text text="Hello from Pixi!" style={{ fill: "white", fontSize: 24 }} rotation={rotation()} />
+  );
+};
+```
+
+#### Using an Existing Application
+
+You can pass an already-created `Pixi.Application` instance using the `existingApp` prop but it's not necessary:
+
+```tsx
+import { PixiApplicationProvider, PixiCanvas } from "pixi-solid";
+import { Application } from "pixi.js";
+
+export const App = () => {
+  const pixiApp = new Application({
+    width: 800,
+    height: 600,
+    background: "#1099bb",
+  });
+
+  // You must manually start the ticker
+  pixiApp.ticker.start();
+
+  return (
+    <PixiApplicationProvider existingApp={pixiApp}>
+      <PixiCanvas style={{ width: "100%", height: "100%" }}>
+        <YourContent />
+      </PixiCanvas>
+    </PixiApplicationProvider>
+  );
+};
+```
+
+<Aside type="caution">
+  When using `existingApp`, you are responsible for: - Starting the ticker with `app.ticker.start()`
+  - Managing the application lifecycle and cleanup - The provider will not destroy the application
+  when unmounting
+</Aside>
+
+### Props
+
+- `children: JSX.Element` - Child components that will have access to the application context (required)
+- `existingApp?: Pixi.Application` - An optional existing Pixi Application instance to use instead of creating a new one
+- Any valid `Pixi.ApplicationOptions` properties: `background`, `antialias`, `resolution`, `width`, `height`, etc.
+
+See the [PixiJS ApplicationOptions](https://pixijs.com/8.x/guides/components/application) documentation for the complete list of options.
+
+### Available Context
+
+Components inside `PixiApplicationProvider` have access to:
+
+- `getPixiApp()` - Access the `Pixi.Application` instance
+- `getRenderer()` - Access the `Pixi.Renderer` instance
+- `getTicker()` - Access the `Pixi.Ticker` instance
+- `usePixiScreen()` - Get reactive screen dimensions
+- `onTick()` - Subscribe to ticker updates
+- `onResize()` - Subscribe to resize events
+- `delay()` - Create ticker-synced delays
+- `createAsyncDelay()` - Create async ticker-synced delays
+
+### When to use PixiApplicationProvider
+
+- When you need HTML components outside the canvas to use pixi-solid hooks
+- When you need manual control over application initialization
+- When you want to provide an existing Pixi Application instance
+
+### When to use PixiCanvas instead
+
+- For simple applications without external HTML components
+- When you don't need to share the application across multiple contexts
+- For the most straightforward and least verbose setup
+
+### When to use TickerProvider instead
+
+- When you only need ticker functionality without a full application
+- When you don't need the full Pixi.js rendering context
+- For lightweight ticker-based utilities only
+
+### Related Components
+
+- [`PixiCanvas`](./pixi-canvas.mdx) - For rendering the actual canvas to the DOM
+- [`TickerProvider`](./ticker-provider.mdx) - For ticker functionality without a full application
+
+### Further reading
+
+- [Getting started with PixiApplicationProvider](../getting-started/application-instantiation.mdx)
+- [PixiJS Application documentation](https://pixijs.com/8.x/guides/components/application)

@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 1.0.0-rc.0
+
+- No public changes yet
+- Added some more tests
+- Updated the docs
+
 ## 0.2.0
 
 - ⚙️ Moved `delay` and `createAsyncDelay` exports from main `pixi-solid` package to `pixi-solid/utils`. Update imports from `import { delay, createAsyncDelay } from "pixi-solid"` to `import { delay, createAsyncDelay } from "pixi-solid/utils"`.
