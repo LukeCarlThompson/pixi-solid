@@ -6,7 +6,9 @@
 A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your scene with [SolidJS](https://www.solidjs.com/) JSX components and its fine-grained signals based reactivity.
 
 [![NPM Version](https://img.shields.io/npm/v/pixi-solid.svg)](https://www.npmjs.com/package/pixi-solid)
-[![License](https://img.shields.io/npm/l/pixi-solid.svg)](https://github.com/your-username/pixi-solid/blob/main/LICENSE)
+[![License](https://img.shields.io/npm/l/pixi-solid.svg)](https://github.com/LukeCarlThompson/pixi-solid/blob/main/LICENSE)
+[![CI](https://github.com/LukeCarlThompson/pixi-solid/actions/workflows/ci.yml/badge.svg)](https://github.com/LukeCarlThompson/pixi-solid/actions)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue)](https://www.typescriptlang.org/)
 
 - 💙 Lightweight and flexible SolidJS library for creating PixiJS applications.
 - 🎁 Provides a set of custom SolidJS components that create PixiJS objects instead of HTML elements.
@@ -14,8 +16,8 @@ A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your sce
 - 🥳 The convenience and speed of SolidJS stores and signals to manage state.
 - ✨ All events emitted by PixiJS objects are supported.
 - 😎 No limitations. Break out of SolidJS any time and interact directly with PixiJS.
-- 💫 Useful helper utilities included.
-- 🤩 Full Typescript support for type safety and auto completion.
+- 💫 Useful helper utilities for animations, layout, and async timing.
+- 🤩 Full TypeScript support with strict type safety and auto completion throughout the API.
 
 ## Install
 
@@ -59,9 +61,11 @@ export const DemoApp = () => {
 };
 ```
 
-## Documentation and examples
+## Next Steps
 
-Check out the [documentation site 🧑‍💻](https://lukecarlthompson.github.io/pixi-solid/) for more comprehensive information and live examples.
+- **New to Pixi Solid?** Check out the [Getting Started guide](https://lukecarlthompson.github.io/pixi-solid/docs/getting-started/project-setup/) to set up your first project.
+- **Explore features** like responsive layout with [`ObjectFitContainer`](https://lukecarlthompson.github.io/pixi-solid/docs/utils/object-fit-container/), animations with [`useSpring`](https://lukecarlthompson.github.io/pixi-solid/docs/utils/use-spring/) and ticker-synced delays.
+- **Browse live examples** in the [documentation site](https://lukecarlthompson.github.io/pixi-solid/).
 
 ## Why combine SolidJS with PixiJS?
 
@@ -81,9 +85,14 @@ Check out the [documentation site 🧑‍💻](https://lukecarlthompson.github.i
 
 - **SolidJS is fully featured**: It has stores, signals, suspense, error boundaries, resource fetching and more. It's a great feature set for simple or complex applications and you won't have to reach for other libraries to manage templating or state.
 
+## Quick Links
+
+- 📖 **[Full Documentation](https://lukecarlthompson.github.io/pixi-solid/)** — Components, hooks, utilities, and examples
+- 🐛 **[GitHub Issues](https://github.com/LukeCarlThompson/pixi-solid/issues)** — Report bugs or request features
+
 ## Contributing
 
-Contributions are welcome! This project is still in its early stages, so feel free to open an issue to report a bug, suggest a feature, or submit a pull request.
+Contributions are welcome! Feel free to open an issue to report a bug, suggest a feature, or submit a pull request.
 
 ## License
 
