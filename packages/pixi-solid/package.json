@@ -21,11 +21,11 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
     "./utils": {
-      "types": "./dist/types/utils/index.d.ts",
+      "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
     }
   },
