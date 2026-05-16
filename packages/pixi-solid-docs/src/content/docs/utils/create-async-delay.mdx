@@ -20,7 +20,8 @@ The returned function can be called in an async context.
 ### Usage
 
 ```tsx
-import { createAsyncDelay, PixiCanvas, Text } from "pixi-solid";
+import { createAsyncDelay } from "pixi-solid/utils";
+import { PixiCanvas, Text } from "pixi-solid";
 import { createSignal } from "solid-js";
 
 const DelayedActionComponent = () => {
@@ -45,7 +46,8 @@ const DelayedActionComponent = () => {
 You can pass an `AbortSignal` to cancel the delay early:
 
 ```tsx
-import { createAsyncDelay, PixiCanvas, Text } from "pixi-solid";
+import { createAsyncDelay } from "pixi-solid/utils";
+import { PixiCanvas, Text } from "pixi-solid";
 import { createSignal } from "solid-js";
 
 const CancellableDelayComponent = () => {

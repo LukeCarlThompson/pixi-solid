@@ -129,6 +129,65 @@ describe("bindChildrenToContainer()", () => {
 
     expect(fn).toThrow(InvalidChildTypeError);
   });
+
+  it("GIVEN invalid children WHEN addChildAt throws THEN the error message is helpful", () => {
+    let caughtError: unknown;
+
+    const fn = () => {
+      const parent = createMockContainer() as unknown as Pixi.Container;
+      const childA = { invalid: true } as unknown as Pixi.Container;
+      const [children] = createSignal([childA]);
+
+      parent.addChildAt = vi.fn().mockImplementation(() => {
+        throw new Error("Cannot read properties of undefined (reading 'parent')");
+      });
+
+      try {
+        const dispose = mountHeadless(() => {
+          bindChildrenToContainer(parent, (() => children()) as any);
+          return null;
+        });
+
+        dispose();
+      } catch (error) {
+        caughtError = error;
+        throw error;
+      }
+    };
+
+    expect(fn).toThrow(InvalidChildTypeError);
+    expect(caughtError).toBeInstanceOf(InvalidChildTypeError);
+    if (caughtError instanceof InvalidChildTypeError) {
+      expect(caughtError.message).toContain("Invalid pixi-solid child type");
+      expect(caughtError.cause).toBeDefined();
+    }
+  });
+
+  it("GIVEN multiple children with one invalid WHEN addChildAt throws THEN InvalidChildTypeError is thrown", () => {
+    const fn = () => {
+      const parent = createMockContainer() as unknown as Pixi.Container;
+      const validChild = createMockContainer() as unknown as Pixi.Container;
+      const invalidChild = { invalid: true } as unknown as Pixi.Container;
+      const [children] = createSignal([validChild, invalidChild]);
+
+      let callCount = 0;
+      parent.addChildAt = vi.fn().mockImplementation(() => {
+        callCount++;
+        if (callCount === 2) {
+          throw new Error("Invalid child type");
+        }
+      });
+
+      const dispose = mountHeadless(() => {
+        bindChildrenToContainer(parent, (() => children()) as any);
+        return null;
+      });
+
+      dispose();
+    };
+
+    expect(fn).toThrow(InvalidChildTypeError);
+  });
 });
 
 describe("bindChildrenToRenderLayer()", () => {

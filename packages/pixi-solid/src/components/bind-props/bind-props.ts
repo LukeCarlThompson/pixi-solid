@@ -27,6 +27,12 @@ export const bindRuntimeProps = <
   instance: InstanceType,
   props: OptionsType,
 ): void => {
+  /**
+   * Outer createRenderEffect runs when the props object itself changes.
+   * For example if a signal is spread into the props, the outer createRenderEffect will run whenever the signal changes because the props object will be a new reference.
+   *
+   * The inner createRenderEffects will then set the individual props on the instance and these effects only run if that specific property changes.
+   */
   createRenderEffect(() => {
     for (const key in props) {
       if (key === "as") continue;

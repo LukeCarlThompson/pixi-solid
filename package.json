@@ -30,7 +30,7 @@
   "pnpm": {
     "overrides": {
       "pixi.js": "8.18.1",
-      "solid-js": "1.9.12"
+      "solid-js": "1.9.13"
     }
   }
 }

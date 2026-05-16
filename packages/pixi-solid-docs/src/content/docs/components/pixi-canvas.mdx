@@ -1,0 +1,180 @@
+---
+title: PixiCanvas
+description: A Solid.js component that renders a PixiJS application canvas.
+sidebar:
+  order: 2
+---
+
+The `PixiCanvas` component is the primary way to create a PixiJS application in a `pixi-solid` application.
+It handles creating and managing the HTML canvas element, the Pixi.js Application instance, and provides context to child components for accessing the application and ticker.
+
+### Features
+
+- Automatically creates and manages a `Pixi.Application` instance
+- Wraps the canvas in a responsive container that automatically resizes
+- Provides context for ticker-based utilities (`onTick`, `getTicker`, etc.)
+- Accepts all standard PixiJS Application options as props
+- Can be used standalone or with `PixiApplicationProvider` for more control
+
+### Usage
+
+#### Simple Standalone Usage
+
+The simplest way to use `PixiCanvas` is standalone.
+It will automatically create and manage the Pixi Application for you:
+
+```tsx
+import { PixiCanvas, Sprite, Container } from "pixi-solid";
+import { Texture } from "pixi.js";
+
+export const App = () => (
+  <PixiCanvas style={{ width: "100%", height: "100dvh" }} background="#1099bb">
+    <Container>
+      <Sprite texture={Texture.WHITE} x={100} y={100} scale={50} tint="#ff0000" />
+    </Container>
+  </PixiCanvas>
+);
+```
+
+#### With HTML Components
+
+For more advanced use cases where you need to access the Pixi application state from HTML components or use pixi-solid hooks outside of `PixiCanvas`, wrap it with `PixiApplicationProvider`:
+
+```tsx
+import {
+  PixiApplicationProvider,
+  PixiCanvas,
+  usePixiScreen,
+  getPixiApp,
+  onTick,
+  Text,
+} from "pixi-solid";
+import { createSignal } from "solid-js";
+
+export const App = () => {
+  return (
+    <PixiApplicationProvider background="#1099bb">
+      {/* HTML components here can use pixi-solid hooks */}
+      <HtmlComponent />
+      <PixiCanvas style={{ width: "100%", height: "500px" }}>
+        <CanvasContent />
+      </PixiCanvas>
+    </PixiApplicationProvider>
+  );
+};
+
+const HtmlComponent = () => {
+  const screen = usePixiScreen();
+  return (
+    <div style={{ padding: "20px" }}>
+      <p>
+        Canvas Size: {screen.width}x{screen.height}
+      </p>
+    </div>
+  );
+};
+
+const CanvasContent = () => {
+  const [rotation, setRotation] = createSignal(0);
+
+  onTick((ticker) => {
+    setRotation((r) => r + 0.01 * ticker.deltaTime);
+  });
+
+  return (
+    <Text text="Hello from Pixi!" style={{ fill: "white", fontSize: 24 }} rotation={rotation()} />
+  );
+};
+```
+
+### Props
+
+`PixiCanvas` accepts two types of props:
+
+#### DOM Props (for the wrapper div)
+
+Standard HTML element props that control the wrapper container:
+
+- `style` - CSS styles for the wrapper div
+- `class` / `classList` - CSS classes
+- `id`, `title`, `role`, `tabIndex` - Standard HTML attributes
+- `aria-*` attributes - ARIA accessibility attributes
+- `data-*` attributes - Data attributes
+- `ref` - Reference to the wrapper `HTMLDivElement`
+- DOM event handlers (without the `on:` prefix)
+
+#### PixiJS Application Options
+
+Any valid `Pixi.ApplicationOptions` property:
+
+- `background` - Background color (hex or CSS color)
+- `antialias` - Enable antialiasing
+- `resolution` - Canvas resolution
+- `width` / `height` - Canvas dimensions (if not using CSS)
+- `preserveDrawingBuffer` - Preserve the drawing buffer
+- And many more...
+
+See the [PixiJS docs](https://pixijs.com/8.x/guides/components/application) for the complete list of options.
+
+#### Special Props
+
+- `children` - The pixi-solid components to render inside the canvas (required)
+
+### Examples
+
+#### Responsive Canvas with Background
+
+```tsx
+<PixiCanvas style={{ width: "100%", height: "100vh" }} background="#1099bb" antialias={true}>
+  <MyContent />
+</PixiCanvas>
+```
+
+#### Canvas with Custom Resolution
+
+```tsx
+<PixiCanvas style={{ width: "800px", height: "600px" }} resolution={2}>
+  <MyContent />
+</PixiCanvas>
+```
+
+#### Canvas with Data Attributes
+
+```tsx
+<PixiCanvas
+  data-testid="pixi-canvas"
+  style={{ width: "100%", height: "100%", backgroundColor: "black" }}
+>
+  <MyContent />
+</PixiCanvas>
+```
+
+### How It Works
+
+1. Creates an internal wrapper `<div>` element with the provided DOM props
+2. Automatically creates a `Pixi.Application` instance with the provided options
+3. Mounts the Pixi canvas into the internal wrapper div
+4. Sets up automatic resizing based on the internal wrapper div's size (not just the window size)
+5. Provides context to child components for accessing the application and ticker
+6. Cleans up the application when the component unmounts
+
+### When to use it
+
+- For all basic Pixi.js applications in Pixi Solid
+- When you want the simplest possible setup
+- When you don't need to share the application with external HTML components
+
+### When to use PixiApplicationProvider instead
+
+- When you need HTML components outside the canvas to access pixi-solid hooks
+- When you need manual control over application creation and initialization
+
+### Related Components
+
+- [`PixiApplicationProvider`](../getting-started/application-instantiation.mdx) - For advanced setup with HTML components
+- [`TickerProvider`](./ticker-provider.mdx) - For ticker functionality without a full application
+
+### Further reading
+
+- [Getting started with PixiCanvas](../getting-started/application-instantiation.mdx)
+- [PixiJS Application documentation](https://pixijs.com/8.x/guides/components/application)

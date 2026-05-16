@@ -67,7 +67,7 @@ With `createResource`, you can easily load your manifest and then use Pixi.js's 
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
 import { PixiCanvas, Sprite, Text } from "pixi-solid";
-import { createResource, Show, createSignal } from "solid-js";
+import { createResource, Show, Suspense } from "solid-js";
 
 export const AssetManifestLoadingDemo = () => {
   // Use createResource to initialize Assets and load the manifest

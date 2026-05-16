@@ -112,4 +112,128 @@ describe("ObjectFitContainer", () => {
 
     dispose();
   });
+
+  it("GIVEN multiple children with different sizes WHEN ObjectFitContainer mounts THEN all children are wrapped and scaled", () => {
+    const ticker = new Ticker();
+    let spriteRef1: Pixi.Sprite | undefined;
+    let spriteRef2: Pixi.Sprite | undefined;
+
+    const dispose = mountHeadless(() => (
+      <TickerProvider ticker={ticker}>
+        <ObjectFitContainer width={100} height={100} fitMode="contain" observeBounds={false}>
+          <Sprite
+            texture={Texture.WHITE}
+            width={100}
+            height={50}
+            ref={(sprite) => {
+              spriteRef1 = sprite;
+            }}
+          />
+          <Sprite
+            texture={Texture.WHITE}
+            width={50}
+            height={100}
+            ref={(sprite) => {
+              spriteRef2 = sprite;
+            }}
+          />
+        </ObjectFitContainer>
+      </TickerProvider>
+    ));
+
+    // Both sprites should have parents (their individual wrappers)
+    expect(spriteRef1?.parent).toBeDefined();
+    expect(spriteRef2?.parent).toBeDefined();
+
+    // Both wrappers should be children of ObjectFitContainer's inner Container
+    expect(spriteRef1?.parent?.parent).toBeDefined();
+    expect(spriteRef2?.parent?.parent).toBeDefined();
+
+    dispose();
+  });
+
+  it("GIVEN multiple children and observeBounds is true WHEN a child changes size THEN fit is recomputed for all children", () => {
+    const ticker = new Ticker();
+    const [sprite1Width, setSprite1Width] = createSignal(100);
+    let spriteRef1: Pixi.Sprite | undefined;
+
+    const dispose = mountHeadless(() => (
+      <TickerProvider ticker={ticker}>
+        <ObjectFitContainer width={100} height={100} fitMode="contain" observeBounds={true}>
+          <Sprite
+            texture={Texture.WHITE}
+            width={sprite1Width()}
+            height={50}
+            ref={(sprite) => {
+              spriteRef1 = sprite;
+            }}
+          />
+          <Sprite texture={Texture.WHITE} width={50} height={100} />
+        </ObjectFitContainer>
+      </TickerProvider>
+    ));
+
+    const wrapper1 = spriteRef1?.parent;
+    expect(wrapper1).toBeDefined();
+    const initialScaleX = wrapper1?.scale.x ?? 0;
+    const initialScaleY = wrapper1?.scale.y ?? 0;
+
+    // Change first sprite size
+    setSprite1Width(200);
+    ticker.update();
+
+    // Scale should change to accommodate the larger sprite
+    expect(wrapper1?.scale.x).not.toBeCloseTo(initialScaleX);
+    expect(wrapper1?.scale.y).not.toBeCloseTo(initialScaleY);
+
+    dispose();
+  });
+
+  it("GIVEN multiple children WHEN fitMode is cover THEN each child is scaled appropriately", () => {
+    const ticker = new Ticker();
+    let spriteRef1: Pixi.Sprite | undefined;
+    let spriteRef2: Pixi.Sprite | undefined;
+
+    const dispose = mountHeadless(() => (
+      <TickerProvider ticker={ticker}>
+        <ObjectFitContainer width={100} height={100} fitMode="cover" observeBounds={false}>
+          <Sprite
+            texture={Texture.WHITE}
+            width={50}
+            height={200}
+            ref={(sprite) => {
+              spriteRef1 = sprite;
+            }}
+          />
+          <Sprite
+            texture={Texture.WHITE}
+            width={200}
+            height={50}
+            ref={(sprite) => {
+              spriteRef2 = sprite;
+            }}
+          />
+        </ObjectFitContainer>
+      </TickerProvider>
+    ));
+
+    const wrapper1 = spriteRef1?.parent;
+    const wrapper2 = spriteRef2?.parent;
+
+    expect(wrapper1).toBeDefined();
+    expect(wrapper2).toBeDefined();
+
+    // Each child has its own wrapper
+    expect(wrapper1).not.toBe(wrapper2);
+
+    // Cover mode: both wrappers should be scaled to 2
+    // Child 1 (50x200): max(100/50, 100/200) = max(2, 0.5) = 2
+    // Child 2 (200x50): max(100/200, 100/50) = max(0.5, 2) = 2
+    expect(wrapper1?.scale.x).toBeCloseTo(2);
+    expect(wrapper1?.scale.y).toBeCloseTo(2);
+    expect(wrapper2?.scale.x).toBeCloseTo(2);
+    expect(wrapper2?.scale.y).toBeCloseTo(2);
+
+    dispose();
+  });
 });
