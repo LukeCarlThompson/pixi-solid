@@ -226,14 +226,13 @@ describe("ObjectFitContainer", () => {
     // Each child has its own wrapper
     expect(wrapper1).not.toBe(wrapper2);
 
-    // Both wrappers should scale equally (cover mode means max scale)
-    const scaleY1 = wrapper1?.scale.y ?? 0;
-    const scaleY2 = wrapper2?.scale.y ?? 0;
-    const scaleX2 = wrapper2?.scale.x ?? 0;
-
-    expect(wrapper1?.scale.x).toBeCloseTo(scaleY1);
-    expect(wrapper2?.scale.x).toBeCloseTo(scaleY2);
-    expect(wrapper1?.scale.x).toBeCloseTo(scaleX2);
+    // Cover mode: both wrappers should be scaled to 2
+    // Child 1 (50x200): max(100/50, 100/200) = max(2, 0.5) = 2
+    // Child 2 (200x50): max(100/200, 100/50) = max(0.5, 2) = 2
+    expect(wrapper1?.scale.x).toBeCloseTo(2);
+    expect(wrapper1?.scale.y).toBeCloseTo(2);
+    expect(wrapper2?.scale.x).toBeCloseTo(2);
+    expect(wrapper2?.scale.y).toBeCloseTo(2);
 
     dispose();
   });
