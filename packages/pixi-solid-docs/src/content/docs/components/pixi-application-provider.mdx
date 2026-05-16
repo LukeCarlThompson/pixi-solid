@@ -63,36 +63,47 @@ const CanvasContent = () => {
 
 #### Using an Existing Application
 
-You can pass an already-created `Pixi.Application` instance using the `existingApp` prop but it's not necessary:
+You can pass an already-created `Pixi.Application` instance using the `existingApp` prop, but you must initialize it with `await app.init()` before the provider renders. Use `createResource` to handle the async initialization:
 
 ```tsx
 import { PixiApplicationProvider, PixiCanvas } from "pixi-solid";
+import { createResource, Show } from "solid-js";
 import { Application } from "pixi.js";
 
 export const App = () => {
-  const pixiApp = new Application({
-    width: 800,
-    height: 600,
-    background: "#1099bb",
+  const [appResource] = createResource(async () => {
+    const pixiApp = new Application();
+    await pixiApp.init({
+      width: 800,
+      height: 600,
+      background: "#1099bb",
+    });
+    return pixiApp;
   });
 
-  // You must manually start the ticker
-  pixiApp.ticker.start();
-
   return (
-    <PixiApplicationProvider existingApp={pixiApp}>
-      <PixiCanvas style={{ width: "100%", height: "100%" }}>
-        <YourContent />
-      </PixiCanvas>
-    </PixiApplicationProvider>
+    <Show when={appResource()}>
+      {(pixiApp) => (
+        <PixiApplicationProvider existingApp={pixiApp()}>
+          <PixiCanvas style={{ width: "100%", height: "100%" }}>
+            <YourContent />
+          </PixiCanvas>
+        </PixiApplicationProvider>
+      )}
+    </Show>
   );
 };
 ```
 
 <Aside type="caution">
-  When using `existingApp`, you are responsible for: - Starting the ticker with `app.ticker.start()`
-  - Managing the application lifecycle and cleanup - The provider will not destroy the application
-  when unmounting
+  When using `existingApp`, you are responsible for:
+  <ul>
+    <li>Ensuring the application is initialized before rendering the provider</li>
+    <li>
+      Managing the application lifecycle and cleanup, the provider will not destroy the application
+      when unmounting
+    </li>
+  </ul>
 </Aside>
 
 ### Props
