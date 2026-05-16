@@ -36,7 +36,7 @@ jobs:
           cache: "pnpm" # Caches pnpm dependencies
 
       - name: Install dependencies
-        run: pnpm --filter "pixi-solid" install
+        run: pnpm --filter "pixi-solid" install --frozen-lockfile
 
       - name: Test
         run: pnpm --filter "pixi-solid" test

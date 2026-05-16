@@ -34,7 +34,7 @@ jobs:
           node-version: 22.21.1
 
       - name: Enable pnpm (Corepack)
-        run: corepack enable && corepack prepare pnpm@latest --activate
+        run: corepack enable && corepack prepare pnpm@10.24.0 --activate
 
       - name: Install workspace dependencies (root)
         run: pnpm install --frozen-lockfile
