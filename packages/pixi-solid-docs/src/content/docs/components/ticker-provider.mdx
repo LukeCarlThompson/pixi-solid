@@ -6,7 +6,7 @@ sidebar:
 ---
 
 The `TickerProvider` component allows you to provide a custom `Pixi.Ticker` instance to child components without requiring a full `PixiApplication` or `PixiCanvas`.
-This is useful for testing, or for more advanced scenarios where you want to use multiple tickers.
+This is useful for testing components that don't need to be mounted, or for more advanced scenarios where you want to use multiple tickers in the same application.
 
 It can be used wrap subtrees of components that you want to provide an additional ticker context to support multiple independent tickers in the same application.
 
@@ -29,6 +29,12 @@ const MyComponent = () => {
   return <Container rotation={rotation()} />;
 };
 
+/**
+ *  This won't render anything by itself since it doesn't have a Pixi Application context, but it will still run the onTick logic and update the rotation signal.
+ * This is useful for testing the ticker-based logic in a component or store without needing to mount and render a full PixiCanvas or PixiApplication.
+ *
+ * In testing scenarios it's useful to create a custom ticker instance and control its updates manually, allowing you to step through animations frame-by-frame and verify the expected state changes.
+ * */
 export const DemoApp = () => {
   // Create a custom ticker instance
   const ticker = new Ticker();
