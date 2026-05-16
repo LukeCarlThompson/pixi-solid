@@ -13,7 +13,9 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md",
+    "pixi-solid-logo.png"
   ],
   "type": "module",
   "sideEffects": false,
