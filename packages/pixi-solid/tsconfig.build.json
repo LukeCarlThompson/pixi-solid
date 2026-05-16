@@ -1,11 +1,17 @@
 {
   "extends": "../../tsconfig.json",
   "include": ["./src/**/*"],
-  "exclude": ["src/demo/**/*"],
+  "exclude": [
+    "src/demo/**/*",
+    "src/benchmarks/**/*",
+    "src/testing/**/*",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ],
   "compilerOptions": {
     "target": "es2022",
     "declaration": true,
-    "declarationDir": "./dist/types/",
+    "declarationDir": "./dist",
     "sourceMap": true,
     "noEmit": false,
     "outDir": "./dist",

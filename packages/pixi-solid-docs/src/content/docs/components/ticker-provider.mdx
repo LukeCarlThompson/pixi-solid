@@ -1,0 +1,131 @@
+---
+title: TickerProvider
+description: A Solid.js component that provides a custom Pixi.js Ticker instance to the context.
+sidebar:
+  order: 4
+---
+
+The `TickerProvider` component allows you to provide a custom `Pixi.Ticker` instance to child components without requiring a full `PixiApplication` or `PixiCanvas`.
+This is useful for testing components that don't need to be mounted, or for more advanced scenarios where you want to use multiple tickers in the same application.
+
+It can be used to wrap subtrees of components that you want to provide an additional ticker context to support multiple independent tickers in the same application.
+
+This component provides context for ticker-dependent utilities like `onTick`, `delay`, `createAsyncDelay`, and `getTicker`.
+
+### Usage
+
+```tsx
+import { TickerProvider, onTick, Container } from "pixi-solid";
+import { Ticker } from "pixi.js";
+import { createSignal, onCleanup } from "solid-js";
+
+const MyComponent = () => {
+  const [rotation, setRotation] = createSignal(0);
+
+  onTick((ticker) => {
+    setRotation((r) => r + 0.01 * ticker.deltaTime);
+  });
+
+  return <Container rotation={rotation()} />;
+};
+
+/**
+ *  This won't render anything by itself since it doesn't have a Pixi Application context, but it will still run the onTick logic and update the rotation signal.
+ * This is useful for testing the ticker-based logic in a component or store without needing to mount and render a full PixiCanvas or PixiApplication.
+ *
+ * In testing scenarios it's useful to create a custom ticker instance and control its updates manually, allowing you to step through animations frame-by-frame and verify the expected state changes.
+ * */
+export const DemoApp = () => {
+  // Create a custom ticker instance
+  const ticker = new Ticker();
+  ticker.start();
+
+  // Cleanup the ticker when the component unmounts to prevent memory leaks
+  onCleanup(() => {
+    ticker.stop();
+    ticker.destroy();
+  });
+
+  return (
+    <TickerProvider ticker={ticker}>
+      <MyComponent />
+    </TickerProvider>
+  );
+};
+```
+
+### Independent ticker context for subtrees
+
+You can also nest `TickerProvider` to give a specific subtree its own independent ticker while the rest of the application uses the default ticker.
+This is useful when you want different parts of your scene to animate at different rates or be controlled separately.
+
+```tsx
+import { PixiCanvas, Container, TickerProvider, onTick } from "pixi-solid";
+import { Sprite } from "pixi-solid";
+import { Texture, Ticker } from "pixi.js";
+import { createSignal, onCleanup } from "solid-js";
+
+// Component that rotates using the context ticker
+const RotatingSprite = () => {
+  const [rotation, setRotation] = createSignal(0);
+
+  onTick((ticker) => {
+    setRotation((r) => r + 0.01 * ticker.deltaTime);
+  });
+
+  return <Sprite texture={Texture.WHITE} rotation={rotation()} x={100} y={100} />;
+};
+
+export const DemoApp = () => {
+  // Create a separate ticker for the slow-moving subtree
+  const slowTicker = new Ticker();
+  slowTicker.speed = 0.5; // Half speed
+  slowTicker.start();
+
+  // Cleanup the ticker when the component unmounts to prevent memory leaks
+  onCleanup(() => {
+    slowTicker.stop();
+    slowTicker.destroy();
+  });
+
+  return (
+    <PixiCanvas style={{ width: "100%", height: "100dvh" }}>
+      <Container>
+        {/* Uses the default canvas ticker */}
+        <RotatingSprite />
+
+        {/* Uses its own slower ticker */}
+        <TickerProvider ticker={slowTicker}>
+          <RotatingSprite />
+        </TickerProvider>
+      </Container>
+    </PixiCanvas>
+  );
+};
+```
+
+In this example, the first `RotatingSprite` rotates at normal speed using the canvas's default ticker, while the second `RotatingSprite` inside the `TickerProvider` rotates at half speed using its own custom ticker.
+
+### Props
+
+- `ticker: Pixi.Ticker` - The ticker instance to provide to child components (required)
+- `children: JSX.Element` - The child components that will have access to the ticker context
+
+### When to use it
+
+- When you need ticker functionality without a full PixiJS application
+- For testing components that depend on ticker-based animations
+- When integrating multiple independent Pixi.js rendering contexts
+- For advanced scenarios where you need manual control over the ticker instance
+- When using ticker utilities like `onTick` or `delay` outside of a `PixiCanvas`
+
+## Relationship to other components
+
+- `PixiCanvas` and `PixiApplicationProvider` both internally provide a ticker through context
+- `TickerProvider` is a lighter-weight alternative when you only need ticker functionality
+- Use `TickerProvider` if you need a ticker for utilities but don't need a full Pixi Application instance
+
+## Further reading
+
+- Read more about the [`Pixi.Ticker` class](https://pixijs.com/8.x/guides/components/ticker) in the PixiJS documentation
+- See related hooks: [`onTick`](../hooks/on-tick.mdx), [`getTicker`](../hooks/get-ticker.mdx), [`delay`](../utils/delay.mdx), [`createAsyncDelay`](../utils/create-async-delay.mdx)
