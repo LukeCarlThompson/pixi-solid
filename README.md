@@ -2,10 +2,10 @@
 <!-- Source: packages/pixi-solid/README.md -->
 
 <div align="center">
-  <img src="packages/pixi-solid/pixi-solid-logo.png" alt="Pixi-Solid Logo" width="200" />
+  <img src="https://raw.githubusercontent.com/LukeCarlThompson/pixi-solid/main/packages/pixi-solid/pixi-solid-logo.png" alt="Pixi-Solid Logo" width="200" />
 
 [![NPM Version](https://img.shields.io/npm/v/pixi-solid.svg)](https://www.npmjs.com/package/pixi-solid)
-[![License](https://img.shields.io/npm/l/pixi-solid.svg)](packages/pixi-solid/LICENSE)
+[![License](https://img.shields.io/npm/l/pixi-solid.svg)](https://github.com/LukeCarlThompson/pixi-solid/blob/main/packages/pixi-solid/LICENSE)
 [![CI](https://github.com/LukeCarlThompson/pixi-solid/actions/workflows/ci.yml/badge.svg)](https://github.com/LukeCarlThompson/pixi-solid/actions)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue)](https://www.typescriptlang.org/)
 
