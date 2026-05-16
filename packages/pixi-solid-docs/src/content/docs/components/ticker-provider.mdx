@@ -17,7 +17,7 @@ This component provides context for ticker-dependent utilities like `onTick`, `d
 ```tsx
 import { TickerProvider, onTick, Container } from "pixi-solid";
 import { Ticker } from "pixi.js";
-import { createSignal } from "solid-js";
+import { createSignal, onCleanup } from "solid-js";
 
 const MyComponent = () => {
   const [rotation, setRotation] = createSignal(0);
@@ -40,6 +40,12 @@ export const DemoApp = () => {
   const ticker = new Ticker();
   ticker.start();
 
+  // Cleanup the ticker when the component unmounts to prevent memory leaks
+  onCleanup(() => {
+    ticker.stop();
+    ticker.destroy();
+  });
+
   return (
     <TickerProvider ticker={ticker}>
       <MyComponent />
@@ -57,7 +63,7 @@ This is useful when you want different parts of your scene to animate at differe
 import { PixiCanvas, Container, TickerProvider, onTick } from "pixi-solid";
 import { Sprite } from "pixi-solid";
 import { Texture, Ticker } from "pixi.js";
-import { createSignal } from "solid-js";
+import { createSignal, onCleanup } from "solid-js";
 
 // Component that rotates using the context ticker
 const RotatingSprite = () => {
@@ -75,6 +81,12 @@ export const DemoApp = () => {
   const slowTicker = new Ticker();
   slowTicker.speed = 0.5; // Half speed
   slowTicker.start();
+
+  // Cleanup the ticker when the component unmounts to prevent memory leaks
+  onCleanup(() => {
+    slowTicker.stop();
+    slowTicker.destroy();
+  });
 
   return (
     <PixiCanvas style={{ width: "100%", height: "100dvh" }}>
