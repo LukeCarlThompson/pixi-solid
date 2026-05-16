@@ -151,10 +151,10 @@ See the [PixiJS docs](https://pixijs.com/8.x/guides/components/application) for 
 
 ### How It Works
 
-1. Creates a wrapper `<div>` element with the provided DOM props
+1. Creates an internal wrapper `<div>` element with the provided DOM props
 2. Automatically creates a `Pixi.Application` instance with the provided options
-3. Mounts the Pixi canvas into the wrapper div
-4. Sets up automatic resizing based on the wrapper div's size
+3. Mounts the Pixi canvas into the internal wrapper div
+4. Sets up automatic resizing based on the internal wrapper div's size (not just the window size)
 5. Provides context to child components for accessing the application and ticker
 6. Cleans up the application when the component unmounts
 
@@ -167,7 +167,6 @@ See the [PixiJS docs](https://pixijs.com/8.x/guides/components/application) for 
 ### When to use PixiApplicationProvider instead
 
 - When you need HTML components outside the canvas to access pixi-solid hooks
-- When you need multiple canvases with independent Pixi applications
 - When you need manual control over application creation and initialization
 
 ### Related Components
