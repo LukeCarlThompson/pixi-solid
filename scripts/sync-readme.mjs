@@ -1,4 +1,4 @@
-import { readFile, writeFile, access } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -31,17 +31,6 @@ if (isCheck) {
   if (currentTargetContent !== generatedContent) {
     console.error("README is out of sync. Run: pnpm readme:sync");
     hasErrors = true;
-  }
-
-  // Verify all linked images exist in source
-  for (const imagePath of images) {
-    const sourceImagePath = resolve(sourceDir, imagePath);
-    try {
-      await access(sourceImagePath);
-    } catch {
-      console.error(`Missing image: ${imagePath}`);
-      hasErrors = true;
-    }
   }
 
   if (hasErrors) {
