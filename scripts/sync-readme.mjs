@@ -22,7 +22,7 @@ const markdownImages = Array.from(sourceContent.matchAll(markdownImageRegex)).ma
 const htmlImages = Array.from(sourceContent.matchAll(htmlImageRegex)).map((match) => match[1]);
 const images = [...markdownImages, ...htmlImages];
 
-// Replace relative image paths to point to packages/pixi-solid
+// Replace relative image paths to point to packages/pixi-solid, and LICENSE link
 const updatedContent = sourceContent
   .replace(markdownImageRegex, (match) => {
     const imagePath = match.match(/\((\.\/[^)]+)\)/)[1];
@@ -31,7 +31,8 @@ const updatedContent = sourceContent
   .replace(htmlImageRegex, (match) => {
     const imagePath = match.match(/src="(\.\/[^"]+)"/)[1];
     return match.replace(imagePath, `packages/pixi-solid/${imagePath.substring(2)}`);
-  });
+  })
+  .replace(/blob\/main\/LICENSE/g, "blob/main/packages/pixi-solid/LICENSE");
 
 const generatedContent = [
   "<!-- AUTO-GENERATED FILE. DO NOT EDIT DIRECTLY. -->",
