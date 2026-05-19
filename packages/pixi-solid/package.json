@@ -1,6 +1,6 @@
 {
   "name": "pixi-solid",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "private": false,
   "description": "A library to write PixiJS applications with SolidJS",
   "homepage": "https://lukecarlthompson.github.io/pixi-solid/",

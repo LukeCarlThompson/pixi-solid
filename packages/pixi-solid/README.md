@@ -24,7 +24,7 @@ A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your sce
 ## Install
 
 ```bash
-npm i pixi-solid pixi.js solid-js
+npm i pixi-solid
 ```
 
 Peer dependencies of
@@ -63,11 +63,10 @@ export const DemoApp = () => {
 };
 ```
 
-## Next Steps
+## More information
 
-- **New to Pixi Solid?** Check out the [Getting Started guide](https://lukecarlthompson.github.io/pixi-solid/docs/getting-started/project-setup/) to set up your first project.
-- **Explore features** like responsive layout with [`ObjectFitContainer`](https://lukecarlthompson.github.io/pixi-solid/docs/utils/object-fit-container/), animations with [`useSpring`](https://lukecarlthompson.github.io/pixi-solid/docs/utils/use-spring/) and ticker-synced delays.
-- **Browse live examples** in the [documentation site](https://lukecarlthompson.github.io/pixi-solid/).
+- 📖 **[Documentation](https://lukecarlthompson.github.io/pixi-solid/)** — Getting started, components, hooks, utilities, and live examples.
+- 🐛 **[GitHub Issues](https://github.com/LukeCarlThompson/pixi-solid/issues)** — Report bugs or request features.
 
 ## Why combine SolidJS with PixiJS?
 
@@ -86,11 +85,6 @@ export const DemoApp = () => {
 - **SolidJS is really fast**: SolidJS is one of the fastest front-end frameworks out there so the overhead is very minimal.
 
 - **SolidJS is fully featured**: It has stores, signals, suspense, error boundaries, resource fetching and more. It's a great feature set for simple or complex applications and you won't have to reach for other libraries to manage templating or state.
-
-## Quick Links
-
-- 📖 **[Full Documentation](https://lukecarlthompson.github.io/pixi-solid/)** — Components, hooks, utilities, and examples
-- 🐛 **[GitHub Issues](https://github.com/LukeCarlThompson/pixi-solid/issues)** — Report bugs or request features
 
 ## Contributing
 
