@@ -1,21 +1,19 @@
 import { CRTFilter } from "pixi-filters";
-import { Container, getPixiApp, onTick, PixiCanvas, Sprite } from "pixi-solid";
-import { objectFit } from "pixi-solid/utils";
+import { Container, onTick, PixiCanvas, Sprite, usePixiScreen, TilingSprite } from "pixi-solid";
+import { objectFit, ObjectFitContainer } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets, BlurFilter, Rectangle } from "pixi.js";
 import { createResource, onCleanup, Show } from "solid-js";
 
 import { Character } from "./character";
 import { Controls } from "./controls";
-import { createAppStore } from "./create-app-store";
-import { Ground } from "./ground";
+import { createPlayerStore } from "./player-store";
 import { loadSceneAssets } from "./load-scene-assets";
 
-export const DemoApp = () => {
-  const appStore = createAppStore();
+const DemoScene = (props: { isRunning: boolean; direction: "left" | "right" }) => {
+  const pixiScreen = usePixiScreen();
+  const sceneBounds = new Rectangle(0, 0, 400, 400);
 
-  const [textureResource] = createResource(loadSceneAssets);
-  const sceneBounds = new Rectangle(0, 0, 200 * 2, 133 * 2);
   const blurFilter = new BlurFilter({ strength: 8 });
   const crtFilter = new CRTFilter({
     curvature: 3,
@@ -25,59 +23,75 @@ export const DemoApp = () => {
     noiseSize: 2,
   });
 
+  onTick(({ deltaTime }) => {
+    crtFilter.seed = Math.random() * 10;
+    crtFilter.time += deltaTime * 0.3;
+  });
+
   onCleanup(() => {
     blurFilter.destroy();
     crtFilter.destroy();
   });
 
   return (
+    <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode="cover">
+      <Container filters={crtFilter} boundsArea={sceneBounds}>
+        <Sprite
+          label="Sky"
+          texture={Assets.get<Pixi.Texture>("sky")}
+          filters={blurFilter}
+          ref={(ref) => {
+            objectFit(ref, sceneBounds, "cover");
+          }}
+        />
+        <TilingSprite
+          label="Ground"
+          width={sceneBounds.width}
+          height={sceneBounds.height * 0.3}
+          position={{ x: 0, y: sceneBounds.height * 0.7 }}
+          ref={(tileRef) => {
+            onTick(({ deltaTime }) => {
+              const movementSpeed = props.isRunning ? 1.3 : 0;
+              const directionMultiplier = props.direction === "left" ? 1 : -1;
+              tileRef.tilePosition.x += movementSpeed * directionMultiplier * deltaTime;
+            });
+          }}
+          texture={Assets.get<Pixi.Texture>("ground")}
+        />
+        <Character
+          direction={props.direction}
+          isRunning={props.isRunning}
+          position={{ x: sceneBounds.width * 0.5, y: sceneBounds.height * 0.7 }}
+        />
+      </Container>
+    </ObjectFitContainer>
+  );
+};
+
+export const DemoApp = () => {
+  const playerStore = createPlayerStore();
+  const [textureResource] = createResource(loadSceneAssets);
+
+  return (
     <div style={{ position: "relative" }}>
       <Controls
-        isRunning={appStore.state.isRunning}
-        direction={appStore.state.direction}
-        onToggleDirectionClicked={appStore.toggleDirection}
-        onToggleRunningClicked={appStore.toggleRunning}
+        isRunning={playerStore.state.isRunning}
+        direction={playerStore.state.direction}
+        onToggleDirectionClicked={playerStore.toggleDirection}
+        onToggleRunningClicked={playerStore.toggleRunning}
       />
       <PixiCanvas
         style={{
-          "aspect-ratio": `${sceneBounds.width}/${sceneBounds.height}`,
+          "aspect-ratio": "16/9",
           overflow: "hidden",
           "border-radius": "10px",
         }}
       >
         <Show when={textureResource()}>
-          <Container
-            filters={crtFilter}
-            ref={(container) => {
-              const app = getPixiApp();
-              onTick((ticker) => {
-                objectFit(container, app.renderer, "cover");
-                crtFilter.seed = Math.random() * 10;
-                crtFilter.time += ticker.deltaTime * 0.3;
-              });
-            }}
-          >
-            <Sprite
-              label="Sky"
-              texture={Assets.get<Pixi.Texture>("sky")}
-              filters={blurFilter}
-              ref={(ref) => {
-                objectFit(ref, sceneBounds, "cover");
-              }}
-            />
-            <Ground
-              movementSpeed={appStore.state.isRunning ? 1.3 : 0}
-              direction={appStore.state.direction}
-              width={sceneBounds.width}
-              height={sceneBounds.height * 0.3}
-              position={{ x: 0, y: sceneBounds.height * 0.7 }}
-            />
-            <Character
-              direction={appStore.state.direction}
-              isRunning={appStore.state.isRunning}
-              position={{ x: sceneBounds.width * 0.5, y: sceneBounds.height * 0.7 }}
-            />
-          </Container>
+          <DemoScene
+            isRunning={playerStore.state.isRunning}
+            direction={playerStore.state.direction}
+          />
         </Show>
       </PixiCanvas>
     </div>

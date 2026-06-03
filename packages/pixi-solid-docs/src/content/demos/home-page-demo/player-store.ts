@@ -1,6 +1,6 @@
 import { createStore } from "solid-js/store";
 
-export type AppStore = {
+export type PlayerStore = {
   state: Readonly<AppState>;
   toggleRunning: () => void;
   toggleDirection: () => void;
@@ -13,7 +13,7 @@ export type AppState = {
 
 export type Direction = "left" | "right";
 
-export const createAppStore = (): AppStore => {
+export const createPlayerStore = (): PlayerStore => {
   const [state, setState] = createStore<AppState>({
     isRunning: true,
     direction: "right",
