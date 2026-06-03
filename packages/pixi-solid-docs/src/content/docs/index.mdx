@@ -22,8 +22,7 @@ hero:
 import { Card, CardGrid, Code, Tabs, TabItem } from "@astrojs/starlight/components";
 import { ClientOnly } from "../demos/client-only";
 import demoIndex from "../demos/home-page-demo/index.tsx?raw";
-import demoCreateAppStore from "../demos/home-page-demo/create-app-store.ts?raw";
-import demoGround from "../demos/home-page-demo/ground.tsx?raw";
+import demoCreatePlayerStore from "../demos/home-page-demo/player-store.ts?raw";
 import demoCharacter from "../demos/home-page-demo/character.tsx?raw";
 import demoGetAnimationTextures from "../demos/home-page-demo/get-animation-textures.ts?raw";
 import demoLoadSceneAssets from "../demos/home-page-demo/load-scene-assets.ts?raw";
@@ -48,7 +47,7 @@ Pixi Solid is a library that provides [SolidJS](https://docs.solidjs.com/) compo
 ### Install
 
 ```bash
-npm i pixi-solid pixi.js solid-js
+npm i pixi-solid
 ```
 
 Peer dependencies of
@@ -93,11 +92,8 @@ Peer dependencies of
   <TabItem label="app.tsx">
     <Code code={demoIndex} lang="tsx" />
   </TabItem>
-  <TabItem label="create-app-store.ts">
-    <Code code={demoCreateAppStore} lang="tsx" />
-  </TabItem>
-  <TabItem label="ground.tsx">
-    <Code code={demoGround} lang="tsx" />
+  <TabItem label="create-player-store.ts">
+    <Code code={demoCreatePlayerStore} lang="tsx" />
   </TabItem>
   <TabItem label="character.tsx">
     <Code code={demoCharacter} lang="tsx" />
