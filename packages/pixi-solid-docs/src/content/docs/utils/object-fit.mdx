@@ -1,0 +1,96 @@
+---
+title: objectFit
+description: A utility function that imperatively scales and positions a PixiJS container to fit within a rectangular bounds.
+sidebar:
+  order: 5
+---
+
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/object-fit.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
+`objectFit` is a utility function from `pixi-solid/utils` that imperatively applies object-fit style scaling and positioning to any `Pixi.Container`.
+
+Unlike the [`ObjectFitContainer`](/utils/object-fit-container) component, which wraps children and manages reactive updates automatically, `objectFit` is a one-shot imperative call. It is well-suited for use inside `ref` callbacks, `createEffect`, event handlers, or anywhere you need direct control over when the fit is applied.
+
+It supports these fit modes:
+
+- `contain` — scale uniformly to fit within bounds, preserving aspect ratio
+- `cover` — scale uniformly to fill bounds, preserving aspect ratio (may clip)
+- `fill` — stretch to fill bounds exactly, ignoring aspect ratio
+- `scale-down` — same as `contain` but never scales up beyond original size
+- `none` — no scaling applied
+
+It also supports these positions:
+
+- `center` (default)
+- `top`, `right`, `bottom`, `left`
+- `top-left`, `top-right`, `bottom-left`, `bottom-right`
+- `{ x: number, y: number }` where `0` is start, `0.5` is center, and `1` is end
+
+Import it from utils:
+
+```ts
+import { objectFit } from "pixi-solid/utils";
+```
+
+### Signature
+
+```ts
+objectFit(
+  object: Pixi.Container,
+  bounds: { width: number; height: number },
+  fitMode: ObjectFitMode,
+  position?: ObjectPosition,
+): void
+```
+
+The function mutates `object.scale`, `object.x`, and `object.y` in place. It reads the object's local bounds via `getLocalBounds()` to determine the original dimensions before scaling.
+
+### Usage in a ref
+
+The most common use is inside a `ref` callback to fit a container once on mount:
+
+```tsx
+import { objectFit } from "pixi-solid/utils";
+
+<Graphics
+  ref={(graphics) => {
+    graphics.rect(0, 0, 200, 100).fill(0xff0000);
+    objectFit(graphics, { width: 400, height: 300 }, "contain");
+  }}
+/>;
+```
+
+### Reactive usage with createEffect
+
+To re-apply whenever a signal changes, use `createEffect`:
+
+```tsx
+import { objectFit } from "pixi-solid/utils";
+import { createEffect, createSignal } from "solid-js";
+
+const [fitMode, setFitMode] = createSignal("contain");
+let graphicsRef;
+
+createEffect(() => {
+  if (!graphicsRef) return;
+  objectFit(graphicsRef, { width: 400, height: 300 }, fitMode());
+});
+
+<Graphics
+  ref={(g) => {
+    graphicsRef = g;
+    g.rect(0, 0, 200, 100).fill(0xff0000);
+    objectFit(g, { width: 400, height: 300 }, fitMode());
+  }}
+/>;
+```
+
+### Demo
+
+<ClientOnly fileName="object-fit" client:load />
+
+### Code example
+
+<Code code={demoCode} lang="tsx" title="demo-app.tsx" />
