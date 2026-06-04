@@ -22,31 +22,31 @@ export default defineConfig({
       sidebar: [
         {
           label: "Getting started",
-          autogenerate: { directory: "getting-started" },
+          items: [{ autogenerate: { directory: "getting-started" } }],
         },
         {
           label: "Components",
-          autogenerate: { directory: "components" },
+          items: [{ autogenerate: { directory: "components" } }],
         },
         {
           label: "Events",
-          autogenerate: { directory: "events" },
+          items: [{ autogenerate: { directory: "events" } }],
         },
         {
           label: "Asset loading",
-          autogenerate: { directory: "asset-loading" },
+          items: [{ autogenerate: { directory: "asset-loading" } }],
         },
         {
           label: "Hooks",
-          autogenerate: { directory: "hooks" },
+          items: [{ autogenerate: { directory: "hooks" } }],
         },
         {
           label: "Utils",
-          autogenerate: { directory: "utils" },
+          items: [{ autogenerate: { directory: "utils" } }],
         },
         {
           label: "Examples",
-          autogenerate: { directory: "examples" },
+          items: [{ autogenerate: { directory: "examples" } }],
         },
       ],
     }),
