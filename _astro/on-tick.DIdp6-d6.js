@@ -1,0 +1,1 @@
+import{U as e,j as t}from"./pixi-canvas.Cq6uwjTU.js";import{l as a,o as n}from"./solid.BuuK4dUg.js";var p=(r,i=e.NORMAL)=>{const o=a(t);if(!o)throw new Error("onTick must be used within a PixiApplicationProvider, PixiCanvas or a TickerProvider");o.add(r,o,i),n(()=>{o.remove(r,o)})};export{p as o};
