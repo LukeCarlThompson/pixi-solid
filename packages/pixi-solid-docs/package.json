@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@astrojs/solid-js": "6.0.1",
-    "@astrojs/starlight": "0.38.4",
-    "astro": "6.2.1",
+    "@astrojs/starlight": "0.39.3",
+    "astro": "6.4.3",
     "pixi-filters": "6.1.5",
     "pixi-solid": "workspace:*",
     "pixi.js": "*",
