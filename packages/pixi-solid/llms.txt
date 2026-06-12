@@ -8,6 +8,65 @@ A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your sce
 - **Signals-based reactivity**: Properties on components can be signals or reactive values.
 - **Direct Access**: Use `ref` to access underlying PixiJS instances when imperative operations are required, but prefer to use the reactive props.
 
+## Imports Quick Reference
+
+### Components & Providers
+```tsx
+import {
+  // Providers
+  PixiCanvas,
+  PixiApplicationProvider,
+  TickerProvider,
+  
+  // Container components
+  Container,
+  RenderContainer,
+  RenderLayer,
+  
+  // Sprite components
+  Sprite,
+  AnimatedSprite,
+  NineSliceSprite,
+  TilingSprite,
+  
+  // Graphics & Text
+  Graphics,
+  Text,
+  BitmapText,
+  HTMLText,
+  
+  // Advanced
+  ParticleContainer,
+  MeshPlane,
+  MeshRope,
+  PerspectiveMesh,
+} from "pixi-solid";
+```
+
+### Hooks & Context
+```tsx
+import {
+  onTick,
+  onResize,
+  getPixiApp,
+  getTicker,
+  getRenderer,
+  usePixiScreen,
+} from "pixi-solid";
+```
+
+### Utilities
+```tsx
+import {
+  useSpring,
+  useSmoothDamp,
+  objectFit,
+  ObjectFitContainer,
+  delay,
+  createAsyncDelay,
+} from "pixi-solid/utils";
+```
+
 ## Component Categories
 
 ### Providers (must be at tree root)
@@ -218,10 +277,10 @@ const App = () => (
 
 This pattern allows HTML components and PixiJS components to share state and reactivity via the same application instance.
 
+## Key Differences from Plain PixiJS
+
 - **Props are reactive**: Change a signal-based prop and the component updates automatically.
 - **Children as JSX**: Use declarative JSX for scene hierarchy instead of imperative `.addChild()`.
 - **Refs for imperative code**: Use `ref` callbacks to access the underlying PixiJS object when you need to call methods like `Graphics.clear()` or access complex state.
 - **Point properties flexible**: Props like `position`, `scale`, `anchor` accept either a number (uniform) or `{ x, y }` object.
 - **Context-based hooks**: Hooks like `onTick` and `getPixiApp()` require a provider (`PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider`) in the component tree.
-
-## Key Differences from Plain PixiJS
