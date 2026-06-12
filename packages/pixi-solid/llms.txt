@@ -98,7 +98,7 @@ import {
 ## Hooks & Context
 
 ### Animation & Timing
-- `onTick(callback)`: Registers a callback to run on each PixiJS ticker frame. Receives `{ delta, deltaTime }` with frame time info.
+- `onTick(callback)`: Registers a callback to run on each PixiJS ticker frame. Receives the `Pixi.Ticker` instance (e.g. use `ticker.deltaTime` for frame timing).
 - `onResize(callback)`: Registers a callback to run when the canvas resizes.
 
 ### Context Access
