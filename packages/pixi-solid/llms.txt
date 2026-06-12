@@ -1,0 +1,286 @@
+# Pixi-Solid
+
+A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your scene with [SolidJS](https://www.solidjs.com/) JSX components and its fine-grained signals based reactivity.
+
+## Architecture
+
+- **Declarative scene graph**: Build PixiJS applications using JSX.
+- **Signals-based reactivity**: Properties on components can be signals or reactive values.
+- **Direct Access**: Use `ref` to access underlying PixiJS instances when imperative operations are required, but prefer to use the reactive props.
+
+## Imports Quick Reference
+
+### Components & Providers
+```tsx
+import {
+  // Providers
+  PixiCanvas,
+  PixiApplicationProvider,
+  TickerProvider,
+  
+  // Container components
+  Container,
+  RenderContainer,
+  RenderLayer,
+  
+  // Sprite components
+  Sprite,
+  AnimatedSprite,
+  NineSliceSprite,
+  TilingSprite,
+  
+  // Graphics & Text
+  Graphics,
+  Text,
+  BitmapText,
+  HTMLText,
+  
+  // Advanced
+  ParticleContainer,
+  MeshPlane,
+  MeshRope,
+  PerspectiveMesh,
+} from "pixi-solid";
+```
+
+### Hooks & Context
+```tsx
+import {
+  onTick,
+  onResize,
+  getPixiApp,
+  getTicker,
+  getRenderer,
+  usePixiScreen,
+} from "pixi-solid";
+```
+
+### Utilities
+```tsx
+import {
+  useSpring,
+  useSmoothDamp,
+  objectFit,
+  ObjectFitContainer,
+  delay,
+  createAsyncDelay,
+} from "pixi-solid/utils";
+```
+
+## Component Categories
+
+### Providers (must be at tree root)
+- `PixiCanvas`: Root component that creates the PixiJS Application and Canvas element. If a `PixiApplicationProvider` is already in the tree, `PixiCanvas` will reuse that application instead of creating a new one.
+- `PixiApplicationProvider`: SolidJS component that creates a `PIXI.Application` instance and acts as a context provider for its children. Useful for sharing the application context with non-PixiJS components (e.g., HTML UI).
+- `TickerProvider`: Specialized provider to supply a `PIXI.Ticker` without a full application context (useful for testing or multi-ticker setups).
+
+### Container Components (can have children)
+- `Container`: Standard PixiJS Container.
+- `RenderContainer`: Container that renders to a texture.
+- `RenderLayer`: A container for render layering.
+
+### Sprite Components
+- `Sprite`: Standard PixiJS Sprite for displaying textures.
+- `AnimatedSprite`: For sprite animations with texture atlases.
+- `NineSliceSprite`: For resizable UI sprites with nine-slice scaling.
+- `TilingSprite`: For repeating/tiled background textures.
+
+### Graphics & Text Components
+- `Graphics`: PixiJS Graphics for drawing shapes. Use `ref` to access drawing methods (`clear()`, `rect()`, `circle()`, `fill()`, etc.).
+- `Text`: Standard PixiJS text rendering.
+- `BitmapText`: Bitmap font rendering (faster than `Text`).
+- `HTMLText`: Text with HTML styling support.
+
+### Advanced Components
+- `ParticleContainer`: High-performance container optimized for many child sprites with limited property changes.
+- `MeshPlane`, `MeshRope`, `PerspectiveMesh`: Mesh-based rendering for advanced effects.
+
+## Hooks & Context
+
+### Animation & Timing
+- `onTick(callback)`: Registers a callback to run on each PixiJS ticker frame. Receives the `Pixi.Ticker` instance (e.g. use `ticker.deltaTime` for frame timing).
+- `onResize(callback)`: Registers a callback to run when the canvas resizes.
+
+### Context Access
+- `getPixiApp()`: Context hook to get the current `PIXI.Application` instance.
+- `getTicker()`: Context hook to get the current `PIXI.Ticker` instance.
+- `getRenderer()`: Context hook to get the current PixiJS renderer instance.
+- `usePixiScreen()`: Hook to get reactive screen dimensions (e.g. `{ width, height, x, y, left, right, top, bottom }`). Returns a Solid store.
+
+## Utilities (`pixi-solid/utils`)
+
+- `useSpring({ to, stiffness, damping })`: Spring-based animation signal.
+- `useSmoothDamp({ to, smoothTime, maxSpeed })`: Smooth damping animation signal.
+- `objectFit({ parent, child, mode })`: Utility for scaling sprites/containers to fit/cover their parent.
+- `ObjectFitContainer`: A component that applies the `objectFit` utility to its children automatically.
+- `delay(ms)`: Async delay helper.
+- `createAsyncDelay()`: Creates a ticker-aware delay function tied to the component's lifecycle.
+
+## Common Component Props
+
+All components inherit standard PixiJS display properties:
+- **Position**: `x`, `y` (numbers) or `position` (object `{ x, y }`)
+- **Scale**: `scale` (number for uniform, or `{ x, y }`), `scaleX`, `scaleY`
+- **Rotation**: `rotation` (radians), `angle` (degrees)
+- **Opacity**: `alpha` (0-1)
+- **Tinting**: `tint` (hex color like `0xff0000` or CSS string like `"#ff0000"`)
+- **Visibility**: `visible` (boolean)
+- **Blending**: `blendMode` (e.g., `"add"`, `"multiply"`)
+- **Anchor/Pivot**: `anchor` or `pivot` (point for registration, `{ x, y }`)
+- **Sorting**: `zIndex` (numeric depth), `sortableChildren` (boolean, on Containers)
+
+## Event Handling
+
+All interactive components support PixiJS event handlers as props:
+```tsx
+<Sprite
+  texture={texture}
+  eventMode="static" // or "dynamic" for mouse events
+  onpointertap={(event) => console.log("clicked")}
+  onpointermove={(event) => console.log("moving")}
+  onpointerdown={(event) => console.log("down")}
+  onpointerup={(event) => console.log("up")}
+  onpointerenter={(event) => console.log("enter")}
+  onpointerleave={(event) => console.log("leave")}
+/>
+```
+
+Event names follow the pattern: `on` + PixiJS event name in camelCase.
+
+## SolidJS Integration
+
+Components can use standard SolidJS lifecycle hooks:
+```tsx
+import { onMount, onCleanup } from "solid-js";
+
+const MySprite = () => {
+  let spriteRef;
+
+  onMount(() => {
+    console.log("Sprite mounted", spriteRef);
+  });
+
+  onCleanup(() => {
+    console.log("Sprite cleaning up");
+  });
+
+  return <Sprite ref={spriteRef} texture={texture} />;
+};
+```
+
+## Usage Examples
+
+### Basic Scene
+```tsx
+import { PixiCanvas, Sprite, Container } from "pixi-solid";
+import { Texture } from "pixi.js";
+
+const App = () => (
+  <PixiCanvas>
+    <Container>
+      <Sprite texture={Texture.WHITE} x={100} y={100} width={50} height={50} />
+    </Container>
+  </PixiCanvas>
+);
+```
+
+### Reactive Properties
+```tsx
+import { createSignal } from "solid-js";
+import { Sprite } from "pixi-solid";
+import { Texture } from "pixi.js";
+
+const [x, setX] = createSignal(0);
+
+const MySprite = () => (
+  <Sprite 
+    texture={Texture.WHITE} 
+    x={x()} 
+    onpointertap={() => setX(x() + 10)}
+  />
+);
+```
+
+### Graphics with Refs (Drawing)
+```tsx
+import { Graphics } from "pixi-solid";
+
+<Graphics
+  ref={(g) => {
+    g.clear().roundRect(0, 0, 100, 100, 10).fill(0xff0000);
+  }}
+/>
+```
+
+### Animation with onTick
+```tsx
+import { onTick } from "pixi-solid";
+import { createSignal } from "solid-js";
+import { Sprite } from "pixi-solid";
+import { Texture } from "pixi.js";
+
+const [rotation, setRotation] = createSignal(0);
+
+onTick((ticker) => {
+  setRotation(r => r + 0.01 * ticker.deltaTime);
+});
+
+<Sprite texture={Texture.WHITE} rotation={rotation()} x={100} y={100} />
+```
+
+### Animated Sprite from Atlas
+```tsx
+import { AnimatedSprite } from "pixi-solid";
+import { Spritesheet } from "pixi.js";
+
+const [isPlaying, setIsPlaying] = createSignal(true);
+
+<AnimatedSprite
+  textures={spritesheet.animations.walk}
+  animationSpeed={0.1}
+  playing={isPlaying()}
+  loop={true}
+/>
+```
+
+## Sharing PixiJS State with HTML
+
+To access PixiJS state (like `Ticker` or `Application`) from regular HTML/Solid components:
+
+```tsx
+import { PixiApplicationProvider, PixiCanvas, getPixiApp, getTicker } from "pixi-solid";
+import { createEffect } from "solid-js";
+
+const HtmlComponent = () => {
+  const app = getPixiApp(); // Access from any descendant
+  const ticker = getTicker();
+
+  createEffect(() => {
+    console.log("App dimensions:", app.renderer.width, app.renderer.height);
+  });
+
+  return <div>PixiJS is running</div>;
+};
+
+const App = () => (
+  <PixiApplicationProvider>
+    {/* HtmlComponent can access the application context */}
+    <HtmlComponent />
+    
+    {/* PixiCanvas uses the same application */}
+    <PixiCanvas>
+      {/* Scene content */}
+    </PixiCanvas>
+  </PixiApplicationProvider>
+);
+```
+
+This pattern allows HTML components and PixiJS components to share state and reactivity via the same application instance.
+
+## Key Differences from Plain PixiJS
+
+- **Props are reactive**: Change a signal-based prop and the component updates automatically.
+- **Children as JSX**: Use declarative JSX for scene hierarchy instead of imperative `.addChild()`.
+- **Refs for imperative code**: Use `ref` callbacks to access the underlying PixiJS object when you need to call methods like `Graphics.clear()` or access complex state.
+- **Point properties flexible**: Props like `position`, `scale`, `anchor` accept either a number (uniform) or `{ x, y }` object.
+- **Context-based hooks**: Hooks like `onTick` and `getPixiApp()` require a provider (`PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider`) in the component tree.
