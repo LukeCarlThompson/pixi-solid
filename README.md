@@ -89,6 +89,45 @@ export const DemoApp = () => {
 
 - **SolidJS is fully featured**: It has stores, signals, suspense, error boundaries, resource fetching and more. It's a great feature set for simple or complex applications and you won't have to reach for other libraries to manage templating or state.
 
+## AI-Assisted Development
+
+This library includes an `llms.txt` file to help AI code assistants understand pixi-solid's API and patterns. When using an LLM to generate pixi-solid code, configure your tool to use it:
+
+### Automatic Discovery (Recommended)
+
+Most modern LLM tools can discover llms.txt files in node_modules automatically. Check your tool's documentation or configuration:
+
+- **Cursor**: Scans `node_modules` for context files by default
+- **GitHub Copilot**: May support llms.txt discovery depending on your setup
+- **Claude**: Use in custom instructions or system prompts
+- **VSCode Copilot Chat**: Can reference from context
+
+### Manual Configuration
+
+If your tool doesn't auto-discover, you can explicitly point it to:
+
+```
+node_modules/pixi-solid/llms.txt
+```
+
+Example for Cursor's `.cursorrules`:
+
+```
+# Reference pixi-solid documentation for LLM context
+node_modules/pixi-solid/llms.txt
+```
+
+### Custom Instructions
+
+For tools that support it, add to your project instructions or system prompt:
+
+```
+You are helping with a pixi-solid (PixiJS + SolidJS) project.
+Reference: node_modules/pixi-solid/llms.txt
+```
+
+By referencing the file in node_modules, you automatically get updates when you upgrade the library, and you won't need to manually manage context files.
+
 ## Contributing
 
 Contributions are welcome! Feel free to open an issue to report a bug, suggest a feature, or submit a pull request.
