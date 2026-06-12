@@ -107,7 +107,7 @@ If your tool doesn't auto-discover, you can explicitly point it to:
 node_modules/pixi-solid/llms.txt
 ```
 
-Example for Cursor's `.cursorules`:
+Example for Cursor's `.cursorrules`:
 
 ```
 # Reference pixi-solid documentation for LLM context
