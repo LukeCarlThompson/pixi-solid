@@ -127,7 +127,7 @@ All components inherit standard PixiJS display properties:
 - **Visibility**: `visible` (boolean)
 - **Blending**: `blendMode` (e.g., `"add"`, `"multiply"`)
 - **Anchor/Pivot**: `anchor` or `pivot` (point for registration, `{ x, y }`)
-- **Sorting**: `zIndex` (numeric depth), `sort-children` (on Containers)
+- **Sorting**: `zIndex` (numeric depth), `sortableChildren` (boolean, on Containers)
 
 ## Event Handling
 
