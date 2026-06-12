@@ -105,7 +105,7 @@ import {
 - `getPixiApp()`: Context hook to get the current `PIXI.Application` instance.
 - `getTicker()`: Context hook to get the current `PIXI.Ticker` instance.
 - `getRenderer()`: Context hook to get the current PixiJS renderer instance.
-- `usePixiScreen()`: Hook to get reactive screen dimensions: `{ width, height, resolution }`. Returns a Solid store.
+- `usePixiScreen()`: Hook to get reactive screen dimensions (e.g. `{ width, height, x, y, left, right, top, bottom }`). Returns a Solid store.
 
 ## Utilities (`pixi-solid/utils`)
 
