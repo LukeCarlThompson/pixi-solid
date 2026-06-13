@@ -72,6 +72,11 @@ export type UseSmoothDampProps = {
 export type SmoothDamp = {
   value: Accessor<number>;
   velocity: Accessor<number>;
+  /**
+   * Sets the current value of the smooth damp directly. This can be used to "teleport" the value to a specific point.
+   * The next frame will still calculate the smooth damp physics as normal based on the current to value so you may want to set the to value at the same time to control the behaviour.
+   */
+  setValue: (value: number) => void;
 };
 
 export const useSmoothDamp = (props: UseSmoothDampProps): SmoothDamp => {
@@ -106,5 +111,6 @@ export const useSmoothDamp = (props: UseSmoothDampProps): SmoothDamp => {
   return {
     value: current,
     velocity: () => velocity.value,
+    setValue: setCurrent,
   };
 };

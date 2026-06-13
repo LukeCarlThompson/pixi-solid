@@ -10,7 +10,17 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
 import demoCode from "../../demos/use-spring.demo.tsx?raw";
 import { ClientOnly } from "../../demos/client-only";
 
-The `useSpring` function provides reactive SolidJS signals for creating physically-based spring animations for numeric values. It returns both the `value` and `velocity` of the spring as signals.
+The `useSpring` function provides reactive SolidJS signals for creating physically-based spring animations for numeric values.
+
+### Return Value
+
+The function returns an object with the following properties:
+
+- **`value`** - An accessor signal containing the current spring-animated value
+- **`velocity`** - An accessor signal containing the current velocity of the spring
+- **`setValue`** - A function to set the current value directly, bypassing physics calculations for that frame. This allows you to "teleport" the spring to a specific value. The velocity will continue to be calculated normally on the next frame.
+
+### Behavior
 
 The function internally manages the spring physics calculations and keeps its updates synchronized with the Pixi.js application's ticker, ensuring smooth and responsive animations that align with your application's frame rate.
 
