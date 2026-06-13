@@ -11,9 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
-## 1.0.0-rc.0
+## 1.0.0 - [UNRELEASED]
 
-- No public changes yet
+- ✅ Added `setValue` method to `useSpring` hook for directly setting the current value, bypassing physics calculations for that frame.
+- ✅ Added `setValue` method to `useSmoothDamp` hook for directly setting the current value, bypassing damping calculations for that frame.
 - Added some more tests
 - Updated the docs
 
