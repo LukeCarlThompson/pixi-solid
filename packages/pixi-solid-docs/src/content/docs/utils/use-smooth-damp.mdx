@@ -11,6 +11,17 @@ import demoCode from "../../demos/use-smooth-damp.demo.tsx?raw";
 import { ClientOnly } from "../../demos/client-only";
 
 The `useSmoothDamp` function provides a reactive SolidJS signal that smoothly interpolates a numeric value towards a target value over time.
+
+### Return Value
+
+The function returns an object with the following properties:
+
+- **`value`** - An accessor signal containing the current damped value
+- **`velocity`** - An accessor signal containing the current velocity
+- **`setValue`** - A function to set the current value directly, bypassing damping calculations for that frame. This allows you to "teleport" the value to a specific point. The velocity will continue to be calculated normally on the next frame.
+
+### Behavior
+
 It internally manages the damping physics and keeps its updates synchronized with the Pixi.js application's ticker, ensuring smooth animations that sync with your application's frame rate.
 
 This function is similar in functionality to Unity's `Mathf.SmoothDamp` which is based on Game Programming Gems 4, Chapter 1.10.

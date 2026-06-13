@@ -19,6 +19,11 @@ export type UseSpringProps = {
 
 export type Spring = {
   value: Accessor<number>;
+  /**
+   * Sets the current value of the spring directly. This can be used to "teleport" the spring to a specific value.
+   * The next frame will still calculate the spring physics as normal based on the current to value so you may want to set the to value at the same time to control the behaviour.
+   */
+  setValue: (value: number) => void;
   velocity: Accessor<number>;
 };
 
@@ -27,7 +32,7 @@ export type Spring = {
  * Internally manages the spring physics and continuous updates synced to the Pixi ticker.
  *
  * @param {UseSpringProps} props - The properties for the spring animation.
- * @returns {Accessor<number>} A signal containing the current spring-animated value.
+ * @returns {Spring} An object containing the current spring-animated value, velocity, and a setter for the value.
  */
 export const useSpring = (props: UseSpringProps): Spring => {
   const [value, setValue] = createSignal(props.to());
@@ -67,7 +72,7 @@ export const useSpring = (props: UseSpringProps): Spring => {
     update(ticker.deltaMS);
   });
 
-  return { value, velocity };
+  return { value, velocity, setValue };
 };
 
 // Helper to convert 0-100 percent range to internal calculation range
