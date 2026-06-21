@@ -1,6 +1,6 @@
 {
   "name": "pixi-solid",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.7",
   "private": false,
   "description": "A library to write PixiJS applications with SolidJS",
   "homepage": "https://lukecarlthompson.github.io/pixi-solid/",
@@ -27,7 +27,7 @@
       "import": "./dist/index.js"
     },
     "./utils": {
-      "browser": "./dist/index.js",
+      "browser": "./dist/utils/index.js",
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
     }
