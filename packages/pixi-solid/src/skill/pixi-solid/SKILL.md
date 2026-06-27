@@ -60,59 +60,17 @@ All of these pixi-solid components take the same props as their PixiJS counterpa
 
 ### Point-axis props
 
-Point properties can be set as objects (`position={{ x: 10, y: 10 }}`) or as individual axis props for fine-grained reactivity. The table below shows which axis props are available on each component:
-
-| Component | Point-axis props |
-|---|---|
-| `Container`, `RenderContainer`, `RenderLayer` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y` |
-| `Graphics`, `ParticleContainer` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y` |
-| `Sprite`, `Text`, `BitmapText`, `HTMLText`, `NineSliceSprite`, `MeshPlane`, `MeshRope`, `PerspectiveMesh` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y` |
-| `AnimatedSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y` |
-| `TilingSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`, `tilePositionX/Y`, `tileScaleX/Y` |
-
-For the full type definitions, see [component-types.md](./component-types.md).
+Point properties can be set as objects (`position={{ x: 10, y: 10 }}`) or as individual axis props for fine-grained reactivity. For the per-component axis availability table and full type definitions, see [component-types.md](./component-types.md#point-axis-types).
 
 #### `ref` and `children`
 
-All pixi-solid components support a `ref` callback that receives the underlying PixiJS object when mounted:
+All pixi-solid components support a `ref` callback that receives the underlying PixiJS object when mounted. Container components (e.g. `Container`, `RenderLayer`) accept `children` — nested pixi-solid components are automatically added to the parent. `Graphics` is typically used imperatively through `ref` for drawing commands.
 
-```tsx
-<Container
-  ref={(container) => {
-    // do something with the container instance
-  }}
-/>
-```
-
-Container components (e.g. `Container`, `RenderLayer`) accept `children` — nested pixi-solid components are automatically added to the parent.
-
-`Graphics` is typically used imperatively through `ref` for drawing commands:
-
-```tsx
-<Graphics
-  ref={(graphics) => {
-    graphics.rect(50, 50, 100, 200).fill(0xff0000).circle(200, 200, 50).stroke(0x00ff00);
-  }}
-/>
-```
+For usage patterns, code examples, and the `as` prop for pre-existing instances, see [component-types.md](./component-types.md#component-api-patterns).
 
 ### `as` prop (advanced)
 
-All pixi-solid components accept an optional `as` prop to use a **pre-existing PixiJS instance** instead of creating a new one. This is useful for sharing a single instance across parts of the tree, providing pre-configured instances, or injecting mock instances in tests.
-
-```tsx
-import { Container, Sprite } from "pixi-solid";
-import { Container as PixiContainer } from "pixi.js";
-
-const existingContainer = new PixiContainer();
-existingContainer.label = "my-container";
-
-<Container as={existingContainer}>
-  <Sprite texture={Texture.WHITE} />
-</Container>
-```
-
-**Lifecycle note:** When `as` is provided, pixi-solid assumes you own the instance's lifecycle and will **not** destroy it on unmount. You must destroy it manually when no longer needed.
+All pixi-solid components accept an optional `as` prop to use a **pre-existing PixiJS instance** instead of creating a new one. See [component-types.md](./component-types.md#as-prop-advanced) for details, examples, and lifecycle notes.
 
 ### Event handlers
 
@@ -128,26 +86,13 @@ All PixiJS events are available as component props with the pattern `on` + the P
 />
 ```
 
-**Common events by category:**
+**Note:** All interactive events require `eventMode="static"` or `eventMode="dynamic"` on the component to be received.
 
-| Category | Props |
-|---|---|
-| Pointer | `onpointerdown`, `onpointerup`, `onpointermove`, `onpointerenter`, `onpointerleave`, `onpointertap` |
-| Mouse | `onmousedown`, `onmouseup`, `onmousemove`, `onmouseenter`, `onmouseleave` |
-| Touch | `ontouchstart`, `ontouchend`, `ontouchmove`, `ontouchcancel` |
-| Wheel | `onwheel` |
-
-All events also have **capture variants** with a `capture` suffix — e.g. `onpointerdowncapture`. These fire during the capture phase before the target phase.
-
-**Note:** All interactive events require `eventMode="static"` or `eventMode="dynamic"` on the component to be received. The full event list is available in PixiJS's `FederatedEventEmitterTypes`.
-
-> **See also:** [component-types](./component-types.md) — complete reference for handler type signatures.
+For common events by category, capture variants, and handler type signatures, see [component-types.md](./component-types.md#event-handler-types).
 
 ### AnimatedSprite
 
-`AnimatedSprite` supports all sprite props (anchor, events, point axes) plus the standard PixiJS `AnimatedSprite` options (`textures`, `playing`, `loop`, `animationSpeed`).
-
-**`autoUpdate` behavior:** PixiJS's default `AnimatedSprite` auto-updates via the global shared ticker. pixi-solid overrides this: when `autoUpdate` is omitted or `true`, the component replaces PixiJS's automatic advance with its own ticker callback registered against the nearest ticker context. This means the animation only advances while that specific ticker is active. Set `autoUpdate={false}` for fully manual control (no ticker registration).
+`AnimatedSprite` supports all sprite props (anchor, events, point axes) plus the standard PixiJS `AnimatedSprite` options (`textures`, `playing`, `loop`, `animationSpeed`, `autoUpdate`). For the `autoUpdate` ticker integration behavior and type definitions, see [component-types.md](./component-types.md#animatedspritepropscomponent).
 
 ```tsx
 import { AnimatedSprite } from "pixi-solid";
@@ -162,61 +107,15 @@ import { AnimatedSprite } from "pixi-solid";
 
 ### Deliberate omissions
 
-The following are intentionally not exported by `pixi-solid`:
-
-```ts
-import {
-  Particle,
-  MeshGeometry,
-  NineSliceGeometry,
-  PerspectivePlaneGeometry,
-  PlaneGeometry,
-  RopeGeometry,
-  Rectangle,
-  Culler,
-} from "pixi.js";
-```
-
-`Particle` is omitted because `ParticleContainer` is designed for high-volume, imperative particle updates rather than fine-grained Solid reactivity. Use `ParticleContainer` from `pixi-solid` and manage particle instances imperatively.
-
-The other omitted classes are low-level geometry classes used when building custom meshes. Create them imperatively with PixiJS and wrap in a custom `pixi-solid` component when needed.
+Certain PixiJS classes are intentionally not exported by `pixi-solid`. See [component-types.md](./component-types.md#deliberate-omissions) for the full list and rationale.
 
 ### Memory management & cleanup
 
-Pixi resources generally are managed by the objects that own them. For typical usage, applying a Texture to a `Sprite` or other display object will not usually require manual destruction — when the display object is destroyed, Pixi will release associated resources as appropriate.
-
-You only need to manually destroy resources that you explicitly create and retain outside of a managed display object (for example, creating a `RenderTexture`, a custom `Geometry`, or a `BaseTexture` for an offscreen buffer). In those cases, destroy them in an unmount/cleanup handler.
-
-General guidance:
-
-- If you create standalone resources (RenderTexture, Geometry, custom Mesh, BaseTexture/Texture you manage yourself), call `destroy()` in an `onCleanup` handler or when you remove the object from the display list.
-- If you pass a Texture into a child `Sprite` that is owned by the component tree, you usually do not need to destroy it yourself.
-- When passing an `existingApp` into `PixiApplicationProvider`, the caller is responsible for that application's lifecycle (start/stop/destroy).
-
-Example — render texture created imperatively and cleaned up on unmount:
-
-```tsx
-<Container
-  ref={(c) => {
-    const rt = PIXI.RenderTexture.create({ width: 256, height: 256 });
-    const s = new PIXI.Sprite(rt);
-    c.addChild(s);
-
-    onCleanup(() => {
-      s.destroy(); // removes sprite from stage and disposes display object
-      rt.destroy(true); // destroy the render texture and underlying base texture
-    });
-  }}
-/>
-```
-
-> Note: APIs vary by Pixi class (options for destroy differ). When in doubt consult the PixiJS docs and prefer attaching resources to managed display objects when possible.
+For memory management guidelines, cleanup patterns, and lifecycle best practices — including handling `RenderTexture`, custom geometry, and the `existingApp` lifecycle — see [hooks-lifecycle.md](./hooks-lifecycle.md#memory-management--cleanup).
 
 ### Performance best-practices
 
-- Prefer axis props (`positionX`/`positionY`) for fine-grained reactive updates instead of replacing whole point objects.
-- Minimize the number of reactive signals driving a single Pixi object; group values when appropriate and batch imperative updates when needed.
-- Use `ParticleContainer` for high-volume particle systems and update particles imperatively.
+Performance guidelines are integrated into the [Usage cheat sheet](#usage-cheat-sheet) below.
 
 ## Application and Canvas instantiation
 
@@ -251,6 +150,8 @@ For complete signatures, parameters, and examples, see [utils-reference.md](./ut
 - Child components are automatically added to parent containers.
 - `onResize` fires a callback; `usePixiScreen` returns a reactive store. Use `usePixiScreen` when you need dimensions as values.
 - All hooks (`onResize`, `onTick`, `usePixiScreen`) require being inside a provider context.
+- Minimize the number of reactive signals driving a single Pixi object; group values when appropriate and batch imperative updates when needed.
+- Use `ParticleContainer` for high-volume particle systems and update particles imperatively.
 
 ### Custom component prop forwarding
 

@@ -138,6 +138,18 @@ type TilingSpriteProps<Component>
 
 Used by: `TilingSprite`.
 
+## Point-axis reference table
+
+The table below shows which axis props are available on each component:
+
+| Component | Point-axis props |
+|---|---|
+| `Container`, `RenderContainer`, `RenderLayer` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y` |
+| `Graphics`, `ParticleContainer` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y` |
+| `Sprite`, `Text`, `BitmapText`, `HTMLText`, `NineSliceSprite`, `MeshPlane`, `MeshRope`, `PerspectiveMesh` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y` |
+| `AnimatedSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y` |
+| `TilingSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`, `tilePositionX/Y`, `tileScaleX/Y` |
+
 ## Point axis types
 
 ### `CommonPointAxisPropName`
@@ -225,6 +237,17 @@ type PixiSolidEventHandlerMap = {
 
 **Note:** Interactive events require `eventMode="static"` or `eventMode="dynamic"` on the component to be received.
 
+### Common events by category
+
+| Category | Props |
+|---|---|
+| Pointer | `onpointerdown`, `onpointerup`, `onpointermove`, `onpointerenter`, `onpointerleave`, `onpointertap` |
+| Mouse | `onmousedown`, `onmouseup`, `onmousemove`, `onmouseenter`, `onmouseleave` |
+| Touch | `ontouchstart`, `ontouchend`, `ontouchmove`, `ontouchcancel` |
+| Wheel | `onwheel` |
+
+All events also have **capture variants** with a `capture` suffix — e.g. `onpointerdowncapture`. These fire during the capture phase before the target phase. The full event list is available in PixiJS's `FederatedEventEmitterTypes`.
+
 ## Using these types
 
 When building a custom component:
@@ -259,3 +282,66 @@ function MySprite(props: PixiComponentProps<Pixi.SpriteOptions> & { label: strin
   );
 }
 ```
+
+## Component API patterns
+
+### `ref` usage
+
+All pixi-solid components support a `ref` callback that receives the underlying PixiJS object when mounted:
+
+```tsx
+<Container
+  ref={(container) => {
+    // do something with the container instance
+  }}
+/>
+```
+
+`Graphics` is typically used imperatively through `ref` for drawing commands:
+
+```tsx
+<Graphics
+  ref={(graphics) => {
+    graphics.rect(50, 50, 100, 200).fill(0xff0000).circle(200, 200, 50).stroke(0x00ff00);
+  }}
+/>
+```
+
+### `as` prop (advanced)
+
+All pixi-solid components accept an optional `as` prop to use a **pre-existing PixiJS instance** instead of creating a new one. This is useful for sharing a single instance across parts of the tree, providing pre-configured instances, or injecting mock instances in tests.
+
+```tsx
+import { Container, Sprite } from "pixi-solid";
+import { Container as PixiContainer } from "pixi.js";
+
+const existingContainer = new PixiContainer();
+existingContainer.label = "my-container";
+
+<Container as={existingContainer}>
+  <Sprite texture={Texture.WHITE} />
+</Container>
+```
+
+**Lifecycle note:** When `as` is provided, pixi-solid assumes you own the instance's lifecycle and will **not** destroy it on unmount. You must destroy it manually when no longer needed.
+
+## Deliberate omissions
+
+The following PixiJS classes are intentionally not exported by `pixi-solid`:
+
+```ts
+import {
+  Particle,
+  MeshGeometry,
+  NineSliceGeometry,
+  PerspectivePlaneGeometry,
+  PlaneGeometry,
+  RopeGeometry,
+  Rectangle,
+  Culler,
+} from "pixi.js";
+```
+
+`Particle` is omitted because `ParticleContainer` is designed for high-volume, imperative particle updates rather than fine-grained Solid reactivity. Use `ParticleContainer` from `pixi-solid` and manage particle instances imperatively.
+
+The other omitted classes are low-level geometry classes used when building custom meshes. Create them imperatively with PixiJS and wrap in a custom `pixi-solid` component when needed.

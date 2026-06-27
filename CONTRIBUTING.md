@@ -148,27 +148,40 @@ Imports are sorted automatically by oxfmt in this order:
 
 ### Factory Functions
 
-All components are created via factory functions in `component-factories.ts`:
+All components are created via factory functions in `packages/pixi-solid/src/components/component-factories.ts`:
 
-```ts
-createContainerComponent<InstanceType, OptionsType>(PixiClass)
-createLeafComponent<InstanceType, OptionsType>(PixiClass)
-createSpriteComponent<InstanceType, OptionsType>(PixiClass)
-createAnimatedSpriteComponent<InstanceType, OptionsType>(PixiClass)
-createTilingSpriteComponent<InstanceType, OptionsType>(PixiClass)
-createFilterComponent<InstanceType, OptionsType>(PixiClass)
+| Factory | Creates | Has children? | Extra props |
+|---|---|---|---|
+| `createContainerComponent()` | Components that accept children | ✅ Yes | Common point axes |
+| `createLeafComponent()` | Components without children | ❌ No | Common point axes |
+| `createSpriteComponent()` | Sprite-like components | ❌ No | Common + anchor point axes |
+| `createAnimatedSpriteComponent()` | AnimatedSprite with managed autoUpdate | ❌ No | Common + anchor point axes |
+| `createTilingSpriteComponent()` | TilingSprite | ❌ No | Common + anchor + tiling axes |
+| `createFilterComponent()` | Filter components | ❌ No | None (ref + as only) |
+
+### Adding a New Component
+
+1. **Pick the right factory** from the table above.
+2. **Choose prop type** — `ContainerProps`, `LeafProps`, `SpriteProps`, `TilingSpriteProps`, or define a new one.
+3. **Call the factory** in `packages/pixi-solid/src/components/components.tsx`:
+
+```tsx
+export const MyNewComponent = createContainerComponent<PixiMyNew, Pixi.MyNewOptions>(PixiMyNew);
 ```
+
+4. **Export** — add to `components/index.ts` and `src/index.ts`.
+5. **Add tests** — use `mountTest` from testing utilities, verify ref typing, prop binding, and cleanup (including the `as` prop skip-destroy guard).
 
 ### Prop Binding
 
-Props are bound in two phases:
+Located in `packages/pixi-solid/src/components/bind-props/`. Props are bound in two phases:
 
-1. **`bindInitialisationProps()`** — passed to the Pixi class constructor.
-2. **`bindRuntimeProps()`** — reactive props bound with `createRenderEffect()`.
+1. **`bindInitialisationProps()`** — sets static props on mount (e.g. `texture`), passed to the Pixi class constructor.
+2. **`bindRuntimeProps()`** — reactive props bound with `createRenderEffect()` via Solid's `on` helper.
 
-Point properties (`position`, `scale`, `pivot`, `anchor`, etc.) accept either a number or an object and are handled by `setPointProperty`.
+Point properties (`position`, `scale`, `pivot`, `anchor`, etc.) accept either a number or an object. They are split into individual axis props using `splitProps` and handled by `setPointProperty`.
 
-Event handlers follow the `on*` naming convention and are bound via `instance.on()`.
+Event handlers follow the `on*` naming convention (e.g. `onPointerDown`) and are mapped to PixiJS `instance.on()` calls.
 
 ### Lifecycle / Cleanup
 
@@ -180,7 +193,17 @@ onCleanup(() => {
 
 Use `children: false` only for `RenderLayer` (which does not own its children).
 
-When the `as` prop is provided, the factory skips `destroy()` entirely — the caller owns the instance's lifecycle. The guard checks `runtimeProps.as` (after `splitProps`), not `props.as`.
+When the `as` prop is provided, the factory skips `destroy()` entirely — the caller owns the instance's lifecycle. The guard checks `runtimeProps.as` (after `splitProps`), not `props.as`, since Solid's `splitProps` consumes the value from the reactive props object.
+
+### Context Providers
+
+| Provider | Provides | File |
+|---|---|---|
+| `PixiCanvas` | App + canvas DOM element + all hooks | `pixi-canvas.tsx` |
+| `PixiApplicationProvider` | App context + all hooks | `pixi-application/pixi-application-provider.tsx` |
+| `TickerProvider` | Ticker context only — `getTicker`, `onTick`, ticker-synced delays | `pixi-application/pixi-application-provider.tsx` |
+
+Context objects are in `packages/pixi-solid/src/pixi-application/context.ts`.
 
 ---
 

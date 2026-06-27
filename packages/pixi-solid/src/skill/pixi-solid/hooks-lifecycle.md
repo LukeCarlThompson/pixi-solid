@@ -141,6 +141,37 @@ type PixiScreenDimensions = {
 
 **Throws:** `"usePixiScreen must be used within a PixiApplicationProvider or PixiCanvas"` if no context is available.
 
+## Memory management & cleanup
+
+Pixi resources generally are managed by the objects that own them. For typical usage, applying a Texture to a `Sprite` or other display object will not usually require manual destruction — when the display object is destroyed, Pixi will release associated resources as appropriate.
+
+You only need to manually destroy resources that you explicitly create and retain outside of a managed display object (for example, creating a `RenderTexture`, a custom `Geometry`, or a `BaseTexture` for an offscreen buffer). In those cases, destroy them in an unmount/cleanup handler.
+
+General guidance:
+
+- If you create standalone resources (RenderTexture, Geometry, custom Mesh, BaseTexture/Texture you manage yourself), call `destroy()` in an `onCleanup` handler or when you remove the object from the display list.
+- If you pass a Texture into a child `Sprite` that is owned by the component tree, you usually do not need to destroy it yourself.
+- When passing an `existingApp` into `PixiApplicationProvider`, the caller is responsible for that application's lifecycle (start/stop/destroy).
+
+Example — render texture created imperatively and cleaned up on unmount:
+
+```tsx
+<Container
+  ref={(c) => {
+    const rt = PIXI.RenderTexture.create({ width: 256, height: 256 });
+    const s = new PIXI.Sprite(rt);
+    c.addChild(s);
+
+    onCleanup(() => {
+      s.destroy(); // removes sprite from stage and disposes display object
+      rt.destroy(true); // destroy the render texture and underlying base texture
+    });
+  }}
+/>
+```
+
+> Note: APIs vary by Pixi class (options for destroy differ). When in doubt consult the PixiJS docs and prefer attaching resources to managed display objects when possible.
+
 ### Testing
 
 For unit tests pixi-solid provides testing utilities that avoid the need for a live canvas. Use `createTestContext()` for a mock provider and `createManualTicker()` for deterministic frame control.

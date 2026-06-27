@@ -16,56 +16,14 @@ For consumer API docs (components, hooks, utils, testing patterns), see [package
 
 ## Architecture
 
-### Component system
+See [CONTRIBUTING.md](./CONTRIBUTING.md#component-architecture) for the full architecture reference — it covers:
 
-Six factory patterns in `packages/pixi-solid/src/components/component-factories.ts`:
-
-| Factory | Creates | Has children? | Extra props |
-|---|---|---|---|
-| `createContainerComponent()` | Components that accept children | ✅ Yes | Common point axes |
-| `createLeafComponent()` | Components without children | ❌ No | Common point axes |
-| `createSpriteComponent()` | Sprite-like components | ❌ No | Common + anchor point axes |
-| `createAnimatedSpriteComponent()` | AnimatedSprite with managed autoUpdate | ❌ No | Common + anchor point axes |
-| `createTilingSpriteComponent()` | TilingSprite | ❌ No | Common + anchor + tiling axes |
-| `createFilterComponent()` | Filter components | ❌ No | None (ref + as only) |
-
-All factories support the `as` prop — if provided, the instance is NOT destroyed on cleanup (caller owns lifecycle). The guard uses `runtimeProps.as` (after `splitProps`), not `props.as`, since Solid's `splitProps` consumes the value from the reactive props object.
-
-### Adding a new component
-
-1. **Pick the right factory** from the table above.
-2. **Choose prop type** — `ContainerProps`, `LeafProps`, `SpriteProps`, `TilingSpriteProps`, or define a new one.
-3. **Call the factory** in [components.tsx](packages/pixi-solid/src/components/components.tsx):
-
-```tsx
-export const MyNewComponent = createContainerComponent<PixiMyNew, Pixi.MyNewOptions>(PixiMyNew);
-```
-
-4. **Export** — add to `components/index.ts` and `src/index.ts`.
-5. **Add tests** — use `mountTest` from testing utilities, verify ref typing, prop binding, and cleanup (including the `as` prop skip-destroy guard).
-
-### Context providers
-
-| Provider | Provides | File |
-|---|---|---|
-| `PixiCanvas` | App + canvas DOM element + all hooks | `pixi-canvas.tsx` |
-| `PixiApplicationProvider` | App context + all hooks | `pixi-application/pixi-application-provider.tsx` |
-| `TickerProvider` | Ticker context only — `getTicker`, `onTick`, ticker-synced delays | `pixi-application/pixi-application-provider.tsx` |
-
-Context objects in `packages/pixi-solid/src/pixi-application/context.ts`.
-
-### Property binding
-
-Located in `packages/pixi-solid/src/components/bind-props/`:
-
-- `bindInitialisationProps()` — sets static props on mount (e.g. `texture`)
-- `bindRuntimeProps()` — handles reactive prop updates via Solid `on` + `createRenderEffect`
-- Point props (`position`, `scale`, etc.) — split into individual axis props using `splitProps`
-- Event handlers — `on` + event name format mapped to PixiJS `on()` calls
-
-### Testing utilities
-
-Located in `packages/pixi-solid/src/testing/`. See [README.md](packages/pixi-solid/src/testing/README.md) and [SPEC.md](packages/pixi-solid/src/testing/SPEC.md). Internal — not published.
+- **Component factories** — the six factory patterns, what each creates, and which accept children
+- **Adding a new component** — step-by-step guide
+- **Prop binding** — initialisation vs runtime props, point props, event handlers
+- **Lifecycle / cleanup** — destroy semantics and the `as` prop skip-destroy guard
+- **Context providers** — `PixiCanvas`, `PixiApplicationProvider`, `TickerProvider`
+- **Testing utilities** — `mountTest`, `createTestContext`, `createManualTicker`, scene graph queries
 
 ## Resources
 
