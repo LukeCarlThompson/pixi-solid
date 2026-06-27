@@ -1,16 +1,25 @@
-import type * as Pixi from "pixi.js";
-import { onCleanup } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { createSignal, onCleanup } from "solid-js";
+import { afterEach, describe, expect, it } from "vitest";
 
-import { createManualTicker, getByLabel, mountTest, queryByLabel } from "./index";
+import {
+  cleanup,
+  createTestRoot,
+  getByLabel,
+  mountScene,
+  queryByLabel,
+} from "./index";
 import { Container } from "../components";
 
-describe("testing helpers", () => {
-  it("GIVEN setup throws in mountTest WHEN creating root THEN cleanup still runs", () => {
+afterEach(() => {
+  cleanup();
+});
+
+describe("createTestRoot", () => {
+  it("GIVEN setup throws WHEN creating root THEN cleanup still runs", () => {
     let didCleanup = false;
 
     expect(() =>
-      mountTest(() => {
+      createTestRoot(() => {
         onCleanup(() => {
           didCleanup = true;
         });
@@ -22,7 +31,17 @@ describe("testing helpers", () => {
     expect(didCleanup).toBe(true);
   });
 
-  it("GIVEN component throws in mountTest WHEN creating root THEN cleanup still runs", () => {
+  it("GIVEN callback returns a number WHEN called THEN value contains the result", () => {
+    const { value, dispose } = createTestRoot(() => 42);
+
+    expect(value).toBe(42);
+
+    dispose();
+  });
+});
+
+describe("mountScene", () => {
+  it("GIVEN component throws WHEN rendering THEN cleanup still runs", () => {
     let didCleanup = false;
 
     const ThrowingComponent = () => {
@@ -33,16 +52,14 @@ describe("testing helpers", () => {
       throw new Error("render failed");
     };
 
-    expect(() => mountTest(() => <ThrowingComponent />)).toThrow("render failed");
+    expect(() => mountScene(() => <ThrowingComponent />)).toThrow("render failed");
 
     expect(didCleanup).toBe(true);
   });
 
-  it("GIVEN a Container with x and y WHEN rendered with ref THEN ref has typed properties", () => {
-    let container!: Pixi.Container;
-
-    const { dispose } = mountTest(() => (
-      <Container ref={container} x={10} y={20} />
+  it("GIVEN a Container with x and y WHEN rendered THEN container has typed properties", () => {
+    const { container, dispose } = mountScene(() => (
+      <Container x={10} y={20} />
     ));
 
     expect(container.x).toBe(10);
@@ -51,29 +68,9 @@ describe("testing helpers", () => {
     dispose();
   });
 
-  it("GIVEN mountTest with a callback returning a number WHEN called THEN value contains the result", () => {
-    const { value, dispose } = mountTest(() => 42);
-
-    expect(value).toBe(42);
-
-    dispose();
-  });
-
-  it("GIVEN createManualTicker WHEN fastForwardFrames is called THEN ticker callbacks fire the expected number of times", () => {
-    const manual = createManualTicker();
-    let calls = 0;
-
-    manual.ticker.add(() => { calls++; });
-    manual.fastForwardFrames(5);
-
-    expect(calls).toBe(5);
-  });
-
-  it("GIVEN a Container with labelled children WHEN getByLabel is called THEN it finds the correct child", () => {
-    let container!: Pixi.Container;
-
-    const { dispose } = mountTest(() => (
-      <Container ref={container} label="root">
+  it("GIVEN a Container with labelled children WHEN rendered THEN getByLabel finds children on container", () => {
+    const { container, dispose } = mountScene(() => (
+      <Container label="root">
         <Container label="child-a" />
         <Container label="child-b" />
       </Container>
@@ -85,5 +82,114 @@ describe("testing helpers", () => {
     expect(() => getByLabel(container, "missing")).toThrow();
 
     dispose();
+  });
+
+  it("GIVEN container is accessed via return value THEN properties are directly accessible (no ref callback needed)", () => {
+    const { container } = mountScene(() => (
+      <Container label="scene">
+        <Container label="child" x={50} />
+      </Container>
+    ));
+
+    // Root properties directly accessible
+    expect(container.label).toBe("scene");
+
+    // Children accessible via getByLabel
+    expect(getByLabel(container, "child").x).toBe(50);
+  });
+});
+
+describe("cleanup", () => {
+  it("GIVEN cleanup is wired in afterEach THEN disposers run automatically", () => {
+    let disposed = false;
+
+    createTestRoot(() => {
+      onCleanup(() => {
+        disposed = true;
+      });
+      return undefined;
+    });
+
+    // cleanup runs in afterEach — after the test, disposed should be true
+    // We verify by calling cleanup manually here
+    cleanup();
+    expect(disposed).toBe(true);
+  });
+});
+
+describe("mountScene children() memo behaviour", () => {
+  /**
+   * mountScene wraps the setup in children(), which creates a lazy memo.
+   * These tests verify that external signal changes do NOT cause the memo
+   * to re-evaluate (which would silently invalidate the container).
+   */
+  it("GIVEN mountScene reads external signals in JSX WHEN signals change THEN container stays stable (memo never re-evaluates)", () => {
+    const [label, setLabel] = createSignal("first");
+
+    const { container } = mountScene(() => (
+      <Container label={label()} />
+    ));
+
+    expect(container.label).toBe("first");
+
+    // Signal changes after mount — children() memo is dirtied but
+    // NOT re-evaluated because mountScene never reads the memo again.
+    setLabel("second");
+
+    // Same container instance — memo didn't re-evaluate
+    expect(container.label).toBe("second");
+
+    // Container was never destroyed
+    expect(container.destroyed).toBe(false);
+  });
+
+  it("GIVEN mountScene with no external signals THEN setup runs once and container is stable", () => {
+    let calls = 0;
+
+    const { container, dispose } = mountScene(() => {
+      calls++;
+      return <Container x={10} y={20} />;
+    });
+
+    expect(calls).toBe(1);
+    expect(container.x).toBe(10);
+    expect(container.y).toBe(20);
+
+    dispose();
+    expect(container.destroyed).toBe(true);
+  });
+
+  it("GIVEN mountScene setup reads reactive signals in props WHEN signals change THEN instance properties update reactively via bindRuntimeProps, container stays stable, setup does NOT re-run", () => {
+    // bindRuntimeProps uses createRenderEffect to subscribe to props.
+    // So even though the children() memo never re-evaluates, the existing
+    // instance's properties DO update reactively via SolidJS's effect system.
+    // The container stays stable (same instance), and no new instances are created.
+    const [x, setX] = createSignal(10);
+    const [label, setLabel] = createSignal("first");
+    let setupCalls = 0;
+
+    const { container } = mountScene(() => {
+      setupCalls++;
+      return <Container x={x()} label={label()} />;
+    });
+
+    expect(container.x).toBe(10);
+    expect(container.label).toBe("first");
+    expect(setupCalls).toBe(1);
+
+    // Change signal — container stays the same, but the instance updates reactively
+    setX(50);
+    setLabel("second");
+
+    // Setup did NOT re-run (children() memo is lazy, never re-read)
+    expect(setupCalls).toBe(1);
+
+    // Container is the SAME instance
+    // But properties updated reactively via render effects
+    expect(container.x).toBe(50);
+    expect(container.label).toBe("second");
+
+    // The instance was never destroyed — it's the same alive instance
+    expect(container.destroyed).toBe(false);
   });
 });

@@ -1,7 +1,7 @@
 import { createEffect } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { mountTest } from "./testing";
+import { createTestRoot } from "./testing";
 import { createTestContext } from "./testing";
 import { onResize } from "./on-resize";
 import { usePixiScreen } from "./use-pixi-screen";
@@ -11,7 +11,7 @@ describe("onResize + usePixiScreen", () => {
     const ctx = createTestContext();
     let callbackCalls = 0;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = createTestRoot(() => (
       <ctx.Provider>
         {(() => {
           onResize(() => {
@@ -32,7 +32,7 @@ describe("onResize + usePixiScreen", () => {
     const ctx = createTestContext();
     const onResizeSnapshots: Array<{ callbackWidth: number; storeWidth: number }> = [];
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = createTestRoot(() => (
       <ctx.Provider>
         {(() => {
           const pixiScreen = usePixiScreen();
@@ -63,7 +63,7 @@ describe("onResize + usePixiScreen", () => {
     let onResizeCalls = 0;
     let pixiScreenEffectRuns = 0;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = createTestRoot(() => (
       <ctx.Provider>
         {(() => {
           const pixiScreen = usePixiScreen();

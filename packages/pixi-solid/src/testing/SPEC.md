@@ -21,7 +21,8 @@ Each file owns one concern and can be used independently.
 
 ### `test-root.tsx` — Solid root lifecycle
 
-- `mountTest(setup)` — mounts JSX or runs Solid code in a temporary root
+- `mountScene(setup)` — mounts JSX and returns the root Container
+- `createTestRoot(setup)` — runs Solid code in a temporary root (for hooks/stores)
 - Returns `{ value, dispose }` — `value` is the setup's return, `dispose` cleans up
 - Uses `children()` internally so signal-driven re-renders work correctly
 - Built on Solid's `createRoot`, no test framework imports

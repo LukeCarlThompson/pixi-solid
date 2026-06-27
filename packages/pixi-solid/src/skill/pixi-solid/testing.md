@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Testing patterns for pixi-solid components and hooks using mountTest, createTestContext, and createManualTicker. Covers scene graph queries, ref-based typed access, and cleanup patterns.
+description: Testing patterns for pixi-solid components and hooks using mountScene, createTestRoot, createTestContext, and createManualTicker. Covers scene graph queries, container-based typed access, and cleanup patterns.
 ---
 
 # Testing pixi-solid
@@ -11,7 +11,8 @@ This subskill documents recommended patterns for unit testing code that uses `pi
 
 | Utility | Purpose |
 |---|---|
-| `mountTest(setup)` | Mount JSX or run Solid code in a temporary root |
+| `mountScene(setup)` | Mount a scene graph and return the root Container |
+| `createTestRoot(setup)` | Run Solid code in a temporary root (for hooks/stores) |
 | `createTestContext()` | One-stop mock provider with ticker, renderer, and app |
 | `createManualTicker()` | Stopped ticker with step-based frame advancement |
 | `getByLabel(root, label)` | Find a node by label (throws if not found) |
@@ -20,7 +21,8 @@ This subskill documents recommended patterns for unit testing code that uses `pi
 
 ```ts
 import {
-  mountTest,
+  mountScene,
+  createTestRoot,
   createTestContext,
   createManualTicker,
   getByLabel,
@@ -29,15 +31,46 @@ import {
 } from "pixi-solid/testing";
 ```
 
-## mountTest
+## mountScene
 
-`mountTest<T>(setup)` mounts JSX or runs Solid code in a temporary root. Returns `MountResult<T>` — an object with `{ value: T, dispose: () => void }`.
+`mountScene(setup)` mounts JSX in a temporary Solid root and returns the root Container. Use this for component tests.
 
-### Rendering components with onTick
+```tsx
+type MountSceneResult<TRoot = Pixi.Container> = {
+  container: TRoot;
+  dispose: () => void;
+};
+```
+
+The returned `container` is the root PixiJS node — access properties directly or query children with `getByLabel`. No ref callback needed.
+
+### Basic component test
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { mountTest, createTestContext } from "pixi-solid/testing";
+import { mountScene, createTestContext } from "pixi-solid/testing";
+import { Container, Sprite } from "pixi-solid";
+
+describe("scene", () => {
+  it("positions a sprite", () => {
+    const { container } = mountScene(() => (
+      <Container label="scene">
+        <Sprite label="player" x={100} />
+      </Container>
+    ));
+
+    // Container is Pixi.Container — no ref callback needed
+    const player = getByLabel(container, "player");
+    expect(player.x).toBe(100);
+  });
+});
+```
+
+### With onTick
+
+```tsx
+import { describe, expect, it } from "vitest";
+import { mountScene, createTestContext } from "pixi-solid/testing";
 import { onTick } from "pixi-solid";
 
 describe("Component with onTick", () => {
@@ -45,7 +78,7 @@ describe("Component with onTick", () => {
     const ctx = createTestContext();
     let calls = 0;
 
-    const { dispose } = mountTest(() => (
+    mountScene(() => (
       <ctx.Provider>
         {onTick(() => { calls++; })}
       </ctx.Provider>
@@ -53,49 +86,47 @@ describe("Component with onTick", () => {
 
     ctx.ticker.fastForwardFrames(5);
     expect(calls).toBe(5);
-
-    dispose();
   });
 });
 ```
 
-### Typed access with refs
+### Non-Container roots (AnimatedSprite, etc.)
 
-JSX always returns `JSX.Element` at the type level, erasing Pixi instance types. **Use refs for typed access** — the ref callback always receives the correct type:
+For component types that are not `Pixi.Container`, specify the type via the generic parameter:
 
 ```tsx
-import { describe, expect, it } from "vitest";
-import { mountTest } from "pixi-solid/testing";
-import { Container } from "pixi-solid";
-import type * as Pixi from "pixi.js";
+const { container } = mountScene<Pixi.AnimatedSprite>(() => (
+  <AnimatedSprite textures={textures} playing />
+));
 
-describe("typed ref access", () => {
-  it("lets you assert on typed Pixi properties", () => {
-    let container!: Pixi.Container;
-
-    const { dispose } = mountTest(() => (
-      <Container ref={container} x={10} y={20} />
-    ));
-
-    expect(container.x).toBe(10);
-    expect(container.y).toBe(20);
-
-    dispose();
-  });
-});
+container.playing;  // typed as Pixi.AnimatedSprite
 ```
 
-### Using value for hook results
+## createTestRoot
+
+`createTestRoot<T>(setup)` runs code in a temporary Solid root and returns the result. Use this for testing hooks and stores.
+
+```tsx
+type CreateTestRootResult<T> = {
+  value: T;
+  dispose: () => void;
+};
+```
+
+Unlike `mountScene`, this does NOT resolve JSX — it runs the callback directly. Bring your own providers.
+
+### Testing hooks
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { mountTest, createTestContext } from "pixi-solid/testing";
+import { createTestRoot, createTestContext } from "pixi-solid/testing";
+import { usePixiScreen } from "pixi-solid";
 
 describe("usePixiScreen", () => {
   it("returns the screen dimensions from context", () => {
     const ctx = createTestContext();
 
-    const { value: screen } = mountTest(() => (
+    const { value: screen } = createTestRoot(() => (
       <ctx.Provider>
         {usePixiScreen()}
       </ctx.Provider>
@@ -111,11 +142,12 @@ describe("usePixiScreen", () => {
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { mountTest } from "pixi-solid/testing";
+import { createTestRoot } from "pixi-solid/testing";
+import { usePixiScreen } from "pixi-solid";
 
 describe("usePixiScreen error", () => {
   it("throws when used outside a provider", () => {
-    expect(() => mountTest(() => usePixiScreen())).toThrow();
+    expect(() => createTestRoot(() => usePixiScreen())).toThrow();
   });
 });
 ```
@@ -125,11 +157,11 @@ describe("usePixiScreen error", () => {
 Creates mock PixiJS contexts for testing. Returns `{ Provider, ticker, renderer, app }`.
 
 ```tsx
-import { createTestContext, mountTest } from "pixi-solid/testing";
+import { createTestContext, mountScene } from "pixi-solid/testing";
 
 const ctx = createTestContext();
 
-const { dispose } = mountTest(() => (
+mountScene(() => (
   <ctx.Provider>
     <MyComponent />
   </ctx.Provider>
@@ -147,12 +179,14 @@ const { dispose } = mountTest(() => (
 
 ```tsx
 import { describe, expect, it } from "vitest";
+import { createTestRoot, createTestContext } from "pixi-solid/testing";
+import { usePixiScreen } from "pixi-solid";
 
 describe("resize handling", () => {
   it("updates on emitResize", () => {
     const ctx = createTestContext();
 
-    const { value: screen } = mountTest(() => (
+    const { value: screen } = createTestRoot(() => (
       <ctx.Provider>
         {usePixiScreen()}
       </ctx.Provider>
@@ -215,36 +249,31 @@ Use query helpers to find nodes by `label` instead of navigating `.children[inde
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { mountTest, getByLabel, queryByLabel } from "pixi-solid/testing";
+import { mountScene, getByLabel, queryByLabel } from "pixi-solid/testing";
 import { Container, Sprite } from "pixi-solid";
-import type * as Pixi from "pixi.js";
 
 describe("getByLabel", () => {
   it("finds a child sprite by label", () => {
-    let scene!: Pixi.Container;
-
-    mountTest(() => (
-      <Container ref={scene} label="scene">
+    const { container } = mountScene(() => (
+      <Container label="scene">
         <Sprite label="player" x={100} y={200} />
         <Sprite label="enemy" x={300} y={400} />
       </Container>
     ));
 
-    const player = getByLabel(scene, "player");
+    const player = getByLabel(container, "player");
     expect(player.x).toBe(100);
   });
 
   it("returns undefined for missing labels with queryByLabel", () => {
-    let scene!: Pixi.Container;
-
-    mountTest(() => (
-      <Container ref={scene} label="scene">
+    const { container } = mountScene(() => (
+      <Container label="scene">
         <Sprite label="player" />
       </Container>
     ));
 
-    expect(queryByLabel(scene, "boss")).toBeUndefined();
-    expect(() => getByLabel(scene, "boss")).toThrow();
+    expect(queryByLabel(container, "boss")).toBeUndefined();
+    expect(() => getByLabel(container, "boss")).toThrow();
   });
 });
 ```
@@ -253,16 +282,15 @@ describe("getByLabel", () => {
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { mountTest, createTestContext } from "pixi-solid/testing";
+import { createTestRoot, createTestContext } from "pixi-solid/testing";
 import { createAsyncDelay } from "pixi-solid/utils";
-import type { AsyncDelayFunction } from "pixi-solid/utils";
 
 describe("createAsyncDelay", () => {
   it("resolves after the requested time passes on the ticker", async () => {
     const ctx = createTestContext();
-    let delay!: AsyncDelayFunction;
+    let delay!: (ms: number, signal?: AbortSignal) => Promise<void>;
 
-    mountTest(() => {
+    createTestRoot(() => {
       delay = createAsyncDelay();
     });
 
@@ -280,9 +308,9 @@ describe("createAsyncDelay", () => {
 
   it("rejects when aborted", async () => {
     const ctx = createTestContext();
-    let delay!: AsyncDelayFunction;
+    let delay!: (ms: number, signal?: AbortSignal) => Promise<void>;
 
-    mountTest(() => {
+    createTestRoot(() => {
       delay = createAsyncDelay();
     });
 
@@ -295,24 +323,33 @@ describe("createAsyncDelay", () => {
 });
 ```
 
-## Cleanup pattern
+## Cleanup
 
-Wire `dispose()` into your test framework's lifecycle to avoid memory leaks:
+All disposers are registered with a global registry. Wire `cleanup()` into your test framework's lifecycle:
 
 ```tsx
 import { afterEach } from "vitest";
-import { mountTest } from "pixi-solid/testing";
+import { cleanup } from "pixi-solid/testing";
 
-const disposers: (() => void)[] = [];
+afterEach(() => cleanup());
+```
 
-afterEach(() => {
-  for (const dispose of disposers) dispose();
-  disposers.length = 0;
-});
+Once wired, you no longer need to track `dispose`:
 
+```tsx
 it("some test", () => {
-  const { dispose } = mountTest(() => <ctx.Provider>...</ctx.Provider>);
-  disposers.push(dispose);
+  mountScene(() => <Container label="root" />);
+  // cleanup runs automatically in afterEach
+});
+```
+
+To disable automatic cleanup for a specific test, pass your own dispose:
+
+```tsx
+it("manual cleanup", () => {
+  const { dispose } = mountScene(() => <Container />);
+  // ... test logic ...
+  dispose(); // manual cleanup, cleanup() won't double-dispose
 });
 ```
 
@@ -324,7 +361,8 @@ it("some test", () => {
 ## Practical tips
 
 - Keep tests deterministic: avoid `ticker.start()` — use `fastForwardFrames()` or `fastForwardTime()` for precise control.
-- Use refs for typed access to rendered Pixi instances — this avoids the `JSX.Element` type erasure problem.
+- Use `mountScene` for component tests — it returns the root Container directly, no ref callbacks needed.
+- Use `createTestRoot` for hook and store tests — it returns the raw value.
 - Use `getByLabel` over `.children[index]` to decouple tests from scene graph layout.
 - When testing components that create resources imperatively, advance frames and then dispose to exercise cleanup paths.
 - All mocks (`ticker`, `renderer`, `app`) are plain objects — spy with `vi.spyOn`, `jest.fn()`, or any framework.

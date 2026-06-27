@@ -81,7 +81,7 @@ let ticker = new Ticker();
 
 createRoot(() => (
   <TickerProvider ticker={ticker}>
-    <MovingSprite ref={spriteRef} />
+    <MovingSprite ref={(r) => (spriteRef = r)} />
   </TickerProvider>
 ));
 

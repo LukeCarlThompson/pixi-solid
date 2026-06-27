@@ -1,20 +1,39 @@
 import type { JSX } from "solid-js";
+import type * as Pixi from "pixi.js";
 import { children, createRoot } from "solid-js";
 
-export type MountResult<T = void> = {
+export type CreateTestRootResult<T> = {
   /**
-   * The value returned by the setup function. For JSX renderers this is
-   * the resolved children (typically a PixiJS scene node).
+   * The value returned by the setup function. For hook/store tests this is
+   * the hook's return value (e.g. PixiScreenDimensions from usePixiScreen).
    */
   value: T;
   /**
    * Destroy the Solid root. Call this in your test cleanup to prevent
-   * memory leaks.
+   * memory leaks, or wire up `cleanup()` in `afterEach`.
    */
   dispose: () => void;
 };
 
-const createRootWithCleanup = <T,>(setup: () => T): MountResult<T> => {
+export type MountSceneResult<TRoot = Pixi.Container> = {
+  /**
+   * The root PixiJS Container of the rendered scene graph.
+   * Use this directly for assertions or pass it to query helpers
+   * like `getByLabel` and `queryByLabel`.
+   */
+  container: TRoot;
+  /**
+   * Destroy the Solid root. Call this in your test cleanup to prevent
+   * memory leaks, or wire up `cleanup()` in `afterEach`.
+   */
+  dispose: () => void;
+};
+
+// ---------------------------------------------------------------------------
+// Internal: create a Solid root and return the value + dispose
+// ---------------------------------------------------------------------------
+
+const createRootWithCleanup = <T,>(setup: () => T): CreateTestRootResult<T> => {
   let disposeRoot: (() => void) | undefined;
 
   try {
@@ -23,51 +42,135 @@ const createRootWithCleanup = <T,>(setup: () => T): MountResult<T> => {
       return setup();
     });
 
-    return {
-      value,
-      dispose: () => disposeRoot?.(),
-    };
+    return { value, dispose: () => disposeRoot?.() };
   } catch (setupError) {
     if (disposeRoot) {
       disposeRoot();
     }
-
     throw setupError;
   }
 };
 
+// ---------------------------------------------------------------------------
+// Global cleanup registry
+// ---------------------------------------------------------------------------
+
+const disposers = new Set<() => void>();
+
+const registerDisposer = (dispose: () => void): void => {
+  const wrapped = () => {
+    dispose();
+    disposers.delete(wrapped);
+  };
+  disposers.add(wrapped);
+};
+
 /**
- * Mount JSX or run Solid code in a temporary root, returning the result
- * and a dispose function for cleanup.
+ * Run all registered cleanup disposers and clear the registry.
  *
- * Use this for rendering components, testing hooks, and error assertions.
- *
- * **For typed access to rendered JSX**, use refs (which always receive the
- * correct Pixi type):
+ * Wire this into your test framework's lifecycle:
  *
  * ```tsx
- * let container!: Pixi.Container;
- * const { dispose } = mountTest(() => (
- *   <Container ref={container} x={10} />
- * ));
- * expect(container.x).toBe(10);
- * dispose();
+ * import { afterEach } from "vitest";
+ * import { cleanup } from "pixi-solid/testing";
+ *
+ * afterEach(() => cleanup());
  * ```
  *
- * **`value`** is useful for hook results and error testing:
+ * Once wired, you no longer need to track `dispose` from `mountScene`
+ * or `createTestRoot` — cleanup happens automatically after each test.
+ */
+export const cleanup = (): void => {
+  for (const dispose of disposers) {
+    dispose();
+  }
+  disposers.clear();
+};
+
+// ---------------------------------------------------------------------------
+// createTestRoot — for hook/store tests
+// ---------------------------------------------------------------------------
+
+/**
+ * Run code in a temporary Solid root and return the result.
  *
+ * This is a thin wrapper around SolidJS's `createRoot` that also
+ * captures the return value. Use it for testing hooks and stores
+ * that need to run inside a reactive context.
+ *
+ * Unlike `mountScene`, this does NOT resolve JSX — it runs the
+ * callback directly in a root. Bring your own providers.
+ *
+ * @example
  * ```tsx
- * const { value: screen } = mountTest(() => usePixiScreen());
- * expect(() => mountTest(() => usePixiScreen())).toThrow();
+ * const ctx = createTestContext();
+ *
+ * const { value: screen } = createTestRoot(() => (
+ *   <ctx.Provider>
+ *     {usePixiScreen()}
+ *   </ctx.Provider>
+ * ));
+ *
+ * expect(screen.width).toBe(800);
  * ```
  */
-export const mountTest = <T,>(setup: () => T): MountResult<T> => {
-  return createRootWithCleanup(() => {
-    // Use children() to create a reactive memo so signal changes inside the
-    // callback trigger proper re-evaluation and cleanup of old JSX nodes.
+export const createTestRoot = <T,>(setup: () => T): CreateTestRootResult<T> => {
+  const result = createRootWithCleanup(setup);
+  registerDisposer(result.dispose);
+  return result;
+};
+
+// ---------------------------------------------------------------------------
+// mountScene — for component tests
+// ---------------------------------------------------------------------------
+
+/**
+ * Mount JSX in a temporary Solid root and return the root Container.
+ *
+ * Use this for testing component scene graphs. The returned `container`
+ * is the root PixiJS node — query children with `getByLabel` or access
+ * properties directly.
+ *
+ * For component types other than `Pixi.Container` (e.g. AnimatedSprite),
+ * specify the type via the generic parameter:
+ *
+ * ```tsx
+ * const { container } = mountScene<Pixi.AnimatedSprite>(() => (
+ *   <AnimatedSprite textures={...} />
+ * ));
+ * container.playing;
+ * ```
+ *
+ * @example
+ * ```tsx
+ * const { container } = mountScene(() => (
+ *   <Container label="scene">
+ *     <Sprite label="player" x={100} />
+ *   </Container>
+ * ));
+ *
+ * expect(container.x).toBe(0);
+ * const player = getByLabel(container, "player");
+ * expect(player.x).toBe(100);
+ * ```
+ */
+export const mountScene = <TRoot = Pixi.Container>(
+  setup: () => JSX.Element,
+): MountSceneResult<TRoot> => {
+  const result = createRootWithCleanup(() => {
+    // Use children() to resolve the JSX tree into a concrete node.
     // The type cast is safe: children() at runtime just calls the function
     // and returns whatever it returns — it doesn't validate JSX.Element.
-    const resolved = children(setup as () => JSX.Element);
-    return resolved() as T;
+    const resolved = children(setup);
+    return resolved();
   });
+
+  registerDisposer(result.dispose);
+
+  return {
+    container: result.value as unknown as TRoot,
+    dispose: result.dispose,
+  };
 };
+
+

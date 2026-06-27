@@ -11,7 +11,7 @@ import { createSignal } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TickerProvider } from "../pixi-application";
-import { mountTest } from "../testing";
+import { mountScene } from "../testing";
 
 import { AnimatedSprite, Container, RenderLayer, Sprite, TilingSprite } from "./components";
 
@@ -24,7 +24,7 @@ describe("Component Factory Cleanup on Unmount", () => {
     let containerRef: Pixi.Container | undefined;
     let destroyCalled = false;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <Container
         ref={(el) => {
           containerRef = el;
@@ -58,7 +58,7 @@ describe("Component Factory Cleanup on Unmount", () => {
       });
     };
 
-    const { dispose } = mountTest(() =>
+    const { dispose } = mountScene(() =>
       shouldShow() ? (
         <Container
           ref={(el) => {
@@ -99,7 +99,7 @@ describe("Component Factory Cleanup on Unmount", () => {
     const [showContainer, setShowContainer] = createSignal(true);
     let parentRef: Pixi.Container | undefined;
 
-    const { dispose } = mountTest(() =>
+    const { dispose } = mountScene(() =>
       showContainer() ? (
         <Container
           ref={(el) => {
@@ -142,7 +142,7 @@ describe("Component Factory Cleanup on Unmount", () => {
     const destroyedInstances: Pixi.Container[] = [];
     const [shouldShow, setShouldShow] = createSignal(true);
 
-    const { dispose } = mountTest(() =>
+    const { dispose } = mountScene(() =>
       shouldShow() ? (
         <Container
           ref={(el) => {
@@ -177,7 +177,7 @@ describe("RenderLayer Component Cleanup", () => {
     const [showChild, setShowChild] = createSignal(true);
     let renderLayerRef: Pixi.Container | undefined;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <RenderLayer
         ref={(el) => {
           renderLayerRef = el;
@@ -217,7 +217,7 @@ describe("AnimatedSprite ticker integration", () => {
     const sharedTickerAddSpy = vi.spyOn(Ticker.shared, "add");
     const sharedTickerRemoveSpy = vi.spyOn(Ticker.shared, "remove");
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <TickerProvider ticker={contextTicker}>
         <AnimatedSprite textures={[Texture.WHITE]} />
       </TickerProvider>
@@ -239,7 +239,7 @@ describe("AnimatedSprite ticker integration", () => {
     const contextTicker = new Ticker();
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <TickerProvider ticker={contextTicker}>
         <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
       </TickerProvider>
@@ -255,7 +255,7 @@ describe("AnimatedSprite ticker integration", () => {
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
     const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <TickerProvider ticker={contextTicker}>
         <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={true} />
       </TickerProvider>
@@ -278,7 +278,7 @@ describe("AnimatedSprite ticker integration", () => {
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
     const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <TickerProvider ticker={contextTicker}>
         <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={autoUpdate()} />
       </TickerProvider>
@@ -300,7 +300,7 @@ describe("AnimatedSprite ticker integration", () => {
 
   it("GIVEN no TickerProvider WHEN mounted with autoUpdate={false} THEN it does not throw", () => {
     expect(() => {
-      const { dispose } = mountTest(() => (
+      const { dispose } = mountScene(() => (
         <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
       ));
 
@@ -310,7 +310,7 @@ describe("AnimatedSprite ticker integration", () => {
 
   it("GIVEN no TickerProvider WHEN mounted with autoUpdate enabled THEN it throws", () => {
     expect(() => {
-      const { dispose } = mountTest(() => <AnimatedSprite textures={[Texture.WHITE]} />);
+      const { dispose } = mountScene(() => <AnimatedSprite textures={[Texture.WHITE]} />);
 
       dispose();
     }).toThrow();
@@ -322,7 +322,7 @@ describe("Sprite-like component cleanup", () => {
     let spriteRef: Pixi.Sprite | undefined;
     let destroyCalled = false;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <Sprite
         texture={Texture.WHITE}
         ref={(el) => {
@@ -349,7 +349,7 @@ describe("Sprite-like component cleanup", () => {
     let destroyCalled = false;
     const contextTicker = new Ticker();
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <TickerProvider ticker={contextTicker}>
         <AnimatedSprite
           textures={[Texture.WHITE]}
@@ -377,7 +377,7 @@ describe("Sprite-like component cleanup", () => {
     let tilingSpriteRef: Pixi.TilingSprite | undefined;
     let destroyCalled = false;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <TilingSprite
         texture={Texture.WHITE}
         width={100}
@@ -413,7 +413,7 @@ describe("as prop lifecycle — user-owned instances are not destroyed on cleanu
       originalDestroy(options);
     });
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <Container as={existingContainer} />
     ));
 
@@ -432,7 +432,7 @@ describe("as prop lifecycle — user-owned instances are not destroyed on cleanu
       originalDestroy(options);
     });
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <Sprite as={existingSprite} texture={Texture.WHITE} />
     ));
 
@@ -451,7 +451,7 @@ describe("as prop lifecycle — user-owned instances are not destroyed on cleanu
       originalDestroy(options);
     });
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <TilingSprite as={existingTilingSprite} texture={Texture.WHITE} width={100} height={100} />
     ));
 
@@ -474,7 +474,7 @@ describe("as prop lifecycle — user-owned instances are not destroyed on cleanu
       originalDestroy(options);
     });
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <TickerProvider ticker={contextTicker}>
         <AnimatedSprite as={existingAnimatedSprite} textures={[Texture.WHITE]} />
       </TickerProvider>
