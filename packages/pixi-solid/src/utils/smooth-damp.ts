@@ -55,12 +55,14 @@ export const smoothDamp = (
 
 /**
  * A SolidJS hook that provides a smoothly damped signal towards a target value.
- * Internally manages velocity and continuous updates synced to the Pixi ticker.
+ * Internally manages velocity with continuous updates synced to the Pixi ticker.
  *
- * @param to - An accessor for the target value to damp towards.
- * @param smoothTimeMs - The approximate time it will take to reach the target in milliseconds. Smaller values will reach the target faster. Defaults to 300ms.
- * @param maxSpeed - Optionally, the maximum speed the value can move in units per second. Defaults to Infinity.
- * @returns A signal containing the current damped value.
+ * @example
+ * ```tsx
+ * const pos = useSmoothDamp({ to: () => targetX() });
+ *
+ * return <Sprite x={pos.value()} />;
+ * ```
  */
 
 export type UseSmoothDampProps = {
@@ -79,6 +81,17 @@ export type SmoothDamp = {
   setValue: (value: number) => void;
 };
 
+/**
+ * A SolidJS hook that provides a smoothly damped signal towards a target value.
+ * Internally manages velocity with continuous updates synced to the Pixi ticker.
+ *
+ * @example
+ * ```tsx
+ * const pos = useSmoothDamp({ to: () => targetX() });
+ *
+ * return <Sprite x={pos.value()} />;
+ * ```
+ */
 export const useSmoothDamp = (props: UseSmoothDampProps): SmoothDamp => {
   const [current, setCurrent] = createSignal(props.to());
   const velocity = createMutable({ value: 0 });

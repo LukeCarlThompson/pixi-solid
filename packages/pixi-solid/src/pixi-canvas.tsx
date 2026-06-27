@@ -11,6 +11,13 @@ type OmitColonEvents<T> = {
   [K in keyof T as K extends `on:${string}` ? never : K]: T[K];
 };
 
+/**
+ * Props for the `PixiCanvas` component.
+ *
+ * Accepts any HTML div attribute (class, style, event listeners, etc.)
+ * plus `Pixi.ApplicationOptions` (except `children` and `resizeTo`,
+ * which are handled internally).
+ */
 export type PixiCanvasProps = {
   children: JSX.Element;
   ref?: (el: HTMLDivElement) => void;
@@ -110,19 +117,14 @@ const InnerPixiCanvas = (props: {
 };
 
 /**
- * PixiCanvas
+ * Mounts the PixiJS application canvas into the DOM with automatic resize.
  *
- * A small wrapper that mounts the PIXI application's canvas element into the DOM
- * and automatically resizes it.
+ * Can be used standalone (creates its own `PixiApplication`) or nested inside
+ * `PixiApplicationProvider` (uses the existing context). Accepts pixi-solid
+ * components as children, which are rendered into the canvas scene graph.
  *
- * - Works with or without a surrounding `PixiApplicationProvider` component.
- * - If used inside `PixiApplicationProvider`, it will use the provided context.
- * - If used standalone, it will create its own PixiApplication and provide context.
- * - Accepts pixi-solid components as children, which will be rendered inside the canvas.
- *
- * Props:
- * @param props.children - JSX content to render inside the canvas wrapper.
- * @param props - DOM props for the wrapper and Pixi ApplicationOptions (except 'children' and 'resizeTo').
+ * Accepts HTML div attributes (`class`, `style`, `id`, event listeners, etc.)
+ * on the wrapper element, plus `Pixi.ApplicationOptions` for the canvas init.
  */
 
 export const PixiCanvas = (props: PixiCanvasProps): JSX.Element => {

@@ -1,5 +1,6 @@
 import type { FederatedEventEmitterTypes } from "pixi.js";
 
+/** All PixiJS federated event names that pixi-solid supports as component props. */
 export const PIXI_EVENT_NAMES: (keyof FederatedEventEmitterTypes)[] = [
   "click",
   "mousedown",
@@ -66,12 +67,15 @@ export const PIXI_EVENT_NAMES: (keyof FederatedEventEmitterTypes)[] = [
   "wheelcapture",
 ] as const;
 
+/** SolidJS-compatible event handler prop names (e.g. `"onpointerdown"`, `"onclick"`). */
 export const PIXI_SOLID_EVENT_HANDLER_NAMES = PIXI_EVENT_NAMES.map(
   (eventName) => `on${eventName}` as const,
 );
 
+/** A single pixi-solid event handler prop name, e.g. `"onpointerdown"`. */
 export type PixiSolidEventHandlerName = (typeof PIXI_SOLID_EVENT_HANDLER_NAMES)[number];
 
+/** Maps each PixiJS event to an optional SolidJS event handler prop, typed to Pixi's event payloads. */
 export type PixiSolidEventHandlerMap = {
   [K in (typeof PIXI_EVENT_NAMES)[number] as `on${K}`]?:
     | null
