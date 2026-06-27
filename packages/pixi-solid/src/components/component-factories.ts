@@ -134,12 +134,15 @@ export const createContainerComponent = <
   return (props): InstanceType & JSX.Element => {
     const [runtimeProps, initialisationProps] = splitProps(props, CONTAINER_RUNTIME_KEYS);
 
+    const isUserOwnedInstance = runtimeProps.as !== undefined;
     const instance = props.as || new PixiClass(initialisationProps as any);
 
     bindInitialisationProps(instance, initialisationProps);
     bindRuntimeProps(instance, runtimeProps);
 
     onCleanup(() => {
+      if (isUserOwnedInstance) return;
+
       if ("attach" in instance) {
         // Means it's a render layer so we don't want to destroy children as they are managed elsewhere in the tree.
         instance.destroy({ children: false });
@@ -176,12 +179,14 @@ export const createSpriteComponent = <
   ): InstanceType & JSX.Element => {
     const [runtimeProps, initialisationProps] = splitProps(props, SPRITE_RUNTIME_KEYS);
 
+    const isUserOwnedInstance = runtimeProps.as !== undefined;
     const instance = props.as || new PixiClass(initialisationProps as any);
 
     bindInitialisationProps(instance, initialisationProps);
     bindRuntimeProps(instance, runtimeProps);
 
     onCleanup(() => {
+      if (isUserOwnedInstance) return;
       instance.destroy({ children: true });
     });
 
@@ -206,6 +211,7 @@ export const createAnimatedSpriteComponent = <
       "autoUpdate",
     ]);
 
+    const isUserOwnedInstance = runtimeProps.as !== undefined;
     const instance = props.as || new PixiClass(initialisationProps as any);
 
     // Set this to false to override Pixi's default shared ticker behaviour.
@@ -234,6 +240,7 @@ export const createAnimatedSpriteComponent = <
     bindRuntimeProps(instance, runtimeProps);
 
     onCleanup(() => {
+      if (isUserOwnedInstance) return;
       instance.destroy({ children: true });
     });
 
@@ -252,12 +259,14 @@ export const createTilingSpriteComponent = <
   ): InstanceType & JSX.Element => {
     const [runtimeProps, initialisationProps] = splitProps(props, TILING_SPRITE_RUNTIME_KEYS);
 
+    const isUserOwnedInstance = runtimeProps.as !== undefined;
     const instance = props.as || new PixiClass(initialisationProps as any);
 
     bindInitialisationProps(instance, initialisationProps);
     bindRuntimeProps(instance, runtimeProps);
 
     onCleanup(() => {
+      if (isUserOwnedInstance) return;
       instance.destroy({ children: true });
     });
 
@@ -271,6 +280,7 @@ export const createFilterComponent = <InstanceType extends Pixi.Filter, OptionsT
   return (props: OptionsType & FilterProps<InstanceType>): InstanceType & JSX.Element => {
     const [runtimeProps, initialisationProps] = splitProps(props, ["ref", "as"]);
 
+    const isUserOwnedInstance = runtimeProps.as !== undefined;
     const instance = props.as || new PixiClass(initialisationProps as any);
 
     for (const key in initialisationProps) {
@@ -308,6 +318,7 @@ export const createFilterComponent = <InstanceType extends Pixi.Filter, OptionsT
     }
 
     onCleanup(() => {
+      if (isUserOwnedInstance) return;
       instance.destroy();
     });
 

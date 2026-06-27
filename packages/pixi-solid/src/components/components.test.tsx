@@ -1,10 +1,17 @@
 import type * as Pixi from "pixi.js";
-import { Texture, Ticker } from "pixi.js";
+import {
+  AnimatedSprite as PixiAnimatedSprite,
+  Container as PixiContainer,
+  Sprite as PixiSprite,
+  Texture,
+  Ticker,
+  TilingSprite as PixiTilingSprite,
+} from "pixi.js";
 import { createSignal } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TickerProvider } from "../pixi-application";
-import { mountHeadless } from "../testing";
+import { mountTest } from "../testing";
 
 import { AnimatedSprite, Container, RenderLayer, Sprite, TilingSprite } from "./components";
 
@@ -17,7 +24,7 @@ describe("Component Factory Cleanup on Unmount", () => {
     let containerRef: Pixi.Container | undefined;
     let destroyCalled = false;
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <Container
         ref={(el) => {
           containerRef = el;
@@ -51,7 +58,7 @@ describe("Component Factory Cleanup on Unmount", () => {
       });
     };
 
-    const dispose = mountHeadless(() =>
+    const { dispose } = mountTest(() =>
       shouldShow() ? (
         <Container
           ref={(el) => {
@@ -92,7 +99,7 @@ describe("Component Factory Cleanup on Unmount", () => {
     const [showContainer, setShowContainer] = createSignal(true);
     let parentRef: Pixi.Container | undefined;
 
-    const dispose = mountHeadless(() =>
+    const { dispose } = mountTest(() =>
       showContainer() ? (
         <Container
           ref={(el) => {
@@ -135,7 +142,7 @@ describe("Component Factory Cleanup on Unmount", () => {
     const destroyedInstances: Pixi.Container[] = [];
     const [shouldShow, setShouldShow] = createSignal(true);
 
-    const dispose = mountHeadless(() =>
+    const { dispose } = mountTest(() =>
       shouldShow() ? (
         <Container
           ref={(el) => {
@@ -170,7 +177,7 @@ describe("RenderLayer Component Cleanup", () => {
     const [showChild, setShowChild] = createSignal(true);
     let renderLayerRef: Pixi.Container | undefined;
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <RenderLayer
         ref={(el) => {
           renderLayerRef = el;
@@ -210,7 +217,7 @@ describe("AnimatedSprite ticker integration", () => {
     const sharedTickerAddSpy = vi.spyOn(Ticker.shared, "add");
     const sharedTickerRemoveSpy = vi.spyOn(Ticker.shared, "remove");
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TickerProvider ticker={contextTicker}>
         <AnimatedSprite textures={[Texture.WHITE]} />
       </TickerProvider>
@@ -232,7 +239,7 @@ describe("AnimatedSprite ticker integration", () => {
     const contextTicker = new Ticker();
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TickerProvider ticker={contextTicker}>
         <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
       </TickerProvider>
@@ -248,7 +255,7 @@ describe("AnimatedSprite ticker integration", () => {
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
     const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TickerProvider ticker={contextTicker}>
         <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={true} />
       </TickerProvider>
@@ -271,7 +278,7 @@ describe("AnimatedSprite ticker integration", () => {
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
     const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TickerProvider ticker={contextTicker}>
         <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={autoUpdate()} />
       </TickerProvider>
@@ -293,7 +300,7 @@ describe("AnimatedSprite ticker integration", () => {
 
   it("GIVEN no TickerProvider WHEN mounted with autoUpdate={false} THEN it does not throw", () => {
     expect(() => {
-      const dispose = mountHeadless(() => (
+      const { dispose } = mountTest(() => (
         <AnimatedSprite textures={[Texture.WHITE]} autoUpdate={false} />
       ));
 
@@ -303,7 +310,7 @@ describe("AnimatedSprite ticker integration", () => {
 
   it("GIVEN no TickerProvider WHEN mounted with autoUpdate enabled THEN it throws", () => {
     expect(() => {
-      const dispose = mountHeadless(() => <AnimatedSprite textures={[Texture.WHITE]} />);
+      const { dispose } = mountTest(() => <AnimatedSprite textures={[Texture.WHITE]} />);
 
       dispose();
     }).toThrow();
@@ -315,7 +322,7 @@ describe("Sprite-like component cleanup", () => {
     let spriteRef: Pixi.Sprite | undefined;
     let destroyCalled = false;
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <Sprite
         texture={Texture.WHITE}
         ref={(el) => {
@@ -342,7 +349,7 @@ describe("Sprite-like component cleanup", () => {
     let destroyCalled = false;
     const contextTicker = new Ticker();
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TickerProvider ticker={contextTicker}>
         <AnimatedSprite
           textures={[Texture.WHITE]}
@@ -370,7 +377,7 @@ describe("Sprite-like component cleanup", () => {
     let tilingSpriteRef: Pixi.TilingSprite | undefined;
     let destroyCalled = false;
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TilingSprite
         texture={Texture.WHITE}
         width={100}
@@ -393,4 +400,89 @@ describe("Sprite-like component cleanup", () => {
 
     expect(destroyCalled).toBe(true);
   });
+});
+
+describe("as prop lifecycle — user-owned instances are not destroyed on cleanup", () => {
+  it("GIVEN a Container with as prop WHEN root is disposed THEN instance is NOT destroyed", () => {
+    const existingContainer = new PixiContainer();
+    let destroyCalled = false;
+
+    const originalDestroy = existingContainer.destroy.bind(existingContainer);
+    existingContainer.destroy = vi.fn((options) => {
+      destroyCalled = true;
+      originalDestroy(options);
+    });
+
+    const { dispose } = mountTest(() => (
+      <Container as={existingContainer} />
+    ));
+
+    dispose();
+
+    expect(destroyCalled).toBe(false);
+  });
+
+  it("GIVEN a Sprite with as prop WHEN root is disposed THEN instance is NOT destroyed", () => {
+    const existingSprite = new PixiSprite(Texture.WHITE);
+    let destroyCalled = false;
+
+    const originalDestroy = existingSprite.destroy.bind(existingSprite);
+    existingSprite.destroy = vi.fn((options) => {
+      destroyCalled = true;
+      originalDestroy(options);
+    });
+
+    const { dispose } = mountTest(() => (
+      <Sprite as={existingSprite} texture={Texture.WHITE} />
+    ));
+
+    dispose();
+
+    expect(destroyCalled).toBe(false);
+  });
+
+  it("GIVEN a TilingSprite with as prop WHEN root is disposed THEN instance is NOT destroyed", () => {
+    const existingTilingSprite = new PixiTilingSprite({ texture: Texture.WHITE, width: 100, height: 100 });
+    let destroyCalled = false;
+
+    const originalDestroy = existingTilingSprite.destroy.bind(existingTilingSprite);
+    existingTilingSprite.destroy = vi.fn((options) => {
+      destroyCalled = true;
+      originalDestroy(options);
+    });
+
+    const { dispose } = mountTest(() => (
+      <TilingSprite as={existingTilingSprite} texture={Texture.WHITE} width={100} height={100} />
+    ));
+
+    dispose();
+
+    expect(destroyCalled).toBe(false);
+  });
+
+  it("GIVEN an AnimatedSprite with as prop WHEN root is disposed THEN instance is NOT destroyed", () => {
+    const contextTicker = new Ticker();
+    const existingAnimatedSprite = new PixiAnimatedSprite({
+      textures: [Texture.WHITE],
+      autoUpdate: false,
+    });
+    let destroyCalled = false;
+
+    const originalDestroy = existingAnimatedSprite.destroy.bind(existingAnimatedSprite);
+    existingAnimatedSprite.destroy = vi.fn((options) => {
+      destroyCalled = true;
+      originalDestroy(options);
+    });
+
+    const { dispose } = mountTest(() => (
+      <TickerProvider ticker={contextTicker}>
+        <AnimatedSprite as={existingAnimatedSprite} textures={[Texture.WHITE]} />
+      </TickerProvider>
+    ));
+
+    dispose();
+
+    expect(destroyCalled).toBe(false);
+  });
+
 });

@@ -15,8 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - ✅ Added `setValue` method to `useSpring` hook for directly setting the current value, bypassing physics calculations for that frame.
 - ✅ Added `setValue` method to `useSmoothDamp` hook for directly setting the current value, bypassing damping calculations for that frame.
-- Added some more tests
+- ✅ **Testing utilities overhaul** — Replaced `mountHeadless` and `withTestRoot` with a single `mountTest({ value, dispose })`. Added `createManualTicker` with step-based `fastForwardFrames()` and `fastForwardTime()`. Added `createTestContext()` one-stop mock provider (`{ Provider, ticker, renderer, app }`). Added scene graph query helpers (`getByLabel`, `queryByLabel`, `getAllByLabel`). Removed vitest coupling from test-root. Added README, SPEC, and extraction-plan docs.
+- ✅ **`as` prop lifecycle** — Components no longer destroy instances provided via the `as` prop. The caller owns the lifecycle.
+- 💀 Removed `llms.txt` from package files and source.
+- 💀 Removed `mock-renderer.ts`, `test-provider.tsx`, `withTestRoot`, `mountHeadless` exports.
 - Updated the docs
+- 🐞 Added `browser` export path so vite won't try to bundle it in the server build in SSR frameworks.
 
 ## 0.2.0
 
