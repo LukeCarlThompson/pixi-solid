@@ -1,6 +1,6 @@
 {
   "name": "pixi-solid",
-  "version": "1.0.0-rc.8",
+  "version": "1.0.0-rc.9",
   "private": false,
   "description": "A library to write PixiJS applications with SolidJS",
   "homepage": "https://lukecarlthompson.github.io/pixi-solid/",
@@ -35,7 +35,7 @@
     "dev": "vite",
     "prebuild": "rm -rf dist",
     "build": "vite build && tsc --project tsconfig.build.json --emitDeclarationOnly",
-    "prepublishOnly": "pnpm run build",
+    "postbuild": "cp -r src/skill dist/skill",
     "preview": "vite preview",
     "preinstall": "npx only-allow pnpm",
     "test": "vitest --run",
