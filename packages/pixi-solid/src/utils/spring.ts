@@ -3,17 +3,14 @@ import { createSignal } from "solid-js";
 
 import { onTick } from "../on-tick";
 
-/**
- * @typedef {Object} UseSpringProps
- * @property {Accessor<number>} to - An accessor for the target value for the spring.
- * @property {Accessor<number>} [stiffness=10] - Effective range from 0 - 100. Controls the spring's resistance to displacement.
- * @property {Accessor<number>} [damping=30] - Effective range from 0 - 100. Controls the amount of friction or resistance to motion.
- * @property {Accessor<number>} [mass=20] - Effective range from 0 - 100. Controls the inertia of the spring.
- */
 export type UseSpringProps = {
+  /** The target value to spring towards. */
   to: () => number;
+  /** Spring stiffness (0–100, effective range). Controls resistance to displacement. Defaults to 10. */
   stiffness?: () => number;
+  /** Spring damping (0–100, effective range). Controls friction / resistance to motion. Defaults to 30. */
   damping?: () => number;
+  /** Spring mass (0–100, effective range). Controls inertia. Defaults to 20. */
   mass?: () => number;
 };
 
@@ -29,10 +26,14 @@ export type Spring = {
 
 /**
  * A SolidJS hook that provides a spring-animated signal towards a target value.
- * Internally manages the spring physics and continuous updates synced to the Pixi ticker.
+ * Internally manages spring physics with continuous updates synced to the Pixi ticker.
  *
- * @param {UseSpringProps} props - The properties for the spring animation.
- * @returns {Spring} An object containing the current spring-animated value, velocity, and a setter for the value.
+ * @example
+ * ```tsx
+ * const spring = useSpring({ to: () => targetX() });
+ *
+ * return <Sprite x={spring.value()} />;
+ * ```
  */
 export const useSpring = (props: UseSpringProps): Spring => {
   const [value, setValue] = createSignal(props.to());

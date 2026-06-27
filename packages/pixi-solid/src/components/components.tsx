@@ -44,7 +44,8 @@ export const Container = createContainerComponent<PixiContainer, Pixi.ContainerO
 );
 /**
  * A SolidJS component that renders a `PIXI.Graphics`.
- * Use a ref to access the underlying graphics instance and draw with it.
+ * Use a ref to access the underlying instance and call its imperative
+ * draw methods (e.g. `rect()`, `fill()`, `stroke()`).
  */
 export const Graphics = createLeafComponent<PixiGraphics, Pixi.GraphicsOptions>(PixiGraphics);
 /**

@@ -24,7 +24,10 @@ export type PointPropName = (typeof POINT_PROP_NAMES)[number];
 
 export const POINT_PROP_NAMES_SET: Set<string> = new Set(POINT_PROP_NAMES);
 
-// Common axis properties available on all Container-based components
+/**
+ * Axis-specific point property names available on all Container-based components:
+ * `positionX`, `positionY`, `scaleX`, `scaleY`, `pivotX`, `pivotY`, `skewX`, `skewY`.
+ */
 export const COMMON_POINT_PROP_AXIS_NAMES = [
   "positionX",
   "positionY",
@@ -36,14 +39,19 @@ export const COMMON_POINT_PROP_AXIS_NAMES = [
   "skewY",
 ] as const;
 
+/** A single axis-specific point property name available on all Container-based components. */
 export type CommonPointAxisPropName = (typeof COMMON_POINT_PROP_AXIS_NAMES)[number];
 
-// Anchor axis properties only available on Sprite-like components
+/** Axis-specific anchor property names available on Sprite-like components: `anchorX`, `anchorY`. */
 export const ANCHOR_POINT_PROP_AXIS_NAMES = ["anchorX", "anchorY"] as const;
 
+/** A single axis-specific anchor property name available on Sprite-like components. */
 export type AnchorPointAxisPropName = (typeof ANCHOR_POINT_PROP_AXIS_NAMES)[number];
 
-// Tiling axis properties only available on TilingSprite
+/**
+ * Axis-specific tiling property names available on TilingSprite:
+ * `tilePositionX`, `tilePositionY`, `tileScaleX`, `tileScaleY`.
+ */
 export const TILING_POINT_PROP_AXIS_NAMES = [
   "tilePositionX",
   "tilePositionY",
@@ -51,6 +59,7 @@ export const TILING_POINT_PROP_AXIS_NAMES = [
   "tileScaleY",
 ] as const;
 
+/** A single axis-specific tiling property name available on TilingSprite. */
 export type TilingPointAxisPropName = (typeof TILING_POINT_PROP_AXIS_NAMES)[number];
 
 // All axis properties (for runtime checking)
@@ -60,6 +69,7 @@ export const POINT_PROP_AXIS_NAMES = [
   ...TILING_POINT_PROP_AXIS_NAMES,
 ] as const;
 
+/** Any axis-specific point property name across all component types. */
 export type PointAxisPropName = (typeof POINT_PROP_AXIS_NAMES)[number];
 
 export const POINT_PROP_AXIS_NAMES_SET: Set<string> = new Set(POINT_PROP_AXIS_NAMES);
