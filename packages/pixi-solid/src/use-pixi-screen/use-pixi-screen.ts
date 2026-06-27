@@ -5,12 +5,14 @@ import { ScreenStoreContext } from "../pixi-application";
 import type { PixiScreenDimensions } from "./pixi-screen-store";
 
 /**
+ * A hook that provides a reactive object with the current dimensions of the
+ * Pixi application's screen. Properties update automatically when the screen
+ * size changes.
  *
- * A hook that provides a reactive object with the current dimensions of the Pixi application's screen.
- * The properties of the returned object update automatically when the screen size changes.
+ * Must be called within `PixiCanvas` or `PixiApplicationProvider`.
  *
- * This hook must be called from a component that is a descendant of `PixiCanvas` or `PixiApplicationProvider`.
- *
+ * @returns A reactive {@link PixiScreenDimensions} object with `width`, `height`,
+ * `x`, `y`, `left`, `right`, `top`, `bottom` properties.
  */
 export const usePixiScreen = (): Readonly<PixiScreenDimensions> => {
   const pixiScreenStore = useContext(ScreenStoreContext);

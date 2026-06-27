@@ -5,19 +5,14 @@ import { onCleanup, useContext } from "solid-js";
 import { TickerContext } from "./pixi-application";
 
 /**
- * onTick
+ * Registers a callback to run on every frame of the PIXI ticker.
+ * The callback is automatically removed when the owning computation is cleaned up.
  *
- * A custom SolidJS hook that registers a callback function to be executed on every frame
- * of the PIXI.Application's ticker. The callback is automatically removed when the
- * component or hook's owning computation is cleaned up.
- *
- * This hook must be called from a component that is a descendant of `PixiCanvas`,
- * `PixiApplicationProvider`, or `TickerProvider`.
+ * Must be called within `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider`.
  *
  * @param tickerCallback - The function to call on each ticker update. It receives
  * the `Pixi.Ticker` instance as its argument.
- * @param priority - An optional priority level for the ticker callback.
- *
+ * @param priority - Optional priority level for the ticker callback. Defaults to `UPDATE_PRIORITY.NORMAL`.
  */
 export const onTick = (
   tickerCallback: Pixi.TickerCallback<Pixi.Ticker>,
