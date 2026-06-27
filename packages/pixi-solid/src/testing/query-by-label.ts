@@ -42,13 +42,15 @@ export const queryByLabel = (
 export const getByLabel = (root: MaybeContainer, label: string): Pixi.Container => {
   if (!root) {
     throw new Error(
-      `getByLabel: root is ${root === undefined ? "undefined" : "null"}. Did you forget to assign the ref before querying?`,
+      "getByLabel: root is " +
+        (root === undefined ? "undefined" : "null") +
+        ". Did you forget to assign the ref before querying?",
     );
   }
 
   const found = queryByLabel(root, label);
   if (!found) {
-    throw new Error(`getByLabel: no node with label "${label}" found in the scene graph.`);
+    throw new Error('getByLabel: no node with label "' + label + '" found in the scene graph.');
   }
   return found;
 };
@@ -56,11 +58,20 @@ export const getByLabel = (root: MaybeContainer, label: string): Pixi.Container 
 /**
  * Find all display objects with the given label.
  * Useful for components that render lists of items with the same label.
- * Accepts `undefined` or `null` for convenience with refs — returns an
- * empty array if root is missing.
+ * Accepts `undefined` or `null` for convenience with refs — throws a
+ * clear error if the root is missing.
  */
-export const getAllByLabel = (root: MaybeContainer, label: string): Pixi.Container[] => {
-  if (!root) return [];
+export const getAllByLabel = (
+  root: MaybeContainer,
+  label: string,
+): Pixi.Container[] => {
+  if (!root) {
+    throw new Error(
+      "getAllByLabel: root is " +
+        (root === undefined ? "undefined" : "null") +
+        ". Did you forget to mount before querying?",
+    );
+  }
 
   const results: Pixi.Container[] = [];
 

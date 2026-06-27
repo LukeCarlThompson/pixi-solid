@@ -117,13 +117,15 @@ describe("cleanup", () => {
   });
 });
 
-describe("mountScene children() memo behaviour", () => {
+describe("mountScene stability and reactivity", () => {
   /**
-   * mountScene wraps the setup in children(), which creates a lazy memo.
-   * These tests verify that external signal changes do NOT cause the memo
-   * to re-evaluate (which would silently invalidate the container).
+   * mountScene calls setup() exactly once inside createRoot.
+   * These tests verify the behavioural contract:
+   * - setup runs once and the container is stable
+   * - signal changes propagate reactively via bindRuntimeProps
+   * - the container is never destroyed / swapped on signal changes
    */
-  it("GIVEN mountScene reads external signals in JSX WHEN signals change THEN container stays stable (memo never re-evaluates)", () => {
+  it("GIVEN mountScene reads external signals in JSX WHEN signals change THEN container stays stable and properties update reactively", () => {
     const [label, setLabel] = createSignal("first");
 
     const { container } = mountScene(() => (
@@ -132,14 +134,11 @@ describe("mountScene children() memo behaviour", () => {
 
     expect(container.label).toBe("first");
 
-    // Signal changes after mount — children() memo is dirtied but
-    // NOT re-evaluated because mountScene never reads the memo again.
+    // Signal changes after mount — properties update via bindRuntimeProps effects
     setLabel("second");
 
-    // Same container instance — memo didn't re-evaluate
+    // Same container instance, not destroyed
     expect(container.label).toBe("second");
-
-    // Container was never destroyed
     expect(container.destroyed).toBe(false);
   });
 
@@ -161,8 +160,8 @@ describe("mountScene children() memo behaviour", () => {
 
   it("GIVEN mountScene setup reads reactive signals in props WHEN signals change THEN instance properties update reactively via bindRuntimeProps, container stays stable, setup does NOT re-run", () => {
     // bindRuntimeProps uses createRenderEffect to subscribe to props.
-    // So even though the children() memo never re-evaluates, the existing
-    // instance's properties DO update reactively via SolidJS's effect system.
+    // So even though setup only runs once inside createRoot, the existing
+    // instance's properties update reactively via SolidJS's effect system.
     // The container stays stable (same instance), and no new instances are created.
     const [x, setX] = createSignal(10);
     const [label, setLabel] = createSignal("first");
@@ -181,7 +180,7 @@ describe("mountScene children() memo behaviour", () => {
     setX(50);
     setLabel("second");
 
-    // Setup did NOT re-run (children() memo is lazy, never re-read)
+    // Setup did NOT re-run (createRoot callback only executes once)
     expect(setupCalls).toBe(1);
 
     // Container is the SAME instance

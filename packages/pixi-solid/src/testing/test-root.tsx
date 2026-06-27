@@ -57,14 +57,6 @@ const createRootWithCleanup = <T,>(setup: () => T): CreateTestRootResult<T> => {
 
 const disposers = new Set<() => void>();
 
-const registerDisposer = (dispose: () => void): void => {
-  const wrapped = () => {
-    dispose();
-    disposers.delete(wrapped);
-  };
-  disposers.add(wrapped);
-};
-
 /**
  * Run all registered cleanup disposers and clear the registry.
  *
@@ -116,8 +108,12 @@ export const cleanup = (): void => {
  */
 export const createTestRoot = <T,>(setup: () => T): CreateTestRootResult<T> => {
   const result = createRootWithCleanup(setup);
-  registerDisposer(result.dispose);
-  return result;
+  const dispose = () => {
+    result.dispose();
+    disposers.delete(dispose);
+  };
+  disposers.add(dispose);
+  return { value: result.value, dispose };
 };
 
 // ---------------------------------------------------------------------------
@@ -159,17 +155,23 @@ export const mountScene = <TRoot = Pixi.Container>(
 ): MountSceneResult<TRoot> => {
   const result = createRootWithCleanup(() => {
     // Use children() to resolve the JSX tree into a concrete node.
-    // The type cast is safe: children() at runtime just calls the function
-    // and returns whatever it returns — it doesn't validate JSX.Element.
+    // This is necessary because Solid component functions may return
+    // reactive wrappers (e.g. memos for conditional rendering) rather
+    // than concrete DOM/PixiJS nodes. children() resolves through
+    // these wrappers to return the actual rendered instance.
     const resolved = children(setup);
     return resolved();
   });
 
-  registerDisposer(result.dispose);
+  const dispose = () => {
+    result.dispose();
+    disposers.delete(dispose);
+  };
+  disposers.add(dispose);
 
   return {
     container: result.value as unknown as TRoot,
-    dispose: result.dispose,
+    dispose,
   };
 };
 
