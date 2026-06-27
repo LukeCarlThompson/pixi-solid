@@ -2,7 +2,7 @@ import type * as Pixi from "pixi.js";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { mountTest } from "../../testing";
+import { mountScene } from "../../testing";
 
 import {
   bindChildrenToContainer,
@@ -32,7 +32,7 @@ describe("bindChildrenToContainer()", () => {
     const childC = createMockContainer() as unknown as Pixi.Container;
     const [children] = createSignal([childA, childB, childC]);
 
-    const { dispose } = mountTest(() => {
+    const { dispose } = mountScene(() => {
       bindChildrenToContainer(parent, (() => children()) as any);
       return null;
     });
@@ -52,7 +52,7 @@ describe("bindChildrenToContainer()", () => {
     const childD = createMockContainer() as unknown as Pixi.Container;
     const [children, setChildren] = createSignal([childA, childB, childC]);
 
-    const { dispose } = mountTest(() => {
+    const { dispose } = mountScene(() => {
       bindChildrenToContainer(parent, (() => children()) as any);
       return null;
     });
@@ -77,7 +77,7 @@ describe("bindChildrenToContainer()", () => {
     const childC = createMockContainer() as unknown as Pixi.Container;
     const [children, setChildren] = createSignal([childA, childB, childC]);
 
-    const { dispose } = mountTest(() => {
+    const { dispose } = mountScene(() => {
       bindChildrenToContainer(parent, (() => children()) as any);
       return null;
     });
@@ -98,7 +98,7 @@ describe("bindChildrenToContainer()", () => {
     const childB = createMockContainer() as unknown as Pixi.Container;
     const [children] = createSignal([childA, undefined, childB]);
 
-    const { dispose } = mountTest(() => {
+    const { dispose } = mountScene(() => {
       bindChildrenToContainer(parent, (() => children()) as any);
       return null;
     });
@@ -119,7 +119,7 @@ describe("bindChildrenToContainer()", () => {
         throw new Error("Cannot read properties of undefined (reading 'parent')");
       });
 
-      const { dispose } = mountTest(() => {
+      const { dispose } = mountScene(() => {
         bindChildrenToContainer(parent, (() => children()) as any);
         return null;
       });
@@ -143,7 +143,7 @@ describe("bindChildrenToContainer()", () => {
       });
 
       try {
-        const { dispose } = mountTest(() => {
+        const { dispose } = mountScene(() => {
           bindChildrenToContainer(parent, (() => children()) as any);
           return null;
         });
@@ -178,7 +178,7 @@ describe("bindChildrenToContainer()", () => {
         }
       });
 
-      const { dispose } = mountTest(() => {
+      const { dispose } = mountScene(() => {
         bindChildrenToContainer(parent, (() => children()) as any);
         return null;
       });
@@ -198,7 +198,7 @@ describe("bindChildrenToRenderLayer()", () => {
     const childC = createMockContainer() as unknown as Pixi.Container;
     const [children] = createSignal([childA, childB, childC]);
 
-    const { dispose } = mountTest(() => {
+    const { dispose } = mountScene(() => {
       bindChildrenToRenderLayer(parent, (() => children()) as any);
       return null;
     });
@@ -217,7 +217,7 @@ describe("bindChildrenToRenderLayer()", () => {
     const childC = createMockContainer() as unknown as Pixi.Container;
     const [children, setChildren] = createSignal([childA, childB, childC]);
 
-    const { dispose } = mountTest(() => {
+    const { dispose } = mountScene(() => {
       bindChildrenToRenderLayer(parent, (() => children()) as any);
       return null;
     });
@@ -236,7 +236,7 @@ describe("bindChildrenToRenderLayer()", () => {
     const childC = createMockContainer() as unknown as Pixi.Container;
     const [children, setChildren] = createSignal([childA, childB, childC]);
 
-    const { dispose } = mountTest(() => {
+    const { dispose } = mountScene(() => {
       bindChildrenToRenderLayer(parent, (() => children()) as any);
       return null;
     });
@@ -257,7 +257,7 @@ describe("bindChildrenToRenderLayer()", () => {
     const childB = createMockContainer() as unknown as Pixi.Container;
     const [children] = createSignal([childA, undefined, childB]);
 
-    const { dispose } = mountTest(() => {
+    const { dispose } = mountScene(() => {
       bindChildrenToRenderLayer(parent, (() => children()) as any);
       return null;
     });
@@ -278,7 +278,7 @@ describe("bindChildrenToRenderLayer()", () => {
         throw new Error("Invalid child");
       });
 
-      const { dispose } = mountTest(() => {
+      const { dispose } = mountScene(() => {
         bindChildrenToRenderLayer(parent, (() => children()) as any);
         return null;
       });

@@ -178,7 +178,7 @@ For unit tests pixi-solid provides testing utilities that avoid the need for a l
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { mountTest, createTestContext } from "pixi-solid/testing";
+import { mountScene, createTestContext } from "pixi-solid/testing";
 import { onTick } from "pixi-solid";
 
 describe("onTick", () => {
@@ -186,7 +186,7 @@ describe("onTick", () => {
     const ctx = createTestContext();
     let calls = 0;
 
-    const { dispose } = mountTest(() => (
+    mountScene(() => (
       <ctx.Provider>
         {onTick(() => { calls++; })}
       </ctx.Provider>
@@ -194,8 +194,6 @@ describe("onTick", () => {
 
     ctx.ticker.fastForwardFrames(5);
     expect(calls).toBe(5);
-
-    dispose();
   });
 });
 ```

@@ -14,7 +14,8 @@
     "preinstall": "npx only-allow pnpm",
     "lint": "oxlint",
     "fmt:check": "oxfmt --check",
-    "fmt": "oxfmt"
+    "fmt": "oxfmt",
+    "typecheck": "pnpm -r run typecheck"
   },
   "devDependencies": {
     "@types/node": "25.6.2",

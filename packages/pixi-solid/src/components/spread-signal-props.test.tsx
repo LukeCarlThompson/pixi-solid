@@ -2,7 +2,7 @@ import type * as Pixi from "pixi.js";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { mountTest } from "../testing";
+import { mountScene } from "../testing";
 
 import type { PixiComponentProps } from "./component-factories";
 import { Container } from "./components";
@@ -19,7 +19,7 @@ describe("Container with spread signal props", () => {
     let containerRef: Pixi.Container | undefined;
 
     // WHEN: Render a Container with spread props from the signal
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <Container
         ref={(el) => {
           containerRef = el;
@@ -66,7 +66,7 @@ describe("Container with spread signal props", () => {
 
     let containerRef: Pixi.Container | undefined;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <Container
         ref={(el) => {
           containerRef = el;
@@ -106,7 +106,7 @@ describe("Container with spread signal props", () => {
 
     let containerRef: Pixi.Container | undefined;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <Container
         ref={(el) => {
           containerRef = el;
@@ -145,7 +145,7 @@ describe("Container with spread signal props", () => {
 
     let containerRef: Pixi.Container | undefined;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <Container
         ref={(el) => {
           containerRef = el;
@@ -194,7 +194,7 @@ describe("Container with spread signal props", () => {
 
     let containerRef: Pixi.Container | undefined;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <Container
         ref={(el) => {
           containerRef = el;

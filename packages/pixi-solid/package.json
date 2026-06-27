@@ -1,6 +1,6 @@
 {
   "name": "pixi-solid",
-  "version": "1.0.0-rc.9",
+  "version": "1.0.0-rc.10",
   "private": false,
   "description": "A library to write PixiJS applications with SolidJS",
   "homepage": "https://lukecarlthompson.github.io/pixi-solid/",
@@ -29,6 +29,11 @@
       "browser": "./dist/utils/index.js",
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
+    },
+    "./testing": {
+      "browser": "./dist/testing/index.js",
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js"
     }
   },
   "scripts": {
@@ -42,7 +47,8 @@
     "test": "vitest --run",
     "test:bench": "vitest bench",
     "test:bench:save": "vitest bench --outputJson=src/benchmarks/results/baseline.json",
-    "test:bench:compare": "vitest bench --compare=src/benchmarks/results/baseline.json"
+    "test:bench:compare": "vitest bench --compare=src/benchmarks/results/baseline.json",
+    "typecheck": "tsc --project tsconfig.test.json --noEmit"
   },
   "peerDependencies": {
     "pixi.js": ">=8.14.3 <9",

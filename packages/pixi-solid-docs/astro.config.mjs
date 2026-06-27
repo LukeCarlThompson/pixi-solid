@@ -13,6 +13,9 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 export default defineConfig({
   site: "https://lukecarlthompson.github.io",
   base: "/pixi-solid",
+  markdown: {
+    gfm: true,
+  },
   integrations: [
     starlight({
       title: "Pixi Solid",
@@ -47,6 +50,10 @@ export default defineConfig({
         {
           label: "Examples",
           items: [{ autogenerate: { directory: "examples" } }],
+        },
+        {
+          label: "Testing",
+          items: [{ autogenerate: { directory: "testing" } }],
         },
       ],
     }),

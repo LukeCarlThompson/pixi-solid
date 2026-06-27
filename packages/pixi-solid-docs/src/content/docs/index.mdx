@@ -3,7 +3,7 @@ title: Pixi Solid
 description: Docs and examples for pixi-solid.
 template: splash
 hero:
-  tagline: PixiJS and SolidJS. An excellent combination for high performance interactive 2D graphics on the web.
+  tagline: High-performance 2D scenes, powered by SolidJS reactivity.
   image:
     file: ../../assets/pixi-solid-logo.png
   actions:
@@ -29,18 +29,14 @@ import demoLoadSceneAssets from "../demos/home-page-demo/load-scene-assets.ts?ra
 import demoControls from "../demos/home-page-demo/controls/index.tsx?raw";
 import demoControlsStyles from "../demos/home-page-demo/controls/style.module.css?raw";
 
-### Features
+### At a glance
 
 Pixi Solid is a library that provides [SolidJS](https://docs.solidjs.com/) components and hooks for working with [PixiJS](https://pixijs.com/).
 
-- 💙 Lightweight and flexible SolidJS library for creating PixiJS applications.
-- 🎁 Provides a set of custom SolidJS components that create PixiJS objects instead of HTML elements.
-- 📦 Supports all PixiJS objects, such as Filter, Container, Sprite, Graphics, Text, etc.
-- 🧑‍💻 The convenience and speed of SolidJS stores and signals to manage state.
-- ✨ All events emitted by PixiJS objects are supported.
-- 😎 No limitations. Break out of SolidJS any time and interact directly with PixiJS.
-- 💫 Useful helper utilities included.
-- 🤩 Full Typescript support for type safety and auto completion.
+- 📦 **Full component coverage** — Every major PixiJS display object has a corresponding component.
+- ⚡ **Signals-driven reactivity** — State changes automatically update your scene.
+- 🧹 **Automatic cleanup** — Components clean up after themselves on unmount.
+- 🧪 **Testable without a browser** — Context, hooks, and ticker are built for simulation.
 
 ---
 
@@ -61,24 +57,44 @@ Peer dependencies of
 
 ---
 
-### Why combine SolidJS with PixiJS?
+### Why pixi-solid?
 
-- **Declarative PixiJS scene graph**: Using SolidJS's JSX templating means we get declarative control over the scene graph.
-  No longer necessary to imperatively add and remove children.
+```tsx
+import { PixiCanvas, Sprite } from "pixi-solid";
+import { Texture } from "pixi.js";
 
-- **Lifecycle hooks in our PixiJS components**: SolidJS rendering PixiJS components means we can take advantage of the built in lifecycle methods in SolidJS `onMount` and `onCleanup` as well as few extra custom hooks so we can automatically subscribe and unsubscribe from the ticker.
+export const App = () => (
+  <PixiCanvas style={{ width: "100%", height: "100vh" }} background="#1099bb">
+    <Sprite texture={Texture.WHITE} x={100} y={100} />
+  </PixiCanvas>
+);
+```
 
-- **Shared State and Reactivity**: Pixi Solid leverages SolidJS's reactivity system to automatically update PixiJS components when SolidJS signals or stores change.
-  HTML elements and PixiJS graphics can stay in sync effortlessly.
+<dl>
+  <dt>Declarative scene graphs</dt>
+  <dd>Compose PixiJS objects with JSX instead of imperative addChild/removeChild calls.
+  The tree is your scene.</dd>
 
-- **Composability**: Pixi Solid components can be easily composed together to create complex scenes and animations out of reusable components.
+  <dt>Automatic lifecycle</dt>
+  <dd>Components clean up after themselves on unmount: display objects, event listeners,
+  ticker subscriptions, textures. No manual disposal tracking.</dd>
 
-- **SolidJS is a thin wrapper**: While Pixi Solid provides a nice abstraction over PixiJS it still provides access to all the properties and events of PixiJS objects directly.
+  <dt>Shared reactivity</dt>
+  <dd>Signals and stores drive both canvas content and HTML UI from the same state.
+  No bridging layer or two-way sync required.</dd>
 
-- **SolidJS is really fast**: SolidJS is on of the fastest front-end frameworks out there so the overhead is very minimal.
+  <dt>Unified timing</dt>
+  <dd>Animations, frame callbacks, and sprite updates all synchronise to the same ticker
+  context. No timing drift between onTick, useSpring, or AnimatedSprite.</dd>
 
-- **SolidJS is fully featured**: It has stores, signals, suspense, error boundaries, resource fetching and more.
-  It's a great feature set for simple or complex applications and you won't have to reach for other libraries to manage templating or state.
+  <dt>Full PixiJS coverage</dt>
+  <dd>Props, refs, event handlers, and compatibility with plain PixiJS children if you
+  need it.</dd>
+
+  <dt>Testable by design</dt>
+  <dd>Context providers, hooks, and the ticker are structured for simulation in tests.
+  No browser or canvas required for unit tests.</dd>
+</dl>
 
 ---
 

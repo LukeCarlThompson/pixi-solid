@@ -53,7 +53,7 @@ import { createSignal } from "solid-js";
 const CancellableDelayComponent = () => {
   const delay = createAsyncDelay();
   const [isWaiting, setIsWaiting] = createSignal(false);
-  let abortController: AbortController | undefined = undefined;
+  let abortController: AbortController | undefined;
 
   const handlePointerDown = async () => {
     setIsWaiting(true);

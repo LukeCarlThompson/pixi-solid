@@ -1,13 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "include": ["./src/**/*"],
-  "exclude": [
-    "src/demo/**/*",
-    "src/benchmarks/**/*",
-    "src/testing/**/*",
-    "**/*.test.ts",
-    "**/*.test.tsx"
-  ],
+  "exclude": ["src/demo/**/*", "src/benchmarks/**/*", "**/*.test.ts", "**/*.test.tsx"],
   "compilerOptions": {
     "target": "es2022",
     "declaration": true,

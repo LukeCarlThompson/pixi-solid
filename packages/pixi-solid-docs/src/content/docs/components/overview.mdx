@@ -61,6 +61,17 @@ let spriteRef: Pixi.Sprite | undefined;
 //...
 ```
 
+### Point-axis props by component
+
+All components support point-axis shorthand props for fine-grained reactivity. The specific axes
+available depend on the component type:
+
+| Component | Point-axis props |
+|---|---|
+| `Container`, `RenderContainer`, `RenderLayer`, `Graphics`, `ParticleContainer` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y` |
+| `Sprite`, `Text`, `BitmapText`, `HTMLText`, `NineSliceSprite`, `MeshPlane`, `MeshRope`, `PerspectiveMesh`, `AnimatedSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y` |
+| `TilingSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`, `tilePositionX/Y`, `tileScaleX/Y` |
+
 ### Property names
 
 All standard PixiJS properties available on a display object instance (e.g., x, y, rotation, alpha, width, height, scale, position, pivot, anchor, skew etc.) are directly available as props on the pixi-solid components.
@@ -111,6 +122,49 @@ export const ExampleComponent = () => {
       }}
     >
       {/* ...children */}
+    </Container>
+  );
+};
+```
+
+### Using a pre-existing instance with the `as` prop
+
+All pixi-solid components accept an optional `as` prop to use a **pre-existing PixiJS instance**
+instead of creating a new one. This is useful for sharing a single instance across parts of the
+tree, providing pre-configured instances, or injecting mock instances in tests.
+
+```tsx
+import { Container, Sprite } from "pixi-solid";
+import { Container as PixiContainer } from "pixi.js";
+
+const existingContainer = new PixiContainer();
+existingContainer.label = "my-container";
+
+const App = () => (
+  <Container as={existingContainer}>
+    <Sprite texture={Texture.WHITE} />
+  </Container>
+);
+```
+
+#### Lifecycle note
+
+When `as` is provided, pixi-solid assumes **you own the instance's lifecycle** and will not destroy
+it on unmount. You must destroy it manually when it is no longer needed.
+
+```tsx
+import { onCleanup } from "solid-js";
+
+const App = () => {
+  const existingContainer = new PixiContainer();
+
+  onCleanup(() => {
+    existingContainer.destroy({ children: true });
+  });
+
+  return (
+    <Container as={existingContainer}>
+      <Sprite texture={Texture.WHITE} />
     </Container>
   );
 };
