@@ -5,13 +5,13 @@ import { describe, expect, it } from "vitest";
 
 import { Sprite } from "../components/components";
 import { TickerProvider } from "../pixi-application";
-import { mountHeadless } from "../testing";
+import { mountTest } from "../testing";
 import { ObjectFitContainer } from "./object-fit";
 
 describe("ObjectFitContainer", () => {
   it("GIVEN observeBounds is false and no ticker context WHEN mounted THEN it does not throw", () => {
     expect(() => {
-      const dispose = mountHeadless(() => (
+      const { dispose } = mountTest(() => (
         <ObjectFitContainer width={100} height={100} fitMode="contain" observeBounds={false}>
           <Sprite texture={Texture.WHITE} width={50} height={50} />
         </ObjectFitContainer>
@@ -23,7 +23,7 @@ describe("ObjectFitContainer", () => {
 
   it("GIVEN no ticker context and observeBounds is omitted WHEN mounted THEN it does not throw", () => {
     expect(() => {
-      const dispose = mountHeadless(() => (
+      const { dispose } = mountTest(() => (
         <ObjectFitContainer width={100} height={100} fitMode="contain">
           <Sprite texture={Texture.WHITE} width={50} height={50} />
         </ObjectFitContainer>
@@ -35,7 +35,7 @@ describe("ObjectFitContainer", () => {
 
   it("GIVEN no ticker context and observeBounds is true WHEN mounted THEN it throws", () => {
     expect(() => {
-      const dispose = mountHeadless(() => (
+      const { dispose } = mountTest(() => (
         <ObjectFitContainer width={100} height={100} fitMode="contain" observeBounds={true}>
           <Sprite texture={Texture.WHITE} width={50} height={50} />
         </ObjectFitContainer>
@@ -50,7 +50,7 @@ describe("ObjectFitContainer", () => {
     const [spriteWidth, setSpriteWidth] = createSignal(50);
     let spriteRef: Pixi.Sprite | undefined;
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TickerProvider ticker={ticker}>
         <ObjectFitContainer width={100} height={100} fitMode="contain" observeBounds={false}>
           <Sprite
@@ -84,7 +84,7 @@ describe("ObjectFitContainer", () => {
     const [spriteWidth, setSpriteWidth] = createSignal(50);
     let spriteRef: Pixi.Sprite | undefined;
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TickerProvider ticker={ticker}>
         <ObjectFitContainer width={100} height={100} fitMode="contain" observeBounds={true}>
           <Sprite
@@ -118,7 +118,7 @@ describe("ObjectFitContainer", () => {
     let spriteRef1: Pixi.Sprite | undefined;
     let spriteRef2: Pixi.Sprite | undefined;
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TickerProvider ticker={ticker}>
         <ObjectFitContainer width={100} height={100} fitMode="contain" observeBounds={false}>
           <Sprite
@@ -157,7 +157,7 @@ describe("ObjectFitContainer", () => {
     const [sprite1Width, setSprite1Width] = createSignal(100);
     let spriteRef1: Pixi.Sprite | undefined;
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TickerProvider ticker={ticker}>
         <ObjectFitContainer width={100} height={100} fitMode="contain" observeBounds={true}>
           <Sprite
@@ -194,7 +194,7 @@ describe("ObjectFitContainer", () => {
     let spriteRef1: Pixi.Sprite | undefined;
     let spriteRef2: Pixi.Sprite | undefined;
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TickerProvider ticker={ticker}>
         <ObjectFitContainer width={100} height={100} fitMode="cover" observeBounds={false}>
           <Sprite

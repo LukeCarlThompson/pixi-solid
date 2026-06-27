@@ -1,23 +1,22 @@
 import { createEffect } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { mountHeadless, withTestRoot } from "../testing";
-import { createMockApp, createMockRenderer, TestPixiProvider } from "../testing/pixi-renderer-mock";
+import { mountTest } from "../testing";
+import { createTestContext } from "../testing";
 
 import { usePixiScreen } from "./use-pixi-screen";
 
 describe("usePixiScreen", () => {
   it("GIVEN no provider WHEN usePixiScreen is called THEN it throws", () => {
     expect(() => {
-      withTestRoot(() => {
+      mountTest(() => {
         usePixiScreen();
       });
     }).toThrow("usePixiScreen must be used within a PixiApplicationProvider or PixiCanvas");
   });
 
   it("GIVEN provider WHEN hook is read THEN it exposes initial dimensions and derived bounds", () => {
-    const renderer = createMockRenderer();
-    const app = createMockApp(renderer);
+    const ctx = createTestContext();
     let snapshot:
       | {
           width: number;
@@ -31,8 +30,8 @@ describe("usePixiScreen", () => {
         }
       | undefined;
 
-    const dispose = mountHeadless(() => (
-      <TestPixiProvider app={app} renderer={renderer}>
+    const { dispose } = mountTest(() => (
+      <ctx.Provider>
         {(() => {
           const screen = usePixiScreen();
           snapshot = {
@@ -47,7 +46,7 @@ describe("usePixiScreen", () => {
           };
           return null;
         })()}
-      </TestPixiProvider>
+      </ctx.Provider>
     ));
 
     expect(snapshot).toEqual({
@@ -65,13 +64,12 @@ describe("usePixiScreen", () => {
   });
 
   it("GIVEN provider WHEN resize changes values THEN hook updates reactively", async () => {
-    const renderer = createMockRenderer();
-    const app = createMockApp(renderer);
+    const ctx = createTestContext();
     let effectRuns = 0;
     const snapshots: Array<{ width: number; x: number; right: number; bottom: number }> = [];
 
-    const dispose = mountHeadless(() => (
-      <TestPixiProvider app={app} renderer={renderer}>
+    const { dispose } = mountTest(() => (
+      <ctx.Provider>
         {(() => {
           const screen = usePixiScreen();
 
@@ -87,12 +85,12 @@ describe("usePixiScreen", () => {
 
           return null;
         })()}
-      </TestPixiProvider>
+      </ctx.Provider>
     ));
 
     expect(effectRuns).toBe(1);
 
-    renderer.emitResize({ width: 900, x: 10, y: 20 });
+    ctx.renderer.emitResize({ width: 900, x: 10, y: 20 });
     await Promise.resolve();
 
     expect(effectRuns).toBe(2);
@@ -107,12 +105,11 @@ describe("usePixiScreen", () => {
   });
 
   it("GIVEN provider WHEN resize event fires with unchanged values THEN hook signals do not re-run", async () => {
-    const renderer = createMockRenderer();
-    const app = createMockApp(renderer);
+    const ctx = createTestContext();
     let effectRuns = 0;
 
-    const dispose = mountHeadless(() => (
-      <TestPixiProvider app={app} renderer={renderer}>
+    const { dispose } = mountTest(() => (
+      <ctx.Provider>
         {(() => {
           const screen = usePixiScreen();
 
@@ -126,12 +123,12 @@ describe("usePixiScreen", () => {
 
           return null;
         })()}
-      </TestPixiProvider>
+      </ctx.Provider>
     ));
 
     expect(effectRuns).toBe(1);
 
-    renderer.emitResize();
+    ctx.renderer.emitResize();
     await Promise.resolve();
 
     expect(effectRuns).toBe(1);

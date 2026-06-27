@@ -1,19 +1,18 @@
 import { createEffect } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { mountHeadless } from "./testing";
-import { createMockApp, createMockRenderer, TestPixiProvider } from "./testing/pixi-renderer-mock";
+import { mountTest } from "./testing";
+import { createTestContext } from "./testing";
 import { onResize } from "./on-resize";
 import { usePixiScreen } from "./use-pixi-screen";
 
 describe("onResize + usePixiScreen", () => {
   it("GIVEN onResize is used WHEN the component mounts THEN callback fires once on init", () => {
-    const renderer = createMockRenderer();
-    const app = createMockApp(renderer);
+    const ctx = createTestContext();
     let callbackCalls = 0;
 
-    const dispose = mountHeadless(() => (
-      <TestPixiProvider app={app} renderer={renderer}>
+    const { dispose } = mountTest(() => (
+      <ctx.Provider>
         {(() => {
           onResize(() => {
             callbackCalls += 1;
@@ -21,7 +20,7 @@ describe("onResize + usePixiScreen", () => {
 
           return null;
         })()}
-      </TestPixiProvider>
+      </ctx.Provider>
     ));
 
     expect(callbackCalls).toBe(1);
@@ -30,12 +29,11 @@ describe("onResize + usePixiScreen", () => {
   });
 
   it("GIVEN onResize and usePixiScreen WHEN size changes THEN callback sees updated screen values", async () => {
-    const renderer = createMockRenderer();
-    const app = createMockApp(renderer);
+    const ctx = createTestContext();
     const onResizeSnapshots: Array<{ callbackWidth: number; storeWidth: number }> = [];
 
-    const dispose = mountHeadless(() => (
-      <TestPixiProvider app={app} renderer={renderer}>
+    const { dispose } = mountTest(() => (
+      <ctx.Provider>
         {(() => {
           const pixiScreen = usePixiScreen();
 
@@ -48,10 +46,10 @@ describe("onResize + usePixiScreen", () => {
 
           return null;
         })()}
-      </TestPixiProvider>
+      </ctx.Provider>
     ));
 
-    renderer.emitResize({ width: 1024 });
+    ctx.renderer.emitResize({ width: 1024 });
     await Promise.resolve();
 
     const latestSnapshot = onResizeSnapshots[onResizeSnapshots.length - 1];
@@ -61,13 +59,12 @@ describe("onResize + usePixiScreen", () => {
   });
 
   it("GIVEN resize event fires with unchanged values WHEN both hooks are used THEN onResize fires but usePixiScreen signal does not re-run", async () => {
-    const renderer = createMockRenderer();
-    const app = createMockApp(renderer);
+    const ctx = createTestContext();
     let onResizeCalls = 0;
     let pixiScreenEffectRuns = 0;
 
-    const dispose = mountHeadless(() => (
-      <TestPixiProvider app={app} renderer={renderer}>
+    const { dispose } = mountTest(() => (
+      <ctx.Provider>
         {(() => {
           const pixiScreen = usePixiScreen();
 
@@ -86,13 +83,13 @@ describe("onResize + usePixiScreen", () => {
 
           return null;
         })()}
-      </TestPixiProvider>
+      </ctx.Provider>
     ));
 
     expect(pixiScreenEffectRuns).toBe(1);
     expect(onResizeCalls).toBe(1);
 
-    renderer.emitResize();
+    ctx.renderer.emitResize();
     await Promise.resolve();
 
     expect(onResizeCalls).toBe(2);

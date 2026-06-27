@@ -1,7 +1,7 @@
 import { createRoot, createSignal, createContext, useContext, onMount } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { withTestRoot } from "../../testing";
+import { mountTest } from "../../testing";
 import { bindInitialisationProps, bindRuntimeProps } from ".";
 
 // TODO: Add in better tests to differentiate between the initialisation and runtime props
@@ -73,7 +73,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN an instance and a ref callback WHEN bindRuntimeProps is called THEN the ref is called with the instance", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockContainer();
       const ref = vi.fn();
 
@@ -87,7 +87,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN a parent with a child that has a ref WHEN bindRuntimeProps is called THEN the ref is called before the child is added to the parent", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const parent = new MockContainer();
       const child = new MockContainer();
       let childParentAtRefTime: any = undefined;
@@ -114,7 +114,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN a ref callback that uses a context provider WHEN bindRuntimeProps is called THEN the ref can access the context", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const TestContext = createContext<string>();
       const instance = new MockContainer();
       let contextValue: string | undefined;
@@ -147,7 +147,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN a ref callback WHEN onMount runs THEN the ref value is available", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockContainer();
       let refValue: MockContainer | undefined;
       const state: { refValueAtMount?: MockContainer } = {};
@@ -171,7 +171,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN an instance and an onclick handler prop WHEN bindRuntimeProps is called THEN it adds the event listener", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockContainer();
       const handler = vi.fn();
 
@@ -186,7 +186,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN an instance with an onclick handler prop WHEN the handler changes THEN the previous listener is removed and the new one is added", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockContainer();
       const handlerA = vi.fn();
       const handlerB = vi.fn();
@@ -213,7 +213,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN an onclick handler prop that is unset WHEN bindRuntimeProps reruns THEN it removes the previous listener", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockContainer();
       const handlerA = vi.fn();
       const [handler, setHandler] = createSignal<(() => void) | undefined>(handlerA);
@@ -238,7 +238,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN a point prop object WHEN bindRuntimeProps is called THEN it sets the point values", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockPointContainer();
 
       bindRuntimeProps(instance as any, { position: { x: 3, y: 7 } } as any);
@@ -251,7 +251,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN a point axis prop WHEN it changes THEN the axis value updates", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockPointContainer();
       const [positionX, setPositionX] = createSignal(4);
 
@@ -274,7 +274,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN render layer children WHEN bindRuntimeProps is called THEN it attaches the children", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockRenderLayer();
       const childA = new MockContainer();
       const childB = new MockContainer();
@@ -291,7 +291,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN an invalid prop WHEN bindRuntimeProps is called THEN it does not throw and does not set the property", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockContainer();
 
       bindRuntimeProps(instance as any, { notAProp: 1 } as any);
@@ -306,7 +306,7 @@ describe("bindRuntimeProps()", () => {
 
 describe("bindInitialisationProps()", () => {
   it("GIVEN deferred reactive props WHEN bindInitialisationProps is called THEN the instance is not updated on the first run", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockContainer();
       const [x] = createSignal(1);
 
@@ -326,7 +326,7 @@ describe("bindInitialisationProps()", () => {
   });
 
   it("GIVEN deferred reactive props WHEN the prop value changes THEN the instance is updated", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockContainer();
       const [x, setX] = createSignal(1);
 
@@ -349,7 +349,7 @@ describe("bindInitialisationProps()", () => {
   });
 
   it("GIVEN a point prop WHEN bindInitialisationProps is called THEN it defers the initial update", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockPointContainer();
       const [position, setPosition] = createSignal({ x: 2, y: 6 });
 
@@ -372,7 +372,7 @@ describe("bindInitialisationProps()", () => {
   });
 
   it("GIVEN an invalid prop WHEN bindInitialisationProps is called THEN it does not throw and does not set the property after changes", () => {
-    const { value, dispose } = withTestRoot(() => {
+    const { value, dispose } = mountTest(() => {
       const instance = new MockContainer();
       const [prop, setProp] = createSignal(1);
 

@@ -1,7 +1,7 @@
 import { Filter } from "pixi.js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { mountHeadless } from "../testing";
+import { mountTest } from "../testing";
 
 import { createFilterComponent } from "./component-factories";
 
@@ -16,7 +16,7 @@ describe("createFilterComponent cleanup", () => {
     let filterRef: Filter | undefined;
     let destroyCalled = false;
 
-    const dispose = mountHeadless(() => (
+    const { dispose } = mountTest(() => (
       <TestFilter
         ref={(el) => {
           filterRef = el;
