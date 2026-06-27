@@ -29,6 +29,11 @@
       "browser": "./dist/utils/index.js",
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
+    },
+    "./testing": {
+      "browser": "./dist/testing/index.js",
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js"
     }
   },
   "scripts": {

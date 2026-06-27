@@ -31,7 +31,7 @@ import {
 
 ## mountTest
 
-`mountTest(setup)` mounts JSX or runs Solid code in a temporary root. Returns `{ value, dispose }`.
+`mountTest<T>(setup)` mounts JSX or runs Solid code in a temporary root. Returns `MountResult<T>` — an object with `{ value: T, dispose: () => void }`.
 
 ### Rendering components with onTick
 

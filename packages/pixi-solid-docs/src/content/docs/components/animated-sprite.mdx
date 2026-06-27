@@ -11,6 +11,19 @@ A SolidJS component that renders a PixiJS `AnimatedSprite`.
 
 Please see the [PixiJS docs](https://pixijs.download/release/docs/scene.AnimatedSprite.html) for detailed information.
 
+### Props
+
+`AnimatedSprite` accepts all standard sprite props (anchor, event handlers, point-axis
+shorthands) plus the following `AnimatedSprite`-specific options:
+
+| Prop | Type | Description |
+|---|---|---|
+| `textures` | `Pixi.Texture[]` | Array of textures to cycle through |
+| `playing` | `boolean` | Whether the animation is currently playing (default `true`) |
+| `loop` | `boolean` | Whether the animation loops (default `true`) |
+| `animationSpeed` | `number` | Speed multiplier for the animation (default `1`) |
+| `autoUpdate` | `boolean` | See autoUpdate behaviour below (default `true`) |
+
 ### autoUpdate behaviour
 
 `AnimatedSprite` in `pixi-solid` `autoUpdate` behaviour intentionally differs from PixiJS defaults to integrate with the `pixi-solid` ticker context providers.

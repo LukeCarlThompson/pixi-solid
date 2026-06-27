@@ -1,7 +1,7 @@
 import type { JSX } from "solid-js";
 import { children, createRoot } from "solid-js";
 
-type MountResult<T = void> = {
+export type MountResult<T = void> = {
   /**
    * The value returned by the setup function. For JSX renderers this is
    * the resolved children (typically a PixiJS scene node).

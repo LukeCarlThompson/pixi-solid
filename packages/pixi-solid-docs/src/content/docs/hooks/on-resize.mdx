@@ -5,13 +5,25 @@ sidebar:
   order: 5
 ---
 
+import { Aside } from "@astrojs/starlight/components";
+
 The `onResize` hook provides a convenient way to react to changes in the Pixi.js renderer's dimensions. It executes a specified callback function whenever the renderer's screen size is updated, which occurs when the browser window is resized or when the HTML element containing the PixiCanvas changes dimensions.
 
 This hook must be called from a component that is a descendant of either `<PixiApplicationProvider />` or `<PixiCanvas />`. If used outside of this context, it will throw an error.
 
 ### Usage
 
-The `onResize` hook takes a single argument: a `resizeCallback` function. This callback receives a `Pixi.Rectangle` object, which contains the current `width`, `height`, `x`, and `y` of the renderer's screen. The callback is invoked immediately upon the hook's initialization and then again every time the renderer detects a resize event.
+The `onResize` hook takes a single argument: a `resizeCallback` function. This callback receives a
+`Pixi.Rectangle` object, which contains the current `width`, `height`, `x`, and `y` of the
+renderer's screen. The callback is invoked immediately upon the hook's initialisation and then
+again every time the renderer detects a resize event.
+
+<Aside type="tip" title="Compatibility with usePixiScreen">
+  The callback is scheduled via <code>queueMicrotask</code>, which means it fires shortly after the
+  renderer's resize event — not synchronously during it. This ensures that
+  <code>usePixiScreen</code> store listeners have already synchronised their reactive values before
+  your callback runs, avoiding stale reads when both hooks are used together.
+</Aside>
 
 ```tsx
 import { onResize, PixiCanvas, Text } from "pixi-solid";

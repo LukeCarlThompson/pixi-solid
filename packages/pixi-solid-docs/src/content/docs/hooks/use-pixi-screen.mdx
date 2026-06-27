@@ -5,9 +5,27 @@ sidebar:
   order: 6
 ---
 
-The `usePixiScreen` hook provides a reactive object containing the current dimensions of the Pixi application's screen. This object's properties (width, height, x, y, etc.) automatically update when the renderer's screen size changes, allowing you to build responsive Pixi.js applications that react to resizing events.
+The `usePixiScreen` hook returns a reactive object containing the current dimensions of the
+Pixi application's screen. Its properties automatically update when the renderer's screen size
+changes, allowing you to build responsive Pixi.js applications that react to resizing events.
 
-It must be called within a component or another hook, that is a descendant of either `<PixiApplicationProvider />` or `<PixiCanvas />`.
+It must be called within a component or another hook that is a descendant of either
+`<PixiApplicationProvider />` or `<PixiCanvas />`.
+
+### Reactive properties
+
+The returned object provides the following properties, all of which update automatically on resize:
+
+| Property | Type | Description |
+|---|---|---|
+| `width` | `number` | Screen width in pixels |
+| `height` | `number` | Screen height in pixels |
+| `x` | `number` | Screen x-offset |
+| `y` | `number` | Screen y-offset |
+| `left` | `number` | Alias for `x` |
+| `right` | `number` | `x + width` |
+| `top` | `number` | Alias for `y` |
+| `bottom` | `number` | `y + height` |
 
 ### Usage
 
