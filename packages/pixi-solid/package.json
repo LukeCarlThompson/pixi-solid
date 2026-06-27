@@ -15,8 +15,7 @@
     "README.md",
     "LICENSE",
     "CHANGELOG.md",
-    "pixi-solid-logo.png",
-    "llms.txt"
+    "pixi-solid-logo.png"
   ],
   "type": "module",
   "sideEffects": false,
