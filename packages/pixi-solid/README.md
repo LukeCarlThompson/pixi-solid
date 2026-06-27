@@ -10,16 +10,15 @@
 
 # Pixi-Solid
 
-A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your scene with [SolidJS](https://www.solidjs.com/) JSX components and its fine-grained signals based reactivity.
+A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your scene with [SolidJS](https://www.solidjs.com/) JSX components and its fine-grained signal-based reactivity.
 
-- 💙 Lightweight and flexible SolidJS library for creating PixiJS applications.
-- 🎁 Provides a set of custom SolidJS components that create PixiJS objects instead of HTML elements.
-- 💪 Supports all PixiJS features.
-- 🥳 The convenience and speed of SolidJS stores and signals to manage state.
-- ✨ All events emitted by PixiJS objects are supported.
-- 😎 No limitations. Break out of SolidJS any time and interact directly with PixiJS.
-- 💫 Useful helper utilities for animations, layout, and async timing.
-- 🤩 Full TypeScript support with strict type safety and auto completion throughout the API.
+- 📦 **Full component coverage** — Every major PixiJS display object has a corresponding component.
+- ⚡ **Signals-driven reactivity** — State changes automatically update your scene.
+- 🧹 **Automatic cleanup** — Components clean up after themselves on unmount (display objects, event listeners, ticker subscriptions, textures).
+- 🧪 **Testable without a browser** — Context, hooks, and ticker are built for simulation. `pixi-solid/testing` provides mountScene, scene graph queries, and manual ticker helpers.
+- ✨ **All PixiJS events supported** — Every federated event from PixiJS works as a component prop.
+- 🛠️ **Utilities included** — Animation helpers (spring, smooth damp), layout (object-fit), and async timing. Available via `pixi-solid/utils`.
+- 🤩 **Full TypeScript support** — Strict type safety and auto completion throughout the API.
 
 ## Install
 
@@ -51,11 +50,11 @@ export const DemoApp = () => {
   };
 
   return (
-    <PixiCanvas style={{ width: "100%", height: "100vh" }}>
+    <PixiCanvas style={{ width: "100%", height: "100vh" }} background="#1099bb">
       <Sprite
         texture={Texture.WHITE}
         scale={scale()}
-        onpointertap={handleSpriteTap}
+        onpointerdown={handleSpriteTap}
         tint="#ff0000"
       />
     </PixiCanvas>
@@ -66,64 +65,33 @@ export const DemoApp = () => {
 ## More information
 
 - 📖 **[Documentation](https://lukecarlthompson.github.io/pixi-solid/)** — Getting started, components, hooks, utilities, and live examples.
+- 🎮 **[Live Demo](https://lukecarlthompson.github.io/pixi-solid/)** — Interactive example on the docs homepage.
 - 🐛 **[GitHub Issues](https://github.com/LukeCarlThompson/pixi-solid/issues)** — Report bugs or request features.
 
 ## Why combine SolidJS with PixiJS?
 
-- **Declarative PixiJS scene graph**: Using SolidJS's JSX templating means we get declarative control over the scene graph. For improved separation of concerns, simpler views and more scalable projects.
+**Declarative scene graphs.** Compose PixiJS objects with JSX instead of imperative `addChild`/`removeChild` calls. The tree is your scene.
 
-- **SolidJS hooks in our PixiJS components**: SolidJS rendering PixiJS components means we can take advantage of the built in lifecycle methods in SolidJS `onMount`, `onCleanup` as well as extra custom hooks for responsive behaviour and ticker subscriptions.
+**Automatic lifecycle.** Components clean up after themselves on unmount — display objects, event listeners, ticker subscriptions, textures. No manual disposal tracking.
 
-- **Shared State and Reactivity**: HTML and PixiJS graphics can stay in sync effortlessly because they can subscribe to the same state.
+**Shared reactivity.** Signals and stores drive both canvas content and HTML UI from the same state. No bridging layer or two-way sync required.
 
-- **Combine the best of both worlds**: Pixi Solid makes it easy to use HTML elements alongside or on top of a PixiJS canvas, allowing you to create rich user interfaces that combine the strengths of both technologies.
+**Unified timing.** Animations, frame callbacks, and sprite updates all synchronise to the same ticker context. No timing drift between `onTick`, `useSpring`, or `AnimatedSprite`.
 
-- **Composability**: Pixi Solid components can be easily composed together to create complex scenes and animations out of reusable components.
+**HTML + canvas side by side.** Use HTML elements alongside or on top of your PixiJS canvas to create rich user interfaces that combine the strengths of both technologies.
 
-- **SolidJS is a thin wrapper**: While Pixi Solid provides a nice abstraction over PixiJS it provides access to all the properties and events of PixiJS objects.
+**Full PixiJS coverage.** Every PixiJS property, event, and ref is accessible. Break out of the abstraction any time and interact directly with PixiJS objects.
 
-- **SolidJS is really fast**: SolidJS is one of the fastest front-end frameworks out there so the overhead is very minimal.
-
-- **SolidJS is fully featured**: It has stores, signals, suspense, error boundaries, resource fetching and more. It's a great feature set for simple or complex applications and you won't have to reach for other libraries to manage templating or state.
+**Testable by design.** Context providers, hooks, and the ticker are structured for simulation in tests. No browser or canvas required for unit tests.
 
 ## AI-Assisted Development
 
-This library includes an `llms.txt` file to help AI code assistants understand pixi-solid's API and patterns. When using an LLM to generate pixi-solid code, configure your tool to use it:
+This project provides skill-based documentation for AI code assistants, containing the library's API and patterns. When using an LLM to generate pixi-solid code, you can reference:
 
-### Automatic Discovery (Recommended)
-
-Most modern LLM tools can discover llms.txt files in node_modules automatically. Check your tool's documentation or configuration:
-
-- **Cursor**: Scans `node_modules` for context files by default
-- **GitHub Copilot**: May support llms.txt discovery depending on your setup
-- **Claude**: Use in custom instructions or system prompts
-- **VSCode Copilot Chat**: Can reference from context
-
-### Manual Configuration
-
-If your tool doesn't auto-discover, you can explicitly point it to:
-
-```
-node_modules/pixi-solid/llms.txt
-```
-
-Example for Cursor's `.cursorrules`:
-
-```
-# Reference pixi-solid documentation for LLM context
-node_modules/pixi-solid/llms.txt
-```
-
-### Custom Instructions
-
-For tools that support it, add to your project instructions or system prompt:
-
-```
-You are helping with a pixi-solid (PixiJS + SolidJS) project.
-Reference: node_modules/pixi-solid/llms.txt
-```
-
-By referencing the file in node_modules, you automatically get updates when you upgrade the library, and you won't need to manually manage context files.
+- [`SKILL.md`](https://github.com/LukeCarlThompson/pixi-solid/blob/main/packages/pixi-solid/src/skill/pixi-solid/SKILL.md) — main entry point for the skill docs
+- [Skill API references](https://github.com/LukeCarlThompson/pixi-solid/tree/main/packages/pixi-solid/src/skill/pixi-solid) — detailed docs on components, hooks, lifecycle, testing, and utils
+- [`AGENTS.md`](https://github.com/LukeCarlThompson/pixi-solid/blob/main/AGENTS.md) — contribution and architecture guide
+- [📖 Docs site](https://lukecarlthompson.github.io/pixi-solid/) — live examples and interactive documentation
 
 ## Contributing
 
