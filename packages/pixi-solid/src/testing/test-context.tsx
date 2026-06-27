@@ -37,7 +37,7 @@ export type TestContext = {
  * ```tsx
  * const ctx = createTestContext();
  *
- * const { dispose } = mountTest(() => (
+ * mountScene(() => (
  *   <ctx.Provider>
  *     <MyComponent />
  *   </ctx.Provider>

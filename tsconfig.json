@@ -1,5 +1,5 @@
 {
-  "exclude": ["node_modules", "**/*.test.ts", "dist", "docs"],
+  "exclude": ["node_modules", "dist", "docs"],
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",

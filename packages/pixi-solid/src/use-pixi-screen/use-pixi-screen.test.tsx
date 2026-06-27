@@ -1,7 +1,7 @@
 import { createEffect } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { mountTest } from "../testing";
+import { createTestRoot } from "../testing";
 import { createTestContext } from "../testing";
 
 import { usePixiScreen } from "./use-pixi-screen";
@@ -9,7 +9,7 @@ import { usePixiScreen } from "./use-pixi-screen";
 describe("usePixiScreen", () => {
   it("GIVEN no provider WHEN usePixiScreen is called THEN it throws", () => {
     expect(() => {
-      mountTest(() => {
+      createTestRoot(() => {
         usePixiScreen();
       });
     }).toThrow("usePixiScreen must be used within a PixiApplicationProvider or PixiCanvas");
@@ -30,7 +30,7 @@ describe("usePixiScreen", () => {
         }
       | undefined;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = createTestRoot(() => (
       <ctx.Provider>
         {(() => {
           const screen = usePixiScreen();
@@ -68,7 +68,7 @@ describe("usePixiScreen", () => {
     let effectRuns = 0;
     const snapshots: Array<{ width: number; x: number; right: number; bottom: number }> = [];
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = createTestRoot(() => (
       <ctx.Provider>
         {(() => {
           const screen = usePixiScreen();
@@ -108,7 +108,7 @@ describe("usePixiScreen", () => {
     const ctx = createTestContext();
     let effectRuns = 0;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = createTestRoot(() => (
       <ctx.Provider>
         {(() => {
           const screen = usePixiScreen();

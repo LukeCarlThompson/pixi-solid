@@ -28,7 +28,7 @@ This skill documents only the public API exported by the package. Quick checklis
 - Components: AnimatedSprite, BitmapText, Container, Graphics, HTMLText, MeshPlane, MeshRope, NineSliceSprite, ParticleContainer, PerspectiveMesh, RenderContainer, RenderLayer, Sprite, Text, TilingSprite — see [component-types.md](./component-types.md)
 - Utils: delay, createAsyncDelay, objectFit, ObjectFitContainer, useSpring, useSmoothDamp — see [utils-reference.md](./utils-reference.md)
 - Types: PixiComponentProps, ContainerProps, LeafProps, SpriteProps, TilingSpriteProps, point-axis types, and event handler types — see [component-types.md](./component-types.md)
-- Testing: mountTest, createTestContext, createManualTicker, getByLabel, queryByLabel, getAllByLabel — see [testing.md](./testing.md)
+- Testing: mountScene, createTestRoot, createTestContext, createManualTicker, getByLabel, queryByLabel, getAllByLabel, cleanup — see [testing.md](./testing.md)
 
 ## Components
 
@@ -174,4 +174,4 @@ For complete signatures, parameters, and examples, see [utils-reference.md](./ut
 
 - See [utils-reference.md](./utils-reference.md) for delays, object fitting, and animation utilities.
 - See [hooks-lifecycle.md](./hooks-lifecycle.md) for hook signatures, constraints, and provider requirements.
-- See [testing.md](./testing.md) for `mountTest`, `createTestContext`, `createManualTicker`, and scene graph queries.
+- See [testing.md](./testing.md) for `mountScene`, `createTestRoot`, `createTestContext`, `createManualTicker`, and scene graph queries.

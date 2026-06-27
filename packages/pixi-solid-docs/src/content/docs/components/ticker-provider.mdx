@@ -54,6 +54,49 @@ export const DemoApp = () => {
 };
 ```
 
+### Testing with manual ticker control
+
+One testing scenario where we need to control time is verifying that a component
+behaves correctly across multiple frames. Create a stopped `Ticker`, wrap your
+component in `TickerProvider`, and advance frames manually using `ticker.update()`.
+
+```tsx
+import { TickerProvider, onTick, Sprite } from "pixi-solid";
+import { Ticker, Texture } from "pixi.js";
+import type * as Pixi from "pixi.js";
+import { createRoot } from "solid-js";
+
+// A component that animates position based on delta time
+// The ref prop receives the underlying Pixi sprite instance
+const MovingSprite = (props: { ref?: Pixi.Sprite }) => {
+  onTick((ticker) => {
+    props.ref.x += 100 * (ticker.deltaMS / 1000);
+  });
+
+  return <Sprite texture={Texture.WHITE} ref={props.ref} />;
+};
+
+let spriteRef: Pixi.Sprite | undefined;
+let ticker = new Ticker();
+
+createRoot(() => (
+  <TickerProvider ticker={ticker}>
+    <MovingSprite ref={(r) => (spriteRef = r)} />
+  </TickerProvider>
+));
+
+// Advance 10 frames at 16ms each (~60fps)
+for (let i = 0; i < 10; i++) {
+  ticker.update(16);
+}
+
+// After 160ms at 100px/s, position should be 16px
+console.log(spriteRef.x);
+```
+
+This lets you test frame-dependent behaviour deterministically without mounting
+a real canvas.
+
 ### Independent ticker context for subtrees
 
 You can also nest `TickerProvider` to give a specific subtree its own independent ticker while the rest of the application uses the default ticker.
