@@ -27,6 +27,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md#component-architecture) for the full arc
 
 ## Resources
 
+- **Philosophy**: [PHILOSOPHY.md](PHILOSOPHY.md) — high-level design principles and library values
 - **Docs Site**: https://lukecarlthompson.github.io/pixi-solid/
 - **PixiJS Docs**: https://pixijs.com/
 - **SolidJS Docs**: https://www.solidjs.com/
