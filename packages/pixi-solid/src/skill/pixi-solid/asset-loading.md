@@ -1,5 +1,5 @@
 ---
-name: pixi-solid-asset-loading
+name: asset-loading
 description: Patterns for loading and managing assets with pixi-solid. Covers createResource, PixiJS manifests, bundle loading, and scene-gated asset patterns.
 metadata:
   triggers: "pixi-solid asset, pixi-solid load, pixi-solid preload, pixi-solid manifest, pixi-solid bundle, createResource, Assets.load, Assets.loadBundle, texture loading pixi-solid"
@@ -48,6 +48,8 @@ Initialise the manifest and load a bundle together inside a single `createResour
 
 ```tsx
 import { Assets, Texture } from "pixi.js";
+import { createResource, Show } from "solid-js";
+import { Sprite } from "pixi-solid";
 
 function MenuScene() {
   const [ready] = createResource(async () => {
@@ -88,6 +90,10 @@ Avoid mixing asset loading logic inside render-heavy Pixi components. Prefer to:
 - Keep scene components focused on display and interaction logic.
 
 ```tsx
+import { Assets, Texture } from "pixi.js";
+import { createResource, Show } from "solid-js";
+import { Sprite } from "pixi-solid";
+
 // Good: loading is handled by the parent
 function GameScreen() {
   const [ready] = createResource(async () => {
@@ -111,8 +117,8 @@ function GameScene() {
 ## Full example: scene-based loading
 
 ```tsx
-import { Assets } from "pixi.js";
-import { createResource, Show, Switch, Match } from "solid-js";
+import { Assets, Texture } from "pixi.js";
+import { createResource, createSignal, Show, Switch, Match } from "solid-js";
 import { PixiCanvas, Container, Sprite } from "pixi-solid";
 
 const manifest = {
