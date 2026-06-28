@@ -9,9 +9,7 @@ import { Aside } from "@astrojs/starlight/components";
 
 The `delay` function provides a way to create a function that will run a callback after a specified number of milliseconds of ticker time.
 
-It ensures that the delay is in sync with the shared ticker's time units, making it ideal for animations or syncing with other actions based on ticker time.
-
-The delay is synchronized with the shared ticker, so it will not progress if the ticker is paused or stopped.
+It ensures that the delay is in sync with the ticker from the nearest context provider, making it ideal for animations or syncing with other actions based on a common ticker time.
 
 This function must be called within a SolidJS tracking scope, such as a component or another function, that is a descendant of `PixiApplicationProvider`, `PixiCanvas` or `TickerProvider`
 

@@ -15,15 +15,12 @@ If used outside of this context, it will throw an error.
 
 ```tsx
 import { getPixiApp, Container, PixiCanvas } from "pixi-solid";
-import { createEffect } from "solid-js";
 
 const MyComponent = () => {
   const app = getPixiApp();
 
-  createEffect(() => {
-    // You can now safely use the Pixi.js Application instance
-    console.log("Pixi.js Application instance:", app);
-  });
+  // You can now safely use the Pixi.js Application instance
+  console.log("Pixi.js Application instance:", app);
 
   return <Container>{/* Your components here*/}</Container>;
 };

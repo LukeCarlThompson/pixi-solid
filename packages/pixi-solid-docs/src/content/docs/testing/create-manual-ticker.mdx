@@ -1,0 +1,50 @@
+---
+title: createManualTicker
+description: Create a stopped ticker with step-based frame advancement for testing.
+sidebar:
+  order: 5
+---
+
+Creates a stopped PixiJS ticker with step-based frame advancement methods.
+
+```tsx
+type ManualTicker = {
+  ticker: Ticker;
+  fastForwardFrames(frames: number, deltaTime?: number): void;
+  fastForwardTime(totalTimeMS: number, stepSizeMS?: number): void;
+};
+```
+
+## fastForwardFrames()
+
+Advance a specific number of frames, each with an optional delta time (defaults to 16ms).
+
+```tsx
+const manual = createManualTicker();
+let calls = 0;
+manual.ticker.add(() => { calls++; });
+
+manual.fastForwardFrames(10);       // 10 frames at 16ms each
+manual.fastForwardFrames(5, 33);    // 5 frames at 33ms each (~30fps)
+expect(calls).toBe(15);
+```
+
+## fastForwardTime()
+
+Advance frames to simulate a total elapsed time, splitting it into steps of a given size (defaults to ~16ms).
+
+```tsx
+manual.fastForwardTime(1000);           // 1 second in ~16ms steps
+manual.fastForwardTime(500, 50);        // 500ms in 50ms steps
+```
+
+import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="note">
+  Step-based advancement avoids the footgun of large single-frame deltas that can break spring,
+  smooth-damp, or sequenced animations.
+</Aside>
+
+## Related
+
+- [`createTestContext`](../create-test-context) — creates mock context that includes a `ManualTicker`

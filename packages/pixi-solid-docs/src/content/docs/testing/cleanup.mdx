@@ -1,0 +1,35 @@
+---
+title: cleanup
+description: Run all registered disposers for test teardown.
+sidebar:
+  order: 7
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+All disposers created by `mountScene` and `createTestRoot` are registered with a global registry.
+Wire `cleanup()` into your test framework's lifecycle to run them automatically:
+
+```tsx
+import { afterEach } from "vitest";
+import { cleanup } from "pixi-solid/testing";
+
+afterEach(() => cleanup());
+```
+
+Once wired, you no longer need to track `dispose`:
+
+```tsx
+it("some test", () => {
+  mountScene(() => <Container label="root" />);
+  // cleanup runs automatically in afterEach
+});
+```
+
+To disable automatic cleanup for a specific test, call `dispose()` directly:
+
+```tsx
+const { dispose } = mountScene(() => <Container />);
+// ... test logic ...
+dispose();
+```

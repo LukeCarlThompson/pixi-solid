@@ -1,0 +1,59 @@
+---
+title: mountScene
+description: Mount JSX in a temporary Solid root for testing view components that render a Pixi display object.
+sidebar:
+  order: 2
+---
+
+`mountScene()` is for testing **view components** that render a Pixi display object (Sprite, Container, Text, etc.).
+It mounts JSX in a temporary Solid root, resolves it to a real Pixi node, and returns the root Container.
+
+```tsx
+type MountSceneResult<TRoot = Pixi.Container> = {
+  container: TRoot;
+  dispose: () => void;
+};
+```
+
+The returned `container` is the root PixiJS node — no ref callback is needed to access it.
+
+## Basic usage
+
+```tsx
+import { Container, Sprite } from "pixi-solid";
+import { mountScene, getByLabel } from "pixi-solid/testing";
+
+const { container, dispose } = mountScene(() => (
+  <Container label="scene">
+    <Sprite label="player" x={100} />
+  </Container>
+));
+
+// Container is Pixi.Container — directly accessible
+container.x;
+
+// Query children by label
+const player = getByLabel(container, "player");
+expect(player.x).toBe(100);
+
+dispose();
+```
+
+## Non-Container roots
+
+For component types other than `Pixi.Container`, specify the type via the generic parameter:
+
+```tsx
+const { container } = mountScene<Pixi.AnimatedSprite>(() => (
+  <AnimatedSprite textures={textures} playing />
+));
+container.playing; // typed as Pixi.AnimatedSprite
+```
+
+## When to use
+
+- Testing view components that render a Pixi display object
+- You need to inspect the rendered scene graph
+- You want to query children by label with `getByLabel` / `queryByLabel`
+
+For testing stores or hooks that don't render a scene, use [`createTestRoot`](../create-test-root) instead.

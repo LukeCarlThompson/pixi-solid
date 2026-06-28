@@ -7,9 +7,7 @@ sidebar:
 
 The `createAsyncDelay` function provides a way to create an async function that will delay execution for a specified number of milliseconds of ticker time.
 
-It ensures that the delay is in sync with the shared ticker's time units, making it ideal for animations or syncing with other actions based on ticker time.
-
-The delay is synchronized with the shared ticker, so it will not progress if the ticker is paused or stopped.
+It ensures that the delay is in sync with the ticker from the nearest context provider, making it ideal for animations or syncing with other actions based on a common ticker time.
 
 You can optionally pass an `AbortSignal` to cancel the delay early, allowing you to interrupt waiting operations when needed.
 

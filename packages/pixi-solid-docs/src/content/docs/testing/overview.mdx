@@ -1,0 +1,72 @@
+---
+title: Overview
+description: Utilities for testing pixi-solid components and hooks without a live canvas.
+sidebar:
+  order: 1
+---
+
+The `pixi-solid/testing` module provides utilities for testing pixi-solid components and hooks without a live canvas:
+
+```tsx
+import {
+  mountScene,
+  createTestRoot,
+  createTestContext,
+  createManualTicker,
+  getByLabel,
+  queryByLabel,
+  getAllByLabel,
+  cleanup,
+} from "pixi-solid/testing";
+```
+
+---
+
+## API quick reference
+
+```tsx
+// Component tests — renders a Pixi display object
+mountScene(() => <Container>...</Container>)
+// => { container: Pixi.Container, dispose: () => void }
+
+// Hook/store tests — no scene rendering
+createTestRoot(() => <ctx.Provider>{usePixiScreen()}</ctx.Provider>)
+// => { value: Screen, dispose: () => void }
+
+// Mock contexts
+createTestContext()
+// => { Provider, ticker: ManualTicker, renderer: TestRenderer, app: Pixi.Application }
+
+// Manual frame advancement
+createManualTicker()
+// => { ticker: Pixi.Ticker, fastForwardFrames(), fastForwardTime() }
+
+// Scene graph queries
+getByLabel(root, "label")      // throws if not found
+queryByLabel(root, "label")    // returns undefined if not found
+getAllByLabel(root, "label")   // returns Pixi.DisplayObject[]
+
+// Teardown (wire in afterEach)
+cleanup()
+```
+
+---
+
+## When to use which
+
+| Task | Function | Page |
+|---|---|---|
+| Render a component scene graph | `mountScene` | [mount-scene](../mount-scene) |
+| Test a hook or store (no scene needed) | `createTestRoot` | [create-test-root](../create-test-root) |
+| Get mock contexts | `createTestContext` | [create-test-context](../create-test-context) |
+| Advance frames manually | `createManualTicker` | [create-manual-ticker](../create-manual-ticker) |
+| Find a node by label | `getByLabel` / `queryByLabel` / `getAllByLabel` | [scene-queries](../scene-queries) |
+| Run all disposers | `cleanup` | [cleanup](../cleanup) |
+
+---
+
+## jsdom / renderer caveats
+
+- **Pixel-level rendering is not tested** — use a real canvas for integration tests
+- **`getContext()` is not available** — you'll see `Not implemented: HTMLCanvasElement's getContext()` warnings in test output, which is expected and harmless
+- **The mock `app` is a minimal stub** — only the parts used by pixi-solid hooks are implemented

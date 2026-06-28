@@ -1,0 +1,44 @@
+---
+title: createTestContext
+description: Create mock PixiJS instances and a context provider for testing.
+sidebar:
+  order: 4
+---
+
+Creates mock PixiJS instances and a context provider. Returns `{ Provider, ticker, renderer, app }`.
+
+| Property | Type | Purpose |
+|---|---|---|
+| `Provider` | Component | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext` |
+| `ticker` | `ManualTicker` | Advance frames with `fastForwardFrames()` or `fastForwardTime()` |
+| `renderer` | `TestRenderer` | Simulate resize events with `emitResize()` |
+| `app` | `Pixi.Application` | Minimal stub for hooks that call `getPixiApp()` |
+
+## Simulating resize
+
+```tsx
+ctx.renderer.emitResize({ width: 1024 });
+ctx.renderer.emitResize();
+ctx.renderer.emitResize({ width: 1024, height: 768, x: 0, y: 0 });
+```
+
+## Spying on mocks
+
+```tsx
+const addSpy = vi.spyOn(ctx.ticker.ticker, "add");
+const resizeSpy = vi.spyOn(ctx.renderer, "addListener");
+```
+
+## Override defaults
+
+```tsx
+const customTicker = createManualTicker();
+vi.spyOn(customTicker.ticker, "add");
+const ctx = createTestContext({ ticker: customTicker });
+```
+
+## Related
+
+- [`createManualTicker`](../create-manual-ticker) — create a stopped ticker with step-based advancement
+- [`createTestRoot`](../create-test-root) — run code in a temporary Solid root using this context
+- [`mountScene`](../mount-scene) — render components in a temporary Solid root using this context

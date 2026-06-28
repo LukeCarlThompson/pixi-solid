@@ -1,0 +1,50 @@
+---
+title: createTestRoot
+description: Run code in a temporary Solid root for testing stores or hooks that need context but don't render a scene.
+sidebar:
+  order: 3
+---
+
+`createTestRoot()` is for testing **stores, hooks, or any logic** that has signals inside or requires context but does **not** render a scene.
+It runs code in a temporary Solid root and returns the result value — no JSX resolution, no Pixi node output.
+
+```tsx
+type CreateTestRootResult<T> = {
+  value: T;
+  dispose: () => void;
+};
+```
+
+Unlike `mountScene`, this does not resolve JSX — it runs the callback directly. Bring your own providers.
+
+## Testing hooks
+
+```tsx
+import { usePixiScreen } from "pixi-solid";
+import { createTestRoot, createTestContext } from "pixi-solid/testing";
+
+const ctx = createTestContext();
+
+const { value: screen } = createTestRoot(() => (
+  <ctx.Provider>
+    {usePixiScreen()}
+  </ctx.Provider>
+));
+
+expect(screen.width).toBe(800);
+expect(screen.height).toBe(600);
+```
+
+## Error testing
+
+```tsx
+expect(() => createTestRoot(() => usePixiScreen())).toThrow();
+```
+
+## When to use
+
+- Testing stores or hooks that have signals inside
+- Testing logic that requires context (`usePixiScreen`, `getPixiApp`, etc.) but doesn't render a scene
+- Error testing for missing context
+
+For testing view components that render a Pixi display object, use [`mountScene`](../mount-scene) instead.

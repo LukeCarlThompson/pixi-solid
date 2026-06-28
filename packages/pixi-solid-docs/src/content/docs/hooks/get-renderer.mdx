@@ -15,16 +15,13 @@ If used outside of this context, it will throw an error.
 
 ```tsx
 import { getRenderer, Container, PixiCanvas } from "pixi-solid";
-import { createEffect } from "solid-js";
 
 const MyComponent = () => {
   const renderer = getRenderer();
 
-  createEffect(() => {
-    // You can now safely use the Pixi.js Renderer instance
-    console.log("Renderer resolution:", renderer.resolution);
-    console.log("Renderer view size:", renderer.width, renderer.height);
-  });
+  // You can now safely use the Pixi.js Renderer instance
+  console.log("Renderer resolution:", renderer.resolution);
+  console.log("Renderer view size:", renderer.width, renderer.height);
 
   return <Container>{/* Your components here*/}</Container>;
 };
