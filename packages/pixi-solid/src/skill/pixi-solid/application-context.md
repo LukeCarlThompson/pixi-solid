@@ -52,7 +52,7 @@ export const DemoApp = () => (
 type PixiCanvasProps = {
   children: JSX.Element;
   ref?: (el: HTMLDivElement) => void;
-} & OmitColonEvents<Omit<JSX.HTMLAttributes<HTMLDivElement>, "children" | "ref">>
+} & Omit<JSX.HTMLAttributes<HTMLDivElement>, "children" | "ref">
   & Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">>;
 ```
 
@@ -150,10 +150,6 @@ See [testing](./testing.md) for recommended TickerProvider test patterns and exa
 - **`PixiApplicationProvider`** — flexible choice for shared app context. Use when HTML outside the canvas needs hooks, or when passing `existingApp`.
 - **`TickerProvider`** — only when you have an existing ticker. Testing or independent ticker subtrees.
 
-## Constraints
+## Provider requirements
 
-- `onResize` must be called from a descendant of `PixiCanvas` or `PixiApplicationProvider`.
-- `onTick`, `delay`, and `createAsyncDelay` must be called from a descendant of `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider`.
-- `usePixiScreen` must be called from a descendant of `PixiCanvas` or `PixiApplicationProvider`.
-- `getPixiApp` and `getRenderer` must be called from a descendant of `PixiCanvas` or `PixiApplicationProvider`.
-- `getTicker` must be called from a descendant of `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider`.
+See the [Provider requirements table in hooks-lifecycle.md](./hooks-lifecycle.md#provider-requirements).

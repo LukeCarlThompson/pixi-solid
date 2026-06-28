@@ -57,3 +57,29 @@ container.playing; // typed as Pixi.AnimatedSprite
 - You want to query children by label with `getByLabel` / `queryByLabel`
 
 For testing stores or hooks that don't render a scene, use [`createTestRoot`](../create-test-root) instead.
+
+## With context (onTick, onResize, etc.)
+
+Wrap your component in `createTestContext().Provider` to provide a mock ticker (stopped, manually
+controlled), renderer, and app context:
+
+```tsx
+import { mountScene, createTestContext } from "pixi-solid/testing";
+import { Container, Sprite, onTick } from "pixi-solid";
+
+const ctx = createTestContext();
+let calls = 0;
+
+mountScene(() => (
+  <ctx.Provider>
+    <Container>
+      {onTick(() => { calls++; })}
+      <Sprite x={100} />
+    </Container>
+  </ctx.Provider>
+));
+
+// Advance frames with the manual ticker
+ctx.ticker.fastForwardFrames(5);
+expect(calls).toBe(5);
+```

@@ -15,12 +15,12 @@ import { onCleanup } from "solid-js";
 const DemoComponent = () => {
   // We have access to the Pixi Application instance using the `getPixiApp` function.
   const pixiApp = getPixiApp();
-  // @ts-expect-error
+  // @ts-ignore — __PIXI_DEVTOOLS__ is not in the type definitions
   globalThis.__PIXI_DEVTOOLS__ = {
     app: pixiApp,
   };
   onCleanup(() => {
-    // @ts-expect-error
+    // @ts-ignore — __PIXI_DEVTOOLS__ is not in the type definitions
     globalThis.__PIXI_DEVTOOLS__ = undefined;
   });
 

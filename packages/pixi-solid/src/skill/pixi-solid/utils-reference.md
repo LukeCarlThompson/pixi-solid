@@ -47,7 +47,7 @@ type delay = (delayMs: number, callback?: () => void) => void;
 - `delayMs` — Number of milliseconds to wait (measured in the ticker's time units).
 - `callback` — A callback function that fires when `delayMs` has passed.
 
-**Constraints:** Must be called within a `PixiApplicationProvider` or `TickerProvider` context.
+**Constraints:** Must be called within a `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` context.
 
 **Note:** Does not run if the ticker is paused or stopped.
 
@@ -286,4 +286,4 @@ const damp = useSmoothDamp({ to: target, smoothTimeMs: 500 });
 - **`useSmoothDamp`** — Use when you want softer damped interpolation without overshoot.
 - **`observeBounds`** — Only use when the container size changes dynamically. It remeasures every tick, which runs on every frame and is a performance concern.
 - Ticker-synced utilities do not advance while the ticker is paused or stopped.
-- Both `delay` and `createAsyncDelay` throw if called outside of a `PixiApplicationProvider` or `TickerProvider` context.
+- Both `delay` and `createAsyncDelay` throw if called outside of a `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` context.

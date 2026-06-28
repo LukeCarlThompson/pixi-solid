@@ -6,98 +6,12 @@ sidebar:
 ---
 
 The `TickerProvider` component allows you to provide a custom `Pixi.Ticker` instance to child components without requiring a full `PixiApplication` or `PixiCanvas`.
-This is useful for testing components that don't need to be mounted, or for more advanced scenarios where you want to use multiple tickers in the same application.
 
 It can be used to wrap subtrees of components that you want to provide an additional ticker context to support multiple independent tickers in the same application.
 
 This component provides context for ticker-dependent utilities like `onTick`, `delay`, `createAsyncDelay`, and `getTicker`.
 
-### Usage
-
-```tsx
-import { TickerProvider, onTick, Container } from "pixi-solid";
-import { Ticker } from "pixi.js";
-import { createSignal, onCleanup } from "solid-js";
-
-const MyComponent = () => {
-  const [rotation, setRotation] = createSignal(0);
-
-  onTick((ticker) => {
-    setRotation((r) => r + 0.01 * ticker.deltaTime);
-  });
-
-  return <Container rotation={rotation()} />;
-};
-
-/**
- *  This won't render anything by itself since it doesn't have a Pixi Application context, but it will still run the onTick logic and update the rotation signal.
- * This is useful for testing the ticker-based logic in a component or store without needing to mount and render a full PixiCanvas or PixiApplication.
- *
- * In testing scenarios it's useful to create a custom ticker instance and control its updates manually, allowing you to step through animations frame-by-frame and verify the expected state changes.
- * */
-export const DemoApp = () => {
-  // Create a custom ticker instance
-  const ticker = new Ticker();
-  ticker.start();
-
-  // Cleanup the ticker when the component unmounts to prevent memory leaks
-  onCleanup(() => {
-    ticker.stop();
-    ticker.destroy();
-  });
-
-  return (
-    <TickerProvider ticker={ticker}>
-      <MyComponent />
-    </TickerProvider>
-  );
-};
-```
-
-### Testing with manual ticker control
-
-One testing scenario where we need to control time is verifying that a component
-behaves correctly across multiple frames. Create a stopped `Ticker`, wrap your
-component in `TickerProvider`, and advance frames manually using `ticker.update()`.
-
-```tsx
-import { TickerProvider, onTick, Sprite } from "pixi-solid";
-import { Ticker, Texture } from "pixi.js";
-import type * as Pixi from "pixi.js";
-import { createRoot } from "solid-js";
-
-// A component that animates position based on delta time
-// The ref prop receives the underlying Pixi sprite instance
-const MovingSprite = (props: { ref?: Pixi.Sprite }) => {
-  onTick((ticker) => {
-    props.ref.x += 100 * (ticker.deltaMS / 1000);
-  });
-
-  return <Sprite texture={Texture.WHITE} ref={props.ref} />;
-};
-
-let spriteRef: Pixi.Sprite | undefined;
-let ticker = new Ticker();
-
-createRoot(() => (
-  <TickerProvider ticker={ticker}>
-    <MovingSprite ref={(r) => (spriteRef = r)} />
-  </TickerProvider>
-));
-
-// Advance 10 frames at 16ms each (~60fps)
-for (let i = 0; i < 10; i++) {
-  ticker.update(16);
-}
-
-// After 160ms at 100px/s, position should be 16px
-console.log(spriteRef.x);
-```
-
-This lets you test frame-dependent behaviour deterministically without mounting
-a real canvas.
-
-### Independent ticker context for subtrees
+## Independent ticker context for subtrees
 
 You can also nest `TickerProvider` to give a specific subtree its own independent ticker while the rest of the application uses the default ticker.
 This is useful when you want different parts of your scene to animate at different rates or be controlled separately.
@@ -157,7 +71,6 @@ In this example, the first `RotatingSprite` rotates at normal speed using the ca
 ### When to use it
 
 - When you need ticker functionality without a full PixiJS application
-- For testing components that depend on ticker-based animations
 - When integrating multiple independent Pixi.js rendering contexts
 - For advanced scenarios where you need manual control over the ticker instance
 - When using ticker utilities like `onTick` or `delay` outside of a `PixiCanvas`
