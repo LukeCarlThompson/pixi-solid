@@ -1,0 +1,40 @@
+---
+title: Scene queries
+description: Find display objects by their label property, decoupling tests from scene graph hierarchy.
+sidebar:
+  order: 6
+---
+
+Find display objects by their `label` property, decoupling tests from scene graph hierarchy.
+
+## getByLabel(root, label)
+
+Throws if the label is not found.
+
+```tsx
+const { container } = mountScene(() => (
+  <Container label="scene">
+    <Sprite label="player" />
+  </Container>
+));
+
+const player = getByLabel(container, "player");
+expect(player.x).toBe(100);
+```
+
+## queryByLabel(root, label)
+
+Same as `getByLabel` but returns `undefined` instead of throwing.
+
+```tsx
+const maybe = queryByLabel(container, "missing-label");  // undefined
+```
+
+## getAllByLabel(root, label)
+
+Find all display objects with the given label.
+
+```tsx
+const enemies = getAllByLabel(container, "enemy");
+expect(enemies).toHaveLength(3);
+```
