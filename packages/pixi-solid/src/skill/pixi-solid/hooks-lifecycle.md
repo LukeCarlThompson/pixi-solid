@@ -174,31 +174,7 @@ Example — render texture created imperatively and cleaned up on unmount:
 
 ### Testing
 
-For unit tests pixi-solid provides testing utilities that avoid the need for a live canvas. Use `createTestContext()` for a mock provider and `createManualTicker()` for deterministic frame control.
-
-```tsx
-import { describe, expect, it } from "vitest";
-import { mountScene, createTestContext } from "pixi-solid/testing";
-import { onTick } from "pixi-solid";
-
-describe("onTick", () => {
-  it("fires each frame", () => {
-    const ctx = createTestContext();
-    let calls = 0;
-
-    mountScene(() => (
-      <ctx.Provider>
-        {onTick(() => { calls++; })}
-      </ctx.Provider>
-    ));
-
-    ctx.ticker.fastForwardFrames(5);
-    expect(calls).toBe(5);
-  });
-});
-```
-
-See [testing.md](./testing.md) for the full guide.
+See [testing.md](./testing.md) for patterns and examples of testing pixi-solid components and hooks.
 
 ## Provider requirements
 
