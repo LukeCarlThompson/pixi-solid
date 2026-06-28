@@ -72,6 +72,10 @@ available depend on the component type:
 | `Sprite`, `Text`, `BitmapText`, `HTMLText`, `NineSliceSprite`, `MeshPlane`, `MeshRope`, `PerspectiveMesh`, `AnimatedSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y` |
 | `TilingSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`, `tilePositionX/Y`, `tileScaleX/Y` |
 
+#### Why axis props?
+
+SolidJS tracks changes by reference. Passing `position={{ x: 100, y: 200 }}` allocates a new object on every update, which both triggers the entire point to rebind and creates GC pressure. Axis props like `positionX` and `positionY` are plain `number` values — no allocations, and only the changed axis triggers an update.
+
 ### Property names
 
 All standard PixiJS properties available on a display object instance (e.g., x, y, rotation, alpha, width, height, scale, position, pivot, anchor, skew etc.) are directly available as props on the pixi-solid components.
@@ -172,16 +176,8 @@ const App = () => {
 
 ### Omissions
 
-There's a few deliberate omissions of PixiJS classes from the components list because wrapping them in a SolidJS component doesn't add much value.
-These include:
+Some PixiJS classes are deliberately omitted because wrapping them in a SolidJS component doesn't add much value:
 
-- `Particle`
-  Particles inside a `ParticleContainer ` are intended for when you want to the maximum performance for a particle system so a dedicated component here is in opposition to that.
-  It's recommended to create and manage the particle instances imperatively with a `<ParticleContainer />` as a parent to try and go for maximum efficency.
-
-  The `MeshGeometry`, `NineSliceGeometry`, `PerspectivePlaneGeometry`, `PlaneGeometry` and `RopeGeometry` classes are pretty low level and generally used when creating custom meshes.
-  This kind of work is best created once imperatively with PixiJS directly and then wrapped in a custom `pixi-solid` component.
-
-- `Culler`
-  It may be worth adding in the future.
-  Have't experimented enough with this one to know if a SolidJS component would be useful just yet.
+- `Particle` — Particles inside a `ParticleContainer` are designed for maximum-performance, high-volume imperative updates. A dedicated SolidJS component for individual particles contradicts that goal. Create and manage particle instances imperatively with a `<ParticleContainer />` as the parent.
+- `MeshGeometry`, `NineSliceGeometry`, `PerspectivePlaneGeometry`, `PlaneGeometry`, `RopeGeometry` — These are low-level geometry classes used when building custom meshes. Create them imperatively with PixiJS and wrap in a custom `pixi-solid` component when needed.
+- `Culler` — May be added in the future; hasn't been evaluated enough to determine if a SolidJS component would be useful.

@@ -11,7 +11,7 @@ It ensures that the delay is in sync with the ticker from the nearest context pr
 
 You can optionally pass an `AbortSignal` to cancel the delay early, allowing you to interrupt waiting operations when needed.
 
-This function must be called within a SolidJS tracking scope, such as a component or another function, that is a descendant of `PixiApplicationProvider` or `PixiCanvas`.
+This function must be called within a SolidJS tracking scope, such as a component or another function, that is a descendant of `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`.
 
 The returned function can be called in an async context.
 
@@ -23,7 +23,7 @@ import { PixiCanvas, Text } from "pixi-solid";
 import { createSignal } from "solid-js";
 
 const DelayedActionComponent = () => {
-  // This must be called within a synchronous scope that is inside the `PixiApplicationProvider` or `PixiCanvas` elements.
+  // This must be called within a synchronous scope that is inside `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`.
   const delay = createAsyncDelay();
   const [isWaiting, setIsWaiting] = createSignal(false);
 
