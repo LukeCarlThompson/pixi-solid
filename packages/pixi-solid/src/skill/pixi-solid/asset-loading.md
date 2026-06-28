@@ -25,14 +25,18 @@ import { createResource, Show } from "solid-js";
 import { Assets, Texture } from "pixi.js";
 import { Sprite } from "pixi-solid";
 
-const [texture] = createResource(() => Assets.load<Texture>("https://example.com/my-texture.png"));
+function MySprite() {
+  const [texture] = createResource(() => Assets.load<Texture>("https://example.com/my-texture.png"));
 
-<Show when={texture()}>
-  <Sprite texture={texture()!} />
-</Show>
+  return (
+    <Show when={texture()}>
+      <Sprite texture={texture()!} />
+    </Show>
+  );
+}
 ```
 
-`createResource` returns a reactive signal that resolves when the asset loads. The `<Show>` wrapper ensures the `Sprite` is only mounted once the texture is ready.
+`createResource` returns a reactive signal that resolves when the asset loads. The `<Show>` wrapper ensures the `Sprite` is only mounted once the texture is ready. The resource is created inside the component so it's properly scoped and cleaned up on unmount.
 
 ## Loading with manifests and bundles
 
@@ -50,6 +54,18 @@ Initialise the manifest and load a bundle together inside a single `createResour
 import { Assets, Texture } from "pixi.js";
 import { createResource, Show } from "solid-js";
 import { Sprite } from "pixi-solid";
+
+const manifest = {
+  bundles: [
+    {
+      name: "menu-scene",
+      assets: [
+        { alias: "menu-bg", src: "textures/menu-bg.png" },
+        { alias: "play-btn", src: "textures/play-btn.png" },
+      ],
+    },
+  ],
+};
 
 function MenuScene() {
   const [ready] = createResource(async () => {
