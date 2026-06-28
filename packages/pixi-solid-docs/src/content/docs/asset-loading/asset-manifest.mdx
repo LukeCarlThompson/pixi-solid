@@ -84,7 +84,8 @@ export const AssetManifestLoadingDemo = () => {
     // We can also load other bundles as needed, or all of them.
     await Assets.loadBundle("ui-assets");
 
-    // Return a boolean or any indicator that assets are ready
+    // Assets.init and loadBundle return void promises.
+    // <Show when={}> gates on truthiness, so return true to open the gate.
     return true;
   });
 

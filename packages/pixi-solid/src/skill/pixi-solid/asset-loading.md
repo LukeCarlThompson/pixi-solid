@@ -69,6 +69,8 @@ function MenuScene() {
   const [ready] = createResource(async () => {
     await Assets.init({ manifest });
     await Assets.loadBundle("menu-scene");
+    // Assets.init and loadBundle return void promises.
+    // <Show when={}> gates on truthiness, so return true to open the gate.
     return true;
   });
 
