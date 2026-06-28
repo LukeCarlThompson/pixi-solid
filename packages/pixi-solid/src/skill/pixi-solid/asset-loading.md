@@ -44,21 +44,22 @@ In production projects, use [AssetPack](https://pixijs.io/assetpack/) to generat
 
 ### 2. Init the manifest and load bundles on demand
 
-```tsx
-// In a root component or early in the app
-await Assets.init({ manifest });
-```
-
-Then in a scene-level component, load only the bundle you need:
+Initialise the manifest and load a bundle together inside a single `createResource`. Return `true` so the signal is truthy when done:
 
 ```tsx
+import { Assets, Texture } from "pixi.js";
+
 function MenuScene() {
-  const [assets] = createResource(() => Assets.loadBundle("menu-scene"));
+  const [ready] = createResource(async () => {
+    await Assets.init({ manifest });
+    await Assets.loadBundle("menu-scene");
+    return true;
+  });
 
   return (
-    <Show when={assets()}>
-      <Sprite texture="menu-bg" />
-      <Sprite texture="play-btn" />
+    <Show when={ready()}>
+      <Sprite texture={Assets.get<Texture>("menu-bg")} />
+      <Sprite texture={Assets.get<Texture>("play-btn")} />
     </Show>
   );
 }
@@ -73,7 +74,7 @@ Once an asset is loaded (via `Assets.load` or `Assets.loadBundle`), PixiJS cache
 ```tsx
 import { Assets, Texture } from "pixi.js";
 
-const texture = Assets.get("player"); // Texture | null
+const texture = Assets.get<Texture>("player");
 ```
 
 This is useful for assets loaded by a parent or provider — children can reference them by alias without awaiting them again.
@@ -89,18 +90,21 @@ Avoid mixing asset loading logic inside render-heavy Pixi components. Prefer to:
 ```tsx
 // Good: loading is handled by the parent
 function GameScreen() {
-  const [assets] = createResource(() => Assets.loadBundle("game-scene"));
+  const [ready] = createResource(async () => {
+    await Assets.loadBundle("game-scene");
+    return true;
+  });
 
   return (
-    <Show when={assets()}>
+    <Show when={ready()}>
       <GameScene />
     </Show>
   );
 }
 
 function GameScene() {
-  // Assets are already cached — just reference by alias
-  return <Sprite texture="player" />;
+  // Assets are already cached — retrieve via Assets.get
+  return <Sprite texture={Assets.get<Texture>("player")} />;
 }
 ```
 
@@ -130,9 +134,6 @@ const manifest = {
   ],
 };
 
-// Init once at app startup
-await Assets.init({ manifest });
-
 function App() {
   const [scene, setScene] = createSignal("intro");
 
@@ -151,24 +152,32 @@ function App() {
 }
 
 function IntroScene(props: { onStart: () => void }) {
-  const [assets] = createResource(() => Assets.loadBundle("intro"));
+  const [ready] = createResource(async () => {
+    await Assets.init({ manifest });
+    await Assets.loadBundle("intro");
+    return true;
+  });
 
   return (
-    <Show when={assets()}>
+    <Show when={ready()}>
       <Container>
-        <Sprite texture="bg" />
-        <Sprite texture="logo" x={100} y={50} />
+        <Sprite texture={Assets.get<Texture>("bg")} />
+        <Sprite texture={Assets.get<Texture>("logo")} x={100} y={50} />
       </Container>
     </Show>
   );
 }
 
 function GameplayScene() {
-  const [assets] = createResource(() => Assets.loadBundle("gameplay"));
+  const [ready] = createResource(async () => {
+    await Assets.init({ manifest });
+    await Assets.loadBundle("gameplay");
+    return true;
+  });
 
   return (
-    <Show when={assets()}>
-      <Sprite texture="hero" />
+    <Show when={ready()}>
+      <Sprite texture={Assets.get<Texture>("hero")} />
     </Show>
   );
 }

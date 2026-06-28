@@ -54,6 +54,8 @@ function App() {
 }
 ```
 
+> **Note:** Both `x`/`y` and `positionX`/`positionY` are equivalent and work for static and reactive values. Axis props (`positionX`, `positionY`, `scaleX`, etc.) enable fine-grained reactivity — only the changed axis triggers an update instead of the whole point object.
+
 For full provider options see [application-context.md](./application-context.md). For component props and types see [component-types.md](./component-types.md). For hooks and lifecycle see [hooks-lifecycle.md](./hooks-lifecycle.md).
 
 ## Public API checklist
