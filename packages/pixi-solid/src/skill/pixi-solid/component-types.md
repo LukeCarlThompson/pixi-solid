@@ -150,6 +150,10 @@ The table below shows which axis props are available on each component:
 | `AnimatedSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y` |
 | `TilingSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`, `tilePositionX/Y`, `tileScaleX/Y` |
 
+### Why axis props?
+
+SolidJS tracks changes by reference. Passing `position={{ x: 100, y: 200 }}` allocates a new object on every update, which both triggers the entire point to rebind and creates GC pressure. Axis props like `positionX` and `positionY` are plain `number` values — no allocations, and only the changed axis triggers an update.
+
 ## Point axis types
 
 ### `CommonPointAxisPropName`

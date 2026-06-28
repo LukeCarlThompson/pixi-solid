@@ -1,8 +1,6 @@
 ---
 name: asset-loading
 description: Patterns for loading and managing assets with pixi-solid. Covers createResource, PixiJS manifests, bundle loading, and scene-gated asset patterns.
-metadata:
-  triggers: "pixi-solid asset, pixi-solid load, pixi-solid preload, pixi-solid manifest, pixi-solid bundle, createResource, Assets.load, Assets.loadBundle, texture loading pixi-solid"
 ---
 
 # Asset loading with pixi-solid
@@ -158,24 +156,30 @@ const manifest = {
 
 function App() {
   const [scene, setScene] = createSignal("intro");
+  // Assets.init returns void, so we return true so the signal is truthy when ready
+  const [initialised] = createResource(async () => {
+    await Assets.init({ manifest });
+    return true;
+  });
 
   return (
-    <PixiCanvas background="#000">
-      <Switch>
-        <Match when={scene() === "intro"}>
-          <IntroScene onStart={() => setScene("gameplay")} />
-        </Match>
-        <Match when={scene() === "gameplay"}>
-          <GameplayScene />
-        </Match>
-      </Switch>
-    </PixiCanvas>
+    <Show when={initialised()}>
+      <PixiCanvas background="#000">
+        <Switch>
+          <Match when={scene() === "intro"}>
+            <IntroScene onStart={() => setScene("gameplay")} />
+          </Match>
+          <Match when={scene() === "gameplay"}>
+            <GameplayScene />
+          </Match>
+        </Switch>
+      </PixiCanvas>
+    </Show>
   );
 }
 
 function IntroScene(props: { onStart: () => void }) {
   const [ready] = createResource(async () => {
-    await Assets.init({ manifest });
     await Assets.loadBundle("intro");
     return true;
   });
@@ -192,7 +196,6 @@ function IntroScene(props: { onStart: () => void }) {
 
 function GameplayScene() {
   const [ready] = createResource(async () => {
-    await Assets.init({ manifest });
     await Assets.loadBundle("gameplay");
     return true;
   });

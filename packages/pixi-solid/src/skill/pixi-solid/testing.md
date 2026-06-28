@@ -11,7 +11,7 @@ This subskill documents recommended patterns for unit testing code that uses `pi
 
 | Utility | Purpose |
 |---|---|
-| `mountScene(setup)` | Mount a scene graph and return the root Container |
+| `mountScene(setup)` | Mount a scene graph and return `{ container, dispose }` |
 | `createTestRoot(setup)` | Run Solid code in a temporary root (for hooks/stores) |
 | `createTestContext()` | One-stop mock provider with ticker, renderer, and app |
 | `createManualTicker()` | Stopped ticker with step-based frame advancement |
