@@ -1,6 +1,6 @@
 {
   "name": "pixi-solid",
-  "version": "1.0.0-rc.13",
+  "version": "1.0.0-rc.14",
   "private": false,
   "description": "A library to write PixiJS applications with SolidJS",
   "homepage": "https://lukecarlthompson.github.io/pixi-solid/",
@@ -40,6 +40,7 @@
     "dev": "vite",
     "prebuild": "rm -rf dist",
     "build": "vite build && tsc --project tsconfig.build.json --emitDeclarationOnly",
+    "prepublishOnly": "pnpm run build",
     "postbuild": "pnpm copy:skill",
     "copy:skill": "[ -d src/skill ] && cp -r src/skill dist/skill || (echo \"ERROR: src/skill directory not found\" >&2 && exit 1)",
     "preview": "vite preview",
