@@ -42,7 +42,11 @@ export type TilingPointAxisProps = Partial<Record<TilingPointAxisPropName, numbe
  */
 export type PixiComponentProps<
   ComponentOptions extends Pixi.ContainerOptions = Pixi.ContainerOptions,
-> = PixiSolidEventHandlerMap & CommonPointAxisProps & Omit<ComponentOptions, "children">;
+> = PixiSolidEventHandlerMap &
+  CommonPointAxisProps &
+  (ComponentOptions extends { anchor?: any } ? AnchorPointAxisProps : unknown) &
+  (ComponentOptions extends { tilePosition?: any } ? TilingPointAxisProps : unknown) &
+  Omit<ComponentOptions, "children">;
 
 type RefAsProps<Component> = {
   ref?: Ref<Component>;
