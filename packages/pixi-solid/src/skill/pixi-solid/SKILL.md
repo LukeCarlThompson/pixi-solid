@@ -1,6 +1,6 @@
 ---
 name: pixi-solid
-description: Use when building scenes and components with pixi-solid. Covers the full public API: JSX components, hooks, utilities, providers, and testing patterns.
+description: Use when building scenes and components with pixi-solid. Covers the full public API, JSX components, hooks, utilities, providers, and testing patterns.
 metadata:
   triggers: "pixi-solid, pixi-solid component, SolidJS Pixi, pixi-solid review, solid pixi, pixi solid"
 ---
@@ -62,14 +62,14 @@ For full provider options see [application-context.md](./application-context.md)
 
 Quick reference for all exported symbols and where they are documented:
 
-| Area | Exports | Docs |
-|---|---|---|
-| **Providers** | `PixiCanvas`, `PixiApplicationProvider`, `TickerProvider` | [application-context.md](./application-context.md) |
-| **Hooks & lifecycle** | `getPixiApp`, `getRenderer`, `getTicker`, `onResize`, `onTick`, `usePixiScreen` | [hooks-lifecycle.md](./hooks-lifecycle.md) |
-| **Components** | `AnimatedSprite`, `BitmapText`, `Container`, `Graphics`, `HTMLText`, `MeshPlane`, `MeshRope`, `NineSliceSprite`, `ParticleContainer`, `PerspectiveMesh`, `RenderContainer`, `RenderLayer`, `Sprite`, `Text`, `TilingSprite` | [component-types.md](./component-types.md) |
-| **Prop types** | `PixiComponentProps`, `ContainerProps`, `LeafProps`, `SpriteProps`, `AnimatedSpriteProps`, `TilingSpriteProps`, point-axis types, event handler types | [component-types.md](./component-types.md) |
-| **Utils** | `delay`, `createAsyncDelay`, `ObjectFitContainer`, `objectFit`, `useSpring`, `useSmoothDamp` | [utils-reference.md](./utils-reference.md) |
-| **Testing** | `mountScene`, `createTestRoot`, `createTestContext`, `createManualTicker`, `getByLabel`, `queryByLabel`, `getAllByLabel`, `cleanup` | [testing.md](./testing.md) |
+| Area                  | Exports                                                                                                                                                                                                                     | Docs                                               |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| **Providers**         | `PixiCanvas`, `PixiApplicationProvider`, `TickerProvider`                                                                                                                                                                   | [application-context.md](./application-context.md) |
+| **Hooks & lifecycle** | `getPixiApp`, `getRenderer`, `getTicker`, `onResize`, `onTick`, `usePixiScreen`                                                                                                                                             | [hooks-lifecycle.md](./hooks-lifecycle.md)         |
+| **Components**        | `AnimatedSprite`, `BitmapText`, `Container`, `Graphics`, `HTMLText`, `MeshPlane`, `MeshRope`, `NineSliceSprite`, `ParticleContainer`, `PerspectiveMesh`, `RenderContainer`, `RenderLayer`, `Sprite`, `Text`, `TilingSprite` | [component-types.md](./component-types.md)         |
+| **Prop types**        | `PixiComponentProps`, `ContainerProps`, `LeafProps`, `SpriteProps`, `AnimatedSpriteProps`, `TilingSpriteProps`, point-axis types, event handler types                                                                       | [component-types.md](./component-types.md)         |
+| **Utils**             | `delay`, `createAsyncDelay`, `ObjectFitContainer`, `objectFit`, `useSpring`, `useSmoothDamp`                                                                                                                                | [utils-reference.md](./utils-reference.md)         |
+| **Testing**           | `mountScene`, `createTestRoot`, `createTestContext`, `createManualTicker`, `getByLabel`, `queryByLabel`, `getAllByLabel`, `cleanup`                                                                                         | [testing.md](./testing.md)                         |
 
 ## Quick rules
 
