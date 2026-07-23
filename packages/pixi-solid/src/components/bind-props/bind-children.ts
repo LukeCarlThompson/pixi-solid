@@ -1,5 +1,5 @@
 import type * as Pixi from "pixi.js";
-import { children as resolveChildren, createRenderEffect } from "solid-js";
+import { children as resolveChildren, createRenderEffect, onCleanup } from "solid-js";
 import type { JSX } from "solid-js";
 
 export class InvalidChildTypeError extends Error {
@@ -44,6 +44,14 @@ export const bindChildrenToRenderLayer = (
   children?: JSX.Element,
 ): void => {
   const resolvedChildren = resolveChildren(() => children);
+
+  onCleanup(() => {
+    const nextChildren = resolvedChildren.toArray().filter(Boolean) as unknown as Pixi.Container[];
+
+    for (let i = 0; i < nextChildren.length; i += 1) {
+      parent.detach(nextChildren[i]);
+    }
+  });
 
   createRenderEffect((prevChildren: Pixi.Container[] | undefined) => {
     const nextChildren = resolvedChildren.toArray().filter(Boolean) as unknown as Pixi.Container[];

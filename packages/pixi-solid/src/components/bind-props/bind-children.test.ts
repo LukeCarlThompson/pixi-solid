@@ -288,4 +288,67 @@ describe("bindChildrenToRenderLayer()", () => {
 
     expect(fn).toThrow(InvalidChildTypeError);
   });
+
+  it("GIVEN a render layer with children WHEN the scene is disposed THEN it detaches all children", () => {
+    expect.assertions(5);
+
+    const parent = createMockRenderLayer() as unknown as Pixi.RenderLayer;
+    const childA = createMockContainer() as unknown as Pixi.Container;
+    const childB = createMockContainer() as unknown as Pixi.Container;
+    const childC = createMockContainer() as unknown as Pixi.Container;
+    const [children] = createSignal([childA, childB, childC]);
+
+    parent.attach = vi.fn();
+    parent.detach = vi.fn();
+
+    const { dispose } = mountScene(() => {
+      bindChildrenToRenderLayer(parent, (() => children()) as any);
+      return null;
+    });
+
+    // Sanity: children were attached on mount
+    expect(parent.attach).toHaveBeenCalledTimes(3);
+
+    // Teardown the Solid root
+    dispose();
+
+    // All children should be detached from the render layer when the effect cleans up
+    expect(parent.detach).toHaveBeenCalledTimes(3);
+    expect(parent.detach).toHaveBeenCalledWith(childA);
+    expect(parent.detach).toHaveBeenCalledWith(childB);
+    expect(parent.detach).toHaveBeenCalledWith(childC);
+  });
+
+  it("GIVEN a render layer with three children WHEN all children are removed from the signal THEN it detaches each of the three children", () => {
+    expect.assertions(6);
+
+    const parent = createMockRenderLayer() as unknown as Pixi.RenderLayer;
+    const childA = createMockContainer() as unknown as Pixi.Container;
+    const childB = createMockContainer() as unknown as Pixi.Container;
+    const childC = createMockContainer() as unknown as Pixi.Container;
+    const [children, setChildren] = createSignal([childA, childB, childC]);
+
+    parent.attach = vi.fn();
+    parent.detach = vi.fn();
+
+    const { dispose } = mountScene(() => {
+      bindChildrenToRenderLayer(parent, (() => children()) as any);
+      return null;
+    });
+
+    // Sanity: children were attached on mount
+    expect(parent.attach).toHaveBeenCalledTimes(3);
+    expect(parent.detach).not.toHaveBeenCalled();
+
+    // Remove all children from the signal (render layer stays mounted)
+    setChildren([]);
+
+    // All children should be detached from the render layer
+    expect(parent.detach).toHaveBeenCalledTimes(3);
+    expect(parent.detach).toHaveBeenCalledWith(childA);
+    expect(parent.detach).toHaveBeenCalledWith(childB);
+    expect(parent.detach).toHaveBeenCalledWith(childC);
+
+    dispose();
+  });
 });
