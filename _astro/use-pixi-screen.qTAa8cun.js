@@ -1,1 +1,0 @@
-import{e as r}from"./pixi-canvas.2_bC4CmQ.js";import{l as i}from"./solid.BuuK4dUg.js";var n=()=>{const e=i(r);if(!e)throw new Error("usePixiScreen must be used within a PixiApplicationProvider or PixiCanvas");return e};export{n as u};
