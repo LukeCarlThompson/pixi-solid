@@ -1,7 +1,7 @@
 import { Sprite as PixiSprite, Texture } from "pixi.js";
 import type * as Pixi from "pixi.js";
 import { Show, createSignal } from "solid-js";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Sprite } from "./components";
 import { PixiApplicationProvider } from "./pixi-application";
@@ -15,10 +15,17 @@ class MockResizeObserver {
   unobserve() {}
 }
 
+beforeEach(() => {
+  vi.stubGlobal("ResizeObserver", MockResizeObserver);
+});
+
+afterEach(() => {
+  // Restore the previous global so the mock doesn't leak into other suites
+  vi.unstubAllGlobals();
+});
+
 describe("PixiCanvas stage binding cleanup", () => {
   it("GIVEN a PixiCanvas whose scene is bound to the app stage WHEN the canvas unmounts THEN the stage children are detached", async () => {
-    (globalThis as any).ResizeObserver = MockResizeObserver;
-
     const ctx = createTestContext();
     (ctx.app as any).queueResize = () => {};
 
@@ -63,8 +70,6 @@ describe("PixiCanvas stage binding cleanup", () => {
   });
 
   it("GIVEN a PixiCanvas with owned component children WHEN the canvas unmounts THEN the children are destroyed and the stage is emptied", async () => {
-    (globalThis as any).ResizeObserver = MockResizeObserver;
-
     const ctx = createTestContext();
     (ctx.app as any).queueResize = () => {};
     const [show, setShow] = createSignal(true);
@@ -109,8 +114,6 @@ describe("PixiCanvas stage binding cleanup", () => {
   });
 
   it("GIVEN a PixiCanvas whose children are an inline render function creating raw instances WHEN the canvas unmounts THEN the stage does not keep the scene", async () => {
-    (globalThis as any).ResizeObserver = MockResizeObserver;
-
     const ctx = createTestContext();
     (ctx.app as any).queueResize = () => {};
     const [show, setShow] = createSignal(true);
