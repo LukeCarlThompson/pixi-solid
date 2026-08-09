@@ -15,8 +15,6 @@ class MockResizeObserver {
   unobserve() {}
 }
 
-const tick = () => new Promise((resolve) => setTimeout(resolve, 30));
-
 describe("PixiCanvas stage binding cleanup", () => {
   it("GIVEN a PixiCanvas whose scene is bound to the app stage WHEN the canvas unmounts THEN the stage children are detached", async () => {
     (globalThis as any).ResizeObserver = MockResizeObserver;
@@ -39,25 +37,27 @@ describe("PixiCanvas stage binding cleanup", () => {
       </PixiApplicationProvider>
     ));
 
-    await tick();
+    // Wait until the provider's resource has resolved and the canvas mounted
+    // its scene onto the stage — no fixed tick count.
+    await vi.waitFor(() => {
+      expect(ctx.app.stage.children).toEqual([rawSprite]);
+    });
 
-    // Sanity: the scene is on the stage while the canvas is mounted
-    expect(ctx.app.stage.children).toEqual([rawSprite]);
-
-    // WHEN: the canvas subtree unmounts while the provider survives
+    // WHEN: the canvas subtree unmounts while the provider survives.
+    // The Show disposal is synchronous — no wait needed.
     setShow(false);
-    await tick();
 
-    // THEN: the scene must be detached from the shared stage
+    // THEN: the scene must be detached from the shared stage…
     expect(ctx.app.stage.children).toEqual([]);
     // …and the user-owned instance must not be destroyed — pixi-solid only detaches what it does not own
     expect(rawSprite.destroyed).toBe(false);
 
-    // AND: remounting must not stack a second copy
+    // AND: remounting must not stack a second copy. The remount goes through
+    // the async provider resource again, so wait for the scene to re-mount.
     setShow(true);
-    await tick();
-
-    expect(ctx.app.stage.children).toEqual([rawSprite]);
+    await vi.waitFor(() => {
+      expect(ctx.app.stage.children).toEqual([rawSprite]);
+    });
 
     dispose();
   });
@@ -91,14 +91,14 @@ describe("PixiCanvas stage binding cleanup", () => {
       </PixiApplicationProvider>
     ));
 
-    await tick();
+    // Wait until the provider's resource has resolved and the canvas mounted its scene
+    await vi.waitFor(() => {
+      expect(ctx.app.stage.children.length).toBe(1);
+    });
 
-    // Sanity: the scene is on the stage while the canvas is mounted
-    expect(ctx.app.stage.children.length).toBe(1);
-
-    // WHEN: the canvas subtree unmounts while the provider survives
+    // WHEN: the canvas subtree unmounts while the provider survives.
+    // The Show disposal is synchronous — no wait needed.
     setShow(false);
-    await tick();
 
     // THEN: owned children are destroyed by their own component cleanups
     // and the stage no longer holds them
@@ -134,14 +134,14 @@ describe("PixiCanvas stage binding cleanup", () => {
       </PixiApplicationProvider>
     ));
 
-    await tick();
+    // Wait until the provider's resource has resolved and the canvas mounted its scene
+    await vi.waitFor(() => {
+      expect(ctx.app.stage.children.length).toBe(1);
+    });
 
-    // Sanity: the scene is on the stage while the canvas is mounted
-    expect(ctx.app.stage.children.length).toBe(1);
-
-    // WHEN: the canvas subtree unmounts while the provider survives
+    // WHEN: the canvas subtree unmounts while the provider survives.
+    // The Show disposal is synchronous — no wait needed.
     setShow(false);
-    await tick();
 
     // THEN: the raw sprite must be detached from the shared stage…
     expect(ctx.app.stage.children).toEqual([]);
@@ -151,9 +151,9 @@ describe("PixiCanvas stage binding cleanup", () => {
 
     // AND: remounting must not stack a second copy on top of the first
     setShow(true);
-    await tick();
-
-    expect(ctx.app.stage.children.length).toBe(1);
+    await vi.waitFor(() => {
+      expect(ctx.app.stage.children.length).toBe(1);
+    });
 
     dispose();
   });
