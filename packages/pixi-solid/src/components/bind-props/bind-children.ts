@@ -21,10 +21,31 @@ export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.E
     throw new Error("Parent does not support children.");
   }
 
-  createRenderEffect(() => {
+  onCleanup(() => {
+    const boundChildren = resolvedChildren.toArray().filter(Boolean) as unknown as Pixi.Container[];
+
+    // Detach (do not destroy) the children this binding added. The owning
+    // pixi-solid components are responsible for destroying themselves; this
+    // only un-binds them from the parent so a surviving parent (e.g. the app
+    // stage behind a removed PixiCanvas) does not keep rendering orphans.
+    for (let i = 0; i < boundChildren.length; i += 1) {
+      parent.removeChild?.(boundChildren[i]);
+    }
+  });
+
+  createRenderEffect((prevChildren: Pixi.Container[] | undefined) => {
     const nextChildren = resolvedChildren.toArray().filter(Boolean) as unknown as Pixi.Container[];
 
     try {
+      if (prevChildren) {
+        for (let i = 0; i < prevChildren.length; i += 1) {
+          const child = prevChildren[i];
+          if (nextChildren.includes(child)) continue;
+
+          parent.removeChild?.(child);
+        }
+      }
+
       for (let i = 0; i < nextChildren.length; i += 1) {
         parent.addChildAt(nextChildren[i], i);
       }
@@ -36,6 +57,8 @@ export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.E
         throw error;
       }
     }
+
+    return nextChildren;
   });
 };
 

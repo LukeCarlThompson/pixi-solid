@@ -208,6 +208,59 @@ describe("RenderLayer Component Cleanup", () => {
   });
 });
 
+describe("Reactive children binding — stale children are not left attached", () => {
+  it("GIVEN a Container with raw pixi children WHEN the children signal flips THEN no stale children accumulate", () => {
+    const [cond, setCond] = createSignal(true);
+    const red = new PixiSprite(Texture.WHITE);
+    const green = new PixiSprite(Texture.WHITE);
+    let containerRef: Pixi.Container | undefined;
+
+    const { dispose } = mountScene(() => (
+      <Container ref={(el) => { containerRef = el; }}>
+        {/* Raw Pixi instances are valid children at runtime; the JSX types don't model them. */}
+        {cond() ? (red as any) : (green as any)}
+      </Container>
+    ));
+
+    expect(containerRef?.children).toEqual([red]);
+
+    setCond(false);
+
+    expect(containerRef?.children).toEqual([green]);
+
+    setCond(true);
+
+    expect(containerRef?.children).toEqual([red]);
+    dispose();
+  });
+
+  it("GIVEN a Container with as-prop children WHEN the children signal flips THEN no stale children accumulate", () => {
+    const [cond, setCond] = createSignal(true);
+    const red = new PixiSprite(Texture.WHITE);
+    const green = new PixiSprite(Texture.WHITE);
+    let containerRef: Pixi.Container | undefined;
+
+    const { dispose } = mountScene(() => (
+      <Container ref={(el) => { containerRef = el; }}>
+        {cond()
+          ? <Sprite as={red} texture={Texture.WHITE} />
+          : <Sprite as={green} texture={Texture.WHITE} />}
+      </Container>
+    ));
+
+    expect(containerRef?.children).toEqual([red]);
+
+    setCond(false);
+
+    expect(containerRef?.children).toEqual([green]);
+
+    setCond(true);
+
+    expect(containerRef?.children).toEqual([red]);
+    dispose();
+  });
+});
+
 describe("AnimatedSprite ticker integration", () => {
   it("GIVEN an AnimatedSprite WHEN mounted in TickerProvider THEN context ticker is used and cleaned up", () => {
     const contextTicker = new Ticker();
