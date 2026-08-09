@@ -54,7 +54,7 @@ export const DemoApp = () => {
       <Sprite
         texture={Texture.WHITE}
         scale={scale()}
-        onpointerdown={handleSpriteTap}
+        onpointertap={handleSpriteTap}
         tint="#ff0000"
       />
     </PixiCanvas>
