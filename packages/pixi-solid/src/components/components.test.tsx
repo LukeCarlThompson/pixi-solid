@@ -208,6 +208,122 @@ describe("RenderLayer Component Cleanup", () => {
   });
 });
 
+describe("Reactive children binding — stale children are not left attached", () => {
+  it("GIVEN a Container with raw pixi children WHEN the children signal flips THEN no stale children accumulate", () => {
+    const [cond, setCond] = createSignal(true);
+    const red = new PixiSprite(Texture.WHITE);
+    const green = new PixiSprite(Texture.WHITE);
+    let containerRef: Pixi.Container | undefined;
+
+    const { dispose } = mountScene(() => (
+      <Container ref={(el) => { containerRef = el; }}>
+        {/* Raw Pixi instances are valid children at runtime; the JSX types don't model them. */}
+        {cond() ? (red as any) : (green as any)}
+      </Container>
+    ));
+
+    expect(containerRef?.children).toEqual([red]);
+
+    setCond(false);
+
+    expect(containerRef?.children).toEqual([green]);
+
+    setCond(true);
+
+    expect(containerRef?.children).toEqual([red]);
+    dispose();
+  });
+
+  it("GIVEN a Container with as-prop children WHEN the children signal flips THEN no stale children accumulate", () => {
+    const [cond, setCond] = createSignal(true);
+    const red = new PixiSprite(Texture.WHITE);
+    const green = new PixiSprite(Texture.WHITE);
+    let containerRef: Pixi.Container | undefined;
+
+    const { dispose } = mountScene(() => (
+      <Container ref={(el) => { containerRef = el; }}>
+        {cond()
+          ? <Sprite as={red} texture={Texture.WHITE} />
+          : <Sprite as={green} texture={Texture.WHITE} />}
+      </Container>
+    ));
+
+    expect(containerRef?.children).toEqual([red]);
+
+    setCond(false);
+
+    expect(containerRef?.children).toEqual([green]);
+
+    setCond(true);
+
+    expect(containerRef?.children).toEqual([red]);
+    dispose();
+  });
+});
+
+describe("Container unmount — unowned children are detached, not destroyed", () => {
+  it("GIVEN a Container with a raw pixi child WHEN the Container unmounts THEN the child is detached but not destroyed", () => {
+    const destroyed: Pixi.Container[] = [];
+    const rawChild = new PixiSprite(Texture.WHITE);
+    const originalDestroy = rawChild.destroy.bind(rawChild);
+    rawChild.destroy = vi.fn((options) => {
+      destroyed.push(rawChild);
+      originalDestroy(options);
+    }) as any;
+
+    const [show, setShow] = createSignal(true);
+
+    const { dispose } = mountScene(() =>
+      show() ? (
+        <Container>
+          {(rawChild as any)}
+        </Container>
+      ) : null,
+    );
+
+    // Sanity: the raw child is on the container while mounted
+    expect(rawChild.parent).not.toBeNull();
+
+    // WHEN: the Container unmounts
+    setShow(false);
+
+    // THEN: the raw child is detached from the container…
+    expect(rawChild.parent).toBeNull();
+    // …but pixi-solid must not destroy what it does not own
+    expect(destroyed).not.toContain(rawChild);
+    dispose();
+  });
+
+  it("GIVEN a Container with an as-prop child WHEN the Container unmounts THEN the child is detached but not destroyed", () => {
+    const destroyed: Pixi.Container[] = [];
+    const rawSprite = new PixiSprite(Texture.WHITE);
+    const originalDestroy = rawSprite.destroy.bind(rawSprite);
+    rawSprite.destroy = vi.fn((options) => {
+      destroyed.push(rawSprite);
+      originalDestroy(options);
+    }) as any;
+
+    const [show, setShow] = createSignal(true);
+
+    const { dispose } = mountScene(() =>
+      show() ? (
+        <Container>
+          <Sprite as={rawSprite} texture={Texture.WHITE} />
+        </Container>
+      ) : null,
+    );
+
+    expect(rawSprite.parent).not.toBeNull();
+
+    setShow(false);
+
+    // The user-owned instance is detached but never destroyed
+    expect(rawSprite.parent).toBeNull();
+    expect(destroyed).not.toContain(rawSprite);
+    dispose();
+  });
+});
+
 describe("AnimatedSprite ticker integration", () => {
   it("GIVEN an AnimatedSprite WHEN mounted in TickerProvider THEN context ticker is used and cleaned up", () => {
     const contextTicker = new Ticker();

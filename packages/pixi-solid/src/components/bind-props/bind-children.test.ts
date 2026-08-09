@@ -1,3 +1,4 @@
+import { Container as PixiContainer } from "pixi.js";
 import type * as Pixi from "pixi.js";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
@@ -187,6 +188,63 @@ describe("bindChildrenToContainer()", () => {
     };
 
     expect(fn).toThrow(InvalidChildTypeError);
+  });
+
+  it("GIVEN a container with three children WHEN a child is removed from the signal THEN it removes the child from the parent", () => {
+    const parent = new PixiContainer();
+    const childA = new PixiContainer();
+    const childB = new PixiContainer();
+    const childC = new PixiContainer();
+    const [children, setChildren] = createSignal([childA, childB, childC]);
+
+    const { dispose } = mountScene(() => {
+      bindChildrenToContainer(parent, (() => children()) as any);
+      return null;
+    });
+
+    expect(parent.children).toEqual([childA, childB, childC]);
+
+    setChildren([childA, childB]);
+
+    expect(parent.children).toEqual([childA, childB]);
+    dispose();
+  });
+
+  it("GIVEN a container with three children WHEN all children are removed from the signal THEN the parent has no children", () => {
+    const parent = new PixiContainer();
+    const childA = new PixiContainer();
+    const childB = new PixiContainer();
+    const childC = new PixiContainer();
+    const [children, setChildren] = createSignal([childA, childB, childC]);
+
+    const { dispose } = mountScene(() => {
+      bindChildrenToContainer(parent, (() => children()) as any);
+      return null;
+    });
+
+    setChildren([]);
+
+    expect(parent.children).toEqual([]);
+    dispose();
+  });
+
+  it("GIVEN a container with children WHEN the scene is disposed THEN all children are removed from the parent", () => {
+    const parent = new PixiContainer();
+    const childA = new PixiContainer();
+    const childB = new PixiContainer();
+    const childC = new PixiContainer();
+    const [children] = createSignal([childA, childB, childC]);
+
+    const { dispose } = mountScene(() => {
+      bindChildrenToContainer(parent, (() => children()) as any);
+      return null;
+    });
+
+    expect(parent.children).toEqual([childA, childB, childC]);
+
+    dispose();
+
+    expect(parent.children).toEqual([]);
   });
 });
 
