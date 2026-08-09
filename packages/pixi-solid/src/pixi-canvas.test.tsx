@@ -1,6 +1,7 @@
 import { Sprite as PixiSprite, Texture } from "pixi.js";
+import type * as Pixi from "pixi.js";
 import { Show, createSignal } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { Sprite } from "./components";
 import { PixiApplicationProvider } from "./pixi-application";
@@ -49,12 +50,110 @@ describe("PixiCanvas stage binding cleanup", () => {
 
     // THEN: the scene must be detached from the shared stage
     expect(ctx.app.stage.children).toEqual([]);
+    // …and the user-owned instance must not be destroyed — pixi-solid only detaches what it does not own
+    expect(rawSprite.destroyed).toBe(false);
 
     // AND: remounting must not stack a second copy
     setShow(true);
     await tick();
 
     expect(ctx.app.stage.children).toEqual([rawSprite]);
+
+    dispose();
+  });
+
+  it("GIVEN a PixiCanvas with owned component children WHEN the canvas unmounts THEN the children are destroyed and the stage is emptied", async () => {
+    (globalThis as any).ResizeObserver = MockResizeObserver;
+
+    const ctx = createTestContext();
+    (ctx.app as any).queueResize = () => {};
+    const [show, setShow] = createSignal(true);
+    const destroyed: Pixi.Sprite[] = [];
+    let spriteRef: Pixi.Sprite | undefined;
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app}>
+        <Show when={show()}>
+          <PixiCanvas style={{ position: "absolute", inset: "0" }}>
+            <Sprite
+              texture={Texture.WHITE}
+              ref={(el) => {
+                spriteRef = el;
+                const originalDestroy = el.destroy.bind(el);
+                el.destroy = vi.fn((options) => {
+                  destroyed.push(el);
+                  originalDestroy(options);
+                }) as any;
+              }}
+            />
+          </PixiCanvas>
+        </Show>
+      </PixiApplicationProvider>
+    ));
+
+    await tick();
+
+    // Sanity: the scene is on the stage while the canvas is mounted
+    expect(ctx.app.stage.children.length).toBe(1);
+
+    // WHEN: the canvas subtree unmounts while the provider survives
+    setShow(false);
+    await tick();
+
+    // THEN: owned children are destroyed by their own component cleanups
+    // and the stage no longer holds them
+    expect(destroyed).toContain(spriteRef);
+    expect(ctx.app.stage.children).toEqual([]);
+
+    dispose();
+  });
+
+  it("GIVEN a PixiCanvas whose children are an inline render function creating raw instances WHEN the canvas unmounts THEN the stage does not keep the scene", async () => {
+    (globalThis as any).ResizeObserver = MockResizeObserver;
+
+    const ctx = createTestContext();
+    (ctx.app as any).queueResize = () => {};
+    const [show, setShow] = createSignal(true);
+
+    // The incident repro: an inline render function as children that creates
+    // fresh raw Pixi instances. Raw instances have no component cleanup, so
+    // only the stage binding can detach them on unmount.
+    let createdSprite: PixiSprite | undefined;
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app}>
+        <Show when={show()}>
+          <PixiCanvas style={{ position: "absolute", inset: "0" }}>
+            {/* Raw instances are valid children at runtime; the JSX types don't model them. */}
+            {(() => {
+              createdSprite = new PixiSprite(Texture.WHITE);
+              return createdSprite;
+            }) as any}
+          </PixiCanvas>
+        </Show>
+      </PixiApplicationProvider>
+    ));
+
+    await tick();
+
+    // Sanity: the scene is on the stage while the canvas is mounted
+    expect(ctx.app.stage.children.length).toBe(1);
+
+    // WHEN: the canvas subtree unmounts while the provider survives
+    setShow(false);
+    await tick();
+
+    // THEN: the raw sprite must be detached from the shared stage…
+    expect(ctx.app.stage.children).toEqual([]);
+    expect(createdSprite?.parent).toBeNull();
+    // …but not destroyed — the library must not destroy what it does not own
+    expect(createdSprite?.destroyed).toBe(false);
+
+    // AND: remounting must not stack a second copy on top of the first
+    setShow(true);
+    await tick();
+
+    expect(ctx.app.stage.children.length).toBe(1);
 
     dispose();
   });
