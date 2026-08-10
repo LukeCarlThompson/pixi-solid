@@ -9,15 +9,15 @@ This subskill documents recommended patterns for unit testing code that uses `pi
 
 ## Quick reference
 
-| Utility | Purpose |
-|---|---|
-| `mountScene(setup)` | Mount a scene graph and return `{ container, dispose }` |
+| Utility                          | Purpose                                                                                              |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `mountScene(setup)`              | Mount a scene graph and return `{ container, dispose }`                                              |
 | `renderHook(callback, options?)` | Run a hook/store in a temporary root, optionally inside a provider, and return `{ result, dispose }` |
-| `createTestContext()` | One-stop mock provider with ticker, renderer, and app |
-| `createManualTicker()` | Stopped ticker with step-based frame advancement |
-| `getByLabel(root, label)` | Find a node by label (throws if not found) |
-| `queryByLabel(root, label)` | Find a node by label (returns `undefined` if not found) |
-| `getAllByLabel(root, label)` | Find all nodes with the given label |
+| `createTestContext()`            | One-stop mock provider with ticker, renderer, and app                                                |
+| `createManualTicker()`           | Stopped ticker with step-based frame advancement                                                     |
+| `getByLabel(root, label)`        | Find a node by label (throws if not found)                                                           |
+| `queryByLabel(root, label)`      | Find a node by label (returns `undefined` if not found)                                              |
+| `getAllByLabel(root, label)`     | Find all nodes with the given label                                                                  |
 
 ```ts
 import {
@@ -80,7 +80,9 @@ describe("Component with onTick", () => {
 
     mountScene(() => (
       <ctx.Provider>
-        {onTick(() => { calls++; })}
+        {onTick(() => {
+          calls++;
+        })}
       </ctx.Provider>
     ));
 
@@ -99,7 +101,7 @@ const { container } = mountScene<Pixi.AnimatedSprite>(() => (
   <AnimatedSprite textures={textures} playing />
 ));
 
-container.playing;  // typed as Pixi.AnimatedSprite
+container.playing; // typed as Pixi.AnimatedSprite
 ```
 
 ## renderHook
@@ -108,7 +110,7 @@ container.playing;  // typed as Pixi.AnimatedSprite
 
 ```tsx
 type RenderHookResult<T> = {
-  result: Accessor<T>;   // call result() to read the current value
+  result: Accessor<T>; // call result() to read the current value
   dispose: () => void;
 };
 ```
@@ -209,12 +211,12 @@ mountScene(() => (
 ));
 ```
 
-| Property | Type | Purpose |
-|---|---|---|
-| `Provider` | Component | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext` |
-| `ticker` | `ManualTicker` | Advance frames with `fastForwardFrames()` or `fastForwardTime()` |
-| `renderer` | `TestRenderer` | Simulate resize events with `emitResize()` |
-| `app` | `Pixi.Application` | Minimal stub for hooks that call `getPixiApp()` |
+| Property     | Type                             | Purpose                                                                             |
+| ------------ | -------------------------------- | ----------------------------------------------------------------------------------- |
+| `Provider`   | Component                        | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext`      |
+| `ticker`     | `ManualTicker`                   | Advance frames with `fastForwardFrames()` or `fastForwardTime()`                    |
+| `renderer`   | `TestRenderer`                   | Simulate resize events with `emitResize()`                                          |
+| `app`        | `Pixi.Application`               | Minimal stub for hooks that call `getPixiApp()`                                     |
 | `renderHook` | `(callback) => RenderHookResult` | `renderHook(callback, { wrapper: Provider })` — runs hooks inside the mock contexts |
 
 ### Simulating resize
@@ -267,16 +269,18 @@ import { createManualTicker } from "pixi-solid/testing";
 const manual = createManualTicker();
 let calls = 0;
 
-manual.ticker.add(() => { calls++; });
+manual.ticker.add(() => {
+  calls++;
+});
 
 // Advance by number of frames
-manual.fastForwardFrames(10);              // 10 frames at 16ms each
-manual.fastForwardFrames(5, 33);           // 5 frames at 33ms each (~30fps)
+manual.fastForwardFrames(10); // 10 frames at 16ms each
+manual.fastForwardFrames(5, 33); // 5 frames at 33ms each (~30fps)
 expect(calls).toBe(15);
 
 // Advance by time duration
-manual.fastForwardTime(1000);              // 1 second in ~16ms steps
-manual.fastForwardTime(500, 50);           // 500ms in 50ms steps
+manual.fastForwardTime(1000); // 1 second in ~16ms steps
+manual.fastForwardTime(500, 50); // 500ms in 50ms steps
 ```
 
 Step-based advancement avoids the footgun of single large deltas that can break spring physics, smooth-damp interpolation, or sequenced animations.

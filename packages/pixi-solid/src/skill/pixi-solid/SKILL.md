@@ -69,7 +69,7 @@ Quick reference for all exported symbols and where they are documented:
 | **Components**        | `AnimatedSprite`, `BitmapText`, `Container`, `Graphics`, `HTMLText`, `MeshPlane`, `MeshRope`, `NineSliceSprite`, `ParticleContainer`, `PerspectiveMesh`, `RenderContainer`, `RenderLayer`, `Sprite`, `Text`, `TilingSprite` | [component-types.md](./component-types.md)         |
 | **Prop types**        | `PixiComponentProps`, `ContainerProps`, `LeafProps`, `SpriteProps`, `AnimatedSpriteProps`, `TilingSpriteProps`, point-axis types, event handler types                                                                       | [component-types.md](./component-types.md)         |
 | **Utils**             | `delay`, `createAsyncDelay`, `ObjectFitContainer`, `objectFit`, `useSpring`, `useSmoothDamp`                                                                                                                                | [utils-reference.md](./utils-reference.md)         |
-| **Testing**           | `mountScene`, `renderHook`, `createTestContext`, `createManualTicker`, `getByLabel`, `queryByLabel`, `getAllByLabel`, `cleanup`                                                                                         | [testing.md](./testing.md)                         |
+| **Testing**           | `mountScene`, `renderHook`, `createTestContext`, `createManualTicker`, `getByLabel`, `queryByLabel`, `getAllByLabel`, `cleanup`                                                                                             | [testing.md](./testing.md)                         |
 
 ## Quick rules
 

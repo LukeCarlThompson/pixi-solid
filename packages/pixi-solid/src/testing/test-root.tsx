@@ -1,5 +1,5 @@
-import type { Accessor, JSX, ParentProps } from "solid-js";
 import type * as Pixi from "pixi.js";
+import type { Accessor, JSX, ParentProps } from "solid-js";
 import { children, createMemo, createRoot, untrack } from "solid-js";
 
 export type MountSceneResult<TRoot = Pixi.Container> = {
@@ -91,6 +91,19 @@ export const cleanup = (): void => {
 };
 
 // ---------------------------------------------------------------------------
+// Internal: register a disposer with the global registry
+// ---------------------------------------------------------------------------
+
+const registerDisposer = (dispose: () => void): (() => void) => {
+  const registered = () => {
+    dispose();
+    disposers.delete(registered);
+  };
+  disposers.add(registered);
+  return registered;
+};
+
+// ---------------------------------------------------------------------------
 // renderHook — for hook/store tests
 // ---------------------------------------------------------------------------
 
@@ -113,11 +126,11 @@ export const cleanup = (): void => {
  * expect(result().width).toBe(1024);
  * ```
  *
- * The callback runs exactly once inside the wrapper, so side effects like
- * `onTick` are registered against a stable owner and cleaned up on dispose.
- * If the callback reads reactive values, `result` re-evaluates it when those
- * values change. Return stable reactive objects (stores, screen dimensions)
- * rather than deriving primitives inside the callback.
+ * The callback runs inside the wrapper, so hooks that register side effects
+ * (`onTick`, `onResize`) are cleaned up on dispose. If the callback reads
+ * reactive values, `result` re-evaluates it when those values change. Return
+ * stable reactive objects (stores, screen dimensions) rather than deriving
+ * primitives inside the callback.
  */
 export const renderHook = <T,>(
   callback: () => T,
@@ -126,25 +139,33 @@ export const renderHook = <T,>(
   const { value, dispose: disposeRoot } = createRootWithCleanup(() => {
     const Wrapper = options?.wrapper;
 
-    const result = createMemo<T>(() => {
-      if (!Wrapper) {
-        return callback();
-      }
+    let memo: Accessor<T> | undefined;
 
-      // Evaluate the wrapper as a component tree so context providers
-      // (e.g. `ctx.Provider`) propagate context to the callback, then run
-      // the callback once inside it.
-      let captured: T | undefined;
+    if (Wrapper) {
+      // The memo must be created inside the wrapper's render so `useContext`
+      // resolves the provider's context. A component is the owner boundary:
+      // the memo's owner inherits the wrapper's context, reactive reads in
+      // the callback track the memo directly, and the wrapper is NOT
+      // re-rendered when the memo recomputes.
+      const HookRunner = (): null => {
+        memo = createMemo<T>(() => callback());
+        return null;
+      };
+
       children(() => (
         <Wrapper>
-          {(() => {
-            captured = callback();
-            return null;
-          })()}
+          <HookRunner />
         </Wrapper>
       ))();
-      return captured as T;
-    });
+    } else {
+      memo = createMemo<T>(() => callback());
+    }
+
+    if (memo === undefined) {
+      throw new Error("renderHook: the wrapper must render its children");
+    }
+
+    const result = memo;
 
     // Evaluate eagerly so errors (e.g. missing context) surface when
     // `renderHook` is called, matching the previous `createTestRoot` behaviour.
@@ -153,11 +174,7 @@ export const renderHook = <T,>(
     return result;
   });
 
-  const dispose = () => {
-    disposeRoot();
-    disposers.delete(dispose);
-  };
-  disposers.add(dispose);
+  const dispose = registerDisposer(disposeRoot);
 
   return { result: value, dispose };
 };
@@ -196,7 +213,7 @@ export const renderHook = <T,>(
  * expect(player.x).toBe(100);
  * ```
  */
-export const mountScene = <TRoot = Pixi.Container>(
+export const mountScene = <TRoot = Pixi.Container,>(
   setup: () => JSX.Element,
 ): MountSceneResult<TRoot> => {
   const result = createRootWithCleanup(() => {
@@ -209,16 +226,8 @@ export const mountScene = <TRoot = Pixi.Container>(
     return resolved();
   });
 
-  const dispose = () => {
-    result.dispose();
-    disposers.delete(dispose);
-  };
-  disposers.add(dispose);
-
   return {
     container: result.value as unknown as TRoot,
-    dispose,
+    dispose: registerDisposer(() => result.dispose()),
   };
 };
-
-

@@ -51,25 +51,25 @@ packages/
 
 ### Root
 
-| Command          | Description                    |
-| ---------------- | ------------------------------ |
-| `pnpm build`     | Build all packages             |
-| `pnpm dev`       | Run all dev servers            |
-| `pnpm test`      | Run all tests                  |
-| `pnpm lint`      | Lint with oxlint               |
-| `pnpm fmt`       | Format with oxfmt              |
-| `pnpm fmt:check` | Check formatting (no writes)   |
+| Command          | Description                  |
+| ---------------- | ---------------------------- |
+| `pnpm build`     | Build all packages           |
+| `pnpm dev`       | Run all dev servers          |
+| `pnpm test`      | Run all tests                |
+| `pnpm lint`      | Lint with oxlint             |
+| `pnpm fmt`       | Format with oxfmt            |
+| `pnpm fmt:check` | Check formatting (no writes) |
 
 ### `packages/pixi-solid`
 
-| Command                    | Description                           |
-| -------------------------- | ------------------------------------- |
-| `pnpm build`               | Vite build + TypeScript declarations  |
-| `pnpm test`                | Vitest                                |
-| `pnpm test:bench`          | Run benchmarks                        |
-| `pnpm test:bench:save`     | Save benchmark results as baseline    |
-| `pnpm test:bench:compare`  | Compare benchmarks against baseline   |
-| `pnpm build:skill`         | Copy LLM skill files to dist/skill (runs automatically after build) |
+| Command                   | Description                                                         |
+| ------------------------- | ------------------------------------------------------------------- |
+| `pnpm build`              | Vite build + TypeScript declarations                                |
+| `pnpm test`               | Vitest                                                              |
+| `pnpm test:bench`         | Run benchmarks                                                      |
+| `pnpm test:bench:save`    | Save benchmark results as baseline                                  |
+| `pnpm test:bench:compare` | Compare benchmarks against baseline                                 |
+| `pnpm build:skill`        | Copy LLM skill files to dist/skill (runs automatically after build) |
 
 ---
 
@@ -105,7 +105,10 @@ Prefer `type` over `interface` (enforced):
 type SpriteProps = { x: number; y: number };
 
 // ❌ wrong
-interface SpriteProps { x: number; y: number }
+interface SpriteProps {
+  x: number;
+  y: number;
+}
 ```
 
 ### Other Enforced Rules
@@ -127,15 +130,15 @@ Imports are sorted automatically by oxfmt in this order:
 
 ## Naming Conventions
 
-| Category          | Convention            | Example                                  |
-| ----------------- | --------------------- | ---------------------------------------- |
-| Components        | PascalCase            | `Container`, `Sprite`, `Graphics`        |
-| Hooks / utilities | camelCase             | `onTick`, `useSpring`, `useSmoothDamp`   |
-| Types             | PascalCase + `Props`  | `SpriteProps`, `ContainerProps`          |
-| Constants         | UPPER_SNAKE_CASE      | `SOLID_PROP_KEYS`, `CONTAINER_RUNTIME_KEYS` |
-| Source files      | kebab-case            | `bind-props.ts`, `point-property-names.ts` |
-| Component files   | kebab-case `.tsx`     | `pixi-application-provider.tsx`          |
-| Barrel files      | `index.ts`            | `components/index.ts`                    |
+| Category          | Convention           | Example                                     |
+| ----------------- | -------------------- | ------------------------------------------- |
+| Components        | PascalCase           | `Container`, `Sprite`, `Graphics`           |
+| Hooks / utilities | camelCase            | `onTick`, `useSpring`, `useSmoothDamp`      |
+| Types             | PascalCase + `Props` | `SpriteProps`, `ContainerProps`             |
+| Constants         | UPPER_SNAKE_CASE     | `SOLID_PROP_KEYS`, `CONTAINER_RUNTIME_KEYS` |
+| Source files      | kebab-case           | `bind-props.ts`, `point-property-names.ts`  |
+| Component files   | kebab-case `.tsx`    | `pixi-application-provider.tsx`             |
+| Barrel files      | `index.ts`           | `components/index.ts`                       |
 
 ---
 
@@ -150,14 +153,14 @@ Imports are sorted automatically by oxfmt in this order:
 
 All components are created via factory functions in `packages/pixi-solid/src/components/component-factories.ts`:
 
-| Factory | Creates | Has children? | Extra props |
-|---|---|---|---|
-| `createContainerComponent()` | Components that accept children | ✅ Yes | Common point axes |
-| `createLeafComponent()` | Components without children | ❌ No | Common point axes |
-| `createSpriteComponent()` | Sprite-like components | ❌ No | Common + anchor point axes |
-| `createAnimatedSpriteComponent()` | AnimatedSprite with managed autoUpdate | ❌ No | Common + anchor point axes |
-| `createTilingSpriteComponent()` | TilingSprite | ❌ No | Common + anchor + tiling axes |
-| `createFilterComponent()` | Filter components | ❌ No | None (ref + as only) |
+| Factory                           | Creates                                | Has children? | Extra props                   |
+| --------------------------------- | -------------------------------------- | ------------- | ----------------------------- |
+| `createContainerComponent()`      | Components that accept children        | ✅ Yes        | Common point axes             |
+| `createLeafComponent()`           | Components without children            | ❌ No         | Common point axes             |
+| `createSpriteComponent()`         | Sprite-like components                 | ❌ No         | Common + anchor point axes    |
+| `createAnimatedSpriteComponent()` | AnimatedSprite with managed autoUpdate | ❌ No         | Common + anchor point axes    |
+| `createTilingSpriteComponent()`   | TilingSprite                           | ❌ No         | Common + anchor + tiling axes |
+| `createFilterComponent()`         | Filter components                      | ❌ No         | None (ref + as only)          |
 
 ### Adding a New Component
 
@@ -197,11 +200,11 @@ When the `as` prop is provided, the factory skips `destroy()` entirely — the c
 
 ### Context Providers
 
-| Provider | Provides | File |
-|---|---|---|
-| `PixiCanvas` | App + canvas DOM element + all hooks | `pixi-canvas.tsx` |
-| `PixiApplicationProvider` | App context + all hooks | `pixi-application/pixi-application-provider.tsx` |
-| `TickerProvider` | Ticker context only — `getTicker`, `onTick`, ticker-synced delays | `pixi-application/pixi-application-provider.tsx` |
+| Provider                  | Provides                                                          | File                                             |
+| ------------------------- | ----------------------------------------------------------------- | ------------------------------------------------ |
+| `PixiCanvas`              | App + canvas DOM element + all hooks                              | `pixi-canvas.tsx`                                |
+| `PixiApplicationProvider` | App context + all hooks                                           | `pixi-application/pixi-application-provider.tsx` |
+| `TickerProvider`          | Ticker context only — `getTicker`, `onTick`, ticker-synced delays | `pixi-application/pixi-application-provider.tsx` |
 
 Context objects are in `packages/pixi-solid/src/pixi-application/context.ts`.
 
@@ -225,7 +228,11 @@ describe("Container component", () => {
     let container: Pixi.Container | undefined;
 
     const { dispose } = mountScene(() => (
-      <Container ref={(el) => { container = el; }} />
+      <Container
+        ref={(el) => {
+          container = el;
+        }}
+      />
     ));
     dispose();
 
@@ -291,18 +298,19 @@ Follow semantic versioning: `MAJOR.MINOR.PATCH`.
 
 The changelog follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format with emoji markers:
 
-| Emoji | Type        | When to use                              |
-| ----- | ----------- | ---------------------------------------- |
-| ✅    | Added       | New feature or component                 |
-| ⚙️    | Changed     | Changes to existing functionality        |
-| 😵    | Deprecated  | Feature marked for future removal        |
-| 💀    | Removed     | Feature removed                          |
-| 🐞    | Fixed       | Bug fix                                  |
+| Emoji | Type       | When to use                       |
+| ----- | ---------- | --------------------------------- |
+| ✅    | Added      | New feature or component          |
+| ⚙️    | Changed    | Changes to existing functionality |
+| 😵    | Deprecated | Feature marked for future removal |
+| 💀    | Removed    | Feature removed                   |
+| 🐞    | Fixed      | Bug fix                           |
 
 **Example entry:**
 
 ```markdown
 ## 0.2.0
+
 - ✅ Added `MeshRope` component.
 - 🐞 Fixed anchor prop not updating reactively on `Sprite`.
 ```

@@ -73,7 +73,9 @@ let calls = 0;
 mountScene(() => (
   <ctx.Provider>
     <Container>
-      {onTick(() => { calls++; })}
+      {onTick(() => {
+        calls++;
+      })}
       <Sprite x={100} />
     </Container>
   </ctx.Provider>

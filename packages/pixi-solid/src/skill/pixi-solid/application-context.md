@@ -10,26 +10,19 @@ This subskill covers every publicly exported provider from `pixi-solid`. Use it 
 ## Import
 
 ```ts
-import {
-  PixiCanvas,
-  PixiApplicationProvider,
-  TickerProvider,
-} from "pixi-solid";
-import type {
-  PixiCanvasProps,
-  PixiApplicationProps,
-} from "pixi-solid";
+import { PixiCanvas, PixiApplicationProvider, TickerProvider } from "pixi-solid";
+import type { PixiCanvasProps, PixiApplicationProps } from "pixi-solid";
 ```
 
 ## Providers overview
 
 Three providers exist. Choose based on your application's needs:
 
-| Provider | Creates canvas? | Creates app? | Provides ticker? | Use when... |
-|---|---|---|---|---|
-| `PixiCanvas` | Yes | Yes (if no context) | Yes | Simplest setup; canvas owned directly by component tree |
-| `PixiApplicationProvider` | No | Yes (if no context) | Yes | HTML outside canvas needs hooks, or you pass `existingApp` |
-| `TickerProvider` | No | No | Yes | You have an existing ticker; testing or independent ticker |
+| Provider                  | Creates canvas? | Creates app?        | Provides ticker? | Use when...                                                |
+| ------------------------- | --------------- | ------------------- | ---------------- | ---------------------------------------------------------- |
+| `PixiCanvas`              | Yes             | Yes (if no context) | Yes              | Simplest setup; canvas owned directly by component tree    |
+| `PixiApplicationProvider` | No              | Yes (if no context) | Yes              | HTML outside canvas needs hooks, or you pass `existingApp` |
+| `TickerProvider`          | No              | No                  | Yes              | You have an existing ticker; testing or independent ticker |
 
 ## `PixiCanvas`
 
@@ -52,16 +45,18 @@ export const DemoApp = () => (
 type PixiCanvasProps = {
   children: JSX.Element;
   ref?: (el: HTMLDivElement) => void;
-} & Omit<JSX.HTMLAttributes<HTMLDivElement>, "children" | "ref">
-  & Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">>;
+} & Omit<JSX.HTMLAttributes<HTMLDivElement>, "children" | "ref"> &
+  Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">>;
 ```
 
 Props accepted:
+
 - `children` — JSX content to render inside the canvas (pixi-solid components).
 - DOM props — Any standard HTML `div` attributes (`style`, `class`, `id`, `aria-*`, `data-*`, etc.) are passed to the wrapper element.
 - Pixi `ApplicationOptions` — Any option except `children` and `resizeTo` (handled internally).
 
 `PixiCanvas` works with or without a surrounding `PixiApplicationProvider`:
+
 - If used inside `PixiApplicationProvider`, it uses the provided context.
 - If used standalone, it creates its own `Pixi.Application` and provides context.
 
@@ -92,10 +87,12 @@ type PixiApplicationProps = Partial<Omit<Pixi.ApplicationOptions, "children" | "
 ```
 
 Props accepted:
+
 - Standard `ApplicationOptions` (except `children` and `resizeTo`).
 - `existingApp` — An already-created `Pixi.Application` instance. When provided, the provider reuses it instead of creating a new one. The application must be initialized before rendering, and you handle lifecycle/cleanup yourself.
 
 `PixiApplicationProvider` also provides context for:
+
 - `getPixiApp` — returns the `PIXI.Application` instance.
 - `getTicker` — returns the `PIXI.Ticker` instance.
 - `usePixiScreen` — returns reactive screen dimensions.
@@ -103,6 +100,7 @@ Props accepted:
 - `onResize` — registers callbacks on resize.
 
 Use `PixiApplicationProvider` when:
+
 - HTML outside the canvas needs access to pixi-solid hooks or application state.
 - You want to provide an existing Pixi application with `existingApp`.
 
@@ -117,9 +115,7 @@ import * as Pixi from "pixi.js";
 const myTicker = new Pixi.Ticker();
 
 export const TestApp = ({ children }) => (
-  <TickerProvider ticker={myTicker}>
-    {children}
-  </TickerProvider>
+  <TickerProvider ticker={myTicker}>{children}</TickerProvider>
 );
 ```
 
@@ -130,9 +126,11 @@ type TickerProviderProps = ParentProps<{ ticker: Pixi.Ticker }>;
 ```
 
 Props accepted:
+
 - `ticker` — An existing `Pixi.Ticker` instance. This is the only required prop.
 
 Use `TickerProvider` when:
+
 - You already have a `Pixi.Ticker` instance to pass as the `ticker` prop.
 - You need ticker context for testing (e.g. controlled ticker with manual advancement).
 - You need a subtree that runs on its own independent ticker.
@@ -140,6 +138,7 @@ Use `TickerProvider` when:
 See [testing](./testing.md) for recommended TickerProvider test patterns and examples.
 
 `TickerProvider` provides context for:
+
 - `getTicker` — returns the provided ticker.
 - `onTick` — registers callbacks on each ticker update.
 - `delay` and `createAsyncDelay` — ticker-synced delays.

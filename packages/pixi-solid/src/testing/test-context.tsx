@@ -8,7 +8,7 @@ import { createPixiScreenStore } from "../use-pixi-screen";
 import type { ManualTicker } from "./manual-ticker";
 import { createManualTicker } from "./manual-ticker";
 import type { RenderHookResult } from "./test-root";
-import { renderHook } from "./test-root";
+import { renderHook as createRenderHook } from "./test-root";
 
 export type TestRenderer = {
   screen: { width: number; height: number; x: number; y: number };
@@ -36,7 +36,7 @@ export type TestContext = {
    * its return value as a reactive accessor. Equivalent to
    * `renderHook(callback, { wrapper: Provider })`.
    */
-  renderHook: <T,>(callback: () => T) => RenderHookResult<T>;
+  renderHook: <T>(callback: () => T) => RenderHookResult<T>;
 };
 
 /**
@@ -72,8 +72,10 @@ export const createTestContext = (options?: {
   ticker?: ManualTicker;
   renderer?: TestRenderer;
   app?: Pixi.Application;
-}): TestContext => {  const renderer: TestRenderer =
-    options?.renderer ?? (() => {
+}): TestContext => {
+  const renderer: TestRenderer =
+    options?.renderer ??
+    (() => {
       const listenersByEvent = new Map<string, Set<() => void>>();
 
       const r: TestRenderer = {
@@ -108,7 +110,7 @@ export const createTestContext = (options?: {
       stage: new Container(),
       ticker: new Ticker(),
       canvas: document.createElement("canvas"),
-    }) as unknown as Pixi.Application;
+    } as unknown as Pixi.Application);
 
   const manualTicker = options?.ticker ?? createManualTicker();
 
@@ -131,6 +133,6 @@ export const createTestContext = (options?: {
     ticker: manualTicker,
     renderer,
     app,
-    renderHook: <T,>(callback: () => T) => renderHook(callback, { wrapper: Provider }),
+    renderHook: <T,>(callback: () => T) => createRenderHook(callback, { wrapper: Provider }),
   };
 };

@@ -1,8 +1,8 @@
 import { createEffect } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { createTestContext } from "./testing";
 import { onResize } from "./on-resize";
+import { createTestContext } from "./testing";
 import { usePixiScreen } from "./use-pixi-screen";
 
 describe("onResize + usePixiScreen", () => {
@@ -14,8 +14,6 @@ describe("onResize + usePixiScreen", () => {
       onResize(() => {
         callbackCalls += 1;
       });
-
-      return null;
     });
 
     expect(callbackCalls).toBe(1);
@@ -34,8 +32,6 @@ describe("onResize + usePixiScreen", () => {
           storeWidth: pixiScreen.width,
         });
       });
-
-      return null;
     });
 
     ctx.renderer.emitResize({ width: 1024 });
@@ -65,8 +61,6 @@ describe("onResize + usePixiScreen", () => {
       onResize(() => {
         onResizeCalls += 1;
       });
-
-      return null;
     });
 
     expect(pixiScreenEffectRuns).toBe(1);

@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { TickerProvider } from "../../pixi-application";
 import { createManualTicker } from "../manual-ticker";
-import { renderHook } from "../test-root";
 import { createTestContext } from "../test-context";
+import { renderHook } from "../test-root";
+
 import { createClockStore } from "./clock-store";
 
 describe("example test", () => {
@@ -14,9 +15,7 @@ describe("example test", () => {
     // Provide just the ticker via TickerProvider — no app, renderer, or
     // screen store required.
     const { result: clock, dispose } = renderHook(() => createClockStore(), {
-      wrapper: (props) => (
-        <TickerProvider ticker={manual.ticker}>{props.children}</TickerProvider>
-      ),
+      wrapper: (props) => <TickerProvider ticker={manual.ticker}>{props.children}</TickerProvider>,
     });
 
     expect(clock().time).toBe(0);

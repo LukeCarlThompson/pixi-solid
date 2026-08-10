@@ -5,13 +5,13 @@ sidebar:
   order: 1
 ---
 
-The `getPixiApp` hook provides a way to access the root `PIXI.Application` instance created by the `PixiApplicationProvider` or `PixiCanvas` component.
-This is useful when you need to interact directly with the Pixi.js application, for example, to access the renderer.
+The `getPixiApp` hook accesses the root `PIXI.Application` instance from the nearest `PixiApplicationProvider` or `PixiCanvas` component.
+Use it when you need to interact directly with the PixiJS application, for example to access the renderer.
 
 ### Usage
 
-This hook must be called from a component that is a descendant of the `<PixiApplicationProvider />` or `<PixiCanvas />` component.
-If used outside of this context, it will throw an error.
+Call this hook from a component that is a descendant of `<PixiApplicationProvider />` or `<PixiCanvas />`.
+If you call it outside this context, it throws an error.
 
 ```tsx
 import { getPixiApp, Container, PixiCanvas } from "pixi-solid";
@@ -36,9 +36,9 @@ export const DemoApp = () => {
 
 ## When to use it
 
-- When you need direct access to the `PIXI.Application` instance to perform operations not covered by specific `pixi-solid` components.
-- To get information about the Pixi.js renderer, such as its dimensions, resolution, or view.
+- To access the `PIXI.Application` instance for operations that `pixi-solid` components do not cover.
+- To get information about the PixiJS renderer, such as its dimensions, resolution, or view.
 
 ## Further reading
 
-- Read more about the [`PIXI.Application` class](https://pixijs.com/8.x/guides/components/application) in the PixiJS documentation.
+- See the [`PIXI.Application` docs](https://pixijs.com/8.x/guides/components/application).

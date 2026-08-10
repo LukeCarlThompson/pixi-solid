@@ -216,7 +216,11 @@ describe("Reactive children binding — stale children are not left attached", (
     let containerRef: Pixi.Container | undefined;
 
     const { dispose } = mountScene(() => (
-      <Container ref={(el) => { containerRef = el; }}>
+      <Container
+        ref={(el) => {
+          containerRef = el;
+        }}
+      >
         {/* Raw Pixi instances are valid children at runtime; the JSX types don't model them. */}
         {cond() ? (red as any) : (green as any)}
       </Container>
@@ -241,10 +245,16 @@ describe("Reactive children binding — stale children are not left attached", (
     let containerRef: Pixi.Container | undefined;
 
     const { dispose } = mountScene(() => (
-      <Container ref={(el) => { containerRef = el; }}>
-        {cond()
-          ? <Sprite as={red} texture={Texture.WHITE} />
-          : <Sprite as={green} texture={Texture.WHITE} />}
+      <Container
+        ref={(el) => {
+          containerRef = el;
+        }}
+      >
+        {cond() ? (
+          <Sprite as={red} texture={Texture.WHITE} />
+        ) : (
+          <Sprite as={green} texture={Texture.WHITE} />
+        )}
       </Container>
     ));
 
@@ -274,11 +284,7 @@ describe("Container unmount — unowned children are detached, not destroyed", (
     const [show, setShow] = createSignal(true);
 
     const { dispose } = mountScene(() =>
-      show() ? (
-        <Container>
-          {(rawChild as any)}
-        </Container>
-      ) : null,
+      show() ? <Container>{rawChild as any}</Container> : null,
     );
 
     // Sanity: the raw child is on the container while mounted
@@ -529,9 +535,7 @@ describe("as prop lifecycle — user-owned instances are not destroyed on cleanu
       originalDestroy(options);
     });
 
-    const { dispose } = mountScene(() => (
-      <Container as={existingContainer} />
-    ));
+    const { dispose } = mountScene(() => <Container as={existingContainer} />);
 
     dispose();
 
@@ -548,9 +552,7 @@ describe("as prop lifecycle — user-owned instances are not destroyed on cleanu
       originalDestroy(options);
     });
 
-    const { dispose } = mountScene(() => (
-      <Sprite as={existingSprite} texture={Texture.WHITE} />
-    ));
+    const { dispose } = mountScene(() => <Sprite as={existingSprite} texture={Texture.WHITE} />);
 
     dispose();
 
@@ -558,7 +560,11 @@ describe("as prop lifecycle — user-owned instances are not destroyed on cleanu
   });
 
   it("GIVEN a TilingSprite with as prop WHEN root is disposed THEN instance is NOT destroyed", () => {
-    const existingTilingSprite = new PixiTilingSprite({ texture: Texture.WHITE, width: 100, height: 100 });
+    const existingTilingSprite = new PixiTilingSprite({
+      texture: Texture.WHITE,
+      width: 100,
+      height: 100,
+    });
     let destroyCalled = false;
 
     const originalDestroy = existingTilingSprite.destroy.bind(existingTilingSprite);
@@ -600,5 +606,4 @@ describe("as prop lifecycle — user-owned instances are not destroyed on cleanu
 
     expect(destroyCalled).toBe(false);
   });
-
 });

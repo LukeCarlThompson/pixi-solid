@@ -44,6 +44,7 @@ type delay = (delayMs: number, callback?: () => void) => void;
 ```
 
 **Parameters:**
+
 - `delayMs` — Number of milliseconds to wait (measured in the ticker's time units).
 - `callback` — A callback function that fires when `delayMs` has passed.
 
@@ -77,6 +78,7 @@ type createAsyncDelay = () => AsyncDelayFunction;
 **Constraints:** `createAsyncDelay` must be called synchronously inside a tracked descendant of `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`. The returned function can be called in an async context later.
 
 **Parameters (returned function):**
+
 - `delayMs` — Number of milliseconds to wait.
 - `signal` — Optional `AbortSignal` to resolve the delay early.
 
@@ -111,6 +113,7 @@ type objectFit = (
 ```
 
 **Parameters:**
+
 - `object` — The `Pixi.Container` to scale.
 - `bounds` — The bounds (width, height) to fit within.
 - `fitMode` — The fit mode to apply.
@@ -118,13 +121,13 @@ type objectFit = (
 
 **`ObjectFitMode`:** `"cover" | "contain" | "fill" | "scale-down" | "none"`
 
-| Mode | Behavior |
-|---|---|
-| `"cover"` | Scale to fill bounds, may crop. Uses `Math.max(widthRatio, heightRatio)`. |
-| `"contain"` | Scale to fit inside bounds, may leave empty space. Uses `Math.min(widthRatio, heightRatio)`. |
-| `"fill"` | Stretch to fill bounds, may distort aspect ratio. |
-| `"scale-down"` | Scale to cover or contain, whichever is smaller. |
-| `"none"` | No scaling applied. |
+| Mode           | Behavior                                                                                     |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| `"cover"`      | Scale to fill bounds, may crop. Uses `Math.max(widthRatio, heightRatio)`.                    |
+| `"contain"`    | Scale to fit inside bounds, may leave empty space. Uses `Math.min(widthRatio, heightRatio)`. |
+| `"fill"`       | Stretch to fill bounds, may distort aspect ratio.                                            |
+| `"scale-down"` | Scale to cover or contain, whichever is smaller.                                             |
+| `"none"`       | No scaling applied.                                                                          |
 
 **`ObjectPosition`:** `"center" | "top" | "right" | "bottom" | "left" | "top-left" | "top-right" | "bottom-left" | "bottom-right" | { x: number; y: number }`
 
@@ -168,6 +171,7 @@ type ObjectFitContainerProps = PixiComponentProps & {
 ```
 
 Props accepted:
+
 - `width`, `height` — The bounding area dimensions.
 - `fitMode` — How children are scaled (see `ObjectFitMode` above).
 - `objectPosition` — How children are positioned within the bounds (see `ObjectPosition` above).
@@ -175,6 +179,7 @@ Props accepted:
 - Standard pixi-solid `Container` props (position, scale, mask, events, etc.) on the outer container.
 
 **Behavior:**
+
 - Each child is wrapped in a container and object-fit scaling is applied based on `width`, `height`, `fitMode`, and `objectPosition`.
 - If multiple children are passed, each one is wrapped, scaled, and positioned independently.
 - To apply the same object-fit behavior to multiple children as a group, wrap them in a parent `Container` and pass that single container as the child to `ObjectFitContainer`.
@@ -188,9 +193,9 @@ A SolidJS hook that provides a spring-animated signal towards a target value. In
 ```ts
 type UseSpringProps = {
   to: () => number;
-  stiffness?: () => number;  // default: 10
-  damping?: () => number;    // default: 30
-  mass?: () => number;       // default: 20
+  stiffness?: () => number; // default: 10
+  damping?: () => number; // default: 30
+  mass?: () => number; // default: 20
 };
 
 type Spring = {
@@ -203,12 +208,14 @@ type useSpring = (props: UseSpringProps) => Spring;
 ```
 
 **Parameters (`UseSpringProps`):**
+
 - `to` — Accessor for the target value.
 - `stiffness` — Effective range 0–100. Controls resistance to displacement. Default: 10.
 - `damping` — Effective range 0–100. Controls friction/resistance. Default: 30.
 - `mass` — Effective range 0–100. Controls inertia. Default: 20.
 
 **Returns (`Spring`):**
+
 - `value` — The current spring-animated value (reactive accessor).
 - `velocity` — The current velocity (reactive accessor).
 - `setValue` — Sets the value directly (teleport). The next frame still calculates physics based on the target.
@@ -232,8 +239,8 @@ A SolidJS hook that provides a smoothly damped signal towards a target value. Si
 ```ts
 type UseSmoothDampProps = {
   to: () => number;
-  smoothTimeMs?: () => number;  // default: 300
-  maxSpeed?: () => number;      // default: Infinity
+  smoothTimeMs?: () => number; // default: 300
+  maxSpeed?: () => number; // default: Infinity
 };
 
 type SmoothDamp = {
@@ -246,11 +253,13 @@ type useSmoothDamp = (props: UseSmoothDampProps) => SmoothDamp;
 ```
 
 **Parameters (`UseSmoothDampProps`):**
+
 - `to` — Accessor for the target value.
 - `smoothTimeMs` — Time to reach the target in milliseconds. Smaller = faster. Default: 300.
 - `maxSpeed` — Maximum speed in units per second. Default: `Infinity`.
 
 **Returns (`SmoothDamp`):**
+
 - `value` — The current damped value (reactive accessor).
 - `velocity` — The current velocity (reactive accessor).
 - `setValue` — Sets the value directly (teleport). The next frame still calculates damping physics based on the target.
@@ -269,12 +278,12 @@ const damp = useSmoothDamp({ to: target, smoothTimeMs: 500 });
 
 ## `useSpring` vs `useSmoothDamp`
 
-| Feature | `useSpring` | `useSmoothDamp` |
-|---|---|---|
-| Behavior | Physically-based spring oscillation | Soft damped interpolation (no overshoot) |
-| Parameters | `stiffness`, `damping`, `mass` | `smoothTimeMs`, `maxSpeed` |
-| Returns | `value`, `velocity`, `setValue` | `value`, `velocity`, `setValue` |
-| Use when | You want spring physics with overshoot | You want smooth, non-oscillating motion |
+| Feature    | `useSpring`                            | `useSmoothDamp`                          |
+| ---------- | -------------------------------------- | ---------------------------------------- |
+| Behavior   | Physically-based spring oscillation    | Soft damped interpolation (no overshoot) |
+| Parameters | `stiffness`, `damping`, `mass`         | `smoothTimeMs`, `maxSpeed`               |
+| Returns    | `value`, `velocity`, `setValue`        | `value`, `velocity`, `setValue`          |
+| Use when   | You want spring physics with overshoot | You want smooth, non-oscillating motion  |
 
 ## Utility usage patterns
 

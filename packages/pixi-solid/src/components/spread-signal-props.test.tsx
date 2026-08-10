@@ -224,5 +224,4 @@ describe("Container with spread signal props", () => {
 
     dispose();
   });
-
 });

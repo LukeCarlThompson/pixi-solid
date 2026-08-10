@@ -32,7 +32,9 @@ it("calls onTick on each frame", () => {
 
   mountScene(() => (
     <ctx.Provider>
-      {onTick(() => { calls++; })}
+      {onTick(() => {
+        calls++;
+      })}
     </ctx.Provider>
   ));
 
@@ -62,6 +64,7 @@ const player = getByLabel(container, "player");
 ```
 
 For non-Container roots (e.g. AnimatedSprite), specify the type via generic:
+
 ```tsx
 const { container } = mountScene<Pixi.AnimatedSprite>(() => (
   <AnimatedSprite textures={textures} playing />
@@ -75,7 +78,7 @@ Runs a hook (or store factory) in a temporary Solid root and exposes its return 
 
 ```tsx
 type RenderHookResult<T> = {
-  result: Accessor<T>;   // call result() to read the current value
+  result: Accessor<T>; // call result() to read the current value
   dispose: () => void;
 };
 ```
@@ -130,21 +133,23 @@ expect(() => renderHook(() => usePixiScreen())).toThrow();
 
 Creates mock PixiJS instances and a context provider. Returns `{ Provider, ticker, renderer, app, renderHook }`.
 
-| Property | Type | Purpose |
-|---|---|---|
-| `Provider` | Component | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext` |
-| `ticker` | `ManualTicker` | Advance frames with `fastForwardFrames()` or `fastForwardTime()` |
-| `renderer` | `TestRenderer` | Simulate resize events with `emitResize()` |
-| `app` | `Pixi.Application` | Minimal stub for hooks that call `getPixiApp()` |
+| Property     | Type                             | Purpose                                                                             |
+| ------------ | -------------------------------- | ----------------------------------------------------------------------------------- |
+| `Provider`   | Component                        | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext`      |
+| `ticker`     | `ManualTicker`                   | Advance frames with `fastForwardFrames()` or `fastForwardTime()`                    |
+| `renderer`   | `TestRenderer`                   | Simulate resize events with `emitResize()`                                          |
+| `app`        | `Pixi.Application`               | Minimal stub for hooks that call `getPixiApp()`                                     |
 | `renderHook` | `(callback) => RenderHookResult` | `renderHook(callback, { wrapper: Provider })` — runs hooks inside the mock contexts |
 
 **Simulating resize:**
+
 ```ts
 ctx.renderer.emitResize({ width: 1024 });
 ctx.renderer.emitResize();
 ```
 
 **Spying on mocks (use your framework's spy):**
+
 ```ts
 const addSpy = vi.spyOn(ctx.ticker.ticker, "add");
 const resizeSpy = vi.spyOn(ctx.renderer, "addListener");
@@ -157,11 +162,11 @@ Creates a stopped ticker with step-based frame advancement.
 ```ts
 const manual = createManualTicker();
 
-manual.fastForwardFrames(10);              // 10 frames at 16ms each
-manual.fastForwardFrames(5, 33);           // 5 frames at 33ms each (~30fps)
+manual.fastForwardFrames(10); // 10 frames at 16ms each
+manual.fastForwardFrames(5, 33); // 5 frames at 33ms each (~30fps)
 
-manual.fastForwardTime(1000);              // 1 second in ~16ms steps
-manual.fastForwardTime(500, 50);           // 500ms in 50ms steps
+manual.fastForwardTime(1000); // 1 second in ~16ms steps
+manual.fastForwardTime(500, 50); // 500ms in 50ms steps
 ```
 
 ### `getByLabel(root, label)`
@@ -184,7 +189,7 @@ expect(player.x).toBe(100);
 Like `getByLabel` but returns `undefined` instead of throwing.
 
 ```ts
-const maybe = queryByLabel(container, "missing");  // undefined
+const maybe = queryByLabel(container, "missing"); // undefined
 ```
 
 ### `getAllByLabel(root, label)`

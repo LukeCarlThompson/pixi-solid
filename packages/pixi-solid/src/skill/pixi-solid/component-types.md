@@ -36,10 +36,8 @@ import type {
 Generic base type for any Pixi-backed component. Takes a Pixi options type (e.g. `Pixi.SpriteOptions`) so consumers can pass through all valid Pixi props.
 
 ```ts
-type PixiComponentProps<ComponentOptions extends Pixi.ContainerOptions = Pixi.ContainerOptions>
-  = PixiSolidEventHandlerMap
-  & CommonPointAxisProps
-  & Omit<ComponentOptions, "children">;
+type PixiComponentProps<ComponentOptions extends Pixi.ContainerOptions = Pixi.ContainerOptions> =
+  PixiSolidEventHandlerMap & CommonPointAxisProps & Omit<ComponentOptions, "children">;
 ```
 
 Use this when building your own Pixi-backed component and you want consumers to pass through Pixi-style props to the underlying instance. If you don't require all props, narrow with `Pick` or `Omit`.
@@ -51,11 +49,8 @@ Use this when building your own Pixi-backed component and you want consumers to 
 Props for container components (those that accept children).
 
 ```ts
-type ContainerProps<Component>
-  = PixiSolidEventHandlerMap
-  & CommonPointAxisProps
-  & { ref?: Ref<Component>; as?: Component }
-  & { children?: JSX.Element };
+type ContainerProps<Component> = PixiSolidEventHandlerMap &
+  CommonPointAxisProps & { ref?: Ref<Component>; as?: Component } & { children?: JSX.Element };
 ```
 
 Used by: `Container`, `RenderContainer`, `RenderLayer`.
@@ -65,10 +60,8 @@ Used by: `Container`, `RenderContainer`, `RenderLayer`.
 Props for leaf components (those that do not accept children).
 
 ```ts
-type LeafProps<Component>
-  = PixiSolidEventHandlerMap
-  & CommonPointAxisProps
-  & { ref?: Ref<Component>; as?: Component };
+type LeafProps<Component> = PixiSolidEventHandlerMap &
+  CommonPointAxisProps & { ref?: Ref<Component>; as?: Component };
 ```
 
 Used by: `Graphics`, `ParticleContainer`.
@@ -102,11 +95,9 @@ function ParticleExample() {
 Props for sprite-like components (includes anchor properties).
 
 ```ts
-type SpriteProps<Component>
-  = PixiSolidEventHandlerMap
-  & CommonPointAxisProps
-  & AnchorPointAxisProps
-  & { ref?: Ref<Component>; as?: Component };
+type SpriteProps<Component> = PixiSolidEventHandlerMap &
+  CommonPointAxisProps &
+  AnchorPointAxisProps & { ref?: Ref<Component>; as?: Component };
 ```
 
 Used by: `Sprite`, `BitmapText`, `HTMLText`, `MeshPlane`, `MeshRope`, `NineSliceSprite`, `PerspectiveMesh`, `Text`.
@@ -116,9 +107,8 @@ Used by: `Sprite`, `BitmapText`, `HTMLText`, `MeshPlane`, `MeshRope`, `NineSlice
 Props for `AnimatedSprite`, extends `SpriteProps` with an additional `autoUpdate` boolean.
 
 ```ts
-type AnimatedSpriteProps<Component>
-  = SpriteProps<Component>
-  & Pick<Pixi.AnimatedSpriteOptions, "autoUpdate">;
+type AnimatedSpriteProps<Component> = SpriteProps<Component> &
+  Pick<Pixi.AnimatedSpriteOptions, "autoUpdate">;
 ```
 
 **`autoUpdate` behavior:** PixiJS's default `AnimatedSprite` auto-updates via the global shared ticker. pixi-solid overrides this: when `autoUpdate` is omitted or `true`, the component sets `autoUpdate = false` on the instance and manages ticker registration itself against the nearest ticker context. When `autoUpdate={false}`, no ticker registration occurs — you control timing manually.
@@ -128,12 +118,10 @@ type AnimatedSpriteProps<Component>
 Props for `TilingSprite` (includes anchor and tiling properties).
 
 ```ts
-type TilingSpriteProps<Component>
-  = PixiSolidEventHandlerMap
-  & CommonPointAxisProps
-  & AnchorPointAxisProps
-  & TilingPointAxisProps
-  & { ref?: Ref<Component>; as?: Component };
+type TilingSpriteProps<Component> = PixiSolidEventHandlerMap &
+  CommonPointAxisProps &
+  AnchorPointAxisProps &
+  TilingPointAxisProps & { ref?: Ref<Component>; as?: Component };
 ```
 
 Used by: `TilingSprite`.
@@ -142,13 +130,13 @@ Used by: `TilingSprite`.
 
 The table below shows which axis props are available on each component:
 
-| Component | Point-axis props |
-|---|---|
-| `Container`, `RenderContainer`, `RenderLayer` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y` |
-| `Graphics`, `ParticleContainer` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y` |
-| `Sprite`, `Text`, `BitmapText`, `HTMLText`, `NineSliceSprite`, `MeshPlane`, `MeshRope`, `PerspectiveMesh` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y` |
-| `AnimatedSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y` |
-| `TilingSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`, `tilePositionX/Y`, `tileScaleX/Y` |
+| Component                                                                                                 | Point-axis props                                                                                 |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `Container`, `RenderContainer`, `RenderLayer`                                                             | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`                                                 |
+| `Graphics`, `ParticleContainer`                                                                           | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`                                                 |
+| `Sprite`, `Text`, `BitmapText`, `HTMLText`, `NineSliceSprite`, `MeshPlane`, `MeshRope`, `PerspectiveMesh` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`                                    |
+| `AnimatedSprite`                                                                                          | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`                                    |
+| `TilingSprite`                                                                                            | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`, `tilePositionX/Y`, `tileScaleX/Y` |
 
 ### Why axis props?
 
@@ -161,7 +149,8 @@ SolidJS tracks changes by reference. Passing `position={{ x: 100, y: 200 }}` all
 Valid axis prop names for `position`, `scale`, `pivot`, and `skew`:
 
 ```ts
-type CommonPointAxisPropName = "positionX" | "positionY" | "scaleX" | "scaleY" | "pivotX" | "pivotY" | "skewX" | "skewY";
+type CommonPointAxisPropName =
+  "positionX" | "positionY" | "scaleX" | "scaleY" | "pivotX" | "pivotY" | "skewX" | "skewY";
 ```
 
 ### `CommonPointAxisProps`
@@ -209,10 +198,8 @@ type TilingPointAxisProps = Partial<Record<TilingPointAxisPropName, number>>;
 All axis properties (union of all categories):
 
 ```ts
-type PointAxisPropName
-  = CommonPointAxisPropName
-  | AnchorPointAxisPropName
-  | TilingPointAxisPropName;
+type PointAxisPropName =
+  CommonPointAxisPropName | AnchorPointAxisPropName | TilingPointAxisPropName;
 ```
 
 ## Event handler types
@@ -234,8 +221,7 @@ Maps event names to their handler signatures:
 ```ts
 type PixiSolidEventHandlerMap = {
   [K in (typeof PIXI_EVENT_NAMES)[number] as `on${K}`]?:
-    | null
-    | ((...args: FederatedEventEmitterTypes[K]) => void);
+    null | ((...args: FederatedEventEmitterTypes[K]) => void);
 };
 ```
 
@@ -243,12 +229,12 @@ type PixiSolidEventHandlerMap = {
 
 ### Common events by category
 
-| Category | Props |
-|---|---|
-| Pointer | `onpointerdown`, `onpointerup`, `onpointermove`, `onpointerenter`, `onpointerleave`, `onpointertap` |
-| Mouse | `onmousedown`, `onmouseup`, `onmousemove`, `onmouseenter`, `onmouseleave` |
-| Touch | `ontouchstart`, `ontouchend`, `ontouchmove`, `ontouchcancel` |
-| Wheel | `onwheel` |
+| Category | Props                                                                                               |
+| -------- | --------------------------------------------------------------------------------------------------- |
+| Pointer  | `onpointerdown`, `onpointerup`, `onpointermove`, `onpointerenter`, `onpointerleave`, `onpointertap` |
+| Mouse    | `onmousedown`, `onmouseup`, `onmousemove`, `onmouseenter`, `onmouseleave`                           |
+| Touch    | `ontouchstart`, `ontouchend`, `ontouchmove`, `ontouchcancel`                                        |
+| Wheel    | `onwheel`                                                                                           |
 
 All events also have **capture variants** with a `capture` suffix — e.g. `onpointerdowncapture`. These fire during the capture phase before the target phase. The full event list is available in PixiJS's `FederatedEventEmitterTypes`.
 
@@ -279,11 +265,7 @@ import type * as Pixi from "pixi.js";
 function MySprite(props: PixiComponentProps<Pixi.SpriteOptions> & { label: string }) {
   const [local, pixiProps] = splitProps(props, ["label"]);
 
-  return (
-    <Sprite {...pixiProps}>
-      {/* custom UI or children that use local.label */}
-    </Sprite>
-  );
+  return <Sprite {...pixiProps}>{/* custom UI or children that use local.label */}</Sprite>;
 }
 ```
 
@@ -324,7 +306,7 @@ existingContainer.label = "my-container";
 
 <Container as={existingContainer}>
   <Sprite texture={Texture.WHITE} />
-</Container>
+</Container>;
 ```
 
 **Lifecycle note:** When `as` is provided, pixi-solid assumes you own the instance's lifecycle and will **not** destroy it on unmount. You must destroy it manually when no longer needed.

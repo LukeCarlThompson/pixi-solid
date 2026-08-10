@@ -75,21 +75,26 @@ export const App = () => (
   <dd>Compose PixiJS objects with JSX instead of imperative addChild/removeChild calls.
   The tree is your scene.</dd>
 
-  <dt>Automatic lifecycle</dt>
-  <dd>Components clean up after themselves on unmount: display objects, event listeners,
-  ticker subscriptions, textures. No manual disposal tracking.</dd>
+<dt>Automatic lifecycle</dt>
+<dd>
+  Components clean up after themselves on unmount: display objects, event listeners, ticker
+  subscriptions, textures. No manual disposal tracking.
+</dd>
 
-  <dt>Shared reactivity</dt>
-  <dd>Signals and stores drive both canvas content and HTML UI from the same state.
-  No bridging layer or two-way sync required.</dd>
+<dt>Shared reactivity</dt>
+<dd>
+  Signals and stores drive both canvas content and HTML UI from the same state. No bridging layer or
+  two-way sync required.
+</dd>
 
-  <dt>Unified timing</dt>
-  <dd>Animations, frame callbacks, and sprite updates all synchronise to the same ticker
-  context. No timing drift between onTick, useSpring, or AnimatedSprite.</dd>
+<dt>Unified timing</dt>
+<dd>
+  Animations, frame callbacks, and sprite updates all synchronise to the same ticker context. No
+  timing drift between onTick, useSpring, or AnimatedSprite.
+</dd>
 
-  <dt>Full PixiJS coverage</dt>
-  <dd>Props, refs, event handlers, and compatibility with plain PixiJS children if you
-  need it.</dd>
+<dt>Full PixiJS coverage</dt>
+<dd>Props, refs, event handlers, and compatibility with plain PixiJS children if you need it.</dd>
 
   <dt>Testable by design</dt>
   <dd>Context providers, hooks, and the ticker are structured for simulation in tests.

@@ -80,8 +80,6 @@ describe("usePixiScreen", () => {
         void screen.y;
         effectRuns += 1;
       });
-
-      return null;
     });
 
     expect(effectRuns).toBe(1);

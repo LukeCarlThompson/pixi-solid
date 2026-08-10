@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { Container } from "../components";
 import { onTick } from "../on-tick";
 import { usePixiScreen } from "../use-pixi-screen";
+
 import {
   cleanup,
   createTestContext,
@@ -51,6 +52,18 @@ describe("renderHook", () => {
 
     setCount(2);
     expect(result()).toBe(2);
+  });
+
+  it("GIVEN a wrapper AND a callback that derives a primitive WHEN the source changes THEN result re-evaluates", () => {
+    const ctx = createTestContext();
+
+    const { result } = renderHook(() => usePixiScreen().width, { wrapper: ctx.Provider });
+
+    expect(result()).toBe(800);
+
+    ctx.renderer.emitResize({ width: 1024 });
+
+    expect(result()).toBe(1024);
   });
 
   it("GIVEN a hook requiring context WHEN run with a wrapper THEN context resolves", () => {
@@ -100,7 +113,6 @@ describe("renderHook", () => {
       onTick((ticker) => {
         elapsed += ticker.deltaMS;
       });
-      return null;
     });
 
     ctx.ticker.fastForwardFrames(2);
@@ -130,9 +142,7 @@ describe("mountScene", () => {
   });
 
   it("GIVEN a Container with x and y WHEN rendered THEN container has typed properties", () => {
-    const { container, dispose } = mountScene(() => (
-      <Container x={10} y={20} />
-    ));
+    const { container, dispose } = mountScene(() => <Container x={10} y={20} />);
 
     expect(container.x).toBe(10);
     expect(container.y).toBe(20);
@@ -200,9 +210,7 @@ describe("mountScene stability and reactivity", () => {
   it("GIVEN mountScene reads external signals in JSX WHEN signals change THEN container stays stable and properties update reactively", () => {
     const [label, setLabel] = createSignal("first");
 
-    const { container } = mountScene(() => (
-      <Container label={label()} />
-    ));
+    const { container } = mountScene(() => <Container label={label()} />);
 
     expect(container.label).toBe("first");
 

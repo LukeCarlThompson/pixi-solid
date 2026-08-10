@@ -10,7 +10,7 @@ It runs the callback in a temporary Solid root, optionally inside a `wrapper` co
 
 ```tsx
 type RenderHookResult<T> = {
-  result: Accessor<T>;   // call result() to read the current value
+  result: Accessor<T>; // call result() to read the current value
   dispose: () => void;
 };
 ```

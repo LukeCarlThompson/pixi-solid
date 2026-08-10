@@ -5,11 +5,11 @@ sidebar:
   order: 1
 ---
 
-Solid.js's `createResource` function provides an excellent way to handle asynchronous data loading and we can pair it very simply with the PixiJS `Assets` class.
+Solid.js's `createResource` function handles asynchronous data loading. Pair it with the PixiJS `Assets` class to load assets.
 
 ### Example: Loading a Single Image
 
-Let's say you want to load a single background image for your scene.
+This example loads a single background image for a scene.
 
 ```tsx
 import type * as Pixi from "pixi.js";
@@ -40,5 +40,5 @@ export const IndividualAssetLoadingDemo = () => {
 
 ### Further reading
 
-- Read more about [Solid.js `createResource`](https://docs.solidjs.com/reference/basic-reactivity/create-resource) in the SolidJS documentation.
-- Explore the [Pixi.js Assets Management](https://pixijs.com/8.x/guides/components/assets) docs for more details on the Pixi Assets class.
+- See the [Solid.js `createResource` docs](https://docs.solidjs.com/reference/basic-reactivity/create-resource).
+- See the [PixiJS Assets guide](https://pixijs.com/8.x/guides/components/assets) for details.
