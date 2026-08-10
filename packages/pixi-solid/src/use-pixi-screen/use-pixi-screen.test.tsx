@@ -1,9 +1,13 @@
 import { createEffect } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
-import { createTestContext, renderHook } from "../testing";
+import { cleanup, createTestContext, renderHook } from "../testing";
 
 import { usePixiScreen } from "./use-pixi-screen";
+
+afterEach(() => {
+  cleanup();
+});
 
 describe("usePixiScreen", () => {
   it("GIVEN no provider WHEN usePixiScreen is called THEN it throws", () => {
@@ -17,7 +21,7 @@ describe("usePixiScreen", () => {
   it("GIVEN provider WHEN hook is read THEN it exposes initial dimensions and derived bounds", () => {
     const ctx = createTestContext();
 
-    const { result } = ctx.renderHook(() => usePixiScreen());
+    const { result, dispose } = ctx.renderHook(() => usePixiScreen());
 
     expect(result().width).toBe(800);
     expect(result().height).toBe(600);
@@ -27,6 +31,8 @@ describe("usePixiScreen", () => {
     expect(result().right).toBe(800);
     expect(result().top).toBe(0);
     expect(result().bottom).toBe(600);
+
+    dispose();
   });
 
   it("GIVEN provider WHEN resize changes values THEN hook updates reactively", async () => {

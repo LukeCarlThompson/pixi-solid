@@ -1,9 +1,13 @@
 import { createEffect } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { onResize } from "./on-resize";
-import { createTestContext } from "./testing";
+import { cleanup, createTestContext } from "./testing";
 import { usePixiScreen } from "./use-pixi-screen";
+
+afterEach(() => {
+  cleanup();
+});
 
 describe("onResize + usePixiScreen", () => {
   it("GIVEN onResize is used WHEN the hook mounts THEN callback fires once on init", () => {
