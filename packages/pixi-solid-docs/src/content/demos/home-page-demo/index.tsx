@@ -7,8 +7,8 @@ import { createResource, onCleanup, Show } from "solid-js";
 
 import { Character } from "./character";
 import { Controls } from "./controls";
-import { createPlayerStore } from "./player-store";
 import { loadSceneAssets } from "./load-scene-assets";
+import { createPlayerStore } from "./player-store";
 
 const DemoScene = (props: { isRunning: boolean; direction: "left" | "right" }) => {
   const pixiScreen = usePixiScreen();

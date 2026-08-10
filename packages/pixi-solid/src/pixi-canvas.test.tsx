@@ -128,10 +128,12 @@ describe("PixiCanvas stage binding cleanup", () => {
         <Show when={show()}>
           <PixiCanvas style={{ position: "absolute", inset: "0" }}>
             {/* Raw instances are valid children at runtime; the JSX types don't model them. */}
-            {(() => {
-              createdSprite = new PixiSprite(Texture.WHITE);
-              return createdSprite;
-            }) as any}
+            {
+              (() => {
+                createdSprite = new PixiSprite(Texture.WHITE);
+                return createdSprite;
+              }) as any
+            }
           </PixiCanvas>
         </Show>
       </PixiApplicationProvider>

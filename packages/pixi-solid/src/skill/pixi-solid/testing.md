@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Testing patterns for pixi-solid components and hooks using mountScene, createTestRoot, createTestContext, and createManualTicker. Covers scene graph queries, container-based typed access, and cleanup patterns.
+description: Testing patterns for pixi-solid components and hooks using mountScene, renderHook, createTestContext, and createManualTicker. Covers scene graph queries, container-based typed access, and cleanup patterns.
 ---
 
 # Testing pixi-solid
@@ -9,20 +9,20 @@ This subskill documents recommended patterns for unit testing code that uses `pi
 
 ## Quick reference
 
-| Utility | Purpose |
-|---|---|
-| `mountScene(setup)` | Mount a scene graph and return `{ container, dispose }` |
-| `createTestRoot(setup)` | Run Solid code in a temporary root (for hooks/stores) |
-| `createTestContext()` | One-stop mock provider with ticker, renderer, and app |
-| `createManualTicker()` | Stopped ticker with step-based frame advancement |
-| `getByLabel(root, label)` | Find a node by label (throws if not found) |
-| `queryByLabel(root, label)` | Find a node by label (returns `undefined` if not found) |
-| `getAllByLabel(root, label)` | Find all nodes with the given label |
+| Utility                          | Purpose                                                                                              |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `mountScene(setup)`              | Mount a scene graph and return `{ container, dispose }`                                              |
+| `renderHook(callback, options?)` | Run a hook/store in a temporary root, optionally inside a provider, and return `{ result, dispose }` |
+| `createTestContext()`            | One-stop mock provider with ticker, renderer, and app                                                |
+| `createManualTicker()`           | Stopped ticker with step-based frame advancement                                                     |
+| `getByLabel(root, label)`        | Find a node by label (throws if not found)                                                           |
+| `queryByLabel(root, label)`      | Find a node by label (returns `undefined` if not found)                                              |
+| `getAllByLabel(root, label)`     | Find all nodes with the given label                                                                  |
 
 ```ts
 import {
   mountScene,
-  createTestRoot,
+  renderHook,
   createTestContext,
   createManualTicker,
   getByLabel,
@@ -80,7 +80,9 @@ describe("Component with onTick", () => {
 
     mountScene(() => (
       <ctx.Provider>
-        {onTick(() => { calls++; })}
+        {onTick(() => {
+          calls++;
+        })}
       </ctx.Provider>
     ));
 
@@ -99,62 +101,103 @@ const { container } = mountScene<Pixi.AnimatedSprite>(() => (
   <AnimatedSprite textures={textures} playing />
 ));
 
-container.playing;  // typed as Pixi.AnimatedSprite
+container.playing; // typed as Pixi.AnimatedSprite
 ```
 
-## createTestRoot
+## renderHook
 
-`createTestRoot<T>(setup)` runs code in a temporary Solid root and returns the result. Use this for testing hooks and stores.
+`renderHook<T>(callback, options?)` runs a hook (or store factory) in a temporary Solid root and exposes its return value as a reactive accessor. Use this for hook and store tests.
 
 ```tsx
-type CreateTestRootResult<T> = {
-  value: T;
+type RenderHookResult<T> = {
+  result: Accessor<T>; // call result() to read the current value
   dispose: () => void;
 };
 ```
 
-Unlike `mountScene`, this does NOT resolve JSX — it runs the callback directly. Bring your own providers.
+The callback runs exactly once inside an optional `wrapper`, so hooks that register side effects (`onTick`, `onResize`) are cleaned up on dispose. If the callback reads reactive values, `result` re-evaluates when they change.
 
-### Testing hooks
+### Testing hooks with context
+
+Hooks like `usePixiScreen` require a provider. Pass `ctx.Provider` as the wrapper, or use the `ctx.renderHook` convenience method:
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { createTestRoot, createTestContext } from "pixi-solid/testing";
+import { renderHook, createTestContext } from "pixi-solid/testing";
 import { usePixiScreen } from "pixi-solid";
 
 describe("usePixiScreen", () => {
   it("returns the screen dimensions from context", () => {
     const ctx = createTestContext();
 
-    const { value: screen } = createTestRoot(() => (
-      <ctx.Provider>
-        {usePixiScreen()}
-      </ctx.Provider>
-    ));
+    const { result } = renderHook(() => usePixiScreen(), {
+      wrapper: ctx.Provider,
+    });
 
-    expect(screen.width).toBe(800);
-    expect(screen.height).toBe(600);
+    expect(result().width).toBe(800);
+    expect(result().height).toBe(600);
   });
 });
 ```
 
+`ctx.renderHook` is equivalent — the mock `Provider` is applied automatically:
+
+```tsx
+const ctx = createTestContext();
+const { result } = ctx.renderHook(() => usePixiScreen());
+expect(result().width).toBe(800);
+```
+
+### Testing stores that use hooks internally
+
+Return a reactive store object, then read through `result()`:
+
+```tsx
+const ctx = createTestContext();
+
+const { result } = ctx.renderHook(() => createClockStore()); // uses onTick internally
+
+expect(result().time).toBe(0);
+
+ctx.ticker.fastForwardFrames(3);
+expect(result().time).toBe(48);
+```
+
+### Reactivity
+
+If the callback reads reactive values, `result` re-evaluates when they change:
+
+```tsx
+const ctx = createTestContext();
+
+const { result } = ctx.renderHook(() => usePixiScreen().width);
+expect(result()).toBe(800);
+
+ctx.renderer.emitResize({ width: 1024 });
+expect(result()).toBe(1024);
+```
+
+> **Tip:** return stable reactive objects (stores, screen dimensions) rather than deriving primitives inside the callback. Derived primitives re-run the callback when they change, which re-creates any state created inside it.
+
 ### Error testing
+
+Errors surface eagerly at `renderHook()` call time, so missing-context tests read cleanly:
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { createTestRoot } from "pixi-solid/testing";
+import { renderHook } from "pixi-solid/testing";
 import { usePixiScreen } from "pixi-solid";
 
 describe("usePixiScreen error", () => {
   it("throws when used outside a provider", () => {
-    expect(() => createTestRoot(() => usePixiScreen())).toThrow();
+    expect(() => renderHook(() => usePixiScreen())).toThrow();
   });
 });
 ```
 
 ## createTestContext
 
-Creates mock PixiJS contexts for testing. Returns `{ Provider, ticker, renderer, app }`.
+Creates mock PixiJS contexts for testing. Returns `{ Provider, ticker, renderer, app, renderHook }`.
 
 ```tsx
 import { createTestContext, mountScene } from "pixi-solid/testing";
@@ -168,35 +211,32 @@ mountScene(() => (
 ));
 ```
 
-| Property | Type | Purpose |
-|---|---|---|
-| `Provider` | Component | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext` |
-| `ticker` | `ManualTicker` | Advance frames with `fastForwardFrames()` or `fastForwardTime()` |
-| `renderer` | `TestRenderer` | Simulate resize events with `emitResize()` |
-| `app` | `Pixi.Application` | Minimal stub for hooks that call `getPixiApp()` |
+| Property     | Type                             | Purpose                                                                             |
+| ------------ | -------------------------------- | ----------------------------------------------------------------------------------- |
+| `Provider`   | Component                        | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext`      |
+| `ticker`     | `ManualTicker`                   | Advance frames with `fastForwardFrames()` or `fastForwardTime()`                    |
+| `renderer`   | `TestRenderer`                   | Simulate resize events with `emitResize()`                                          |
+| `app`        | `Pixi.Application`               | Minimal stub for hooks that call `getPixiApp()`                                     |
+| `renderHook` | `(callback) => RenderHookResult` | `renderHook(callback, { wrapper: Provider })` — runs hooks inside the mock contexts |
 
 ### Simulating resize
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { createTestRoot, createTestContext } from "pixi-solid/testing";
+import { renderHook, createTestContext } from "pixi-solid/testing";
 import { usePixiScreen } from "pixi-solid";
 
 describe("resize handling", () => {
   it("updates on emitResize", () => {
     const ctx = createTestContext();
 
-    const { value: screen } = createTestRoot(() => (
-      <ctx.Provider>
-        {usePixiScreen()}
-      </ctx.Provider>
-    ));
+    const { result } = ctx.renderHook(() => usePixiScreen());
 
-    expect(screen.width).toBe(800);
+    expect(result().width).toBe(800);
 
     ctx.renderer.emitResize({ width: 1024 });
 
-    expect(screen.width).toBe(1024);
+    expect(result().width).toBe(1024);
   });
 });
 ```
@@ -229,16 +269,18 @@ import { createManualTicker } from "pixi-solid/testing";
 const manual = createManualTicker();
 let calls = 0;
 
-manual.ticker.add(() => { calls++; });
+manual.ticker.add(() => {
+  calls++;
+});
 
 // Advance by number of frames
-manual.fastForwardFrames(10);              // 10 frames at 16ms each
-manual.fastForwardFrames(5, 33);           // 5 frames at 33ms each (~30fps)
+manual.fastForwardFrames(10); // 10 frames at 16ms each
+manual.fastForwardFrames(5, 33); // 5 frames at 33ms each (~30fps)
 expect(calls).toBe(15);
 
 // Advance by time duration
-manual.fastForwardTime(1000);              // 1 second in ~16ms steps
-manual.fastForwardTime(500, 50);           // 500ms in 50ms steps
+manual.fastForwardTime(1000); // 1 second in ~16ms steps
+manual.fastForwardTime(500, 50); // 500ms in 50ms steps
 ```
 
 Step-based advancement avoids the footgun of single large deltas that can break spring physics, smooth-damp interpolation, or sequenced animations.
@@ -282,7 +324,7 @@ describe("getByLabel", () => {
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { createTestRoot, createTestContext } from "pixi-solid/testing";
+import { renderHook, createTestContext } from "pixi-solid/testing";
 import { createAsyncDelay } from "pixi-solid/utils";
 
 describe("createAsyncDelay", () => {
@@ -290,7 +332,7 @@ describe("createAsyncDelay", () => {
     const ctx = createTestContext();
     let delay!: (ms: number, signal?: AbortSignal) => Promise<void>;
 
-    createTestRoot(() => {
+    renderHook(() => {
       delay = createAsyncDelay();
     });
 
@@ -310,7 +352,7 @@ describe("createAsyncDelay", () => {
     const ctx = createTestContext();
     let delay!: (ms: number, signal?: AbortSignal) => Promise<void>;
 
-    createTestRoot(() => {
+    renderHook(() => {
       delay = createAsyncDelay();
     });
 
@@ -362,7 +404,7 @@ it("manual cleanup", () => {
 
 - Keep tests deterministic: avoid `ticker.start()` — use `fastForwardFrames()` or `fastForwardTime()` for precise control.
 - Use `mountScene` for component tests — it returns the root Container directly, no ref callbacks needed.
-- Use `createTestRoot` for hook and store tests — it returns the raw value.
+- Use `renderHook` for hook and store tests — `ctx.renderHook(cb)` when context is needed.
 - Use `getByLabel` over `.children[index]` to decouple tests from scene graph layout.
 - When testing components that create resources imperatively, advance frames and then dispose to exercise cleanup paths.
 - All mocks (`ticker`, `renderer`, `app`) are plain objects — spy with `vi.spyOn`, `jest.fn()`, or any framework.

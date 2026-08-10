@@ -10,7 +10,7 @@ The `pixi-solid/testing` module provides utilities for testing pixi-solid compon
 ```tsx
 import {
   mountScene,
-  createTestRoot,
+  renderHook,
   createTestContext,
   createManualTicker,
   getByLabel,
@@ -26,47 +26,47 @@ import {
 
 ```tsx
 // Component tests — renders a Pixi display object
-mountScene(() => <Container>...</Container>)
+mountScene(() => <Container>...</Container>);
 // => { container: Pixi.Container, dispose: () => void }
 
 // Hook/store tests — no scene rendering
-createTestRoot(() => <ctx.Provider>{usePixiScreen()}</ctx.Provider>)
-// => { value: Screen, dispose: () => void }
+renderHook(() => usePixiScreen(), { wrapper: ctx.Provider });
+// => { result: Accessor<Screen>, dispose: () => void }
 
 // Mock contexts
-createTestContext()
-// => { Provider, ticker: ManualTicker, renderer: TestRenderer, app: Pixi.Application }
+createTestContext();
+// => { Provider, ticker: ManualTicker, renderer: TestRenderer, app: Pixi.Application, renderHook }
 
 // Manual frame advancement
-createManualTicker()
+createManualTicker();
 // => { ticker: Pixi.Ticker, fastForwardFrames(), fastForwardTime() }
 
 // Scene graph queries
-getByLabel(root, "label")      // throws if not found
-queryByLabel(root, "label")    // returns undefined if not found
-getAllByLabel(root, "label")   // returns Pixi.DisplayObject[]
+getByLabel(root, "label"); // throws if not found
+queryByLabel(root, "label"); // returns undefined if not found
+getAllByLabel(root, "label"); // returns Pixi.DisplayObject[]
 
 // Teardown (wire in afterEach)
-cleanup()
+cleanup();
 ```
 
 ---
 
 ## When to use which
 
-| Task | Function | Page |
-|---|---|---|
-| Render a component scene graph | `mountScene` | [mount-scene](../mount-scene) |
-| Test a hook or store (no scene needed) | `createTestRoot` | [create-test-root](../create-test-root) |
-| Get mock contexts | `createTestContext` | [create-test-context](../create-test-context) |
-| Advance frames manually | `createManualTicker` | [create-manual-ticker](../create-manual-ticker) |
-| Find a node by label | `getByLabel` / `queryByLabel` / `getAllByLabel` | [scene-queries](../scene-queries) |
-| Run all disposers | `cleanup` | [cleanup](../cleanup) |
+| Task                                   | Function                                        | Page                                            |
+| -------------------------------------- | ----------------------------------------------- | ----------------------------------------------- |
+| Render a component scene graph         | `mountScene`                                    | [mount-scene](../mount-scene)                   |
+| Test a hook or store (no scene needed) | `renderHook`                                    | [render-hook](../render-hook)                   |
+| Get mock contexts                      | `createTestContext`                             | [create-test-context](../create-test-context)   |
+| Advance frames manually                | `createManualTicker`                            | [create-manual-ticker](../create-manual-ticker) |
+| Find a node by label                   | `getByLabel` / `queryByLabel` / `getAllByLabel` | [scene-queries](../scene-queries)               |
+| Run all disposers                      | `cleanup`                                       | [cleanup](../cleanup)                           |
 
 ---
 
 ## jsdom / renderer caveats
 
-- **Pixel-level rendering is not tested** — use a real canvas for integration tests
-- **`getContext()` is not available** — you'll see `Not implemented: HTMLCanvasElement's getContext()` warnings in test output, which is expected and harmless
-- **The mock `app` is a minimal stub** — only the parts used by pixi-solid hooks are implemented
+- **Pixel-level rendering is not tested** — use a real canvas for integration tests.
+- **`getContext()` is not available** — you will see `Not implemented: HTMLCanvasElement's getContext()` warnings in test output. These warnings are normal and safe.
+- **The mock `app` is a minimal stub** — it implements only the parts that pixi-solid hooks use.

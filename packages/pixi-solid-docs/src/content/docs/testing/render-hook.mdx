@@ -1,0 +1,93 @@
+---
+title: renderHook
+description: Run a hook or store in a temporary Solid root — optionally inside a provider — for testing logic that needs context but doesn't render a scene.
+sidebar:
+  order: 3
+---
+
+`renderHook()` is for testing **stores, hooks, or any logic** that has signals inside or requires context but does **not** render a scene.
+It runs the callback in a temporary Solid root, optionally inside a `wrapper` component (e.g. `ctx.Provider`), and exposes the return value as a reactive accessor.
+
+```tsx
+type RenderHookResult<T> = {
+  result: Accessor<T>; // call result() to read the current value
+  dispose: () => void;
+};
+```
+
+The callback runs exactly once inside the wrapper, so hooks that register side effects (`onTick`, `onResize`) are cleaned up on dispose. If the callback reads reactive values, `result` re-evaluates when they change.
+
+## Testing hooks with context
+
+Hooks like `usePixiScreen` require a provider. Pass `ctx.Provider` as the wrapper:
+
+```tsx
+import { usePixiScreen } from "pixi-solid";
+import { renderHook, createTestContext } from "pixi-solid/testing";
+
+const ctx = createTestContext();
+
+const { result } = renderHook(() => usePixiScreen(), {
+  wrapper: ctx.Provider,
+});
+
+expect(result().width).toBe(800);
+expect(result().height).toBe(600);
+```
+
+Or use the `ctx.renderHook` convenience method — the mock `Provider` is applied automatically:
+
+```tsx
+const ctx = createTestContext();
+
+const { result } = ctx.renderHook(() => usePixiScreen());
+
+expect(result().width).toBe(800);
+```
+
+## Testing stores that use hooks internally
+
+Return a reactive store object, then read through `result()`:
+
+```tsx
+const ctx = createTestContext();
+
+const { result } = ctx.renderHook(() => createClockStore()); // uses onTick internally
+
+expect(result().time).toBe(0);
+
+ctx.ticker.fastForwardFrames(3);
+expect(result().time).toBe(48);
+```
+
+## Reactivity
+
+If the callback reads reactive values, `result` re-evaluates when they change:
+
+```tsx
+const ctx = createTestContext();
+
+const { result } = ctx.renderHook(() => usePixiScreen().width);
+expect(result()).toBe(800);
+
+ctx.renderer.emitResize({ width: 1024 });
+expect(result()).toBe(1024);
+```
+
+> **Tip:** return stable reactive objects (stores, screen dimensions) rather than deriving primitives inside the callback. Derived primitives re-run the callback when they change, which re-creates any state created inside it.
+
+## Error testing
+
+Errors surface eagerly at `renderHook()` call time, so missing-context tests read cleanly:
+
+```tsx
+expect(() => renderHook(() => usePixiScreen())).toThrow();
+```
+
+## When to use
+
+- Testing stores or hooks that have signals inside
+- Testing logic that requires context (`usePixiScreen`, `getPixiApp`, etc.) but doesn't render a scene
+- Error testing for missing context
+
+For testing view components that render a Pixi display object, use [`mountScene`](../mount-scene) instead.

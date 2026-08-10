@@ -2,7 +2,6 @@
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   "experimentalSortImports": {
     "groups": [
-      ["side-effect"],
       ["builtin"],
       ["external", "type-external"],
       ["internal", "type-internal"],

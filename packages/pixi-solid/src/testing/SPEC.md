@@ -9,12 +9,13 @@
 
 ## Design
 
-### Three concerns, three files
+### Three concerns, four files
 
 ```
 manual-ticker.ts    →  Frame-accurate ticker control
-test-context.tsx    →  One-stop mock context provider
-test-root.tsx       →  Solid root lifecycle management
+test-context.tsx    →  One-stop mock context provider + ctx.renderHook
+test-root.tsx       →  Solid root lifecycle management (mountScene, renderHook)
+query-by-label.ts   →  Scene graph queries
 ```
 
 Each file owns one concern and can be used independently.
@@ -22,9 +23,9 @@ Each file owns one concern and can be used independently.
 ### `test-root.tsx` — Solid root lifecycle
 
 - `mountScene(setup)` — mounts JSX and returns the root Container
-- `createTestRoot(setup)` — runs Solid code in a temporary root (for hooks/stores)
-- Returns `{ value, dispose }` — `value` is the setup's return, `dispose` cleans up
-- Uses `children()` internally so signal-driven re-renders work correctly
+- `renderHook(callback, options?)` — runs a hook/store in a temporary root, optionally inside a `wrapper` component (e.g. `ctx.Provider`), and returns `{ result, dispose }`
+- `result` is a reactive `Accessor<T>` — re-evaluates the callback when tracked values change; returns stable reactive objects unchanged
+- `renderHook` evaluates eagerly, so errors (e.g. missing context) surface at call time
 - Built on Solid's `createRoot`, no test framework imports
 
 ### `query-by-label.ts` — Scene graph queries
@@ -38,14 +39,16 @@ Each file owns one concern and can be used independently.
 
 - `createManualTicker()` → `ManualTicker`
 - `ticker` — the raw PixiJS `Ticker` instance (stopped by default)
+- Seeds `ticker.lastTime = 0` so the first frame produces exactly the requested delta
 - `fastForwardFrames(n, deltaTime?)` — advance N frames at a given step size
 - `fastForwardTime(totalMS, stepSize?)` — advance through a duration in small steps
 - Step-based advancement avoids footguns where single large deltas break spring/smooth-damp or sequenced animations
 
 ### `test-context.tsx` — Mock context provider
 
-- `createTestContext(options?)` → `{ Provider, ticker, renderer, app }`
+- `createTestContext(options?)` → `{ Provider, ticker, renderer, app, renderHook }`
 - `Provider` wraps children in `PixiAppContext`, `TickerContext`, and `ScreenStoreContext`
+- `renderHook` — convenience method equivalent to `renderHook(callback, { wrapper: Provider })`
 - `renderer` — mock with `emit()` and `emitResize()` for simulating resize events
 - `ticker` — a `ManualTicker` for advancing frames
 - `app` — minimal `Pixi.Application` stub

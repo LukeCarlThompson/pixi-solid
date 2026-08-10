@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { Sprite } from "../components/components";
 import { TickerProvider } from "../pixi-application";
 import { mountScene } from "../testing";
+
 import { ObjectFitContainer } from "./object-fit";
 
 describe("ObjectFitContainer", () => {

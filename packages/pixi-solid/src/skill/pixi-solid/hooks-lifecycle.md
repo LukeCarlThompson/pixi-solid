@@ -10,14 +10,7 @@ This subskill covers every publicly exported hook from `pixi-solid`. Use it when
 ## Import
 
 ```ts
-import {
-  getPixiApp,
-  getTicker,
-  getRenderer,
-  onResize,
-  onTick,
-  usePixiScreen,
-} from "pixi-solid";
+import { getPixiApp, getTicker, getRenderer, onResize, onTick, usePixiScreen } from "pixi-solid";
 ```
 
 ## Hooks
@@ -79,6 +72,7 @@ type onResize = (resizeCallback: (screen: Pixi.Rectangle) => void) => void;
 ```
 
 **Parameters:**
+
 - `resizeCallback` — A callback that receives `(screen: Pixi.Rectangle) => void`, giving you `.width`, `.height`, `.x`, and `.y`. The callback is called immediately upon hook initialization and then on every subsequent resize event.
 
 **Constraints:** Must be called from a component that is a descendant of `PixiCanvas` or `PixiApplicationProvider`.
@@ -101,6 +95,7 @@ type onTick = (
 ```
 
 **Parameters:**
+
 - `tickerCallback` — The function to call on each ticker update. Receives the `Pixi.Ticker` instance as its argument.
 - `priority` — Optional priority level (`Pixi.UPDATE_PRIORITY`). Controls callback ordering. Defaults to `UPDATE_PRIORITY.NORMAL`.
 
@@ -126,10 +121,10 @@ type usePixiScreen = () => Readonly<PixiScreenDimensions>;
 type PixiScreenDimensions = {
   width: number;
   height: number;
-  left: number;    // getter: this.x
-  right: number;   // getter: this.x + this.width
-  bottom: number;  // getter: this.y + this.height
-  top: number;     // getter: this.y
+  left: number; // getter: this.x
+  right: number; // getter: this.x + this.width
+  bottom: number; // getter: this.y + this.height
+  top: number; // getter: this.y
   x: number;
   y: number;
 };
@@ -178,14 +173,14 @@ See [testing.md](./testing.md) for patterns and examples of testing pixi-solid c
 
 ## Provider requirements
 
-| Hook | Required context |
-|---|---|
-| `getPixiApp` | `PixiCanvas` or `PixiApplicationProvider` |
-| `getRenderer` | `PixiCanvas` or `PixiApplicationProvider` |
-| `getTicker` | `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` |
-| `onResize` | `PixiCanvas` or `PixiApplicationProvider` |
-| `onTick` | `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` |
-| `usePixiScreen` | `PixiCanvas` or `PixiApplicationProvider` |
+| Hook            | Required context                                             |
+| --------------- | ------------------------------------------------------------ |
+| `getPixiApp`    | `PixiCanvas` or `PixiApplicationProvider`                    |
+| `getRenderer`   | `PixiCanvas` or `PixiApplicationProvider`                    |
+| `getTicker`     | `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` |
+| `onResize`      | `PixiCanvas` or `PixiApplicationProvider`                    |
+| `onTick`        | `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` |
+| `usePixiScreen` | `PixiCanvas` or `PixiApplicationProvider`                    |
 
 ## `onResize` vs `usePixiScreen`
 

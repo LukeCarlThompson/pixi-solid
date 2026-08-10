@@ -1,25 +1,30 @@
 import { createSignal, onCleanup } from "solid-js";
+import { createStore } from "solid-js/store";
 import { afterEach, describe, expect, it } from "vitest";
+
+import { Container } from "../components";
+import { onTick } from "../on-tick";
+import { usePixiScreen } from "../use-pixi-screen";
 
 import {
   cleanup,
-  createTestRoot,
+  createTestContext,
   getByLabel,
   mountScene,
   queryByLabel,
+  renderHook,
 } from "./index";
-import { Container } from "../components";
 
 afterEach(() => {
   cleanup();
 });
 
-describe("createTestRoot", () => {
+describe("renderHook", () => {
   it("GIVEN setup throws WHEN creating root THEN cleanup still runs", () => {
     let didCleanup = false;
 
     expect(() =>
-      createTestRoot(() => {
+      renderHook(() => {
         onCleanup(() => {
           didCleanup = true;
         });
@@ -31,12 +36,91 @@ describe("createTestRoot", () => {
     expect(didCleanup).toBe(true);
   });
 
-  it("GIVEN callback returns a number WHEN called THEN value contains the result", () => {
-    const { value, dispose } = createTestRoot(() => 42);
+  it("GIVEN callback returns a number WHEN called THEN result contains the value", () => {
+    const { result, dispose } = renderHook(() => 42);
 
-    expect(value).toBe(42);
+    expect(result()).toBe(42);
 
     dispose();
+  });
+
+  it("GIVEN callback reads an external signal WHEN the signal changes THEN result re-evaluates", () => {
+    const [count, setCount] = createSignal(1);
+
+    const { result } = renderHook(() => count());
+    expect(result()).toBe(1);
+
+    setCount(2);
+    expect(result()).toBe(2);
+  });
+
+  it("GIVEN a wrapper AND a callback that derives a primitive WHEN the source changes THEN result re-evaluates", () => {
+    const ctx = createTestContext();
+
+    const { result } = renderHook(() => usePixiScreen().width, { wrapper: ctx.Provider });
+
+    expect(result()).toBe(800);
+
+    ctx.renderer.emitResize({ width: 1024 });
+
+    expect(result()).toBe(1024);
+  });
+
+  it("GIVEN a hook requiring context WHEN run with a wrapper THEN context resolves", () => {
+    const ctx = createTestContext();
+
+    const { result } = renderHook(() => usePixiScreen(), { wrapper: ctx.Provider });
+
+    expect(result().width).toBe(800);
+    expect(result().height).toBe(600);
+  });
+
+  it("GIVEN a hook requiring context WHEN run via ctx.renderHook THEN context resolves", () => {
+    const ctx = createTestContext();
+
+    const { result } = ctx.renderHook(() => usePixiScreen());
+
+    expect(result().width).toBe(800);
+  });
+
+  it("GIVEN a hook requiring context WHEN no wrapper is provided THEN it throws immediately", () => {
+    expect(() => renderHook(() => usePixiScreen())).toThrow(
+      "usePixiScreen must be used within a PixiApplicationProvider or PixiCanvas",
+    );
+  });
+
+  it("GIVEN a store using onTick WHEN frames advance THEN result().time reflects ticks", () => {
+    const ctx = createTestContext();
+
+    const { result } = ctx.renderHook(() => {
+      const [store, setStore] = createStore({ time: 0 });
+      onTick((ticker) => setStore("time", (t) => t + ticker.deltaMS));
+      return store;
+    });
+
+    expect(result().time).toBe(0);
+
+    ctx.ticker.fastForwardFrames(3);
+
+    expect(result().time).toBe(48);
+  });
+
+  it("GIVEN a store using onTick WHEN the root is disposed THEN the ticker listener is removed", () => {
+    const ctx = createTestContext();
+    let elapsed = 0;
+
+    const { dispose } = ctx.renderHook(() => {
+      onTick((ticker) => {
+        elapsed += ticker.deltaMS;
+      });
+    });
+
+    ctx.ticker.fastForwardFrames(2);
+    expect(elapsed).toBe(32);
+
+    dispose();
+    ctx.ticker.fastForwardFrames(2);
+    expect(elapsed).toBe(32);
   });
 });
 
@@ -58,9 +142,7 @@ describe("mountScene", () => {
   });
 
   it("GIVEN a Container with x and y WHEN rendered THEN container has typed properties", () => {
-    const { container, dispose } = mountScene(() => (
-      <Container x={10} y={20} />
-    ));
+    const { container, dispose } = mountScene(() => <Container x={10} y={20} />);
 
     expect(container.x).toBe(10);
     expect(container.y).toBe(20);
@@ -103,7 +185,7 @@ describe("cleanup", () => {
   it("GIVEN cleanup is wired in afterEach THEN disposers run automatically", () => {
     let disposed = false;
 
-    createTestRoot(() => {
+    renderHook(() => {
       onCleanup(() => {
         disposed = true;
       });
@@ -128,9 +210,7 @@ describe("mountScene stability and reactivity", () => {
   it("GIVEN mountScene reads external signals in JSX WHEN signals change THEN container stays stable and properties update reactively", () => {
     const [label, setLabel] = createSignal("first");
 
-    const { container } = mountScene(() => (
-      <Container label={label()} />
-    ));
+    const { container } = mountScene(() => <Container label={label()} />);
 
     expect(container.label).toBe("first");
 

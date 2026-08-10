@@ -7,15 +7,14 @@ sidebar:
 
 import { Aside } from "@astrojs/starlight/components";
 
-The `delay` function provides a way to create a function that will run a callback after a specified number of milliseconds of ticker time.
+The `delay` function runs a callback after a specified number of milliseconds of ticker time.
 
-It ensures that the delay is in sync with the ticker from the nearest context provider, making it ideal for animations or syncing with other actions based on a common ticker time.
+The delay synchronizes with the ticker from the nearest context provider. Use it for animations or other operations that depend on the ticker timing.
 
-This function must be called within a SolidJS tracking scope, such as a component or another function, that is a descendant of `PixiApplicationProvider`, `PixiCanvas` or `TickerProvider`
+Call this function within a SolidJS tracking scope. This scope must be a descendant of `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`.
 
 <Aside type="note">
-  This function cannot be used in an async context. For that purpose you should use the alternative
-  `createAsyncDelay` function.
+  This function does not work in an async context. Use `createAsyncDelay` instead.
 </Aside>
 
 ### Usage
@@ -38,6 +37,6 @@ const DelayedCallbackComponent = () => {
 
 ### When to use it
 
-- When you need to delay execution in a way that is synchronized with the ticker.
-- For animations or other operations that depend on the ticker's timing.
-- To avoid using external time measurements like `setTimeout` in ticker-dependent contexts.
+- When you need to delay execution that synchronizes with the ticker.
+- For animations or other operations that depend on the ticker timing.
+- To replace external time measurements such as `setTimeout` in ticker-dependent contexts.

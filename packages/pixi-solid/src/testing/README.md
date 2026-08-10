@@ -5,7 +5,7 @@ Utilities for testing pixi-solid components and hooks without a live canvas.
 ```ts
 import {
   mountScene,
-  createTestRoot,
+  renderHook,
   createTestContext,
   createManualTicker,
   getByLabel,
@@ -32,7 +32,9 @@ it("calls onTick on each frame", () => {
 
   mountScene(() => (
     <ctx.Provider>
-      {onTick(() => { calls++; })}
+      {onTick(() => {
+        calls++;
+      })}
     </ctx.Provider>
   ));
 
@@ -62,6 +64,7 @@ const player = getByLabel(container, "player");
 ```
 
 For non-Container roots (e.g. AnimatedSprite), specify the type via generic:
+
 ```tsx
 const { container } = mountScene<Pixi.AnimatedSprite>(() => (
   <AnimatedSprite textures={textures} playing />
@@ -69,40 +72,84 @@ const { container } = mountScene<Pixi.AnimatedSprite>(() => (
 container.playing;
 ```
 
-### `createTestRoot(setup)`
+### `renderHook(callback, options?)`
 
-Runs code in a temporary Solid root and returns the value. Use this for hook and store tests.
+Runs a hook (or store factory) in a temporary Solid root and exposes its return value as a reactive accessor. Use this for hook and store tests.
+
+```tsx
+type RenderHookResult<T> = {
+  result: Accessor<T>; // call result() to read the current value
+  dispose: () => void;
+};
+```
+
+The callback runs exactly once inside an optional `wrapper`, so hooks that register side effects (`onTick`, `onResize`) are cleaned up on dispose. If the callback reads reactive values, `result` re-evaluates when they change.
+
+**With a context provider** (e.g. `usePixiScreen`, which requires `ScreenStoreContext`):
 
 ```tsx
 const ctx = createTestContext();
 
-const { value: screen } = createTestRoot(() => (
-  <ctx.Provider>
-    {usePixiScreen()}
-  </ctx.Provider>
-));
+const { result } = renderHook(() => usePixiScreen(), {
+  wrapper: ctx.Provider,
+});
 
-expect(screen.width).toBe(800);
+expect(result().width).toBe(800);
+
+ctx.renderer.emitResize({ width: 1024 });
+expect(result().width).toBe(1024);
 ```
+
+**Or use the `ctx.renderHook` convenience method** — same thing, wrapper implied:
+
+```tsx
+const ctx = createTestContext();
+
+const { result } = ctx.renderHook(() => usePixiScreen());
+```
+
+**Testing a store that uses hooks internally** — return a reactive store object, then read through `result()`:
+
+```tsx
+const ctx = createTestContext();
+
+const { result } = ctx.renderHook(() => createClockStore()); // uses onTick internally
+
+expect(result().time).toBe(0);
+
+ctx.ticker.fastForwardFrames(3);
+expect(result().time).toBe(48);
+```
+
+**Error testing** (missing context throws eagerly, at `renderHook()` call time):
+
+```tsx
+expect(() => renderHook(() => usePixiScreen())).toThrow();
+```
+
+> **Tip:** return stable reactive objects (stores, screen dimensions) rather than deriving primitives inside the callback. Derived primitives re-run the callback when they change, which re-creates any state created inside it.
 
 ### `createTestContext()`
 
-Creates mock PixiJS instances and a context provider. Returns `{ Provider, ticker, renderer, app }`.
+Creates mock PixiJS instances and a context provider. Returns `{ Provider, ticker, renderer, app, renderHook }`.
 
-| Property | Type | Purpose |
-|---|---|---|
-| `Provider` | Component | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext` |
-| `ticker` | `ManualTicker` | Advance frames with `fastForwardFrames()` or `fastForwardTime()` |
-| `renderer` | `TestRenderer` | Simulate resize events with `emitResize()` |
-| `app` | `Pixi.Application` | Minimal stub for hooks that call `getPixiApp()` |
+| Property     | Type                             | Purpose                                                                             |
+| ------------ | -------------------------------- | ----------------------------------------------------------------------------------- |
+| `Provider`   | Component                        | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext`      |
+| `ticker`     | `ManualTicker`                   | Advance frames with `fastForwardFrames()` or `fastForwardTime()`                    |
+| `renderer`   | `TestRenderer`                   | Simulate resize events with `emitResize()`                                          |
+| `app`        | `Pixi.Application`               | Minimal stub for hooks that call `getPixiApp()`                                     |
+| `renderHook` | `(callback) => RenderHookResult` | `renderHook(callback, { wrapper: Provider })` — runs hooks inside the mock contexts |
 
 **Simulating resize:**
+
 ```ts
 ctx.renderer.emitResize({ width: 1024 });
 ctx.renderer.emitResize();
 ```
 
 **Spying on mocks (use your framework's spy):**
+
 ```ts
 const addSpy = vi.spyOn(ctx.ticker.ticker, "add");
 const resizeSpy = vi.spyOn(ctx.renderer, "addListener");
@@ -115,11 +162,11 @@ Creates a stopped ticker with step-based frame advancement.
 ```ts
 const manual = createManualTicker();
 
-manual.fastForwardFrames(10);              // 10 frames at 16ms each
-manual.fastForwardFrames(5, 33);           // 5 frames at 33ms each (~30fps)
+manual.fastForwardFrames(10); // 10 frames at 16ms each
+manual.fastForwardFrames(5, 33); // 5 frames at 33ms each (~30fps)
 
-manual.fastForwardTime(1000);              // 1 second in ~16ms steps
-manual.fastForwardTime(500, 50);           // 500ms in 50ms steps
+manual.fastForwardTime(1000); // 1 second in ~16ms steps
+manual.fastForwardTime(500, 50); // 500ms in 50ms steps
 ```
 
 ### `getByLabel(root, label)`
@@ -142,7 +189,7 @@ expect(player.x).toBe(100);
 Like `getByLabel` but returns `undefined` instead of throwing.
 
 ```ts
-const maybe = queryByLabel(container, "missing");  // undefined
+const maybe = queryByLabel(container, "missing"); // undefined
 ```
 
 ### `getAllByLabel(root, label)`
@@ -167,7 +214,7 @@ import { cleanup } from "pixi-solid/testing";
 afterEach(() => cleanup());
 ```
 
-All disposers from `mountScene` and `createTestRoot` are registered automatically.
+All disposers from `mountScene` and `renderHook` are registered automatically.
 No need to track `dispose` manually.
 
 To disable automatic cleanup for a specific test, call `dispose()` directly:

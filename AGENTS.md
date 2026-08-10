@@ -23,7 +23,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md#component-architecture) for the full arc
 - **Prop binding** — initialisation vs runtime props, point props, event handlers
 - **Lifecycle / cleanup** — destroy semantics and the `as` prop skip-destroy guard
 - **Context providers** — `PixiCanvas`, `PixiApplicationProvider`, `TickerProvider`
-- **Testing utilities** — `mountTest`, `createTestContext`, `createManualTicker`, scene graph queries
+- **Testing utilities** — `mountScene`, `renderHook`, `createTestContext`, `createManualTicker`, scene graph queries
 
 ## Resources
 

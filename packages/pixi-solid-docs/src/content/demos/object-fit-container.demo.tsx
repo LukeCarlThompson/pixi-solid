@@ -1,9 +1,9 @@
 import { Container, Graphics, PixiCanvas, usePixiScreen } from "pixi-solid";
 import type { ObjectFitMode, ObjectPosition } from "pixi-solid/utils";
 import { ObjectFitContainer } from "pixi-solid/utils";
+import { Rectangle } from "pixi.js";
 import type { JSX } from "solid-js";
 import { createSignal } from "solid-js";
-import { Rectangle } from "pixi.js";
 
 const fitModes: ObjectFitMode[] = ["contain", "cover", "fill", "scale-down", "none"];
 type ObjectPositionPreset = Exclude<ObjectPosition, { x?: number; y?: number }>;

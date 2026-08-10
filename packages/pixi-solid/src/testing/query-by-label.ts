@@ -16,10 +16,7 @@ type MaybeContainer = Pixi.Container | undefined | null;
  * const score = queryByLabel(container, "score");
  * ```
  */
-export const queryByLabel = (
-  root: MaybeContainer,
-  label: string,
-): Pixi.Container | undefined => {
+export const queryByLabel = (root: MaybeContainer, label: string): Pixi.Container | undefined => {
   if (!root) return undefined;
   if (root.label === label) return root;
 
@@ -61,10 +58,7 @@ export const getByLabel = (root: MaybeContainer, label: string): Pixi.Container 
  * Accepts `undefined` or `null` for convenience with refs — throws a
  * clear error if the root is missing.
  */
-export const getAllByLabel = (
-  root: MaybeContainer,
-  label: string,
-): Pixi.Container[] => {
+export const getAllByLabel = (root: MaybeContainer, label: string): Pixi.Container[] => {
   if (!root) {
     throw new Error(
       "getAllByLabel: root is " +

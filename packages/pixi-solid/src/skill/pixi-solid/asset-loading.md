@@ -24,7 +24,9 @@ import { Assets, Texture } from "pixi.js";
 import { Sprite } from "pixi-solid";
 
 function MySprite() {
-  const [texture] = createResource(() => Assets.load<Texture>("https://example.com/my-texture.png"));
+  const [texture] = createResource(() =>
+    Assets.load<Texture>("https://example.com/my-texture.png"),
+  );
 
   return (
     <Show when={texture()}>

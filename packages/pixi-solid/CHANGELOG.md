@@ -15,7 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - ✅ Added `setValue` method to `useSpring` hook for directly setting the current value, bypassing physics calculations for that frame.
 - ✅ Added `setValue` method to `useSmoothDamp` hook for directly setting the current value, bypassing damping calculations for that frame.
-- ✅ **Testing utilities** — Added `pixi-solid/testing` subpath export with `mountScene` (returns `{ container, dispose }` for component tests), `createTestRoot` (returns `{ value, dispose }` for hook/store tests), `cleanup` (automatic disposal in `afterEach`), `createTestContext` (mock provider with ticker, renderer, app), `createManualTicker` (step-based frame advancement), and scene graph query helpers `getByLabel`, `queryByLabel`, `getAllByLabel`.
+- ✅ **Testing utilities** — Added `pixi-solid/testing` subpath export with `mountScene` (returns `{ container, dispose }` for component tests), `renderHook` (returns `{ result, dispose }` for hook/store tests — `result` is a reactive accessor; run inside mock contexts via `ctx.renderHook(callback)` or `renderHook(callback, { wrapper: ctx.Provider })`), `cleanup` (automatic disposal in `afterEach`), `createTestContext` (mock provider with ticker, renderer, app, renderHook), `createManualTicker` (step-based frame advancement), and scene graph query helpers `getByLabel`, `queryByLabel`, `getAllByLabel`.
+- 💀 Removed `createTestRoot` from the testing utilities — `renderHook` supersedes it (`renderHook(callback).result()` replaces `createTestRoot(callback).value`).
+- 🐞 Fixed `createManualTicker` first-frame delta being one millisecond too large — PixiJS seeds `Ticker.lastTime` to `-1`, so the first `fastForwardFrames`/`fastForwardTime` step reported `deltaMS + 1`.
 - ✅ **`as` prop lifecycle** — Components no longer destroy instances provided via the `as` prop. The caller owns the lifecycle.
 - 💀 Removed `llms.txt` from package files and source.
 - Updated the docs

@@ -1,19 +1,6 @@
-import type { JSX } from "solid-js";
 import type * as Pixi from "pixi.js";
-import { children, createRoot } from "solid-js";
-
-export type CreateTestRootResult<T> = {
-  /**
-   * The value returned by the setup function. For hook/store tests this is
-   * the hook's return value (e.g. PixiScreenDimensions from usePixiScreen).
-   */
-  value: T;
-  /**
-   * Destroy the Solid root. Call this in your test cleanup to prevent
-   * memory leaks, or wire up `cleanup()` in `afterEach`.
-   */
-  dispose: () => void;
-};
+import type { Accessor, JSX, ParentProps } from "solid-js";
+import { children, createMemo, createRoot, untrack } from "solid-js";
 
 export type MountSceneResult<TRoot = Pixi.Container> = {
   /**
@@ -29,11 +16,35 @@ export type MountSceneResult<TRoot = Pixi.Container> = {
   dispose: () => void;
 };
 
+export type RenderHookOptions = {
+  /**
+   * Component to run the hook inside. Pass `ctx.Provider` from
+   * `createTestContext()` to provide the mock Pixi contexts, or your own
+   * provider component for custom context.
+   */
+  wrapper?: (props: ParentProps) => JSX.Element;
+};
+
+export type RenderHookResult<T> = {
+  /**
+   * Accessor returning the hook's current return value. If the hook reads
+   * reactive values (e.g. a store property), `result` re-evaluates when they
+   * change. For hooks that return a stable reactive object (stores, screen
+   * dimensions), `result()` returns that object and reads on it track normally.
+   */
+  result: Accessor<T>;
+  /**
+   * Destroy the Solid root. Call this in your test cleanup to prevent
+   * memory leaks, or wire up `cleanup()` in `afterEach`.
+   */
+  dispose: () => void;
+};
+
 // ---------------------------------------------------------------------------
 // Internal: create a Solid root and return the value + dispose
 // ---------------------------------------------------------------------------
 
-const createRootWithCleanup = <T,>(setup: () => T): CreateTestRootResult<T> => {
+const createRootWithCleanup = <T,>(setup: () => T): { value: T; dispose: () => void } => {
   let disposeRoot: (() => void) | undefined;
 
   try {
@@ -70,7 +81,7 @@ const disposers = new Set<() => void>();
  * ```
  *
  * Once wired, you no longer need to track `dispose` from `mountScene`
- * or `createTestRoot` — cleanup happens automatically after each test.
+ * or `renderHook` — cleanup happens automatically after each test.
  */
 export const cleanup = (): void => {
   for (const dispose of disposers) {
@@ -80,40 +91,92 @@ export const cleanup = (): void => {
 };
 
 // ---------------------------------------------------------------------------
-// createTestRoot — for hook/store tests
+// Internal: register a disposer with the global registry
+// ---------------------------------------------------------------------------
+
+const registerDisposer = (dispose: () => void): (() => void) => {
+  const registered = () => {
+    dispose();
+    disposers.delete(registered);
+  };
+  disposers.add(registered);
+  return registered;
+};
+
+// ---------------------------------------------------------------------------
+// renderHook — for hook/store tests
 // ---------------------------------------------------------------------------
 
 /**
- * Run code in a temporary Solid root and return the result.
+ * Run a hook (or store factory) in a temporary Solid root and expose its
+ * return value as a reactive accessor.
  *
- * This is a thin wrapper around SolidJS's `createRoot` that also
- * captures the return value. Use it for testing hooks and stores
- * that need to run inside a reactive context.
+ * This is the clean way to test stores or functions that contain hooks
+ * requiring context:
  *
- * Unlike `mountScene`, this does NOT resolve JSX — it runs the
- * callback directly in a root. Bring your own providers.
- *
- * @example
  * ```tsx
  * const ctx = createTestContext();
  *
- * const { value: screen } = createTestRoot(() => (
- *   <ctx.Provider>
- *     {usePixiScreen()}
- *   </ctx.Provider>
- * ));
+ * const { result } = renderHook(() => usePixiScreen(), {
+ *   wrapper: ctx.Provider,
+ * });
  *
- * expect(screen.width).toBe(800);
+ * expect(result().width).toBe(800);
+ * ctx.renderer.emitResize({ width: 1024 });
+ * expect(result().width).toBe(1024);
  * ```
+ *
+ * The callback runs inside the wrapper, so hooks that register side effects
+ * (`onTick`, `onResize`) are cleaned up on dispose. If the callback reads
+ * reactive values, `result` re-evaluates it when those values change. Return
+ * stable reactive objects (stores, screen dimensions) rather than deriving
+ * primitives inside the callback.
  */
-export const createTestRoot = <T,>(setup: () => T): CreateTestRootResult<T> => {
-  const result = createRootWithCleanup(setup);
-  const dispose = () => {
-    result.dispose();
-    disposers.delete(dispose);
-  };
-  disposers.add(dispose);
-  return { value: result.value, dispose };
+export const renderHook = <T,>(
+  callback: () => T,
+  options?: RenderHookOptions,
+): RenderHookResult<T> => {
+  const { value, dispose: disposeRoot } = createRootWithCleanup(() => {
+    const Wrapper = options?.wrapper;
+
+    let memo: Accessor<T> | undefined;
+
+    if (Wrapper) {
+      // The memo must be created inside the wrapper's render so `useContext`
+      // resolves the provider's context. A component is the owner boundary:
+      // the memo's owner inherits the wrapper's context, reactive reads in
+      // the callback track the memo directly, and the wrapper is NOT
+      // re-rendered when the memo recomputes.
+      const HookRunner = (): null => {
+        memo = createMemo<T>(() => callback());
+        return null;
+      };
+
+      children(() => (
+        <Wrapper>
+          <HookRunner />
+        </Wrapper>
+      ))();
+    } else {
+      memo = createMemo<T>(() => callback());
+    }
+
+    if (memo === undefined) {
+      throw new Error("renderHook: the wrapper must render its children");
+    }
+
+    const result = memo;
+
+    // Evaluate eagerly so errors (e.g. missing context) surface when
+    // `renderHook` is called, matching the previous `createTestRoot` behaviour.
+    untrack(() => result());
+
+    return result;
+  });
+
+  const dispose = registerDisposer(disposeRoot);
+
+  return { result: value, dispose };
 };
 
 // ---------------------------------------------------------------------------
@@ -150,7 +213,7 @@ export const createTestRoot = <T,>(setup: () => T): CreateTestRootResult<T> => {
  * expect(player.x).toBe(100);
  * ```
  */
-export const mountScene = <TRoot = Pixi.Container>(
+export const mountScene = <TRoot = Pixi.Container,>(
   setup: () => JSX.Element,
 ): MountSceneResult<TRoot> => {
   const result = createRootWithCleanup(() => {
@@ -163,16 +226,8 @@ export const mountScene = <TRoot = Pixi.Container>(
     return resolved();
   });
 
-  const dispose = () => {
-    result.dispose();
-    disposers.delete(dispose);
-  };
-  disposers.add(dispose);
-
   return {
     container: result.value as unknown as TRoot,
-    dispose,
+    dispose: registerDisposer(() => result.dispose()),
   };
 };
-
-
