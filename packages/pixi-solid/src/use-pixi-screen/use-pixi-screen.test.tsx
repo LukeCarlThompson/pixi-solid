@@ -1,15 +1,14 @@
 import { createEffect } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { createTestRoot } from "../testing";
-import { createTestContext } from "../testing";
+import { createTestContext, renderHook } from "../testing";
 
 import { usePixiScreen } from "./use-pixi-screen";
 
 describe("usePixiScreen", () => {
   it("GIVEN no provider WHEN usePixiScreen is called THEN it throws", () => {
     expect(() => {
-      createTestRoot(() => {
+      renderHook(() => {
         usePixiScreen();
       });
     }).toThrow("usePixiScreen must be used within a PixiApplicationProvider or PixiCanvas");
@@ -17,50 +16,17 @@ describe("usePixiScreen", () => {
 
   it("GIVEN provider WHEN hook is read THEN it exposes initial dimensions and derived bounds", () => {
     const ctx = createTestContext();
-    let snapshot:
-      | {
-          width: number;
-          height: number;
-          x: number;
-          y: number;
-          left: number;
-          right: number;
-          top: number;
-          bottom: number;
-        }
-      | undefined;
 
-    const { dispose } = createTestRoot(() => (
-      <ctx.Provider>
-        {(() => {
-          const screen = usePixiScreen();
-          snapshot = {
-            width: screen.width,
-            height: screen.height,
-            x: screen.x,
-            y: screen.y,
-            left: screen.left,
-            right: screen.right,
-            top: screen.top,
-            bottom: screen.bottom,
-          };
-          return null;
-        })()}
-      </ctx.Provider>
-    ));
+    const { result } = ctx.renderHook(() => usePixiScreen());
 
-    expect(snapshot).toEqual({
-      width: 800,
-      height: 600,
-      x: 0,
-      y: 0,
-      left: 0,
-      right: 800,
-      top: 0,
-      bottom: 600,
-    });
-
-    dispose();
+    expect(result().width).toBe(800);
+    expect(result().height).toBe(600);
+    expect(result().x).toBe(0);
+    expect(result().y).toBe(0);
+    expect(result().left).toBe(0);
+    expect(result().right).toBe(800);
+    expect(result().top).toBe(0);
+    expect(result().bottom).toBe(600);
   });
 
   it("GIVEN provider WHEN resize changes values THEN hook updates reactively", async () => {
@@ -68,25 +34,21 @@ describe("usePixiScreen", () => {
     let effectRuns = 0;
     const snapshots: Array<{ width: number; x: number; right: number; bottom: number }> = [];
 
-    const { dispose } = createTestRoot(() => (
-      <ctx.Provider>
-        {(() => {
-          const screen = usePixiScreen();
+    const { dispose } = ctx.renderHook(() => {
+      const screen = usePixiScreen();
 
-          createEffect(() => {
-            snapshots.push({
-              width: screen.width,
-              x: screen.x,
-              right: screen.right,
-              bottom: screen.bottom,
-            });
-            effectRuns += 1;
-          });
+      createEffect(() => {
+        snapshots.push({
+          width: screen.width,
+          x: screen.x,
+          right: screen.right,
+          bottom: screen.bottom,
+        });
+        effectRuns += 1;
+      });
 
-          return null;
-        })()}
-      </ctx.Provider>
-    ));
+      return screen;
+    });
 
     expect(effectRuns).toBe(1);
 
@@ -108,23 +70,19 @@ describe("usePixiScreen", () => {
     const ctx = createTestContext();
     let effectRuns = 0;
 
-    const { dispose } = createTestRoot(() => (
-      <ctx.Provider>
-        {(() => {
-          const screen = usePixiScreen();
+    const { dispose } = ctx.renderHook(() => {
+      const screen = usePixiScreen();
 
-          createEffect(() => {
-            void screen.width;
-            void screen.height;
-            void screen.x;
-            void screen.y;
-            effectRuns += 1;
-          });
+      createEffect(() => {
+        void screen.width;
+        void screen.height;
+        void screen.x;
+        void screen.y;
+        effectRuns += 1;
+      });
 
-          return null;
-        })()}
-      </ctx.Provider>
-    ));
+      return null;
+    });
 
     expect(effectRuns).toBe(1);
 

@@ -7,6 +7,8 @@ import { createPixiScreenStore } from "../use-pixi-screen";
 
 import type { ManualTicker } from "./manual-ticker";
 import { createManualTicker } from "./manual-ticker";
+import type { RenderHookResult } from "./test-root";
+import { renderHook } from "./test-root";
 
 export type TestRenderer = {
   screen: { width: number; height: number; x: number; y: number };
@@ -29,6 +31,12 @@ export type TestContext = {
   renderer: TestRenderer;
   /** Minimal Pixi.Application stub wired to `renderer`. */
   app: Pixi.Application;
+  /**
+   * Run a hook (or store factory) inside the mock Pixi contexts and expose
+   * its return value as a reactive accessor. Equivalent to
+   * `renderHook(callback, { wrapper: Provider })`.
+   */
+  renderHook: <T,>(callback: () => T) => RenderHookResult<T>;
 };
 
 /**
@@ -64,8 +72,7 @@ export const createTestContext = (options?: {
   ticker?: ManualTicker;
   renderer?: TestRenderer;
   app?: Pixi.Application;
-}): TestContext => {
-  const renderer: TestRenderer =
+}): TestContext => {  const renderer: TestRenderer =
     options?.renderer ?? (() => {
       const listenersByEvent = new Map<string, Set<() => void>>();
 
@@ -119,5 +126,11 @@ export const createTestContext = (options?: {
     );
   };
 
-  return { Provider, ticker: manualTicker, renderer, app };
+  return {
+    Provider,
+    ticker: manualTicker,
+    renderer,
+    app,
+    renderHook: <T,>(callback: () => T) => renderHook(callback, { wrapper: Provider }),
+  };
 };

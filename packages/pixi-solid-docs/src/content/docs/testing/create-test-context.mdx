@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-Creates mock PixiJS instances and a context provider. Returns `{ Provider, ticker, renderer, app }`.
+Creates mock PixiJS instances and a context provider. Returns `{ Provider, ticker, renderer, app, renderHook }`.
 
 | Property | Type | Purpose |
 |---|---|---|
@@ -13,6 +13,7 @@ Creates mock PixiJS instances and a context provider. Returns `{ Provider, ticke
 | `ticker` | `ManualTicker` | Advance frames with `fastForwardFrames()` or `fastForwardTime()` |
 | `renderer` | `TestRenderer` | Simulate resize events with `emitResize()` |
 | `app` | `Pixi.Application` | Minimal stub for hooks that call `getPixiApp()` |
+| `renderHook` | `(callback) => RenderHookResult` | `renderHook(callback, { wrapper: Provider })` — runs hooks inside the mock contexts |
 
 ## Simulating resize
 
@@ -40,5 +41,5 @@ const ctx = createTestContext({ ticker: customTicker });
 ## Related
 
 - [`createManualTicker`](../create-manual-ticker) — create a stopped ticker with step-based advancement
-- [`createTestRoot`](../create-test-root) — run code in a temporary Solid root using this context
+- [`renderHook`](../render-hook) — run a hook or store in a temporary Solid root using this context
 - [`mountScene`](../mount-scene) — render components in a temporary Solid root using this context

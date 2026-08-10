@@ -170,7 +170,7 @@ export const MyNewComponent = createContainerComponent<PixiMyNew, Pixi.MyNewOpti
 ```
 
 4. **Export** — add to `components/index.ts` and `src/index.ts`.
-5. **Add tests** — use `mountTest` from testing utilities, verify ref typing, prop binding, and cleanup (including the `as` prop skip-destroy guard).
+5. **Add tests** — use `mountScene` from testing utilities, verify ref typing, prop binding, and cleanup (including the `as` prop skip-destroy guard).
 
 ### Prop Binding
 
@@ -224,7 +224,7 @@ describe("Container component", () => {
   it("GIVEN a Container WHEN the root is disposed THEN the instance is destroyed", () => {
     let container: Pixi.Container | undefined;
 
-    const { dispose } = mountTest(() => (
+    const { dispose } = mountScene(() => (
       <Container ref={(el) => { container = el; }} />
     ));
     dispose();
@@ -238,10 +238,12 @@ describe("Container component", () => {
 
 Located in `packages/pixi-solid/src/testing/`:
 
-- `mountTest(setup)` — mount JSX or Solid code in a temporary root. Returns `{ value, dispose }`.
-- `createTestContext()` — mock provider returning `{ Provider, ticker, renderer, app }`.
+- `mountScene(setup)` — mount JSX in a temporary root and return the root Pixi node. Returns `{ container, dispose }`.
+- `renderHook(callback, options?)` — run a hook/store in a temporary root (optionally inside a provider via `wrapper` or `ctx.renderHook`). Returns `{ result, dispose }` where `result` is a reactive accessor.
+- `createTestContext()` — mock provider returning `{ Provider, ticker, renderer, app, renderHook }`.
 - `createManualTicker()` — stopped ticker with `fastForwardFrames()` and `fastForwardTime()`.
 - `getByLabel(root, label)` / `queryByLabel(root, label)` / `getAllByLabel(root, label)` — scene graph queries.
+- `cleanup()` — run all registered disposers (wire into `afterEach`).
 
 See `packages/pixi-solid/src/testing/README.md` for full usage.
 

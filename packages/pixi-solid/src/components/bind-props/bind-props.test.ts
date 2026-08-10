@@ -1,7 +1,7 @@
 import { createRoot, createSignal, createContext, useContext, onMount } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { createTestRoot } from "../../testing";
+import { renderHook } from "../../testing";
 import { bindInitialisationProps, bindRuntimeProps } from ".";
 
 // TODO: Add in better tests to differentiate between the initialisation and runtime props
@@ -73,7 +73,7 @@ describe("bindRuntimeProps()", () => {
   });
 
   it("GIVEN an instance and a ref callback WHEN bindRuntimeProps is called THEN the ref is called with the instance", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockContainer();
       const ref = vi.fn();
 
@@ -82,12 +82,12 @@ describe("bindRuntimeProps()", () => {
       return { instance, ref };
     });
 
-    expect(value.ref).toHaveBeenCalledWith(value.instance);
+    expect(result().ref).toHaveBeenCalledWith(result().instance);
     dispose();
   });
 
   it("GIVEN a parent with a child that has a ref WHEN bindRuntimeProps is called THEN the ref is called before the child is added to the parent", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const parent = new MockContainer();
       const child = new MockContainer();
       let childParentAtRefTime: any = undefined;
@@ -107,14 +107,14 @@ describe("bindRuntimeProps()", () => {
     });
 
     // The ref should have been called
-    expect(value.childRef).toHaveBeenCalledWith(value.child);
+    expect(result().childRef).toHaveBeenCalledWith(result().child);
     // And the parent should be set when the ref is called
-    expect(value.childParentAtRefTime).toBe(null);
+    expect(result().childParentAtRefTime).toBe(null);
     dispose();
   });
 
   it("GIVEN a ref callback that uses a context provider WHEN bindRuntimeProps is called THEN the ref can access the context", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const TestContext = createContext<string>();
       const instance = new MockContainer();
       let contextValue: string | undefined;
@@ -140,14 +140,14 @@ describe("bindRuntimeProps()", () => {
     });
 
     // The ref should have been called
-    expect(value.ref).toHaveBeenCalledWith(value.instance);
+    expect(result().ref).toHaveBeenCalledWith(result().instance);
     // And it should have access to the context
-    expect(value.contextValue).toBe("test-value");
+    expect(result().contextValue).toBe("test-value");
     dispose();
   });
 
   it("GIVEN a ref callback WHEN onMount runs THEN the ref value is available", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockContainer();
       let refValue: MockContainer | undefined;
       const state: { refValueAtMount?: MockContainer } = {};
@@ -165,13 +165,13 @@ describe("bindRuntimeProps()", () => {
       return { instance, ref, state };
     });
 
-    expect(value.ref).toHaveBeenCalledWith(value.instance);
-    expect(value.state.refValueAtMount).toBe(value.instance);
+    expect(result().ref).toHaveBeenCalledWith(result().instance);
+    expect(result().state.refValueAtMount).toBe(result().instance);
     dispose();
   });
 
   it("GIVEN an instance and an onclick handler prop WHEN bindRuntimeProps is called THEN it adds the event listener", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockContainer();
       const handler = vi.fn();
 
@@ -180,13 +180,13 @@ describe("bindRuntimeProps()", () => {
       return { instance, handler };
     });
 
-    expect(value.instance.on).toHaveBeenCalledTimes(1);
-    expect(value.instance.on).toHaveBeenCalledWith("click", value.handler);
+    expect(result().instance.on).toHaveBeenCalledTimes(1);
+    expect(result().instance.on).toHaveBeenCalledWith("click", result().handler);
     dispose();
   });
 
   it("GIVEN an instance with an onclick handler prop WHEN the handler changes THEN the previous listener is removed and the new one is added", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockContainer();
       const handlerA = vi.fn();
       const handlerB = vi.fn();
@@ -203,17 +203,17 @@ describe("bindRuntimeProps()", () => {
       return { instance, handlerA, handlerB, setHandler };
     });
 
-    value.setHandler(() => value.handlerB);
+    result().setHandler(() => result().handlerB);
 
-    expect(value.instance.off).toHaveBeenCalledTimes(1);
-    expect(value.instance.off).toHaveBeenCalledWith("click", value.handlerA);
-    expect(value.instance.on).toHaveBeenCalledTimes(2);
-    expect(value.instance.on).toHaveBeenLastCalledWith("click", value.handlerB);
+    expect(result().instance.off).toHaveBeenCalledTimes(1);
+    expect(result().instance.off).toHaveBeenCalledWith("click", result().handlerA);
+    expect(result().instance.on).toHaveBeenCalledTimes(2);
+    expect(result().instance.on).toHaveBeenLastCalledWith("click", result().handlerB);
     dispose();
   });
 
   it("GIVEN an onclick handler prop that is unset WHEN bindRuntimeProps reruns THEN it removes the previous listener", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockContainer();
       const handlerA = vi.fn();
       const [handler, setHandler] = createSignal<(() => void) | undefined>(handlerA);
@@ -229,16 +229,16 @@ describe("bindRuntimeProps()", () => {
       return { instance, handlerA, setHandler };
     });
 
-    value.setHandler(undefined);
+    result().setHandler(undefined);
 
-    expect(value.instance.off).toHaveBeenCalledTimes(1);
-    expect(value.instance.off).toHaveBeenCalledWith("click", value.handlerA);
-    expect(value.instance.on).toHaveBeenCalledTimes(1);
+    expect(result().instance.off).toHaveBeenCalledTimes(1);
+    expect(result().instance.off).toHaveBeenCalledWith("click", result().handlerA);
+    expect(result().instance.on).toHaveBeenCalledTimes(1);
     dispose();
   });
 
   it("GIVEN a point prop object WHEN bindRuntimeProps is called THEN it sets the point values", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockPointContainer();
 
       bindRuntimeProps(instance as any, { position: { x: 3, y: 7 } } as any);
@@ -246,12 +246,12 @@ describe("bindRuntimeProps()", () => {
       return { instance };
     });
 
-    expect(value.instance.position.set).toHaveBeenCalledWith(3, 7);
+    expect(result().instance.position.set).toHaveBeenCalledWith(3, 7);
     dispose();
   });
 
   it("GIVEN a point axis prop WHEN it changes THEN the axis value updates", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockPointContainer();
       const [positionX, setPositionX] = createSignal(4);
 
@@ -266,15 +266,15 @@ describe("bindRuntimeProps()", () => {
       return { instance, setPositionX };
     });
 
-    expect(value.instance.position.x).toBe(4);
+    expect(result().instance.position.x).toBe(4);
 
-    value.setPositionX(9);
-    expect(value.instance.position.x).toBe(9);
+    result().setPositionX(9);
+    expect(result().instance.position.x).toBe(9);
     dispose();
   });
 
   it("GIVEN render layer children WHEN bindRuntimeProps is called THEN it attaches the children", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockRenderLayer();
       const childA = new MockContainer();
       const childB = new MockContainer();
@@ -284,14 +284,14 @@ describe("bindRuntimeProps()", () => {
       return { instance, childA, childB };
     });
 
-    expect(value.instance.attach).toHaveBeenCalledTimes(2);
-    expect(value.instance.attach).toHaveBeenNthCalledWith(1, value.childA);
-    expect(value.instance.attach).toHaveBeenNthCalledWith(2, value.childB);
+    expect(result().instance.attach).toHaveBeenCalledTimes(2);
+    expect(result().instance.attach).toHaveBeenNthCalledWith(1, result().childA);
+    expect(result().instance.attach).toHaveBeenNthCalledWith(2, result().childB);
     dispose();
   });
 
   it("GIVEN an invalid prop WHEN bindRuntimeProps is called THEN it does not throw and does not set the property", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockContainer();
 
       bindRuntimeProps(instance as any, { notAProp: 1 } as any);
@@ -299,14 +299,14 @@ describe("bindRuntimeProps()", () => {
       return { instance };
     });
 
-    expect((value.instance as any).notAProp).toBeUndefined();
+    expect((result().instance as any).notAProp).toBeUndefined();
     dispose();
   });
 });
 
 describe("bindInitialisationProps()", () => {
   it("GIVEN deferred reactive props WHEN bindInitialisationProps is called THEN the instance is not updated on the first run", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockContainer();
       const [x] = createSignal(1);
 
@@ -321,12 +321,12 @@ describe("bindInitialisationProps()", () => {
       return { instance };
     });
 
-    expect(value.instance.x).toBe(0);
+    expect(result().instance.x).toBe(0);
     dispose();
   });
 
   it("GIVEN deferred reactive props WHEN the prop value changes THEN the instance is updated", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockContainer();
       const [x, setX] = createSignal(1);
 
@@ -341,15 +341,15 @@ describe("bindInitialisationProps()", () => {
       return { instance, setX };
     });
 
-    expect(value.instance.x).toBe(0);
+    expect(result().instance.x).toBe(0);
 
-    value.setX(5);
-    expect(value.instance.x).toBe(5);
+    result().setX(5);
+    expect(result().instance.x).toBe(5);
     dispose();
   });
 
   it("GIVEN a point prop WHEN bindInitialisationProps is called THEN it defers the initial update", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockPointContainer();
       const [position, setPosition] = createSignal({ x: 2, y: 6 });
 
@@ -364,15 +364,15 @@ describe("bindInitialisationProps()", () => {
       return { instance, setPosition };
     });
 
-    expect(value.instance.position.set).not.toHaveBeenCalled();
+    expect(result().instance.position.set).not.toHaveBeenCalled();
 
-    value.setPosition({ x: 8, y: 9 });
-    expect(value.instance.position.set).toHaveBeenCalledWith(8, 9);
+    result().setPosition({ x: 8, y: 9 });
+    expect(result().instance.position.set).toHaveBeenCalledWith(8, 9);
     dispose();
   });
 
   it("GIVEN an invalid prop WHEN bindInitialisationProps is called THEN it does not throw and does not set the property after changes", () => {
-    const { value, dispose } = createTestRoot(() => {
+    const { result, dispose } = renderHook(() => {
       const instance = new MockContainer();
       const [prop, setProp] = createSignal(1);
 
@@ -387,10 +387,10 @@ describe("bindInitialisationProps()", () => {
       return { instance, setProp };
     });
 
-    expect((value.instance as any).notAProp).toBeUndefined();
+    expect((result().instance as any).notAProp).toBeUndefined();
 
-    value.setProp(2);
-    expect((value.instance as any).notAProp).toBeUndefined();
+    result().setProp(2);
+    expect((result().instance as any).notAProp).toBeUndefined();
     dispose();
   });
 });
