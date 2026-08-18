@@ -110,9 +110,10 @@ Wraps an existing `Pixi.Ticker` instance in context. Does **not** create an appl
 
 ```tsx
 import { TickerProvider, onTick } from "pixi-solid";
-import * as Pixi from "pixi.js";
+import { Ticker } from "pixi.js";
+import type * as Pixi from "pixi.js";
 
-const myTicker = new Pixi.Ticker();
+const myTicker = new Ticker();
 
 export const TestApp = ({ children }) => (
   <TickerProvider ticker={myTicker}>{children}</TickerProvider>

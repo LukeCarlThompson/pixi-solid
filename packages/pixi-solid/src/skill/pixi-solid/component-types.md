@@ -69,24 +69,28 @@ Used by: `Graphics`, `ParticleContainer`.
 Example — `ParticleContainer` usage:
 
 ```tsx
-import * as PIXI from "pixi.js";
+import type * as Pixi from "pixi.js";
+import { ParticleContainer } from "pixi.js";
 import { onMount, onCleanup } from "solid-js";
 
 function ParticleExample() {
-  let pc: PIXI.ParticleContainer | undefined;
+  let particleContainerRef: PIXI.ParticleContainer | undefined;
 
   onMount(() => {
-    const s = new PIXI.Sprite(myTexture);
-    s.x = Math.random() * 800;
-    pc!.addChild(s);
+    if (!particleContainerRef) {
+      throw new Error("particleContainerRef not found");
+    }
+    const sprite = new Sprite(myTexture);
+    sprite.x = Math.random() * 800;
+    particleContainerRef.addChild(s);
 
     onCleanup(() => {
-      pc!.removeChild(s);
-      s.destroy();
+      particleContainerRef.removeChild(s);
+      sprite.destroy();
     });
   });
 
-  return <ParticleContainer ref={(el) => (pc = el)} />;
+  return <ParticleContainer ref={(ref) => (particleContainerRef = ref)} />;
 }
 ```
 
