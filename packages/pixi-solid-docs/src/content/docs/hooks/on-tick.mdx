@@ -15,7 +15,8 @@ Call `onTick` within a SolidJS tracking scope. This scope must be a descendant o
 ```tsx
 import { onTick, PixiCanvas, Sprite } from "pixi-solid";
 import { createSignal } from "solid-js";
-import * as Pixi from "pixi.js";
+import { Texture } from "pixi.js";
+import type * as Pixi from "pixi.js";
 
 const RotatingSpriteBySignal = (props: { texture: Pixi.Texture }) => {
   const [rotation, setRotation] = createSignal(0);
@@ -47,7 +48,7 @@ const RotatingSprite = (props: { texture: Pixi.Texture }) => {
 export const DemoApp = () => {
   return (
     <PixiCanvas>
-      <RotatingSpriteBySignal texture={Pixi.Texture.WHITE} />
+      <RotatingSpriteBySignal texture={Texture.WHITE} />
     </PixiCanvas>
   );
 };

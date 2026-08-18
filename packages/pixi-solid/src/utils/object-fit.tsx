@@ -157,7 +157,7 @@ export type ObjectFitContainerProps = PixiComponentProps & {
  * ```
  */
 export const ObjectFitContainer = (props: ObjectFitContainerProps): JSX.Element => {
-  const [local, rest] = splitProps(props, [
+  const [local, containerProps] = splitProps(props, [
     "width",
     "height",
     "fitMode",
@@ -235,7 +235,7 @@ export const ObjectFitContainer = (props: ObjectFitContainerProps): JSX.Element 
   );
 
   return (
-    <Container {...rest}>
+    <Container {...containerProps}>
       <Index each={resolvedChildren.toArray()}>
         {(child, index) => {
           return (
