@@ -159,7 +159,7 @@ const { result } = ctx.renderHook(() => createClockStore()); // uses onTick inte
 
 expect(result().time).toBe(0);
 
-ctx.ticker.fastForwardFrames(3);
+await ctx.ticker.fastForwardFrames(3);
 expect(result().time).toBe(48);
 ```
 
