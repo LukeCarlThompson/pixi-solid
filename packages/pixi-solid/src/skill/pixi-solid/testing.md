@@ -74,7 +74,7 @@ import { mountScene, createTestContext } from "pixi-solid/testing";
 import { onTick } from "pixi-solid";
 
 describe("Component with onTick", () => {
-  it("calls the tick callback each frame", () => {
+  it("calls the tick callback each frame", async () => {
     const ctx = createTestContext();
     let calls = 0;
 
@@ -86,7 +86,7 @@ describe("Component with onTick", () => {
       </ctx.Provider>
     ));
 
-    ctx.ticker.fastForwardFrames(5);
+    await ctx.ticker.fastForwardFrames(5);
     expect(calls).toBe(5);
   });
 });
@@ -159,9 +159,11 @@ const { result } = ctx.renderHook(() => createClockStore()); // uses onTick inte
 
 expect(result().time).toBe(0);
 
-ctx.ticker.fastForwardFrames(3);
+await ctx.ticker.fastForwardFrames(3);
 expect(result().time).toBe(48);
 ```
+
+> **Note:** the ticker driver methods (`fastForwardFrames`, `fastForwardTime`) are **async** — always `await` them. They flush microtasks after every tick so promise-based continuations (awaited `delay`, animation `onEnded` chains) receive subsequent ticks without manual `await Promise.resolve()` in tests. Successive calls are additive: they share one monotonic absolute clock.
 
 ### Reactivity
 
@@ -214,7 +216,7 @@ mountScene(() => (
 | Property     | Type                             | Purpose                                                                             |
 | ------------ | -------------------------------- | ----------------------------------------------------------------------------------- |
 | `Provider`   | Component                        | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext`      |
-| `ticker`     | `ManualTicker`                   | Advance frames with `fastForwardFrames()` or `fastForwardTime()`                    |
+| `ticker`     | `ManualTicker`                   | Advance frames with `await fastForwardFrames()` or `await fastForwardTime()`        |
 | `renderer`   | `TestRenderer`                   | Simulate resize events with `emitResize()`                                          |
 | `app`        | `Pixi.Application`               | Minimal stub for hooks that call `getPixiApp()`                                     |
 | `renderHook` | `(callback) => RenderHookResult` | `renderHook(callback, { wrapper: Provider })` — runs hooks inside the mock contexts |
@@ -273,15 +275,19 @@ manual.ticker.add(() => {
   calls++;
 });
 
-// Advance by number of frames
-manual.fastForwardFrames(10); // 10 frames at 16ms each
-manual.fastForwardFrames(5, 33); // 5 frames at 33ms each (~30fps)
+// Advance by number of frames (methods are async — await them)
+await manual.fastForwardFrames(10); // 10 frames at 16ms each
+await manual.fastForwardFrames(5, 33); // 5 frames at 33ms each (~30fps)
 expect(calls).toBe(15);
 
 // Advance by time duration
-manual.fastForwardTime(1000); // 1 second in ~16ms steps
-manual.fastForwardTime(500, 50); // 500ms in 50ms steps
+await manual.fastForwardTime(1000); // 1 second in ~16ms steps
+await manual.fastForwardTime(500, 50); // 500ms in 50ms steps
 ```
+
+The drivers own a monotonic absolute clock, so successive calls are exactly additive — `await fastForwardTime(100)` then `await fastForwardTime(50)` delivers 100ms then 50ms of accumulated `deltaMS` with no dropped first frame.
+
+> **Note:** the returned `ticker` wraps a real PixiJS `Ticker`, so the same defaults apply (e.g. per-step deltas are capped at 100ms via the default `minFPS = 10`) and can be overridden on the instance after creation — e.g. `ticker.ticker.minFPS = 4` to allow larger step deltas.
 
 Step-based advancement avoids the footgun of single large deltas that can break spring physics, smooth-damp interpolation, or sequenced animations.
 
@@ -340,11 +346,10 @@ describe("createAsyncDelay", () => {
     const promise = delay(500, controller.signal);
 
     // Advance half the time — still pending
-    ctx.ticker.fastForwardTime(250);
-    await Promise.resolve();
+    await ctx.ticker.fastForwardTime(250);
 
     // Advance remaining time — resolves
-    ctx.ticker.fastForwardTime(250);
+    await ctx.ticker.fastForwardTime(250);
     await promise;
   });
 

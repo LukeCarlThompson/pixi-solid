@@ -10,7 +10,7 @@ Creates mock PixiJS instances and a context provider. Returns `{ Provider, ticke
 | Property     | Type                             | Purpose                                                                             |
 | ------------ | -------------------------------- | ----------------------------------------------------------------------------------- |
 | `Provider`   | Component                        | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext`      |
-| `ticker`     | `ManualTicker`                   | Advance frames with `fastForwardFrames()` or `fastForwardTime()`                    |
+| `ticker`     | `ManualTicker`                   | Advance frames with `await fastForwardFrames()` or `await fastForwardTime()`        |
 | `renderer`   | `TestRenderer`                   | Simulate resize events with `emitResize()`                                          |
 | `app`        | `Pixi.Application`               | Minimal stub for hooks that call `getPixiApp()`                                     |
 | `renderHook` | `(callback) => RenderHookResult` | `renderHook(callback, { wrapper: Provider })` — runs hooks inside the mock contexts |

@@ -8,7 +8,7 @@ import { renderHook } from "../test-root";
 import { createClockStore } from "./clock-store";
 
 describe("example test", () => {
-  it("GIVEN a store that registers onTick WHEN only the ticker context is provided THEN the store updates", () => {
+  it("GIVEN a store that registers onTick WHEN only the ticker context is provided THEN the store updates", async () => {
     const manual = createManualTicker();
 
     // createClockStore uses `onTick`, which only needs TickerContext.
@@ -20,14 +20,14 @@ describe("example test", () => {
 
     expect(clock().time).toBe(0);
 
-    manual.fastForwardFrames(3);
+    await manual.fastForwardFrames(3);
 
     expect(clock().time).toBe(48);
 
     dispose();
   });
 
-  it("GIVEN a store that registers onTick WHEN the full mock context is provided THEN the store updates", () => {
+  it("GIVEN a store that registers onTick WHEN the full mock context is provided THEN the store updates", async () => {
     const ctx = createTestContext();
 
     // createTestContext() provides ticker, app, renderer, and screen store —
@@ -36,7 +36,7 @@ describe("example test", () => {
 
     expect(clock().time).toBe(0);
 
-    ctx.ticker.fastForwardFrames(3);
+    await ctx.ticker.fastForwardFrames(3);
 
     expect(clock().time).toBe(48);
 

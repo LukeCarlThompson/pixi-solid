@@ -248,7 +248,7 @@ Located in `packages/pixi-solid/src/testing/`:
 - `mountScene(setup)` — mount JSX in a temporary root and return the root Pixi node. Returns `{ container, dispose }`.
 - `renderHook(callback, options?)` — run a hook/store in a temporary root (optionally inside a provider via `wrapper` or `ctx.renderHook`). Returns `{ result, dispose }` where `result` is a reactive accessor.
 - `createTestContext()` — mock provider returning `{ Provider, ticker, renderer, app, renderHook }`.
-- `createManualTicker()` — stopped ticker with `fastForwardFrames()` and `fastForwardTime()`.
+- `createManualTicker()` — stopped ticker with async `fastForwardFrames()` and `fastForwardTime()` drivers (await them; successive calls are additive).
 - `getByLabel(root, label)` / `queryByLabel(root, label)` / `getAllByLabel(root, label)` — scene graph queries.
 - `cleanup()` — run all registered disposers (wire into `afterEach`).
 
