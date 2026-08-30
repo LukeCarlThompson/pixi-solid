@@ -26,7 +26,7 @@ import { onTick } from "pixi-solid";
 
 afterEach(() => cleanup());
 
-it("calls onTick on each frame", () => {
+it("calls onTick on each frame", async () => {
   const ctx = createTestContext();
   let calls = 0;
 
@@ -38,7 +38,7 @@ it("calls onTick on each frame", () => {
     </ctx.Provider>
   ));
 
-  ctx.ticker.fastForwardFrames(5);
+  await ctx.ticker.fastForwardFrames(5);
   expect(calls).toBe(5);
 });
 ```
@@ -121,6 +121,8 @@ ctx.ticker.fastForwardFrames(3);
 expect(result().time).toBe(48);
 ```
 
+> **Note:** the ticker driver methods (`fastForwardFrames`, `fastForwardTime`) are **async** — always `await` them. They flush microtasks after every tick so promise-based continuations (awaited `delay`, animation `onEnded` chains) receive subsequent ticks without manual flushing in tests. Successive calls are additive: they share one monotonic absolute clock.
+
 **Error testing** (missing context throws eagerly, at `renderHook()` call time):
 
 ```tsx
@@ -136,7 +138,7 @@ Creates mock PixiJS instances and a context provider. Returns `{ Provider, ticke
 | Property     | Type                             | Purpose                                                                             |
 | ------------ | -------------------------------- | ----------------------------------------------------------------------------------- |
 | `Provider`   | Component                        | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext`      |
-| `ticker`     | `ManualTicker`                   | Advance frames with `fastForwardFrames()` or `fastForwardTime()`                    |
+| `ticker`     | `ManualTicker`                   | Advance frames with `await fastForwardFrames()` or `await fastForwardTime()`        |
 | `renderer`   | `TestRenderer`                   | Simulate resize events with `emitResize()`                                          |
 | `app`        | `Pixi.Application`               | Minimal stub for hooks that call `getPixiApp()`                                     |
 | `renderHook` | `(callback) => RenderHookResult` | `renderHook(callback, { wrapper: Provider })` — runs hooks inside the mock contexts |
@@ -157,17 +159,21 @@ const resizeSpy = vi.spyOn(ctx.renderer, "addListener");
 
 ### `createManualTicker()`
 
-Creates a stopped ticker with step-based frame advancement.
+Creates a stopped ticker with step-based frame advancement. The driver methods are **async** and must be awaited.
 
 ```ts
 const manual = createManualTicker();
 
-manual.fastForwardFrames(10); // 10 frames at 16ms each
-manual.fastForwardFrames(5, 33); // 5 frames at 33ms each (~30fps)
+await manual.fastForwardFrames(10); // 10 frames at 16ms each
+await manual.fastForwardFrames(5, 33); // 5 frames at 33ms each (~30fps)
 
-manual.fastForwardTime(1000); // 1 second in ~16ms steps
-manual.fastForwardTime(500, 50); // 500ms in 50ms steps
+await manual.fastForwardTime(1000); // 1 second in ~16ms steps
+await manual.fastForwardTime(500, 50); // 500ms in 50ms steps
 ```
+
+Because the drivers own a monotonic absolute clock, successive calls are exactly additive — `await fastForwardTime(100)` then `await fastForwardTime(50)` delivers 100ms then 50ms of accumulated `deltaMS` with no dropped first frame.
+
+> **Note:** the returned `ticker` wraps a real PixiJS `Ticker`, so the same defaults apply (e.g. per-step deltas are capped at 100ms via the default `minFPS = 10`) and can be overridden on the instance after creation — e.g. `ticker.ticker.minFPS = 4` to allow larger step deltas.
 
 ### `getByLabel(root, label)`
 

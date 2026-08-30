@@ -52,7 +52,7 @@ export type TestContext = {
  * ));
  *
  * // Advance time frame-by-frame
- * ctx.ticker.fastForwardFrames(10);
+ * await ctx.ticker.fastForwardFrames(10);
  *
  * // Simulate resize
  * ctx.renderer.emitResize({ width: 1024, height: 768 });

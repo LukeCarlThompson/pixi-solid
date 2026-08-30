@@ -89,7 +89,7 @@ describe("renderHook", () => {
     );
   });
 
-  it("GIVEN a store using onTick WHEN frames advance THEN result().time reflects ticks", () => {
+  it("GIVEN a store using onTick WHEN frames advance THEN result().time reflects ticks", async () => {
     const ctx = createTestContext();
 
     const { result } = ctx.renderHook(() => {
@@ -100,12 +100,12 @@ describe("renderHook", () => {
 
     expect(result().time).toBe(0);
 
-    ctx.ticker.fastForwardFrames(3);
+    await ctx.ticker.fastForwardFrames(3);
 
     expect(result().time).toBe(48);
   });
 
-  it("GIVEN a store using onTick WHEN the root is disposed THEN the ticker listener is removed", () => {
+  it("GIVEN a store using onTick WHEN the root is disposed THEN the ticker listener is removed", async () => {
     const ctx = createTestContext();
     let elapsed = 0;
 
@@ -115,11 +115,11 @@ describe("renderHook", () => {
       });
     });
 
-    ctx.ticker.fastForwardFrames(2);
+    await ctx.ticker.fastForwardFrames(2);
     expect(elapsed).toBe(32);
 
     dispose();
-    ctx.ticker.fastForwardFrames(2);
+    await ctx.ticker.fastForwardFrames(2);
     expect(elapsed).toBe(32);
   });
 });

@@ -10,10 +10,12 @@ Creates a stopped PixiJS ticker with step-based frame advancement methods.
 ```tsx
 type ManualTicker = {
   ticker: Ticker;
-  fastForwardFrames(frames: number, deltaTime?: number): void;
-  fastForwardTime(totalTimeMS: number, stepSizeMS?: number): void;
+  fastForwardFrames(frames: number, deltaTime?: number): Promise<void>;
+  fastForwardTime(totalTimeMS: number, stepSizeMS?: number): Promise<void>;
 };
 ```
+
+The driver methods are **async** — always `await` them. They own a monotonic absolute clock, so successive calls are exactly additive (no dropped first frame), and they flush microtasks after every tick so promise-based continuations (awaited `delay`, animation `onEnded` chains) receive subsequent ticks.
 
 ## fastForwardFrames()
 
@@ -26,8 +28,8 @@ manual.ticker.add(() => {
   calls++;
 });
 
-manual.fastForwardFrames(10); // 10 frames at 16ms each
-manual.fastForwardFrames(5, 33); // 5 frames at 33ms each (~30fps)
+await manual.fastForwardFrames(10); // 10 frames at 16ms each
+await manual.fastForwardFrames(5, 33); // 5 frames at 33ms each (~30fps)
 expect(calls).toBe(15);
 ```
 
@@ -36,11 +38,17 @@ expect(calls).toBe(15);
 Advance frames to simulate a total elapsed time, splitting it into steps of a given size (defaults to ~16ms).
 
 ```tsx
-manual.fastForwardTime(1000); // 1 second in ~16ms steps
-manual.fastForwardTime(500, 50); // 500ms in 50ms steps
+await manual.fastForwardTime(1000); // 1 second in ~16ms steps
+await manual.fastForwardTime(500, 50); // 500ms in 50ms steps
 ```
 
 import { Aside } from "@astrojs/starlight/components";
+
+<Aside type="note">
+  The returned `ticker` wraps a real PixiJS `Ticker`, so the same defaults apply (e.g. per-step deltas
+  are capped at 100ms via the default `minFPS = 10`) and can be overridden on the instance after
+  creation — e.g. `ticker.ticker.minFPS = 4` to allow larger step deltas.
+</Aside>
 
 <Aside type="note">
   Step-based advancement avoids the footgun of large single-frame deltas that can break spring,

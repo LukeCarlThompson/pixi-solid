@@ -40,8 +40,10 @@ Each file owns one concern and can be used independently.
 - `createManualTicker()` → `ManualTicker`
 - `ticker` — the raw PixiJS `Ticker` instance (stopped by default)
 - Seeds `ticker.lastTime = 0` so the first frame produces exactly the requested delta
-- `fastForwardFrames(n, deltaTime?)` — advance N frames at a given step size
-- `fastForwardTime(totalMS, stepSize?)` — advance through a duration in small steps
+- Owns a monotonic absolute clock — successive `fastForward*` calls are additive and never drop a frame
+- `fastForwardFrames(n, deltaTime?)` — advance N frames at a given step size (async)
+- `fastForwardTime(totalMS, stepSize?)` — advance through a duration in small steps (async)
+- Both drivers are `async` and flush microtasks after every tick, so promise-based continuations (awaited `delay`, animation `onEnded` chains) receive subsequent ticks without manual `await Promise.resolve()` in tests
 - Step-based advancement avoids footguns where single large deltas break spring/smooth-damp or sequenced animations
 
 ### `test-context.tsx` — Mock context provider
