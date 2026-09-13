@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🐞 Fixed `createManualTicker` successive calls not being additive — the drivers re-created a local time from `0` on every call, so PixiJS's `update()` (which always writes `lastTime`) dropped the first frame and rewound the ticker clock. The drivers now own a monotonic absolute clock.
 - ⚙️ `createManualTicker` drivers (`fastForwardFrames`/`fastForwardTime`) are now async and flush microtasks after every tick, so promise-based continuations (awaited `delay`, animation `onEnded` chains) receive subsequent ticks without manual `await Promise.resolve()` in tests. Existing tests must `await` the driver calls.
 - ✅ **`as` prop lifecycle** — Components no longer destroy instances provided via the `as` prop. The caller owns the lifecycle.
+- ✅ Added `SplitText` and `SplitBitmapText` components.
 - 💀 Removed `llms.txt` from package files and source.
 - Updated the docs
 - 🐞 Added `browser` export path so vite won't try to bundle it in the server build in SSR frameworks.
