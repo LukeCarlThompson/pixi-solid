@@ -1,0 +1,44 @@
+---
+title: Split Text
+description: A SolidJS component that renders a PixiJS SplitText container for per-character, per-word, and per-line animation.
+---
+
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/split-text.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
+`SplitText` renders text as separate line, word, and character objects. Use the exposed `chars`, `words`, and `lines` arrays when you need to animate text segments independently.
+
+`SplitText` is a `Container`, not a sprite, so it does not have an outer `anchor` or `anchorX`/`anchorY` prop. Position the split text with `x`, `y`, or `position`; use `charAnchor`, `wordAnchor`, and `lineAnchor` for the segment transform origins.
+
+Please see the [PixiJS SplitText docs](https://pixijs.download/release/docs/text.SplitText.html) for detailed information about the PixiJS API.
+
+`SplitText` uses regular canvas `Text` objects for its characters. It is a good choice for short, highly styled strings. For long strings or many animated text instances, use [`SplitBitmapText`](../split-bitmap-text/) instead.
+
+### Demo
+
+<ClientOnly fileName="split-text" client:load />
+
+### Code example
+
+<Code code={demoCode} lang="tsx" title="split-text-demo.tsx" />
+
+### Segment collections
+
+The component exposes three collections:
+
+- `chars` contains each character `Text` instance.
+- `words` contains containers for each word.
+- `lines` contains containers for each line.
+
+Set `charAnchor`, `wordAnchor`, and `lineAnchor` to control the transform origin for each collection. `autoSplit` is enabled by default, so changing `text` or `style` rebuilds the segment collections.
+
+```tsx
+<SplitText
+  text="Animate each character"
+  style={{ fontSize: 40, fill: "white" }}
+  charAnchor={{ x: 0.5, y: 1 }}
+  wordAnchor={{ x: 0, y: 0.5 }}
+  lineAnchor={0.5}
+/>
+```

@@ -10,6 +10,8 @@ export {
   ParticleContainer,
   PerspectiveMesh,
   Sprite,
+  SplitText,
+  SplitBitmapText,
   Text,
   RenderContainer,
   RenderLayer,

@@ -40,6 +40,8 @@ export {
   RenderContainer,
   RenderLayer,
   Sprite,
+  SplitBitmapText,
+  SplitText,
   Text,
   TilingSprite,
 } from "./components";

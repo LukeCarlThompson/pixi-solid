@@ -139,7 +139,7 @@ export const createContainerComponent = <
     const [runtimeProps, initialisationProps] = splitProps(props, CONTAINER_RUNTIME_KEYS);
 
     const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new PixiClass(initialisationProps as any);
+    const instance = props.as || new PixiClass({ ...initialisationProps } as any);
 
     bindInitialisationProps(instance, initialisationProps);
     bindRuntimeProps(instance, runtimeProps);
@@ -184,7 +184,7 @@ export const createSpriteComponent = <
     const [runtimeProps, initialisationProps] = splitProps(props, SPRITE_RUNTIME_KEYS);
 
     const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new PixiClass(initialisationProps as any);
+    const instance = props.as || new PixiClass({ ...initialisationProps } as any);
 
     bindInitialisationProps(instance, initialisationProps);
     bindRuntimeProps(instance, runtimeProps);
@@ -216,7 +216,7 @@ export const createAnimatedSpriteComponent = <
     ]);
 
     const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new PixiClass(initialisationProps as any);
+    const instance = props.as || new PixiClass({ ...initialisationProps } as any);
 
     // Set this to false to override Pixi's default shared ticker behaviour.
     instance.autoUpdate = false;
@@ -264,7 +264,7 @@ export const createTilingSpriteComponent = <
     const [runtimeProps, initialisationProps] = splitProps(props, TILING_SPRITE_RUNTIME_KEYS);
 
     const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new PixiClass(initialisationProps as any);
+    const instance = props.as || new PixiClass({ ...initialisationProps } as any);
 
     bindInitialisationProps(instance, initialisationProps);
     bindRuntimeProps(instance, runtimeProps);
@@ -285,7 +285,7 @@ export const createFilterComponent = <InstanceType extends Pixi.Filter, OptionsT
     const [runtimeProps, initialisationProps] = splitProps(props, ["ref", "as"]);
 
     const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new PixiClass(initialisationProps as any);
+    const instance = props.as || new PixiClass({ ...initialisationProps } as any);
 
     for (const key in initialisationProps) {
       if (key === "as") continue;

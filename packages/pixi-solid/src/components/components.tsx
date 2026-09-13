@@ -13,6 +13,8 @@ import {
   RenderContainer as PixiRenderContainer,
   RenderLayer as PixiRenderLayer,
   Sprite as PixiSprite,
+  SplitText as PixiSplitText,
+  SplitBitmapText as PixiSplitBitmapText,
   Text as PixiText,
   TilingSprite as PixiTilingSprite,
 } from "pixi.js";
@@ -56,12 +58,12 @@ export const HTMLText = createSpriteComponent<PixiHTMLText, Pixi.HTMLTextOptions
 /**
  * A SolidJS component that renders a `PIXI.MeshPlane`.
  */
-export const MeshPlane = createSpriteComponent<PixiMeshPlane, Pixi.MeshPlaneOptions>(PixiMeshPlane);
+export const MeshPlane = createLeafComponent<PixiMeshPlane, Pixi.MeshPlaneOptions>(PixiMeshPlane);
 
 /**
  * A SolidJS component that renders a `PIXI.MeshRope`.
  */
-export const MeshRope = createSpriteComponent<PixiMeshRope, Pixi.MeshRopeOptions>(PixiMeshRope);
+export const MeshRope = createLeafComponent<PixiMeshRope, Pixi.MeshRopeOptions>(PixiMeshRope);
 
 /**
  * A SolidJS component that renders a `PIXI.NineSliceSprite`.
@@ -84,7 +86,7 @@ export const ParticleContainer = createLeafComponent<
 /**
  * A SolidJS component that renders a `PIXI.PerspectiveMesh`.
  */
-export const PerspectiveMesh = createSpriteComponent<
+export const PerspectiveMesh = createLeafComponent<
   PixiPerspectiveMesh,
   Pixi.PerspectivePlaneOptions
 >(PixiPerspectiveMesh);
@@ -108,10 +110,24 @@ export const RenderLayer = createContainerComponent<PixiRenderLayer, Pixi.Render
  * A SolidJS component that renders a `PIXI.Sprite`.
  */
 export const Sprite = createSpriteComponent<PixiSprite, Pixi.SpriteOptions>(PixiSprite);
+
 /**
  * A SolidJS component that renders a `PIXI.Text`.
  */
 export const Text = createSpriteComponent<PixiText, Pixi.CanvasTextOptions>(PixiText);
+
+/**
+ * A SolidJS component that renders a `PIXI.SplitText`.
+ */
+export const SplitText = createLeafComponent<PixiSplitText, Pixi.SplitTextOptions>(PixiSplitText);
+
+/**
+ * A SolidJS component that renders a `PIXI.SplitBitmapText`.
+ */
+export const SplitBitmapText = createLeafComponent<
+  PixiSplitBitmapText,
+  Pixi.SplitBitmapTextOptions
+>(PixiSplitBitmapText);
 
 /**
  * A SolidJS component that renders a `PIXI.TilingSprite`.

@@ -34,6 +34,8 @@ import {
   RenderContainer,
   RenderLayer,
   Sprite,
+  SplitBitmapText,
+  SplitText,
   Text,
   TilingSprite,
 } from "pixi-solid";
@@ -68,8 +70,8 @@ available depend on the component type:
 
 | Component                                                                                                                   | Point-axis props                                                                                 |
 | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `Container`, `RenderContainer`, `RenderLayer`, `Graphics`, `ParticleContainer`                                              | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`                                                 |
-| `Sprite`, `Text`, `BitmapText`, `HTMLText`, `NineSliceSprite`, `MeshPlane`, `MeshRope`, `PerspectiveMesh`, `AnimatedSprite` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`                                    |
+| `Container`, `RenderContainer`, `RenderLayer`, `Graphics`, `MeshPlane`, `MeshRope`, `ParticleContainer`, `PerspectiveMesh`, `SplitText`, `SplitBitmapText` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`                                                 |
+| `Sprite`, `Text`, `BitmapText`, `HTMLText`, `NineSliceSprite`, `AnimatedSprite`                              | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`                                    |
 | `TilingSprite`                                                                                                              | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`, `tilePositionX/Y`, `tileScaleX/Y` |
 
 #### Why axis props?

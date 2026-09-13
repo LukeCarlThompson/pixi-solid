@@ -64,7 +64,7 @@ type LeafProps<Component> = PixiSolidEventHandlerMap &
   CommonPointAxisProps & { ref?: Ref<Component>; as?: Component };
 ```
 
-Used by: `Graphics`, `ParticleContainer`.
+Used by: `Graphics`, `MeshPlane`, `MeshRope`, `ParticleContainer`, `PerspectiveMesh`, `SplitText`, `SplitBitmapText`.
 
 Example — `ParticleContainer` usage:
 
@@ -104,7 +104,7 @@ type SpriteProps<Component> = PixiSolidEventHandlerMap &
   AnchorPointAxisProps & { ref?: Ref<Component>; as?: Component };
 ```
 
-Used by: `Sprite`, `BitmapText`, `HTMLText`, `MeshPlane`, `MeshRope`, `NineSliceSprite`, `PerspectiveMesh`, `Text`.
+Used by: `Sprite`, `BitmapText`, `HTMLText`, `NineSliceSprite`, `Text`.
 
 ### `AnimatedSpriteProps<Component>`
 
@@ -134,13 +134,13 @@ Used by: `TilingSprite`.
 
 The table below shows which axis props are available on each component:
 
-| Component                                                                                                 | Point-axis props                                                                                 |
-| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `Container`, `RenderContainer`, `RenderLayer`                                                             | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`                                                 |
-| `Graphics`, `ParticleContainer`                                                                           | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`                                                 |
-| `Sprite`, `Text`, `BitmapText`, `HTMLText`, `NineSliceSprite`, `MeshPlane`, `MeshRope`, `PerspectiveMesh` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`                                    |
-| `AnimatedSprite`                                                                                          | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`                                    |
-| `TilingSprite`                                                                                            | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`, `tilePositionX/Y`, `tileScaleX/Y` |
+| Component                                                                                                   | Point-axis props                                                                                 |
+| ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `Container`, `RenderContainer`, `RenderLayer`                                                               | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`                                                 |
+| `Graphics`, `MeshPlane`, `MeshRope`, `ParticleContainer`, `PerspectiveMesh`, `SplitText`, `SplitBitmapText` | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`                                                 |
+| `Sprite`, `Text`, `BitmapText`, `HTMLText`, `NineSliceSprite`                                               | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`                                    |
+| `AnimatedSprite`                                                                                            | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`                                    |
+| `TilingSprite`                                                                                              | `positionX/Y`, `scaleX/Y`, `pivotX/Y`, `skewX/Y`, `anchorX/Y`, `tilePositionX/Y`, `tileScaleX/Y` |
 
 ### Why axis props?
 
