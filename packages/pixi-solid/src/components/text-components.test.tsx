@@ -350,7 +350,9 @@ describe("SplitText", () => {
         text="Hello world"
         style={splitStyle}
         autoSplit={false}
-        charAnchor={0.5}
+        charAnchor={{ x: 0.25, y: 0.75 }}
+        wordAnchor={{ x: 0, y: 0.5 }}
+        lineAnchor={0.5}
         position={{ x: 10, y: 20 }}
         ref={(instance) => {
           splitTextRef = instance;
@@ -365,7 +367,9 @@ describe("SplitText", () => {
     expect(splitTextRef.text).toBe("Hello world");
     expect(splitTextRef.style.fontSize).toBe(24);
     expect(splitTextRef.style.fill).toBe(0xffffff);
-    expect(splitTextRef.charAnchor).toBe(0.5);
+    expect(splitTextRef.charAnchor).toEqual({ x: 0.25, y: 0.75 });
+    expect(splitTextRef.wordAnchor).toEqual({ x: 0, y: 0.5 });
+    expect(splitTextRef.lineAnchor).toBe(0.5);
     expect(splitTextRef.position.x).toBe(10);
     expect(splitTextRef.position.y).toBe(20);
     expect(splitTextRef.chars).toHaveLength(0);
