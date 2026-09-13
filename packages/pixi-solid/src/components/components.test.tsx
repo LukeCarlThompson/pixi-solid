@@ -7,16 +7,142 @@ import {
   Ticker,
   TilingSprite as PixiTilingSprite,
 } from "pixi.js";
+import type { JSX } from "solid-js";
 import { createSignal } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TickerProvider } from "../pixi-application";
 import { mountScene } from "../testing";
 
-import { AnimatedSprite, Container, RenderLayer, Sprite, TilingSprite } from "./components";
+import {
+  AnimatedSprite,
+  Container,
+  Graphics,
+  HTMLText,
+  MeshPlane,
+  MeshRope,
+  NineSliceSprite,
+  ParticleContainer,
+  PerspectiveMesh,
+  RenderContainer,
+  RenderLayer,
+  Sprite,
+  TilingSprite,
+} from "./components";
 
 afterEach(() => {
   vi.restoreAllMocks();
+});
+
+type ComponentSmokeCase = {
+  name: string;
+  render: (ref: (instance: Pixi.Container) => void) => JSX.Element;
+};
+
+const acceptsMeshPlaneProps = (props: Parameters<typeof MeshPlane>[0]) => props;
+const acceptsMeshRopeProps = (props: Parameters<typeof MeshRope>[0]) => props;
+const acceptsPerspectiveMeshProps = (props: Parameters<typeof PerspectiveMesh>[0]) => props;
+
+acceptsMeshPlaneProps({ texture: Texture.WHITE });
+acceptsMeshRopeProps({ texture: Texture.WHITE, points: [{ x: 0, y: 0 }] });
+acceptsPerspectiveMeshProps({ texture: Texture.WHITE });
+
+// @ts-expect-error MeshPlane is a mesh, not a sprite, and has no anchorX prop.
+acceptsMeshPlaneProps({ texture: Texture.WHITE, anchorX: 0.5 });
+// @ts-expect-error MeshRope is a mesh, not a sprite, and has no anchorX prop.
+acceptsMeshRopeProps({ texture: Texture.WHITE, points: [{ x: 0, y: 0 }], anchorX: 0.5 });
+// @ts-expect-error PerspectiveMesh is a mesh, not a sprite, and has no anchorX prop.
+acceptsPerspectiveMeshProps({ texture: Texture.WHITE, anchorX: 0.5 });
+
+const componentSmokeCases: ComponentSmokeCase[] = [
+  {
+    name: "Graphics",
+    render: (ref) => <Graphics ref={(instance) => ref(instance)} />,
+  },
+  {
+    name: "HTMLText",
+    render: (ref) => (
+      <HTMLText ref={(instance) => ref(instance)} text="hello" style={{ fontSize: 16 }} />
+    ),
+  },
+  {
+    name: "MeshPlane",
+    render: (ref) => (
+      <MeshPlane
+        ref={(instance) => ref(instance)}
+        texture={Texture.WHITE}
+        verticesX={2}
+        verticesY={2}
+      />
+    ),
+  },
+  {
+    name: "MeshRope",
+    render: (ref) => (
+      <MeshRope
+        ref={(instance) => ref(instance)}
+        texture={Texture.WHITE}
+        points={[
+          { x: 0, y: 0 },
+          { x: 10, y: 0 },
+        ]}
+      />
+    ),
+  },
+  {
+    name: "NineSliceSprite",
+    render: (ref) => (
+      <NineSliceSprite
+        ref={(instance) => ref(instance)}
+        texture={Texture.WHITE}
+        width={32}
+        height={32}
+      />
+    ),
+  },
+  {
+    name: "ParticleContainer",
+    render: (ref) => <ParticleContainer ref={(instance) => ref(instance)} />,
+  },
+  {
+    name: "PerspectiveMesh",
+    render: (ref) => (
+      <PerspectiveMesh
+        ref={(instance) => ref(instance)}
+        texture={Texture.WHITE}
+        verticesX={2}
+        verticesY={2}
+      />
+    ),
+  },
+  {
+    name: "RenderContainer",
+    render: (ref) => <RenderContainer ref={(instance) => ref(instance)} />,
+  },
+];
+
+describe("Exported component smoke tests", () => {
+  for (const { name, render } of componentSmokeCases) {
+    it(`GIVEN the ${name} export WHEN mounted THEN it creates and cleans up its Pixi instance`, () => {
+      let instance: Pixi.Container | undefined;
+
+      const { dispose } = mountScene(() =>
+        render((value) => {
+          instance = value;
+        }),
+      );
+
+      if (!instance) {
+        throw new Error(`${name} ref was not set`);
+      }
+
+      const destroySpy = vi.spyOn(instance, "destroy");
+
+      dispose();
+
+      expect(destroySpy).toHaveBeenCalledWith({ children: true });
+    });
+  }
 });
 
 describe("Component Factory Cleanup on Unmount", () => {
@@ -436,6 +562,44 @@ describe("AnimatedSprite ticker integration", () => {
 
       dispose();
     }).toThrow();
+  });
+});
+
+describe("TilingSprite-specific point props", () => {
+  it("GIVEN reactive tile point props WHEN their signals change THEN each point updates", () => {
+    const [tilePosition, setTilePosition] = createSignal({ x: 10, y: 20 });
+    const [tileScale, setTileScale] = createSignal({ x: 2, y: 3 });
+    let tilingSpriteRef: Pixi.TilingSprite | undefined;
+
+    const { dispose } = mountScene(() => (
+      <TilingSprite
+        texture={Texture.WHITE}
+        tilePosition={tilePosition()}
+        tileScale={tileScale()}
+        ref={(instance) => {
+          tilingSpriteRef = instance;
+        }}
+      />
+    ));
+
+    if (!tilingSpriteRef) {
+      throw new Error("TilingSprite ref was not set");
+    }
+
+    expect(tilingSpriteRef.tilePosition.x).toBe(10);
+    expect(tilingSpriteRef.tilePosition.y).toBe(20);
+    expect(tilingSpriteRef.tileScale.x).toBe(2);
+    expect(tilingSpriteRef.tileScale.y).toBe(3);
+
+    setTilePosition({ x: 30, y: 40 });
+    setTileScale({ x: 4, y: 5 });
+
+    expect(tilingSpriteRef.tilePosition.x).toBe(30);
+    expect(tilingSpriteRef.tilePosition.y).toBe(40);
+    expect(tilingSpriteRef.tileScale.x).toBe(4);
+    expect(tilingSpriteRef.tileScale.y).toBe(5);
+
+    dispose();
   });
 });
 

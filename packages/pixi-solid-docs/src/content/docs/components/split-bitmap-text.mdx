@@ -1,0 +1,48 @@
+---
+title: Split Bitmap Text
+description: A SolidJS component that renders a PixiJS SplitBitmapText container for efficient per-character, per-word, and per-line animation.
+---
+
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/split-bitmap-text.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
+`SplitBitmapText` renders text as separate bitmap text segments. Use the exposed `chars`, `words`, and `lines` arrays when you need to animate many text segments efficiently.
+
+`SplitBitmapText` is a `Container`, not a sprite, so it does not have an outer `anchor` or `anchorX`/`anchorY` prop. Position the split text with `x`, `y`, or `position`; use `charAnchor`, `wordAnchor`, and `lineAnchor` for the segment transform origins.
+
+Please see the [PixiJS SplitBitmapText docs](https://pixijs.download/release/docs/text.SplitBitmapText.html) for detailed information about the PixiJS API.
+
+`SplitBitmapText` uses a bitmap font atlas. Install or load the font before rendering the component. It is a good choice for long strings, frequently changing text, or many simultaneous per-character animations.
+
+### Demo
+
+<ClientOnly fileName="split-bitmap-text" client:load />
+
+### Code example
+
+<Code code={demoCode} lang="tsx" title="split-bitmap-text-demo.tsx" />
+
+### Bitmap fonts
+
+Install a bitmap font before creating `SplitBitmapText`:
+
+```tsx
+import { SplitBitmapText } from "pixi-solid";
+import { BitmapFont } from "pixi.js";
+
+BitmapFont.install({
+  name: "GameFont",
+  style: {
+    fontFamily: "Arial",
+    fontSize: 40,
+  },
+});
+
+<SplitBitmapText
+  text="Fast per-character animation"
+  style={{ fontFamily: "GameFont", fontSize: 40, fill: "white" }}
+/>
+```
+
+The component exposes the same `chars`, `words`, `lines`, `autoSplit`, and transform-origin props as [`SplitText`](../split-text/). The character segments use bitmap text, so they inherit BitmapText's font atlas and glyph coverage requirements.
