@@ -1,2 +1,9 @@
 packages:
   - packages/*
+allowBuilds:
+  "@parcel/watcher": true
+  esbuild: true
+  sharp: true
+overrides:
+  pixi.js: 8.20.1
+  solid-js: 1.9.15
