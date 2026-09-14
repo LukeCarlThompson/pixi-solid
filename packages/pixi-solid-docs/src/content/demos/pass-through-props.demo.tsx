@@ -1,5 +1,5 @@
-import { getPixiApp, onTick, PixiCanvas, Text } from "pixi-solid";
-import { objectFit } from "pixi-solid/utils";
+import { PixiCanvas, Text, usePixiScreen, Sprite } from "pixi-solid";
+import { ObjectFitContainer } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
 import { createResource, createSignal, Show } from "solid-js";
@@ -12,10 +12,11 @@ import birdAssetUrl_05 from "@/assets/bird_05.png";
 import birdAssetUrl_06 from "@/assets/bird_06.png";
 import skyAssetUrl from "@/assets/sky.png";
 
-import { Sky } from "./pass-through-props";
+import { Bird } from "./pass-through-props";
 
 const DemoComponent = () => {
   const [flyingSpeed, setFlyingSpeed] = createSignal(1);
+  const pixiScreen = usePixiScreen();
 
   const [texturesResource] = createResource(async () => {
     await Assets.init();
@@ -37,32 +38,34 @@ const DemoComponent = () => {
   const handlePointerMove = (e: Pixi.FederatedPointerEvent) => {
     const notInsideCanvas =
       e.global.x < 0 ||
-      e.global.x > e.currentTarget.width ||
+      e.global.x > pixiScreen.width ||
       e.global.y < 0 ||
-      e.global.y > e.currentTarget.height;
+      e.global.y > pixiScreen.height;
     if (notInsideCanvas) return;
 
-    const speed = Math.min(Math.max((e.global.x / e.currentTarget.width) * 2, 0), 2);
+    const speed = Math.min(Math.max((e.global.x / pixiScreen.width) * 2, 0), 2);
     setFlyingSpeed(speed);
   };
   return (
     <Show when={texturesResource()}>
-      {/* Here on our `Sky` custom component we can also set any valid ContainerOptions and they will be passed through to the underlying Container */}
-      <Sky
+      <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode={"cover"}>
+        <Sprite
+          texture={Assets.get<Pixi.Texture>("sky")}
+          onglobalpointermove={handlePointerMove}
+          eventMode="static"
+        />
+      </ObjectFitContainer>
+      {/* Here on our `Bird` custom component we can also set any of the ContainerOptions we picked and they will be passed through to the underlying Container */}
+      <Bird
         flyingSpeed={flyingSpeed()}
-        onglobalpointermove={handlePointerMove}
-        eventMode="static"
-        tint={"#fff0a6"}
-        ref={(component) => {
-          const app = getPixiApp();
-          onTick(() => {
-            objectFit(component, app.renderer, "cover");
-          });
-        }}
+        x={pixiScreen.width / 2}
+        y={pixiScreen.height / 2}
+        scale={2}
       />
       <Text
         text={`Flying Speed: ${flyingSpeed().toFixed(2)}`}
-        position={{ x: 10, y: 10 }}
+        x={10}
+        y={10}
         style={{
           fill: "#ffffff",
           fontSize: 16,

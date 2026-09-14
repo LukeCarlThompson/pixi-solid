@@ -1,5 +1,5 @@
 import { Container, Graphics, PixiCanvas, Sprite, usePixiScreen } from "pixi-solid";
-import { objectFit } from "pixi-solid/utils";
+import { ObjectFitContainer } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
 import { createResource, onCleanup, Show } from "solid-js";
@@ -33,14 +33,9 @@ const DemoComponent = () => {
             instance.circle(0, 0, 100).fill(0x000000);
           }}
         />
-        <Sprite
-          label="sky"
-          texture={Assets.get<Pixi.Texture>("sky")}
-          mask={graphicsRef}
-          ref={(instance) => {
-            objectFit(instance, pixiScreen, "cover");
-          }}
-        />
+        <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode="cover">
+          <Sprite label="sky" texture={Assets.get<Pixi.Texture>("sky")} mask={graphicsRef} />
+        </ObjectFitContainer>
       </Container>
     </Show>
   );

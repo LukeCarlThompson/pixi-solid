@@ -1,18 +1,15 @@
 import type { PixiComponentProps } from "pixi-solid";
-import { AnimatedSprite, Container, onTick, Sprite } from "pixi-solid";
+import { AnimatedSprite, onTick, Container } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import type { Ref } from "solid-js";
 import { splitProps } from "solid-js";
 
-// Using the utility PixiComponentProps type to allow passing through any ContainerOptions props as well as adding a ref type to forward the ref to an internal Container.
-export type SkyProps = PixiComponentProps & {
-  ref?: Ref<Pixi.Container>;
+// Using the utility PixiComponentProps type to allow passing through any ContainerOptions props by default or accepts a generic for the specific Pixi component options we want to support.
+export type BirdProps = Pick<PixiComponentProps, "position" | "x" | "y" | "angle" | "scale"> & {
   flyingSpeed: number;
 };
 
-export const Sky = (props: SkyProps) => {
-  const skyTexture = Assets.get<Pixi.Texture>("sky");
+export const Bird = (props: BirdProps) => {
   const birdTextures = Assets.get<Pixi.Texture>([
     "bird_01",
     "bird_02",
@@ -22,24 +19,23 @@ export const Sky = (props: SkyProps) => {
     "bird_06",
   ]);
 
-  // Splitting out flyingSpeed so we pass only the valid Container props to our Container
+  // Splitting out flyingSpeed so we pass only the valid Container props to our AnimatedSprite
   const [, containerProps] = splitProps(props, ["flyingSpeed"]);
 
   return (
     // Spread the containerProps to pass through all valid Container options and the ref
     <Container {...containerProps}>
-      <Sprite texture={skyTexture} />
       <AnimatedSprite
-        scale={0.5}
         textures={Object.values(birdTextures)}
         animationSpeed={0.4 * props.flyingSpeed}
+        autoPlay={true}
+        anchor={0.5}
         ref={(bird) => {
-          bird.play();
           let time = 0;
           onTick((ticker) => {
             time = time + ticker.deltaTime * props.flyingSpeed;
-            bird.position.x = Math.sin(time / 90) * 20 + 60;
-            bird.position.y = Math.cos(time / 30) * 25 + 30;
+            bird.position.x = Math.sin(time / 90) * 20;
+            bird.position.y = Math.cos(time / 30) * 25;
           });
         }}
       />

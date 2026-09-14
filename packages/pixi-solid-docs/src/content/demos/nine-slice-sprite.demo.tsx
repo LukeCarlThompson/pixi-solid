@@ -1,4 +1,4 @@
-import { getPixiApp, NineSliceSprite, onTick, PixiCanvas, usePixiScreen } from "pixi-solid";
+import { NineSliceSprite, onTick, PixiCanvas, usePixiScreen } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
 import { createResource, Show } from "solid-js";
@@ -25,8 +25,6 @@ const DemoComponent = () => {
         x={pixiScreen.width * 0.5}
         y={pixiScreen.height * 0.5}
         ref={(sprite) => {
-          const app = getPixiApp();
-
           let cumulativeDeltaTime = 0;
 
           onTick((ticker) => {
@@ -34,11 +32,9 @@ const DemoComponent = () => {
 
             // Change the width and height to show dynamic scaling with stable corner scale
             sprite.width =
-              (Math.abs(Math.sin(cumulativeDeltaTime * 0.01)) * 0.8 + 0.2) *
-              app.renderer.screen.width;
+              (Math.abs(Math.sin(cumulativeDeltaTime * 0.01)) * 0.8 + 0.2) * pixiScreen.width;
             sprite.height =
-              (Math.abs(Math.sin(cumulativeDeltaTime * 0.003)) * 0.8 + 0.2) *
-              app.renderer.screen.height;
+              (Math.abs(Math.sin(cumulativeDeltaTime * 0.003)) * 0.8 + 0.2) * pixiScreen.height;
           });
         }}
       />
