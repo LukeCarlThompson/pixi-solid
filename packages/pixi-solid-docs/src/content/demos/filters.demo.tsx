@@ -1,5 +1,5 @@
 import { PixiCanvas, Sprite, usePixiScreen } from "pixi-solid";
-import { objectFit } from "pixi-solid/utils";
+import { ObjectFitContainer } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets, BlurFilter, TextureStyle } from "pixi.js";
 import { createEffect, createResource, createSignal, onCleanup, Show } from "solid-js";
@@ -38,37 +38,35 @@ const DemoComponent = () => {
   const handlePointerMove = (e: Pixi.FederatedPointerEvent) => {
     const notInsideCanvas =
       e.global.x < 0 ||
-      e.global.x > e.currentTarget.width ||
+      e.global.x > pixiScreen.width ||
       e.global.y < 0 ||
-      e.global.y > e.currentTarget.height;
+      e.global.y > pixiScreen.height;
     if (notInsideCanvas) return;
 
-    const newBlurAmount = Math.min(Math.max((e.global.x / e.currentTarget.width) * 10, 0), 10);
+    const newBlurAmount = Math.min(Math.max((e.global.x / pixiScreen.width) * 10, 0), 10);
     setBlurAmount(newBlurAmount);
   };
 
   return (
     <Show when={textureResource()}>
       {/* Show our Stage when the assets are loaded */}
-      <Sprite
-        label="sky"
-        texture={Assets.get<Pixi.Texture>("sky")}
-        filters={blurFilter}
-        eventMode="static"
-        onglobalpointermove={handlePointerMove}
-        ref={(instance) => {
-          objectFit(instance, pixiScreen, "cover");
-        }}
-      />
+      <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode="cover">
+        <Sprite
+          label="sky"
+          texture={Assets.get<Pixi.Texture>("sky")}
+          filters={blurFilter}
+          eventMode="static"
+          onglobalpointermove={handlePointerMove}
+        />
+      </ObjectFitContainer>
+
       <Sprite
         label="bird"
         texture={Assets.get<Pixi.Texture>("bird")}
         scale={2}
         anchor={0.5}
-        ref={(instance) => {
-          instance.x = pixiScreen.width * 0.5;
-          instance.y = pixiScreen.height * 0.5;
-        }}
+        x={pixiScreen.width * 0.5}
+        y={pixiScreen.height * 0.5}
       />
     </Show>
   );

@@ -1,5 +1,5 @@
 import { PerspectiveMesh, PixiCanvas, usePixiScreen } from "pixi-solid";
-import { objectFit } from "pixi-solid/utils";
+import { ObjectFitContainer } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
 import { createResource, Show } from "solid-js";
@@ -15,23 +15,22 @@ const DemoComponent = () => {
 
   return (
     <Show when={textureResource()}>
-      <PerspectiveMesh
-        label="Ground"
-        texture={Assets.get("ground")}
-        verticesX={20}
-        verticesY={20}
-        x0={50}
-        y0={20}
-        x1={150}
-        y1={20}
-        x2={200}
-        y2={60}
-        x3={0}
-        y3={60}
-        ref={(component) => {
-          objectFit(component, pixiScreen, "contain");
-        }}
-      />
+      <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode={"contain"}>
+        <PerspectiveMesh
+          label="Ground"
+          texture={Assets.get("ground")}
+          verticesX={20}
+          verticesY={20}
+          x0={50}
+          y0={20}
+          x1={150}
+          y1={20}
+          x2={200}
+          y2={60}
+          x3={0}
+          y3={60}
+        />
+      </ObjectFitContainer>
     </Show>
   );
 };
