@@ -2,8 +2,13 @@ packages:
   - packages/*
 allowBuilds:
   "@parcel/watcher": true
+  canvas: true
   esbuild: true
   sharp: true
+minimumReleaseAgeExclude:
+  - '@vitest/mocker@5.0.1'
+  - '@vitest/spy@5.0.1'
+  - vitest@5.0.1
 overrides:
   pixi.js: 8.20.1
   solid-js: 1.9.15

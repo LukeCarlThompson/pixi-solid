@@ -6,7 +6,7 @@ import { Ticker } from "pixi.js";
  *
  * The driver methods are async: after every tick they flush microtasks so
  * promise-based continuations (e.g. an animation `onEnded`, an awaited
- * `delay`) run before the next tick. Successive calls are additive — the
+ * `createAsyncDelay`) run before the next tick. Successive calls are additive — the
  * ticker owns a monotonic absolute clock that is never reset between calls.
  *
  * @example
@@ -68,7 +68,7 @@ export const createManualTicker = (): ManualTicker => {
 
   // Flush microtasks between ticks so async continuations (promises resolved
   // during a tick) run before the next tick. Two flushes resolve one-level
-  // and two-level chains (delay -> store action, glide end -> settle start);
+  // and two-level chains (createAsyncDelay -> store action, glide end -> settle start);
   // the second flush is safety margin.
   const flushMicrotasks = async (): Promise<void> => {
     await Promise.resolve();

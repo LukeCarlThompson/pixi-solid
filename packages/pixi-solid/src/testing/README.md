@@ -121,7 +121,7 @@ await ctx.ticker.fastForwardFrames(3);
 expect(result().time).toBe(48);
 ```
 
-> **Note:** the ticker driver methods (`fastForwardFrames`, `fastForwardTime`) are **async** — always `await` them. They flush microtasks after every tick so promise-based continuations (awaited `delay`, animation `onEnded` chains) receive subsequent ticks without manual flushing in tests. Successive calls are additive: they share one monotonic absolute clock.
+> **Note:** the ticker driver methods (`fastForwardFrames`, `fastForwardTime`) are **async** — always `await` them. They flush microtasks after every tick so promise-based continuations (awaited `createAsyncDelay`, animation `onEnded` chains) receive subsequent ticks without manual flushing in tests. Successive calls are additive: they share one monotonic absolute clock.
 
 **Error testing** (missing context throws eagerly, at `renderHook()` call time):
 
