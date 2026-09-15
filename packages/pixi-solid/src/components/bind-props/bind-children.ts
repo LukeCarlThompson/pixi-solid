@@ -51,7 +51,6 @@ export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.E
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Invalid children", nextChildren);
         throw new InvalidChildTypeError(error);
       } else {
         throw error;
@@ -94,7 +93,6 @@ export const bindChildrenToRenderLayer = (
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Invalid children", nextChildren);
         throw new InvalidChildTypeError(error);
       } else {
         throw error;

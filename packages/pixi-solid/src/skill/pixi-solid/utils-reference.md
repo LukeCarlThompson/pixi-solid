@@ -11,7 +11,7 @@ This subskill covers every publicly exported utility from `pixi-solid/utils`. Us
 
 ```ts
 import {
-  delay,
+  createDelay,
   createAsyncDelay,
   ObjectFitContainer,
   objectFit,
@@ -29,38 +29,50 @@ import type {
   ObjectFitContainerProps,
   Spring,
   UseSpringProps,
+  DelayFunction,
   AsyncDelayFunction,
 } from "pixi-solid/utils";
 ```
 
 ## Delay utilities
 
-### `delay(ms, callback)`
+### `createDelay()`
 
-Runs a callback when a given number of milliseconds has passed on the ticker.
+Creates a callback-based delay function bound to the current ticker.
 
 ```ts
-type delay = (delayMs: number, callback?: () => void) => void;
+type DelayFunction = (delayMs: number, callback: () => void) => void;
+type createDelay = () => DelayFunction;
 ```
 
-**Parameters:**
+Call `createDelay` synchronously inside a descendant of `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider`. The returned function captures that ticker and can be called later from event handlers, ticker callbacks, async continuations, or nested delay callbacks.
+
+**Parameters (returned function):**
 
 - `delayMs` — Number of milliseconds to wait (measured in the ticker's time units).
 - `callback` — A callback function that fires when `delayMs` has passed.
-
-**Constraints:** Must be called within a `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` context.
 
 **Note:** Does not run if the ticker is paused or stopped.
 
 **Example:**
 
 ```tsx
-import { delay } from "pixi-solid/utils";
+import { createDelay } from "pixi-solid/utils";
 
-const handleClick = () => {
-  delay(1000, () => {
-    console.log("One second later, ticker-synced");
-  });
+const DelayedCallbackComponent = () => {
+  const delay = createDelay();
+
+  const handleClick = () => {
+    delay(1000, () => {
+      console.log("One second later, ticker-synced");
+
+      delay(500, () => {
+        console.log("Nested delay complete");
+      });
+    });
+  };
+
+  return <Text text="Click me" onpointerdown={handleClick} />;
 };
 ```
 
@@ -287,7 +299,7 @@ const damp = useSmoothDamp({ to: target, smoothTimeMs: 500 });
 
 ## Utility usage patterns
 
-- **`delay`** — Use when you just need a callback after a ticker-synced wait (e.g. in event handlers or effects).
+- **`createDelay`** — Create once inside provider context when you need callback-based ticker-synced waits, including nested delays from event handlers or async continuations.
 - **`createAsyncDelay`** — Use when you need to `await` a ticker-synced wait from async code. Create it synchronously inside a tracked descendant of `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`, then reuse it later.
 - **`ObjectFitContainer`** — Use when children should be laid out reactively inside a fixed region.
 - **`objectFit`** — Use when you want the same behavior imperatively on a container.
@@ -295,4 +307,4 @@ const damp = useSmoothDamp({ to: target, smoothTimeMs: 500 });
 - **`useSmoothDamp`** — Use when you want softer damped interpolation without overshoot.
 - **`observeBounds`** — Only use when the container size changes dynamically. It remeasures every tick, which runs on every frame and is a performance concern.
 - Ticker-synced utilities do not advance while the ticker is paused or stopped.
-- Both `delay` and `createAsyncDelay` throw if called outside of a `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` context.
+- Both `createDelay` and `createAsyncDelay` throw if called outside of a `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` context.

@@ -130,25 +130,26 @@ Props accepted:
 
 - `ticker` — An existing `Pixi.Ticker` instance. This is the only required prop.
 
-Use `TickerProvider` when:
+Use `TickerProvider` mainly when:
 
-- You already have a `Pixi.Ticker` instance to pass as the `ticker` prop.
-- You need ticker context for testing (e.g. controlled ticker with manual advancement).
-- You need a subtree that runs on its own independent ticker.
+- A scene graph branch needs an independently managed ticker.
+- Different branches need different rates or clocks.
+- You need to integrate an existing ticker owned by another system.
+- A non-standard integration must populate ticker context for descendants outside the normal application provider tree.
 
-See [testing](./testing.md) for recommended TickerProvider test patterns and examples.
+These are edge cases. `PixiCanvas` and `PixiApplicationProvider` provide ticker context for normal scenes. Use `createManualTicker` and `createTestContext` for testing instead of using `TickerProvider` as a test harness.
 
 `TickerProvider` provides context for:
 
 - `getTicker` — returns the provided ticker.
 - `onTick` — registers callbacks on each ticker update.
-- `delay` and `createAsyncDelay` — ticker-synced delays.
+- `createDelay` and `createAsyncDelay` — ticker-synced delays.
 
 ## Choosing the right provider
 
 - **`PixiCanvas`** — default for most apps. Simplest setup; canvas owned directly by the component tree.
 - **`PixiApplicationProvider`** — flexible choice for shared app context. Use when HTML outside the canvas needs hooks, or when passing `existingApp`.
-- **`TickerProvider`** — only when you have an existing ticker. Testing or independent ticker subtrees.
+- **`TickerProvider`** — overrides ticker context for descendants, mainly for independent ticker scene branches and other edge-case integrations.
 
 ## Provider requirements
 

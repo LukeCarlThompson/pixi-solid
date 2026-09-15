@@ -15,7 +15,7 @@ type ManualTicker = {
 };
 ```
 
-The driver methods are **async** — always `await` them. They own a monotonic absolute clock, so successive calls are exactly additive (no dropped first frame), and they flush microtasks after every tick so promise-based continuations (awaited `delay`, animation `onEnded` chains) receive subsequent ticks.
+The driver methods are **async** — always `await` them. They own a monotonic absolute clock, so successive calls are exactly additive (no dropped first frame), and they flush microtasks after every tick so promise-based continuations (awaited `createAsyncDelay`, animation `onEnded` chains) receive subsequent ticks.
 
 ## fastForwardFrames()
 

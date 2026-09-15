@@ -1,20 +1,17 @@
 ---
 title: TickerProvider
-description: A Solid.js component that provides a custom Pixi.js Ticker instance to the context.
+description: Provide an alternate Pixi.js Ticker to a scene graph subtree.
 sidebar:
   order: 4
 ---
 
-The `TickerProvider` component allows you to provide a custom `Pixi.Ticker` instance to child components without requiring a full `PixiApplication` or `PixiCanvas`.
+`TickerProvider` supplies a `Pixi.Ticker` to descendants through context. It does not create or add anything to the Pixi scene graph.
 
-It can be used to wrap subtrees of components that you want to provide an additional ticker context to support multiple independent tickers in the same application.
+`PixiCanvas` and `PixiApplicationProvider` already provide ticker context. Use `TickerProvider` when a scene graph branch needs a different ticker instance. Descendants can use `onTick`, `createDelay`, `createAsyncDelay`, and `getTicker` with that ticker.
 
-This component provides context for ticker-dependent utilities like `onTick`, `delay`, `createAsyncDelay`, and `getTicker`.
+## Example
 
-## Independent ticker context for subtrees
-
-You can also nest `TickerProvider` to give a specific subtree its own independent ticker while the rest of the application uses the default ticker.
-This is useful when you want different parts of your scene to animate at different rates or be controlled separately.
+This branch runs at half speed while the rest of the scene uses the canvas ticker.
 
 ```tsx
 import { PixiCanvas, Container, TickerProvider, onTick } from "pixi-solid";
@@ -34,12 +31,12 @@ const RotatingSprite = () => {
 };
 
 export const DemoApp = () => {
-  // Create a separate ticker for the slow-moving subtree
+  // Create a separate ticker for one scene graph branch.
   const slowTicker = new Ticker();
   slowTicker.speed = 0.5; // Half speed
   slowTicker.start();
 
-  // Cleanup the ticker when the component unmounts to prevent memory leaks
+  // The caller owns this externally-created ticker.
   onCleanup(() => {
     slowTicker.stop();
     slowTicker.destroy();
@@ -61,8 +58,6 @@ export const DemoApp = () => {
 };
 ```
 
-In this example, the first `RotatingSprite` rotates at normal speed using the canvas's default ticker, while the second `RotatingSprite` inside the `TickerProvider` rotates at half speed using its own custom ticker.
-
 ### Props
 
 - `ticker: Pixi.Ticker` - The ticker instance to provide to child components (required)
@@ -70,18 +65,17 @@ In this example, the first `RotatingSprite` rotates at normal speed using the ca
 
 ### When to use it
 
-- When you need ticker functionality without a full PixiJS application
-- When integrating multiple independent Pixi.js rendering contexts
-- For advanced scenarios where you need manual control over the ticker instance
-- When using ticker utilities like `onTick` or `delay` outside of a `PixiCanvas`
+`TickerProvider` is an edge-case provider. Use it when:
 
-## Relationship to other components
+- A scene graph branch needs an independently managed ticker, such as a different rate or clock.
+- An existing ticker owned by another system must drive a branch.
+- A non-standard integration must populate ticker context outside the normal application provider tree.
 
-- `PixiCanvas` and `PixiApplicationProvider` both internally provide a ticker through context
-- `TickerProvider` is a lighter-weight alternative when you only need ticker functionality
-- Use `TickerProvider` if you need a ticker for utilities but don't need a full Pixi Application instance
+For normal scenes, use `PixiCanvas` or `PixiApplicationProvider`. For tests, use `createManualTicker` and `createTestContext` instead.
+
+The caller owns the ticker passed to `TickerProvider`. Create, start, stop, and destroy it outside the provider when appropriate.
 
 ## Further reading
 
 - Read more about the [`Pixi.Ticker` class](https://pixijs.com/8.x/guides/components/ticker) in the PixiJS documentation
-- See related hooks: [`onTick`](../hooks/on-tick.mdx), [`getTicker`](../hooks/get-ticker.mdx), [`delay`](../utils/delay.mdx), [`createAsyncDelay`](../utils/create-async-delay.mdx)
+- See related hooks: [`onTick`](../hooks/on-tick.mdx), [`getTicker`](../hooks/get-ticker.mdx), [`createDelay`](../utils/create-delay.mdx), [`createAsyncDelay`](../utils/create-async-delay.mdx)

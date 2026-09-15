@@ -1,0 +1,41 @@
+---
+title: createDelay
+description: Create a callback-based delay function synchronized with the Pixi.js Ticker.
+sidebar:
+  order: 3
+---
+
+The `createDelay` function creates a callback-based delay function synchronized with the nearest ticker context.
+
+Call `createDelay` synchronously inside a descendant of `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`. The returned function captures that ticker and can be called later from event handlers, ticker callbacks, async continuations, or nested delay callbacks.
+
+### Usage
+
+```tsx
+import { createDelay } from "pixi-solid/utils";
+import { Text } from "pixi-solid";
+
+const DelayedCallbackComponent = () => {
+  const delay = createDelay();
+
+  const handlePointerDown = () => {
+    console.log("Pointer down");
+    delay(1000, () => {
+      console.log("1 second has passed on the ticker");
+
+      delay(500, () => {
+        console.log("Nested delay complete");
+      });
+    });
+  };
+
+  return <Text text="Click me" onpointerdown={handlePointerDown} />;
+};
+```
+
+### When to use it
+
+- When you need callback-based execution synchronized with ticker time.
+- When you need nested callback delays from event handlers or async continuations.
+- For animations or other operations that depend on ticker timing.
+- To replace external time measurements such as `setTimeout` in ticker-dependent contexts.
