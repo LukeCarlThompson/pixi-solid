@@ -18,7 +18,27 @@ import {
   Text as PixiText,
   TilingSprite as PixiTilingSprite,
 } from "pixi.js";
+import type { Component } from "solid-js";
 
+import type {
+  AnimatedSpriteProps,
+  BitmapTextProps,
+  ContainerProps,
+  GraphicsProps,
+  HTMLTextProps,
+  MeshPlaneProps,
+  MeshRopeProps,
+  NineSliceSpriteProps,
+  ParticleContainerProps,
+  PerspectiveMeshProps,
+  RenderContainerProps,
+  RenderLayerProps,
+  SpriteProps,
+  SplitBitmapTextProps,
+  SplitTextProps,
+  TextProps,
+  TilingSpriteProps,
+} from "./component-props";
 import {
   createAnimatedSpriteComponent,
   createContainerComponent,
@@ -30,45 +50,61 @@ import {
 /**
  * A SolidJS component that renders a `PIXI.AnimatedSprite`.
  */
-export const AnimatedSprite = createAnimatedSpriteComponent<
+export const AnimatedSprite: Component<AnimatedSpriteProps> = createAnimatedSpriteComponent<
   PixiAnimatedSprite,
   Pixi.AnimatedSpriteOptions
 >(PixiAnimatedSprite);
 /**
  * A SolidJS component that renders a `PIXI.BitmapText`.
  */
-export const BitmapText = createSpriteComponent<PixiBitmapText, Pixi.TextOptions>(PixiBitmapText);
+export const BitmapText: Component<BitmapTextProps> = createSpriteComponent<
+  PixiBitmapText,
+  Pixi.TextOptions
+>(PixiBitmapText);
 /**
  * A SolidJS component that renders a `PIXI.Container`.
  */
-export const Container = createContainerComponent<PixiContainer, Pixi.ContainerOptions>(
+export const Container: Component<ContainerProps> = createContainerComponent<
   PixiContainer,
-);
+  Pixi.ContainerOptions
+>(PixiContainer);
 /**
  * A SolidJS component that renders a `PIXI.Graphics`.
  * Use a ref to access the underlying instance and call its imperative
  * draw methods (e.g. `rect()`, `fill()`, `stroke()`).
  */
-export const Graphics = createLeafComponent<PixiGraphics, Pixi.GraphicsOptions>(PixiGraphics);
+export const Graphics: Component<GraphicsProps> = createLeafComponent<
+  PixiGraphics,
+  Pixi.GraphicsOptions
+>(PixiGraphics);
 /**
  * A SolidJS component that renders a `PIXI.HTMLText`.
  */
-export const HTMLText = createSpriteComponent<PixiHTMLText, Pixi.HTMLTextOptions>(PixiHTMLText);
+export const HTMLText: Component<HTMLTextProps> = createSpriteComponent<
+  PixiHTMLText,
+  Pixi.HTMLTextOptions
+>(PixiHTMLText);
 
 /**
  * A SolidJS component that renders a `PIXI.MeshPlane`.
  */
-export const MeshPlane = createLeafComponent<PixiMeshPlane, Pixi.MeshPlaneOptions>(PixiMeshPlane);
+export const MeshPlane: Component<MeshPlaneProps> = createLeafComponent<
+  PixiMeshPlane,
+  Pixi.MeshPlaneOptions
+>(PixiMeshPlane);
 
 /**
  * A SolidJS component that renders a `PIXI.MeshRope`.
  */
-export const MeshRope = createLeafComponent<PixiMeshRope, Pixi.MeshRopeOptions>(PixiMeshRope);
+export const MeshRope: Component<MeshRopeProps> = createLeafComponent<
+  PixiMeshRope,
+  Pixi.MeshRopeOptions
+>(PixiMeshRope);
 
 /**
  * A SolidJS component that renders a `PIXI.NineSliceSprite`.
  */
-export const NineSliceSprite = createSpriteComponent<
+export const NineSliceSprite: Component<NineSliceSpriteProps> = createSpriteComponent<
   PixiNineSliceSprite,
   Pixi.NineSliceSpriteOptions
 >(PixiNineSliceSprite);
@@ -78,7 +114,7 @@ export const NineSliceSprite = createSpriteComponent<
  *
  * Particles should be added and removed from this component imperatively. Please see the docs for a reference example.
  */
-export const ParticleContainer = createLeafComponent<
+export const ParticleContainer: Component<ParticleContainerProps> = createLeafComponent<
   PixiParticleContainer,
   Pixi.ParticleContainerOptions
 >(PixiParticleContainer);
@@ -86,7 +122,7 @@ export const ParticleContainer = createLeafComponent<
 /**
  * A SolidJS component that renders a `PIXI.PerspectiveMesh`.
  */
-export const PerspectiveMesh = createLeafComponent<
+export const PerspectiveMesh: Component<PerspectiveMeshProps> = createLeafComponent<
   PixiPerspectiveMesh,
   Pixi.PerspectivePlaneOptions
 >(PixiPerspectiveMesh);
@@ -94,7 +130,7 @@ export const PerspectiveMesh = createLeafComponent<
 /**
  * A SolidJS component that renders a `PIXI.RenderContainer`.
  */
-export const RenderContainer = createContainerComponent<
+export const RenderContainer: Component<RenderContainerProps> = createContainerComponent<
   PixiRenderContainer,
   Pixi.RenderContainerOptions
 >(PixiRenderContainer);
@@ -102,29 +138,39 @@ export const RenderContainer = createContainerComponent<
 /**
  * A SolidJS component that renders a `PIXI.RenderLayer`.
  */
-export const RenderLayer = createContainerComponent<PixiRenderLayer, Pixi.RenderLayerOptions>(
+export const RenderLayer: Component<RenderLayerProps> = createContainerComponent<
   PixiRenderLayer,
-);
+  Pixi.RenderLayerOptions
+>(PixiRenderLayer);
 
 /**
  * A SolidJS component that renders a `PIXI.Sprite`.
  */
-export const Sprite = createSpriteComponent<PixiSprite, Pixi.SpriteOptions>(PixiSprite);
+export const Sprite: Component<SpriteProps> = createSpriteComponent<
+  PixiSprite,
+  Pixi.SpriteOptions
+>(PixiSprite);
 
 /**
  * A SolidJS component that renders a `PIXI.Text`.
  */
-export const Text = createSpriteComponent<PixiText, Pixi.CanvasTextOptions>(PixiText);
+export const Text: Component<TextProps> = createSpriteComponent<
+  PixiText,
+  Pixi.CanvasTextOptions
+>(PixiText);
 
 /**
  * A SolidJS component that renders a `PIXI.SplitText`.
  */
-export const SplitText = createLeafComponent<PixiSplitText, Pixi.SplitTextOptions>(PixiSplitText);
+export const SplitText: Component<SplitTextProps> = createLeafComponent<
+  PixiSplitText,
+  Pixi.SplitTextOptions
+>(PixiSplitText);
 
 /**
  * A SolidJS component that renders a `PIXI.SplitBitmapText`.
  */
-export const SplitBitmapText = createLeafComponent<
+export const SplitBitmapText: Component<SplitBitmapTextProps> = createLeafComponent<
   PixiSplitBitmapText,
   Pixi.SplitBitmapTextOptions
 >(PixiSplitBitmapText);
@@ -132,6 +178,7 @@ export const SplitBitmapText = createLeafComponent<
 /**
  * A SolidJS component that renders a `PIXI.TilingSprite`.
  */
-export const TilingSprite = createTilingSpriteComponent<PixiTilingSprite, Pixi.TilingSpriteOptions>(
+export const TilingSprite: Component<TilingSpriteProps> = createTilingSpriteComponent<
   PixiTilingSprite,
-);
+  Pixi.TilingSpriteOptions
+>(PixiTilingSprite);

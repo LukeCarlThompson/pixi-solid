@@ -1,37 +1,88 @@
-import type {
-  AnimatedSprite,
-  BitmapText,
-  Container,
-  Graphics,
-  HTMLText,
-  MeshPlane,
-  MeshRope,
-  NineSliceSprite,
-  ParticleContainer,
-  PerspectiveMesh,
-  RenderContainer,
-  RenderLayer,
-  Sprite,
-  SplitBitmapText,
-  SplitText,
-  Text,
-  TilingSprite,
-} from "./components";
+import type * as Pixi from "pixi.js";
+import type { JSX, Ref } from "solid-js";
 
-export type AnimatedSpriteProps = Parameters<typeof AnimatedSprite>[0];
-export type BitmapTextProps = Parameters<typeof BitmapText>[0];
-export type ContainerProps = Parameters<typeof Container>[0];
-export type GraphicsProps = Parameters<typeof Graphics>[0];
-export type HTMLTextProps = Parameters<typeof HTMLText>[0];
-export type MeshPlaneProps = Parameters<typeof MeshPlane>[0];
-export type MeshRopeProps = Parameters<typeof MeshRope>[0];
-export type NineSliceSpriteProps = Parameters<typeof NineSliceSprite>[0];
-export type ParticleContainerProps = Parameters<typeof ParticleContainer>[0];
-export type PerspectiveMeshProps = Parameters<typeof PerspectiveMesh>[0];
-export type RenderContainerProps = Parameters<typeof RenderContainer>[0];
-export type RenderLayerProps = Parameters<typeof RenderLayer>[0];
-export type SpriteProps = Parameters<typeof Sprite>[0];
-export type SplitBitmapTextProps = Parameters<typeof SplitBitmapText>[0];
-export type SplitTextProps = Parameters<typeof SplitText>[0];
-export type TextProps = Parameters<typeof Text>[0];
-export type TilingSpriteProps = Parameters<typeof TilingSprite>[0];
+import type { PixiSolidEventHandlerMap } from "./event-properties";
+import type { AnchorPointAxisProps, CommonPointAxisProps, TilingPointAxisProps } from "./factories";
+
+type InstanceProps<Instance extends Pixi.Container> = {
+  ref?: Ref<Instance>;
+  as?: Instance;
+};
+
+type CommonComponentProps = PixiSolidEventHandlerMap & CommonPointAxisProps;
+type SpriteComponentProps = CommonComponentProps & AnchorPointAxisProps;
+type TilingComponentProps = SpriteComponentProps & TilingPointAxisProps;
+
+export type AnimatedSpriteProps = SpriteComponentProps &
+  Omit<Pixi.AnimatedSpriteOptions, "children"> &
+  InstanceProps<Pixi.AnimatedSprite>;
+
+export type BitmapTextProps = SpriteComponentProps &
+  Omit<Pixi.TextOptions, "children"> &
+  InstanceProps<Pixi.BitmapText>;
+
+export type ContainerProps = CommonComponentProps &
+  Omit<Pixi.ContainerOptions, "children"> &
+  InstanceProps<Pixi.Container> & {
+    children?: JSX.Element;
+  };
+
+export type GraphicsProps = CommonComponentProps &
+  Omit<Pixi.GraphicsOptions, "children"> &
+  InstanceProps<Pixi.Graphics>;
+
+export type HTMLTextProps = SpriteComponentProps &
+  Omit<Pixi.HTMLTextOptions, "children"> &
+  InstanceProps<Pixi.HTMLText>;
+
+export type MeshPlaneProps = CommonComponentProps &
+  Omit<Pixi.MeshPlaneOptions, "children"> &
+  InstanceProps<Pixi.MeshPlane>;
+
+export type MeshRopeProps = CommonComponentProps &
+  Omit<Pixi.MeshRopeOptions, "children"> &
+  InstanceProps<Pixi.MeshRope>;
+
+export type NineSliceSpriteProps = SpriteComponentProps &
+  Omit<Pixi.NineSliceSpriteOptions, "children"> &
+  InstanceProps<Pixi.NineSliceSprite>;
+
+export type ParticleContainerProps = CommonComponentProps &
+  Omit<Pixi.ParticleContainerOptions, "children"> &
+  InstanceProps<Pixi.ParticleContainer>;
+
+export type PerspectiveMeshProps = CommonComponentProps &
+  Omit<Pixi.PerspectivePlaneOptions, "children"> &
+  InstanceProps<Pixi.PerspectiveMesh>;
+
+export type RenderContainerProps = CommonComponentProps &
+  Omit<Pixi.RenderContainerOptions, "children"> &
+  InstanceProps<Pixi.RenderContainer> & {
+    children?: JSX.Element;
+  };
+
+export type RenderLayerProps = CommonComponentProps &
+  Omit<Pixi.RenderLayerOptions, "children"> &
+  InstanceProps<Pixi.RenderLayer> & {
+    children?: JSX.Element;
+  };
+
+export type SpriteProps = SpriteComponentProps &
+  Omit<Pixi.SpriteOptions, "children"> &
+  InstanceProps<Pixi.Sprite>;
+
+export type SplitBitmapTextProps = CommonComponentProps &
+  Omit<Pixi.SplitBitmapTextOptions, "children"> &
+  InstanceProps<Pixi.SplitBitmapText>;
+
+export type SplitTextProps = CommonComponentProps &
+  Omit<Pixi.SplitTextOptions, "children"> &
+  InstanceProps<Pixi.SplitText>;
+
+export type TextProps = SpriteComponentProps &
+  Omit<Pixi.CanvasTextOptions, "children"> &
+  InstanceProps<Pixi.Text>;
+
+export type TilingSpriteProps = TilingComponentProps &
+  Omit<Pixi.TilingSpriteOptions, "children"> &
+  InstanceProps<Pixi.TilingSprite>;

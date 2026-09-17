@@ -49,11 +49,19 @@ Use this when building your own Pixi-backed component and you want consumers to 
 
 Each component has a concrete prop type. These types match component signatures and include Pixi options, Solid props, event props, and axis props.
 
+Concrete prop types combine the matching PixiJS options with Solid lifecycle props:
+
 ```ts
-type SpriteProps = Parameters<typeof Sprite>[0];
-type GraphicsProps = Parameters<typeof Graphics>[0];
-type ContainerProps = Parameters<typeof Container>[0];
-type AnimatedSpriteProps = Parameters<typeof AnimatedSprite>[0];
+type SpriteProps = PixiComponentProps<Pixi.SpriteOptions> & {
+  ref?: Ref<Pixi.Sprite>;
+  as?: Pixi.Sprite;
+};
+
+type ContainerProps = PixiComponentProps<Pixi.ContainerOptions> & {
+  ref?: Ref<Pixi.Container>;
+  as?: Pixi.Container;
+  children?: JSX.Element;
+};
 ```
 
 Available concrete prop types:
