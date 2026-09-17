@@ -3,7 +3,7 @@ import type { JSX } from "solid-js";
 import { onCleanup, onMount } from "solid-js";
 
 import { bindRuntimeProps } from "./components";
-import type { ContainerProps } from "./components";
+import type { ContainerProps } from "./components/factories";
 import { getPixiApp, PixiApplicationProvider } from "./pixi-application";
 
 // Helper type to remove colon event handlers from JSX attributes

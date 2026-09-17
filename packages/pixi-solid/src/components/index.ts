@@ -19,21 +19,23 @@ export {
 } from "./components";
 export { bindRuntimeProps, bindInitialisationProps } from "./bind-props";
 export { PIXI_EVENT_NAMES, PIXI_SOLID_EVENT_HANDLER_NAMES } from "./event-properties";
-export type {
-  PointAxisPropName,
-  CommonPointAxisPropName,
-  AnchorPointAxisPropName,
-  TilingPointAxisPropName,
-} from "./point-properties";
-export type { PixiSolidEventHandlerMap, PixiSolidEventHandlerName } from "./event-properties";
+export type { PixiComponentProps } from "./factories";
 export type {
   AnimatedSpriteProps,
+  BitmapTextProps,
   ContainerProps,
-  LeafProps,
+  GraphicsProps,
+  HTMLTextProps,
+  MeshPlaneProps,
+  MeshRopeProps,
+  NineSliceSpriteProps,
+  ParticleContainerProps,
+  PerspectiveMeshProps,
+  RenderContainerProps,
+  RenderLayerProps,
   SpriteProps,
+  SplitBitmapTextProps,
+  SplitTextProps,
+  TextProps,
   TilingSpriteProps,
-  PixiComponentProps,
-  CommonPointAxisProps,
-  AnchorPointAxisProps,
-  TilingPointAxisProps,
-} from "./factories";
+} from "./component-props";
