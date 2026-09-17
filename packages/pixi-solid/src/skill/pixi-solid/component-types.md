@@ -25,7 +25,6 @@ import type {
   AnchorPointAxisPropName,
   TilingPointAxisPropName,
   PixiSolidEventHandlerName,
-  PixiSolidEventHandlerMap,
 } from "pixi-solid";
 ```
 
@@ -217,17 +216,6 @@ type PixiSolidEventHandlerName = `on${keyof FederatedEventEmitterTypes}`;
 ```
 
 Supported events include all pointer, mouse, touch, wheel, and tap events, plus **capture variants** (e.g. `onpointerdowncapture` — fires during the capture phase before the target phase). Every event from PixiJS's `FederatedEventEmitterTypes` is covered.
-
-### `PixiSolidEventHandlerMap`
-
-Maps event names to their handler signatures:
-
-```ts
-type PixiSolidEventHandlerMap = {
-  [K in (typeof PIXI_EVENT_NAMES)[number] as `on${K}`]?:
-    null | ((...args: FederatedEventEmitterTypes[K]) => void);
-};
-```
 
 **Note:** Interactive events require `eventMode="static"` or `eventMode="dynamic"` on the component to be received.
 
