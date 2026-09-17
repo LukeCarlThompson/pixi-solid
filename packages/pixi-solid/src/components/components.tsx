@@ -135,24 +135,3 @@ export const SplitBitmapText = createLeafComponent<
 export const TilingSprite = createTilingSpriteComponent<PixiTilingSprite, Pixi.TilingSpriteOptions>(
   PixiTilingSprite,
 );
-
-// export const MeshGeometry = createLeafComponent<PixiMeshGeometry, Pixi.MeshGeometryOptions>(PixiMeshGeometry);
-
-// export const NineSliceGeometry = createLeafComponent<PixiNineSliceGeometry, Pixi.NineSliceGeometryOptions>(
-//   PixiNineSliceGeometry
-// );
-
-// export const Particle = createLeafComponent<PixiParticle, Pixi.ParticleOptions>(PixiParticle);
-
-// export const PerspectivePlaneGeometry = createLeafComponent<
-//   PixiPerspectivePlaneGeometry,
-//   Pixi.PerspectivePlaneGeometryOptions
-// >(PixiPerspectivePlaneGeometry);
-
-// export const PlaneGeometry = createLeafComponent<PixiPlaneGeometry, Pixi.PlaneGeometryOptions>(PixiPlaneGeometry);
-
-// export const RopeGeometry = createLeafComponent<PixiRopeGeometry, Pixi.RopeGeometryOptions>(PixiRopeGeometry);
-
-// TODO: Do we need a component for the Culler. It needs to interact with the stage directly.
-// export const Culler = createLeafComponent<PixiCuller, Pixi.Culler>(PixiCuller);
-
