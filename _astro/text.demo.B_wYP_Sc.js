@@ -1,0 +1,1 @@
+import{P as e,a as o}from"./pixi-canvas.0Yp58bp4.js";import{a as t}from"./solid.CNfS86f4.js";const r=()=>t(o,{text:"Hello World",style:{fill:"white",fontSize:68,fontFamily:"Arial"}}),i=()=>t(e,{style:{"aspect-ratio":"2/1.5"},background:"#1099bb",get children(){return t(r,{})}});export{i as Demo};
