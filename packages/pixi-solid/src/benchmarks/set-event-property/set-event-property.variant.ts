@@ -3,7 +3,7 @@ import type * as Pixi from "pixi.js";
 import {
   PIXI_EVENT_NAMES,
   PIXI_SOLID_EVENT_HANDLER_NAMES,
-} from "../../components/bind-props/event-names";
+} from "../../components/event-properties";
 
 const EVENT_NAME_BY_HANDLER = PIXI_SOLID_EVENT_HANDLER_NAMES.reduce((map, handlerName, index) => {
   map.set(handlerName, PIXI_EVENT_NAMES[index]);

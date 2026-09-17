@@ -1,6 +1,6 @@
 ---
 name: component-types
-description: Reference for all publicly exported prop types, point axis types, and event handler types from pixi-solid. Use when building custom components or forwarding props.
+description: Reference for publicly exported component prop types from pixi-solid. Use when building custom components or forwarding props.
 ---
 
 # Component prop types
@@ -12,20 +12,23 @@ This subskill covers every publicly exported type from `pixi-solid` that defines
 ```ts
 import type {
   PixiComponentProps,
-  ContainerProps,
-  LeafProps,
-  SpriteProps,
   AnimatedSpriteProps,
+  BitmapTextProps,
+  ContainerProps,
+  GraphicsProps,
+  HTMLTextProps,
+  MeshPlaneProps,
+  MeshRopeProps,
+  NineSliceSpriteProps,
+  ParticleContainerProps,
+  PerspectiveMeshProps,
+  RenderContainerProps,
+  RenderLayerProps,
+  SpriteProps,
+  SplitBitmapTextProps,
+  SplitTextProps,
+  TextProps,
   TilingSpriteProps,
-  CommonPointAxisProps,
-  AnchorPointAxisProps,
-  TilingPointAxisProps,
-  PointAxisPropName,
-  CommonPointAxisPropName,
-  AnchorPointAxisPropName,
-  TilingPointAxisPropName,
-  PixiSolidEventHandlerName,
-  PixiSolidEventHandlerMap,
 } from "pixi-solid";
 ```
 
@@ -44,91 +47,44 @@ Use this when building your own Pixi-backed component and you want consumers to 
 
 **Example:** `PixiComponentProps<Pixi.SpriteOptions>` or `PixiComponentProps<Pixi.ContainerOptions>`.
 
-### `ContainerProps<Component>`
+Each component has a concrete prop type. These types match component signatures and include Pixi options, Solid props, event props, and axis props.
 
-Props for container components (those that accept children).
-
-```ts
-type ContainerProps<Component> = PixiSolidEventHandlerMap &
-  CommonPointAxisProps & { ref?: Ref<Component>; as?: Component } & { children?: JSX.Element };
-```
-
-Used by: `Container`, `RenderContainer`, `RenderLayer`.
-
-### `LeafProps<Component>`
-
-Props for leaf components (those that do not accept children).
+Concrete prop types combine the matching PixiJS options with Solid lifecycle props:
 
 ```ts
-type LeafProps<Component> = PixiSolidEventHandlerMap &
-  CommonPointAxisProps & { ref?: Ref<Component>; as?: Component };
+type SpriteProps = PixiComponentProps<Pixi.SpriteOptions> & {
+  ref?: Ref<Pixi.Sprite>;
+  as?: Pixi.Sprite;
+};
+
+type ContainerProps = PixiComponentProps<Pixi.ContainerOptions> & {
+  ref?: Ref<Pixi.Container>;
+  as?: Pixi.Container;
+  children?: JSX.Element;
+};
 ```
 
-Used by: `Graphics`, `MeshPlane`, `MeshRope`, `ParticleContainer`, `PerspectiveMesh`, `SplitText`, `SplitBitmapText`.
+Available concrete prop types:
 
-Example — `ParticleContainer` usage:
+- `AnimatedSpriteProps`
+- `BitmapTextProps`
+- `ContainerProps`
+- `GraphicsProps`
+- `HTMLTextProps`
+- `MeshPlaneProps`
+- `MeshRopeProps`
+- `NineSliceSpriteProps`
+- `ParticleContainerProps`
+- `PerspectiveMeshProps`
+- `RenderContainerProps`
+- `RenderLayerProps`
+- `SpriteProps`
+- `SplitBitmapTextProps`
+- `SplitTextProps`
+- `TextProps`
+- `TilingSpriteProps`
 
-```tsx
-import type * as Pixi from "pixi.js";
-import { ParticleContainer } from "pixi.js";
-import { onMount, onCleanup } from "solid-js";
-
-function ParticleExample() {
-  let particleContainerRef: PIXI.ParticleContainer | undefined;
-
-  onMount(() => {
-    if (!particleContainerRef) {
-      throw new Error("particleContainerRef not found");
-    }
-    const sprite = new Sprite(myTexture);
-    sprite.x = Math.random() * 800;
-    particleContainerRef.addChild(s);
-
-    onCleanup(() => {
-      particleContainerRef.removeChild(s);
-      sprite.destroy();
-    });
-  });
-
-  return <ParticleContainer ref={(ref) => (particleContainerRef = ref)} />;
-}
-```
-
-### `SpriteProps<Component>`
-
-Props for sprite-like components (includes anchor properties).
-
-```ts
-type SpriteProps<Component> = PixiSolidEventHandlerMap &
-  CommonPointAxisProps &
-  AnchorPointAxisProps & { ref?: Ref<Component>; as?: Component };
-```
-
-Used by: `Sprite`, `BitmapText`, `HTMLText`, `NineSliceSprite`, `Text`.
-
-### `AnimatedSpriteProps<Component>`
-
-Props for `AnimatedSprite`, extends `SpriteProps` with an additional `autoUpdate` boolean.
-
-```ts
-type AnimatedSpriteProps<Component> = SpriteProps<Component> &
-  Pick<Pixi.AnimatedSpriteOptions, "autoUpdate">;
-```
-
-**`autoUpdate` behavior:** PixiJS's default `AnimatedSprite` auto-updates via the global shared ticker. pixi-solid overrides this: when `autoUpdate` is omitted or `true`, the component sets `autoUpdate = false` on the instance and manages ticker registration itself against the nearest ticker context. When `autoUpdate={false}`, no ticker registration occurs — you control timing manually.
-
-### `TilingSpriteProps<Component>`
-
-Props for `TilingSprite` (includes anchor and tiling properties).
-
-```ts
-type TilingSpriteProps<Component> = PixiSolidEventHandlerMap &
-  CommonPointAxisProps &
-  AnchorPointAxisProps &
-  TilingPointAxisProps & { ref?: Ref<Component>; as?: Component };
-```
-
-Used by: `TilingSprite`.
+`AnimatedSpriteProps` includes `autoUpdate`. Container prop types include `children`. Leaf prop types do not.
 
 ## Point-axis reference table
 
@@ -146,90 +102,13 @@ The table below shows which axis props are available on each component:
 
 SolidJS tracks changes by reference. Passing `position={{ x: 100, y: 200 }}` allocates a new object on every update, which both triggers the entire point to rebind and creates GC pressure. Axis props like `positionX` and `positionY` are plain `number` values — no allocations, and only the changed axis triggers an update.
 
-## Point axis types
+## Event props
 
-### `CommonPointAxisPropName`
+All concrete component prop types include typed PixiJS event props. Use lowercase names such as `onpointerdown` and `onmousemove`.
 
-Valid axis prop names for `position`, `scale`, `pivot`, and `skew`:
+Supported events include pointer, mouse, touch, wheel, tap, global movement, and capture variants such as `onpointerdowncapture`.
 
-```ts
-type CommonPointAxisPropName =
-  "positionX" | "positionY" | "scaleX" | "scaleY" | "pivotX" | "pivotY" | "skewX" | "skewY";
-```
-
-### `CommonPointAxisProps`
-
-Shorthand props for common point properties:
-
-```ts
-type CommonPointAxisProps = Partial<Record<CommonPointAxisPropName, number>>;
-```
-
-### `AnchorPointAxisPropName`
-
-Valid axis prop names for `anchor`:
-
-```ts
-type AnchorPointAxisPropName = "anchorX" | "anchorY";
-```
-
-### `AnchorPointAxisProps`
-
-Shorthand props for anchor:
-
-```ts
-type AnchorPointAxisProps = Partial<Record<AnchorPointAxisPropName, number>>;
-```
-
-### `TilingPointAxisPropName`
-
-Valid axis prop names for `tilePosition` and `tileScale`:
-
-```ts
-type TilingPointAxisPropName = "tilePositionX" | "tilePositionY" | "tileScaleX" | "tileScaleY";
-```
-
-### `TilingPointAxisProps`
-
-Shorthand props for tiling-specific properties:
-
-```ts
-type TilingPointAxisProps = Partial<Record<TilingPointAxisPropName, number>>;
-```
-
-### `PointAxisPropName`
-
-All axis properties (union of all categories):
-
-```ts
-type PointAxisPropName =
-  CommonPointAxisPropName | AnchorPointAxisPropName | TilingPointAxisPropName;
-```
-
-## Event handler types
-
-### `PixiSolidEventHandlerName`
-
-Maps every supported event name to its corresponding prop name string. Events are all lowercase with `on` prefix: `onpointerdown`, `onmousemove`, `ontouchstart`, etc.
-
-```ts
-type PixiSolidEventHandlerName = `on${keyof FederatedEventEmitterTypes}`;
-```
-
-Supported events include all pointer, mouse, touch, wheel, and tap events, plus **capture variants** (e.g. `onpointerdowncapture` — fires during the capture phase before the target phase). Every event from PixiJS's `FederatedEventEmitterTypes` is covered.
-
-### `PixiSolidEventHandlerMap`
-
-Maps event names to their handler signatures:
-
-```ts
-type PixiSolidEventHandlerMap = {
-  [K in (typeof PIXI_EVENT_NAMES)[number] as `on${K}`]?:
-    null | ((...args: FederatedEventEmitterTypes[K]) => void);
-};
-```
-
-**Note:** Interactive events require `eventMode="static"` or `eventMode="dynamic"` on the component to be received.
+Interactive events require `eventMode="static"` or `eventMode="dynamic"` on the component to be received.
 
 ### Common events by category
 

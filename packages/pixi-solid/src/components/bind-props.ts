@@ -1,16 +1,15 @@
 import type * as Pixi from "pixi.js";
 import { createRenderEffect, onCleanup, on } from "solid-js";
 
-import type { ContainerProps } from "../component-factories";
-
 import { bindChildrenToContainer, bindChildrenToRenderLayer } from "./bind-children";
-import { isEventProperty } from "./is-event-property";
+import { isEventProperty } from "./event-properties";
+import type { ContainerProps } from "./factories";
 import {
   isPointProperty,
   setPointProperty,
   isPointAxisProperty,
   setPointAxisProperty,
-} from "./set-point-property";
+} from "./point-properties";
 
 /**
  * Binds the props to a Pixi instance with subscriptions to maintain reactivity.

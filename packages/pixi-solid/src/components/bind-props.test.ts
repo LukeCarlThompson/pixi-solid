@@ -1,9 +1,9 @@
 import { createRoot, createSignal, createContext, useContext, onMount } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { renderHook } from "../../testing";
+import { renderHook } from "../testing";
 
-import { bindInitialisationProps, bindRuntimeProps } from ".";
+import { bindInitialisationProps, bindRuntimeProps } from "./bind-props";
 
 // TODO: Add in better tests to differentiate between the initialisation and runtime props
 class MockContainer {
