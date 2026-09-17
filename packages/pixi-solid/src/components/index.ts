@@ -17,20 +17,15 @@ export {
   RenderLayer,
   TilingSprite,
 } from "./components";
-export {
-  PIXI_EVENT_NAMES,
-  PIXI_SOLID_EVENT_HANDLER_NAMES,
-  bindRuntimeProps,
-  bindInitialisationProps,
-} from "./bind-props";
+export { bindRuntimeProps, bindInitialisationProps } from "./bind-props";
+export { PIXI_EVENT_NAMES, PIXI_SOLID_EVENT_HANDLER_NAMES } from "./event-properties";
 export type {
-  PixiSolidEventHandlerMap,
-  PixiSolidEventHandlerName,
   PointAxisPropName,
   CommonPointAxisPropName,
   AnchorPointAxisPropName,
   TilingPointAxisPropName,
-} from "./bind-props";
+} from "./point-properties";
+export type { PixiSolidEventHandlerMap, PixiSolidEventHandlerName } from "./event-properties";
 export type {
   AnimatedSpriteProps,
   ContainerProps,
@@ -41,12 +36,4 @@ export type {
   CommonPointAxisProps,
   AnchorPointAxisProps,
   TilingPointAxisProps,
-} from "./component-factories";
-export {
-  createAnimatedSpriteComponent,
-  createContainerComponent,
-  createLeafComponent,
-  createSpriteComponent,
-  createTilingSpriteComponent,
-  createFilterComponent,
-} from "./component-factories";
+} from "./factories";

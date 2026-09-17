@@ -5,9 +5,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { mountScene } from "../testing";
 
-import type { PixiComponentProps } from "./component-factories";
-import { createContainerComponent, createFilterComponent } from "./component-factories";
 import { Container } from "./components";
+import type { PixiComponentProps } from "./factories";
+import { createContainerComponent, createFilterComponent } from "./factories";
 
 class MutatingContainer extends PixiContainer {
   marker: string;

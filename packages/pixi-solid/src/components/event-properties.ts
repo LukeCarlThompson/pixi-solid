@@ -75,6 +75,9 @@ export const PIXI_SOLID_EVENT_HANDLER_NAMES = PIXI_EVENT_NAMES.map(
 /** A single pixi-solid event handler prop name, e.g. `"onpointerdown"`. */
 export type PixiSolidEventHandlerName = (typeof PIXI_SOLID_EVENT_HANDLER_NAMES)[number];
 
+export const isEventProperty = (name: string): name is PixiSolidEventHandlerName =>
+  PIXI_SOLID_EVENT_HANDLER_NAME_SET.has(name);
+
 /** Maps each PixiJS event to an optional SolidJS event handler prop, typed to Pixi's event payloads. */
 export type PixiSolidEventHandlerMap = {
   [K in (typeof PIXI_EVENT_NAMES)[number] as `on${K}`]?:

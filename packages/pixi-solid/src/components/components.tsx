@@ -25,7 +25,7 @@ import {
   createLeafComponent,
   createSpriteComponent,
   createTilingSpriteComponent,
-} from "./component-factories";
+} from "./factories";
 
 /**
  * A SolidJS component that renders a `PIXI.AnimatedSprite`.

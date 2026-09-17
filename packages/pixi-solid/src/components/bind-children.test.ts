@@ -3,7 +3,7 @@ import type * as Pixi from "pixi.js";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { mountScene } from "../../testing";
+import { mountScene } from "../testing";
 
 import {
   bindChildrenToContainer,

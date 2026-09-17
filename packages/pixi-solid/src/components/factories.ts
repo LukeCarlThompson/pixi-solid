@@ -5,18 +5,18 @@ import { createRenderEffect, on, splitProps, onCleanup } from "solid-js";
 import { getTicker } from "../pixi-application";
 
 import { bindInitialisationProps, bindRuntimeProps } from "./bind-props";
-import type { PixiSolidEventHandlerMap } from "./bind-props/event-names";
-import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./bind-props/event-names";
+import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./event-properties";
+import type { PixiSolidEventHandlerMap } from "./event-properties";
 import type {
   CommonPointAxisPropName,
   AnchorPointAxisPropName,
   TilingPointAxisPropName,
-} from "./bind-props/point-property-names";
+} from "./point-properties";
 import {
   COMMON_POINT_PROP_AXIS_NAMES,
   ANCHOR_POINT_PROP_AXIS_NAMES,
   TILING_POINT_PROP_AXIS_NAMES,
-} from "./bind-props/point-property-names";
+} from "./point-properties";
 
 /**
  * Common point axis properties available on all Container-based components
