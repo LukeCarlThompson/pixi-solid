@@ -96,11 +96,6 @@ export type TilingSpriteProps<Component> = PixiSolidEventHandlerMap &
   TilingPointAxisProps &
   RefAsProps<Component>;
 
-/**
- * Prop definition for filter components
- */
-export type FilterProps<Component> = RefAsProps<Component>;
-
 // Keys that are specific to Solid components and not Pixi props
 export const SOLID_PROP_KEYS = ["ref", "as", "children"] as const;
 
@@ -278,54 +273,3 @@ export const createTilingSpriteComponent = <
   };
 };
 
-export const createFilterComponent = <InstanceType extends Pixi.Filter, OptionsType extends object>(
-  PixiClass: new (props: OptionsType) => InstanceType,
-): PixiComponent<OptionsType & FilterProps<InstanceType>, InstanceType> => {
-  return (props: OptionsType & FilterProps<InstanceType>): InstanceType & JSX.Element => {
-    const [runtimeProps, initialisationProps] = splitProps(props, ["ref", "as"]);
-
-    const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new PixiClass({ ...initialisationProps } as any);
-
-    for (const key in initialisationProps) {
-      if (key === "as") continue;
-
-      if (key === "ref") {
-        createRenderEffect(() => {
-          // Solid converts the ref prop to a callback function
-          (props[key] as unknown as (arg: any) => void)(instance);
-        });
-      } else if (key === "children") {
-        throw new Error(`Cannot set children on non-container instance.`);
-      } else {
-        createRenderEffect(
-          on(
-            () => props[key as keyof typeof initialisationProps],
-            () => {
-              (instance as any)[key] = initialisationProps[key];
-            },
-            { defer: true },
-          ),
-        );
-      }
-    }
-
-    for (const key in runtimeProps) {
-      if (key === "as") continue;
-
-      if (key === "ref") {
-        createRenderEffect(() => {
-          // Solid converts the ref prop to a callback function
-          (props[key] as unknown as (arg: any) => void)(instance);
-        });
-      }
-    }
-
-    onCleanup(() => {
-      if (isUserOwnedInstance) return;
-      instance.destroy();
-    });
-
-    return instance as InstanceType & JSX.Element;
-  };
-};

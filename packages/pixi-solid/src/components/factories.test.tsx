@@ -1,5 +1,5 @@
 import type * as Pixi from "pixi.js";
-import { Container as PixiContainer, Filter } from "pixi.js";
+import { Container as PixiContainer } from "pixi.js";
 import { createSignal } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -7,7 +7,7 @@ import { mountScene } from "../testing";
 
 import { Container } from "./components";
 import type { PixiComponentProps } from "./factories";
-import { createContainerComponent, createFilterComponent } from "./factories";
+import { createContainerComponent } from "./factories";
 
 class MutatingContainer extends PixiContainer {
   marker: string;
@@ -43,34 +43,6 @@ describe("Component factory constructor options", () => {
     expect(instance?.marker).toBe("default");
 
     dispose();
-  });
-});
-
-describe("createFilterComponent cleanup", () => {
-  it("GIVEN a filter component WHEN root is disposed THEN instance is destroyed", () => {
-    const TestFilter = createFilterComponent<Filter, object>(Filter);
-
-    let filterRef: Filter | undefined;
-    let destroyCalled = false;
-
-    const { dispose } = mountScene(() => (
-      <TestFilter
-        ref={(el) => {
-          filterRef = el;
-          const originalDestroy = el.destroy.bind(el);
-          el.destroy = vi.fn(() => {
-            destroyCalled = true;
-            originalDestroy();
-          });
-        }}
-      />
-    ));
-
-    expect(filterRef).toBeDefined();
-
-    dispose();
-
-    expect(destroyCalled).toBe(true);
   });
 });
 
