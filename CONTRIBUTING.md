@@ -62,14 +62,13 @@ packages/
 
 ### `packages/pixi-solid`
 
-| Command                   | Description                                                            |
-| ------------------------- | ---------------------------------------------------------------------- |
-| `pnpm build`              | Vite build + TypeScript declarations                                   |
-| `pnpm test`               | Vitest                                                                 |
-| `pnpm test:bench`         | Run benchmarks                                                         |
-| `pnpm test:bench:save`    | Save benchmark results as baseline                                     |
-| `pnpm test:bench:compare` | Compare benchmarks against baseline                                    |
-| `pnpm copy:skills`        | Copy LLM skill files to `dist/skills` (runs automatically after build) |
+| Command                   | Description                                                               |
+| ------------------------- | ------------------------------------------------------------------------- |
+| `pnpm build`              | Vite build + TypeScript declarations; copies skill files to `dist/skills` |
+| `pnpm test`               | Vitest                                                                    |
+| `pnpm test:bench`         | Run benchmarks                                                            |
+| `pnpm test:bench:save`    | Save benchmark results as baseline                                        |
+| `pnpm test:bench:compare` | Compare benchmarks against baseline                                       |
 
 ---
 
