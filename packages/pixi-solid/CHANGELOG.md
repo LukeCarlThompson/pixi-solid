@@ -27,6 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ⚙️ Limited `PixiCanvas` wrapper props to `class`, `classList`, `style`, and `ref`; put other DOM props on a caller-owned element. Only one canvas can be mounted per application at a time.
 - ⚙️ Application options apply only when the provider creates the app; ignored options warn in development when an app is reused.
 
+### Removed
+
+- 💀 Removed the public `createTestRoot` testing utility. Replace `createTestRoot(callback).value` with `renderHook(callback).result()`; use `ctx.renderHook(callback)` when the hook needs test context.
+
 ### Fixed
 
 - 🐞 Cleaned up app initialization failures and apps whose provider unmounts while initialization is pending; detached scene children when `PixiCanvas` unmounts.
