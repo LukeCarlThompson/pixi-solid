@@ -37,6 +37,21 @@ const splitPixiCanvasProps = (props: PixiCanvasProps) => {
   };
 };
 
+const applicationsWithCanvas = new WeakSet<Pixi.Application>();
+
+const claimCanvasMount = (app: Pixi.Application): (() => void) => {
+  if (applicationsWithCanvas.has(app)) {
+    throw new Error(
+      "Only one PixiCanvas may be mounted at a time per Pixi.Application. Unmount it before mounting another.",
+    );
+  }
+
+  applicationsWithCanvas.add(app);
+  return () => {
+    applicationsWithCanvas.delete(app);
+  };
+};
+
 const InnerPixiCanvas = (props: {
   children: JSX.Element;
   wrapperProps?: PixiCanvasWrapperProps;
@@ -51,6 +66,9 @@ const InnerPixiCanvas = (props: {
       "InnerPixiCanvas must be used within a PixiApplicationProvider or a PixiCanvas",
     );
   }
+
+  const releaseCanvasMount = claimCanvasMount(pixiApp);
+  onCleanup(releaseCanvasMount);
 
   bindRuntimeProps(pixiApp.stage, {
     children: props.children,
@@ -117,7 +135,7 @@ const InnerPixiCanvas = (props: {
  * components as children, which are rendered into the canvas scene graph.
  *
  * Accepts `class`, `classList`, `style`, and `ref` for the wrapper, plus `Pixi.ApplicationOptions`
- * for application initialization.
+ * for application initialization. Only one `PixiCanvas` can be mounted at a time per app; it may be remounted after unmount.
  */
 
 export const PixiCanvas = (props: PixiCanvasProps): JSX.Element => {

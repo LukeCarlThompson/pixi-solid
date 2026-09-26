@@ -52,7 +52,7 @@ Requires `children`. Wrapper-specific props are `class`, `classList`, `style`, a
 - If used inside `PixiApplicationProvider`, it uses the provided app; `PixiCanvas` application options are ignored in this case.
 - If used standalone, it creates its own `Pixi.Application` and provides context.
 
-Give the wrapper non-zero dimensions with `style` or CSS so automatic resizing has a usable size. Use one `PixiCanvas` per application; each instance mounts the same `app.canvas` and controls the app's shared `resizeTo` target.
+Give the wrapper non-zero dimensions with `style` or CSS so automatic resizing has a usable size. Only one `PixiCanvas` may be mounted per application at a time; it can be unmounted and remounted under a persistent provider.
 
 ## `PixiApplicationProvider`
 

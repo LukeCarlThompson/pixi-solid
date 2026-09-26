@@ -1,6 +1,6 @@
 import { Sprite as PixiSprite, Texture } from "pixi.js";
 import type * as Pixi from "pixi.js";
-import { Show, createSignal } from "solid-js";
+import { ErrorBoundary, Show, createSignal } from "solid-js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Sprite } from "./components";
@@ -158,6 +158,39 @@ describe("PixiCanvas stage binding cleanup", () => {
     setShow(true);
     await vi.waitFor(() => {
       expect(ctx.app.stage.children.length).toBe(1);
+    });
+
+    dispose();
+  });
+});
+
+describe("PixiCanvas application ownership", () => {
+  it("GIVEN one canvas mounted WHEN a second canvas uses the same app THEN it throws a clear error", async () => {
+    const ctx = createTestContext();
+    (ctx.app as any).queueResize = () => {};
+    let duplicateCanvasError: unknown;
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app}>
+        <ErrorBoundary
+          fallback={(error) => {
+            duplicateCanvasError = error;
+            return <Sprite texture={Texture.WHITE} />;
+          }}
+        >
+          <PixiCanvas>
+            <Sprite texture={Texture.WHITE} />
+          </PixiCanvas>
+          <PixiCanvas>
+            <Sprite texture={Texture.WHITE} />
+          </PixiCanvas>
+        </ErrorBoundary>
+      </PixiApplicationProvider>
+    ));
+
+    await vi.waitFor(() => expect(duplicateCanvasError).toBeInstanceOf(Error));
+    expect(duplicateCanvasError).toMatchObject({
+      message: expect.stringContaining("Only one PixiCanvas can be mounted per Pixi.Application"),
     });
 
     dispose();
