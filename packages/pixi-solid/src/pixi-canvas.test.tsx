@@ -1,6 +1,6 @@
 import { Sprite as PixiSprite, Texture } from "pixi.js";
 import type * as Pixi from "pixi.js";
-import { Show, createSignal } from "solid-js";
+import { ErrorBoundary, Show, createSignal } from "solid-js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Sprite } from "./components";
@@ -20,8 +20,9 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  // Restore the previous global so the mock doesn't leak into other suites
+  // Restore globals and spies so mocks don't leak into other suites
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe("PixiCanvas stage binding cleanup", () => {
@@ -160,6 +161,129 @@ describe("PixiCanvas stage binding cleanup", () => {
       expect(ctx.app.stage.children.length).toBe(1);
     });
 
+    dispose();
+  });
+});
+
+describe("PixiCanvas application ownership", () => {
+  it("GIVEN one canvas mounted WHEN a second canvas uses the same app THEN it throws a clear error", async () => {
+    const ctx = createTestContext();
+    (ctx.app as any).queueResize = () => {};
+    let duplicateCanvasError: unknown;
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app}>
+        <ErrorBoundary
+          fallback={(error) => {
+            duplicateCanvasError = error;
+            return <Sprite texture={Texture.WHITE} />;
+          }}
+        >
+          <PixiCanvas>
+            <Sprite texture={Texture.WHITE} />
+          </PixiCanvas>
+          <PixiCanvas>
+            <Sprite texture={Texture.WHITE} />
+          </PixiCanvas>
+        </ErrorBoundary>
+      </PixiApplicationProvider>
+    ));
+
+    await vi.waitFor(() => expect(duplicateCanvasError).toBeInstanceOf(Error));
+    expect(duplicateCanvasError).toMatchObject({
+      message: expect.stringContaining(
+        "Only one PixiCanvas may be mounted at a time per Pixi.Application",
+      ),
+    });
+
+    dispose();
+  });
+});
+
+describe("PixiCanvas application options", () => {
+  it("GIVEN PixiCanvas is nested under an app provider WHEN app options are passed THEN it warns that they are ignored", async () => {
+    const ctx = createTestContext();
+    (ctx.app as any).queueResize = () => {};
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app}>
+        <PixiCanvas background="#1099bb">
+          <Sprite texture={Texture.WHITE} />
+        </PixiCanvas>
+      </PixiApplicationProvider>
+    ));
+
+    await vi.waitFor(() => {
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining("Application options were provided but ignored"),
+      );
+    });
+    dispose();
+  });
+});
+
+describe("PixiCanvas wrapper props", () => {
+  it("GIVEN wrapper class and string style WHEN PixiCanvas mounts THEN they apply to its wrapper", async () => {
+    const ctx = createTestContext();
+    (ctx.app as any).queueResize = () => {};
+    let wrapper: HTMLDivElement | undefined;
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app}>
+        <PixiCanvas
+          ref={(element) => {
+            wrapper = element;
+          }}
+          class="scene-wrapper"
+          style="width: 320px"
+        >
+          <Sprite texture={Texture.WHITE} />
+        </PixiCanvas>
+      </PixiApplicationProvider>
+    ));
+
+    await vi.waitFor(() => expect(wrapper).toBeDefined());
+
+    expect(wrapper?.className).toBe("scene-wrapper");
+    expect(wrapper?.style.width).toBe("320px");
+    expect(wrapper?.style.position).toBe("relative");
+    dispose();
+  });
+
+  it("GIVEN reactive wrapper class and style WHEN their signals change THEN the wrapper updates", async () => {
+    const ctx = createTestContext();
+    (ctx.app as any).queueResize = () => {};
+    const [className, setClassName] = createSignal("initial");
+    const [active, setActive] = createSignal(false);
+    const [width, setWidth] = createSignal(100);
+    let wrapper: HTMLDivElement | undefined;
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app}>
+        <PixiCanvas
+          ref={(element) => {
+            wrapper = element;
+          }}
+          class={className()}
+          classList={{ active: active() }}
+          style={{ width: `${width()}px` }}
+        >
+          <Sprite texture={Texture.WHITE} />
+        </PixiCanvas>
+      </PixiApplicationProvider>
+    ));
+
+    await vi.waitFor(() => expect(wrapper?.className).toBe("initial"));
+
+    setClassName("updated");
+    setActive(true);
+    setWidth(240);
+
+    expect(wrapper?.classList.contains("updated")).toBe(true);
+    expect(wrapper?.classList.contains("active")).toBe(true);
+    expect(wrapper?.style.width).toBe("240px");
+    expect(wrapper?.style.position).toBe("relative");
     dispose();
   });
 });

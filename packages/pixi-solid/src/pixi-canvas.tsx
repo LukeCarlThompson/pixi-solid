@@ -1,59 +1,60 @@
 import type * as Pixi from "pixi.js";
 import type { JSX } from "solid-js";
-import { onCleanup, onMount } from "solid-js";
+import { createMemo, onCleanup, onMount, splitProps } from "solid-js";
 
 import { bindRuntimeProps } from "./components";
 import type { ContainerProps } from "./components/factories";
 import { getPixiApp, PixiApplicationProvider } from "./pixi-application";
 
-// Helper type to remove colon event handlers from JSX attributes
-type OmitColonEvents<T> = {
-  [K in keyof T as K extends `on:${string}` ? never : K]: T[K];
-};
-
 /**
- * Props for the `PixiCanvas` component.
+ * Props for `PixiCanvas`.
  *
- * Accepts any HTML div attribute (class, style, event listeners, etc.)
- * plus `Pixi.ApplicationOptions` (except `children` and `resizeTo`,
- * which are handled internally).
+ * Accepts Pixi application initialization options, plus `class`, `classList`, `style`, and `ref`
+ * for its internal wrapper. Other DOM attributes belong on a caller-owned parent element.
  */
 export type PixiCanvasProps = {
   children: JSX.Element;
+  class?: string;
+  classList?: JSX.HTMLAttributes<HTMLDivElement>["classList"];
   ref?: (el: HTMLDivElement) => void;
-} & OmitColonEvents<Omit<JSX.HTMLAttributes<HTMLDivElement>, "children" | "ref">> &
-  Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">>;
+  style?: JSX.HTMLAttributes<HTMLDivElement>["style"];
+} & Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">>;
 
-const isDomPropKey = (key: string): boolean => {
-  if (key === "class" || key === "classList" || key === "style") return true;
-  if (key === "id" || key === "title" || key === "role" || key === "tabIndex") return true;
-  if (key.startsWith("aria-") || key.startsWith("data-")) return true;
-  if (/^on[A-Z]/.test(key)) return true;
-
-  return false;
-};
+type PixiCanvasWrapperProps = Pick<PixiCanvasProps, "class" | "classList" | "ref" | "style">;
 
 const splitPixiCanvasProps = (props: PixiCanvasProps) => {
-  const wrapperProps: JSX.HTMLAttributes<HTMLDivElement> = {};
-  const applicationOptions: Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">> = {};
+  const [, wrapperProps, applicationOptions] = splitProps(
+    props,
+    ["children"],
+    ["class", "classList", "ref", "style"],
+  );
 
-  for (const key in props) {
-    if (key === "children") continue;
-    const value = props[key as keyof PixiCanvasProps];
+  return {
+    applicationOptions: applicationOptions as Partial<
+      Omit<Pixi.ApplicationOptions, "children" | "resizeTo">
+    >,
+    wrapperProps: wrapperProps as PixiCanvasWrapperProps,
+  };
+};
 
-    if (key === "ref" || isDomPropKey(key)) {
-      (wrapperProps as Record<string, unknown>)[key] = value;
-    } else {
-      (applicationOptions as Record<string, unknown>)[key] = value;
-    }
+const applicationsWithCanvas = new WeakSet<Pixi.Application>();
+
+const claimCanvasMount = (app: Pixi.Application): (() => void) => {
+  if (applicationsWithCanvas.has(app)) {
+    throw new Error(
+      "Only one PixiCanvas may be mounted at a time per Pixi.Application. Unmount it before mounting another.",
+    );
   }
 
-  return { applicationOptions, wrapperProps };
+  applicationsWithCanvas.add(app);
+  return () => {
+    applicationsWithCanvas.delete(app);
+  };
 };
 
 const InnerPixiCanvas = (props: {
   children: JSX.Element;
-  wrapperProps?: JSX.HTMLAttributes<HTMLDivElement>;
+  wrapperProps?: PixiCanvasWrapperProps;
 }): JSX.Element => {
   let canvasWrapElement: HTMLDivElement | undefined;
   let pixiApp: Pixi.Application;
@@ -66,12 +67,30 @@ const InnerPixiCanvas = (props: {
     );
   }
 
+  const releaseCanvasMount = claimCanvasMount(pixiApp);
+  onCleanup(releaseCanvasMount);
+
   bindRuntimeProps(pixiApp.stage, {
     children: props.children,
   } as ContainerProps<Pixi.Container>);
 
   let previousResizeTo: HTMLElement | Window;
   let resizeObserver: ResizeObserver | undefined;
+  const wrapperStyle = createMemo<JSX.HTMLAttributes<HTMLDivElement>["style"]>(() => {
+    const style = props.wrapperProps?.style;
+
+    if (typeof style === "string") {
+      return `position: relative; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; ${style}`;
+    }
+
+    return {
+      position: "relative",
+      ["-webkit-touch-callout"]: "none",
+      ["-webkit-user-select"]: "none",
+      ["user-select"]: "none",
+      ...style,
+    } as JSX.CSSProperties;
+  });
 
   onMount(() => {
     if (!canvasWrapElement) return;
@@ -101,15 +120,7 @@ const InnerPixiCanvas = (props: {
           userRef(el);
         }
       }}
-      style={{
-        position: "relative",
-        /* Disables the callout/menu on long-press */
-        ["-webkit-touch-callout"]: "none",
-        /* Disables text selection */
-        ["-webkit-user-select"]: "none",
-        ["user-select"]: "none",
-        ...(typeof props.wrapperProps?.style === "object" ? props.wrapperProps.style : {}),
-      }}
+      style={wrapperStyle()}
     >
       {pixiApp.canvas}
     </div>
@@ -123,8 +134,8 @@ const InnerPixiCanvas = (props: {
  * `PixiApplicationProvider` (uses the existing context). Accepts pixi-solid
  * components as children, which are rendered into the canvas scene graph.
  *
- * Accepts HTML div attributes (`class`, `style`, `id`, event listeners, etc.)
- * on the wrapper element, plus `Pixi.ApplicationOptions` for the canvas init.
+ * Accepts `class`, `classList`, `style`, and `ref` for the wrapper, plus `Pixi.ApplicationOptions`
+ * for application initialization. Only one `PixiCanvas` can be mounted at a time per app; it may be remounted after unmount.
  */
 
 export const PixiCanvas = (props: PixiCanvasProps): JSX.Element => {

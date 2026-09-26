@@ -26,7 +26,7 @@ Three providers exist. Choose based on your application's needs:
 
 ## `PixiCanvas`
 
-The simplest setup. Mounts the Pixi canvas inside a positioned wrapper `div`, forwards supported wrapper props, and automatically resizes to the wrapper's bounds.
+The simplest setup. Mounts the Pixi canvas inside a positioned wrapper `div`, applies `class`/`style`, and automatically resizes to the wrapper's bounds.
 
 ```tsx
 import { PixiCanvas, Sprite } from "pixi-solid";
@@ -41,26 +41,22 @@ export const DemoApp = () => (
 
 ### `PixiCanvasProps`
 
-Requires `children`. Also accepts a callback `ref` for the wrapper, supported wrapper props, and Pixi application initialization options.
+Requires `children`. Wrapper-specific props are `class`, `classList`, `style`, and a callback `ref` that receives the internal wrapper `div`.
 
-Props accepted:
-
-- `children` — JSX content rendered into the Pixi stage.
-- Wrapper props currently routed at runtime — `ref`, `class`, `classList`, `style`, `id`, `title`, `role`, `tabIndex`, `aria-*`, `data-*`, and camel-case DOM handlers such as `onClick`.
-- Pixi `ApplicationOptions` — Initialization options except `children` and `resizeTo` (handled internally). They are not runtime-reactive.
-
-Although the TypeScript type includes `JSX.HTMLAttributes<HTMLDivElement>`, other DOM attributes are not currently routed to the wrapper.
+- `class`, `classList`, and `style` control wrapper styling; `style` accepts Solid's CSS object or CSS string.
+- Pixi `ApplicationOptions` configure app initialization, except `children` and `resizeTo` (handled internally). They are not runtime-reactive.
+- Other DOM attributes and event handlers are not forwarded. Wrap `PixiCanvas` in your own element when you need them.
 
 `PixiCanvas` works with or without a surrounding `PixiApplicationProvider`:
 
 - If used inside `PixiApplicationProvider`, it uses the provided app; `PixiCanvas` application options are ignored in this case.
 - If used standalone, it creates its own `Pixi.Application` and provides context.
 
-Give the wrapper non-zero dimensions with `style` or CSS so automatic resizing has a usable size.
+Give the wrapper non-zero dimensions with `style` or CSS so automatic resizing has a usable size. Only one `PixiCanvas` may be mounted per application at a time; it can be unmounted and remounted under a persistent provider.
 
 ## `PixiApplicationProvider`
 
-Creates a `Pixi.Application` instance and provides it through context. Does **not** mount a canvas itself — use `PixiCanvas` as a child to render the canvas.
+Creates a `Pixi.Application` instance and provides it through context. It does **not** mount or resize a canvas; the supported rendering setup is to use `PixiCanvas` as a child. `resizeTo` is omitted from provider props because `PixiCanvas` controls the resize target.
 
 ```tsx
 import { PixiApplicationProvider, PixiCanvas, usePixiScreen, Text } from "pixi-solid";
@@ -100,6 +96,8 @@ Props accepted:
 
 - Standard `ApplicationOptions` (except `children` and `resizeTo`). They apply only when this provider creates the app and are initialization-only.
 - `existingApp` — An already-created `Pixi.Application` instance. When provided, the provider reuses it; other app options are ignored. The application must be initialized before rendering, and you handle lifecycle/cleanup yourself.
+
+If options are passed while `existingApp` or an ancestor provider supplies the app, pixi-solid warns in development because those options are ignored.
 
 `PixiApplicationProvider` also provides context for:
 
