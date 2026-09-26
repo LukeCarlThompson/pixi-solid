@@ -42,7 +42,6 @@
     "prepublishOnly": "pnpm run build",
     "prepack": "node -e \"require('fs').existsSync('dist/index.js') || (console.error('ERROR: dist/index.js not found') && process.exit(1))\"",
     "preview": "vite preview",
-    "preinstall": "npx only-allow pnpm",
     "test": "vitest --run",
     "test:bench": "vitest bench",
     "test:bench:save": "vitest bench --outputJson=src/benchmarks/results/baseline.json",
