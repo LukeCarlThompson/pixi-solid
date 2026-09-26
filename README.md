@@ -91,8 +91,8 @@ export const DemoApp = () => {
 
 This project provides skill-based documentation for AI code assistants, containing the library's API and patterns. When using an LLM to generate pixi-solid code, you can reference:
 
-- [`SKILL.md`](https://github.com/LukeCarlThompson/pixi-solid/blob/main/packages/pixi-solid/src/skill/pixi-solid/SKILL.md) — main entry point for the skill docs
-- [Skill API references](https://github.com/LukeCarlThompson/pixi-solid/tree/main/packages/pixi-solid/src/skill/pixi-solid) — detailed docs on components, hooks, lifecycle, testing, and utils
+- [`SKILL.md`](https://github.com/LukeCarlThompson/pixi-solid/blob/main/packages/pixi-solid/src/skills/pixi-solid/SKILL.md) — main entry point for the skill docs
+- [Skill API references](https://github.com/LukeCarlThompson/pixi-solid/tree/main/packages/pixi-solid/src/skills/pixi-solid) — detailed docs on components, hooks, asset loading, lifecycle, testing, and utils
 - [`AGENTS.md`](https://github.com/LukeCarlThompson/pixi-solid/blob/main/AGENTS.md) — contribution and architecture guide
 - [📖 Docs site](https://lukecarlthompson.github.io/pixi-solid/) — live examples and interactive documentation
 

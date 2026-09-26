@@ -36,16 +36,11 @@ import type {
 
 ### `PixiComponentProps<ComponentOptions>`
 
-Generic base type for any Pixi-backed component. Takes a Pixi options type (e.g. `Pixi.SpriteOptions`) so consumers can pass through all valid Pixi props.
-
-```ts
-type PixiComponentProps<ComponentOptions extends Pixi.ContainerOptions = Pixi.ContainerOptions> =
-  PixiSolidEventHandlerMap & CommonPointAxisProps & Omit<ComponentOptions, "children">;
-```
+Generic base type for a Pixi-backed component. It combines Pixi options with typed event props and common point-axis props. It also adds `anchorX`/`anchorY` when the options include `anchor`, and `tilePositionX`/`tilePositionY` plus `tileScaleX`/`tileScaleY` when options include `tilePosition`.
 
 Use this when building your own Pixi-backed component and you want consumers to pass through Pixi-style props to the underlying instance. If you don't require all props, narrow with `Pick` or `Omit`.
 
-**Example:** `PixiComponentProps<Pixi.SpriteOptions>` or `PixiComponentProps<Pixi.ContainerOptions>`.
+**Examples:** `PixiComponentProps<Pixi.SpriteOptions>` or `PixiComponentProps<Pixi.ContainerOptions>`. The first includes anchor axes; the second does not.
 
 Each component has a concrete prop type. These types match component signatures and include Pixi options, Solid props, event props, and axis props.
 
@@ -142,13 +137,18 @@ Example — forwarding Pixi props while handling custom props with `splitProps`:
 
 ```tsx
 import { splitProps } from "solid-js";
+import { Container, Sprite } from "pixi-solid";
 import type { PixiComponentProps } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 
 function MySprite(props: PixiComponentProps<Pixi.SpriteOptions> & { label: string }) {
   const [local, pixiProps] = splitProps(props, ["label"]);
 
-  return <Sprite {...pixiProps}>{/* custom UI or children that use local.label */}</Sprite>;
+  return (
+    <Container label={local.label}>
+      <Sprite {...pixiProps} />
+    </Container>
+  );
 }
 ```
 

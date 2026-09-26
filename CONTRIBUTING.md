@@ -69,7 +69,7 @@ packages/
 | `pnpm test:bench`         | Run benchmarks                                                      |
 | `pnpm test:bench:save`    | Save benchmark results as baseline                                  |
 | `pnpm test:bench:compare` | Compare benchmarks against baseline                                 |
-| `pnpm build:skill`        | Copy LLM skill files to dist/skill (runs automatically after build) |
+| `pnpm copy:skills`        | Copy LLM skill files to `dist/skills` (runs automatically after build) |
 
 ---
 

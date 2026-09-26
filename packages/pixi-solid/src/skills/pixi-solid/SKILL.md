@@ -56,20 +56,22 @@ function App() {
 
 > **Note:** Both `x`/`y` and `positionX`/`positionY` are equivalent and work for static and reactive values. Axis props (`positionX`, `positionY`, `scaleX`, etc.) enable fine-grained reactivity — only the changed axis triggers an update instead of the whole point object.
 
-For full provider options see [application-context.md](./application-context.md). For component props and types see [component-types.md](./component-types.md). For hooks and lifecycle see [hooks-lifecycle.md](./hooks-lifecycle.md).
+For details, see [application-context.md](./application-context.md), [asset-loading.md](./asset-loading.md), [component-types.md](./component-types.md), [hooks-lifecycle.md](./hooks-lifecycle.md), [testing.md](./testing.md), and [utils-reference.md](./utils-reference.md).
 
 ## Public API checklist
 
-Quick reference for all exported symbols and where they are documented:
+Exports from `pixi-solid` and its public subpaths:
 
-| Area                  | Exports                                                                                                                                                                                                                     | Docs                                               |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| **Providers**         | `PixiCanvas`, `PixiApplicationProvider`, `TickerProvider`                                                                                                                                                                   | [application-context.md](./application-context.md) |
-| **Hooks & lifecycle** | `getPixiApp`, `getRenderer`, `getTicker`, `onResize`, `onTick`, `usePixiScreen`                                                                                                                                             | [hooks-lifecycle.md](./hooks-lifecycle.md)         |
-| **Components**        | `AnimatedSprite`, `BitmapText`, `Container`, `Graphics`, `HTMLText`, `MeshPlane`, `MeshRope`, `NineSliceSprite`, `ParticleContainer`, `PerspectiveMesh`, `RenderContainer`, `RenderLayer`, `Sprite`, `SplitBitmapText`, `SplitText`, `Text`, `TilingSprite` | [component-types.md](./component-types.md)         |
-| **Prop types**        | `PixiComponentProps` and concrete component prop types (`SpriteProps`, `GraphicsProps`, `ContainerProps`, etc.) | [component-types.md](./component-types.md)         |
-| **Utils**             | `createDelay`, `createAsyncDelay`, `ObjectFitContainer`, `objectFit`, `useSpring`, `useSmoothDamp`                                                                                                                                | [utils-reference.md](./utils-reference.md)         |
-| **Testing**           | `mountScene`, `renderHook`, `createTestContext`, `createManualTicker`, `getByLabel`, `queryByLabel`, `getAllByLabel`, `cleanup`                                                                                             | [testing.md](./testing.md)                         |
+| Area | Exports | Reference |
+| --- | --- | --- |
+| Providers | `PixiCanvas`, `PixiApplicationProvider`, `TickerProvider` | [application-context.md](./application-context.md) |
+| Hooks and lifecycle | `getPixiApp`, `getRenderer`, `getTicker`, `onResize`, `onTick`, `usePixiScreen` | [hooks-lifecycle.md](./hooks-lifecycle.md) |
+| Components | `AnimatedSprite`, `BitmapText`, `Container`, `Graphics`, `HTMLText`, `MeshPlane`, `MeshRope`, `NineSliceSprite`, `ParticleContainer`, `PerspectiveMesh`, `RenderContainer`, `RenderLayer`, `Sprite`, `SplitBitmapText`, `SplitText`, `Text`, `TilingSprite` | [component-types.md](./component-types.md) |
+| Root types | `AnimatedSpriteProps`, `BitmapTextProps`, `ContainerProps`, `GraphicsProps`, `HTMLTextProps`, `MeshPlaneProps`, `MeshRopeProps`, `NineSliceSpriteProps`, `ParticleContainerProps`, `PerspectiveMeshProps`, `PixiApplicationProps`, `PixiCanvasProps`, `PixiComponentProps`, `PixiScreenDimensions`, `RenderContainerProps`, `RenderLayerProps`, `SpriteProps`, `SplitBitmapTextProps`, `SplitTextProps`, `TextProps`, `TilingSpriteProps` | [application-context.md](./application-context.md), [component-types.md](./component-types.md), [hooks-lifecycle.md](./hooks-lifecycle.md) |
+| `pixi-solid/utils` values | `createAsyncDelay`, `createDelay`, `objectFit`, `ObjectFitContainer`, `useSmoothDamp`, `useSpring` | [utils-reference.md](./utils-reference.md) |
+| `pixi-solid/utils` types | `AsyncDelayFunction`, `DelayFunction`, `ObjectFitContainerProps`, `ObjectFitMode`, `ObjectPosition`, `Spring`, `UseSpringProps` | [utils-reference.md](./utils-reference.md) |
+| `pixi-solid/testing` values | `cleanup`, `createManualTicker`, `createTestContext`, `getAllByLabel`, `getByLabel`, `mountScene`, `queryByLabel`, `renderHook` | [testing.md](./testing.md) |
+| `pixi-solid/testing` types | `ManualTicker`, `MountSceneResult`, `RenderHookOptions`, `RenderHookResult`, `TestContext`, `TestRenderer` | [testing.md](./testing.md) |
 
 ## Quick rules
 

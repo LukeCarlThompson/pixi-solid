@@ -329,16 +329,18 @@ describe("getByLabel", () => {
 ## Testing createAsyncDelay
 
 ```tsx
-import { describe, expect, it } from "vitest";
-import { renderHook, createTestContext } from "pixi-solid/testing";
+import { afterEach, describe, expect, it } from "vitest";
+import { cleanup, createTestContext } from "pixi-solid/testing";
 import { createAsyncDelay } from "pixi-solid/utils";
+
+afterEach(() => cleanup());
 
 describe("createAsyncDelay", () => {
   it("resolves after the requested time passes on the ticker", async () => {
     const ctx = createTestContext();
     let delay!: (ms: number, signal?: AbortSignal) => Promise<void>;
 
-    renderHook(() => {
+    ctx.renderHook(() => {
       delay = createAsyncDelay();
     });
 
@@ -353,11 +355,11 @@ describe("createAsyncDelay", () => {
     await promise;
   });
 
-  it("rejects when aborted", async () => {
+  it("resolves when aborted", async () => {
     const ctx = createTestContext();
     let delay!: (ms: number, signal?: AbortSignal) => Promise<void>;
 
-    renderHook(() => {
+    ctx.renderHook(() => {
       delay = createAsyncDelay();
     });
 
@@ -365,7 +367,7 @@ describe("createAsyncDelay", () => {
     const promise = delay(1000, controller.signal);
     controller.abort();
 
-    await expect(promise).rejects.toBeDefined();
+    await expect(promise).resolves.toBeUndefined();
   });
 });
 ```

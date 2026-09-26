@@ -89,7 +89,7 @@ This keeps loading focused — the game-scene textures aren't fetched until the 
 
 ## Accessing loaded assets from the cache
 
-Once an asset is loaded (via `Assets.load` or `Assets.loadBundle`), PixiJS caches it by alias. You can access it synchronously anywhere in your app:
+Once loaded, PixiJS caches the asset under the key used to load or register it. Use the manifest alias for bundle assets (such as `"player"`); when loading a URL directly with `Assets.load(url)`, use that URL unless you registered a separate alias. You can access the cached asset synchronously:
 
 ```tsx
 import { Assets, Texture } from "pixi.js";
@@ -97,7 +97,7 @@ import { Assets, Texture } from "pixi.js";
 const texture = Assets.get<Texture>("player");
 ```
 
-This is useful for assets loaded by a parent or provider — children can reference them by alias without awaiting them again.
+This is useful for assets loaded by a parent or provider — children can reference them by the same key without awaiting them again.
 
 ## Keeping asset loading separate from scene rendering
 
