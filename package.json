@@ -18,15 +18,17 @@
     "typecheck": "pnpm -r run typecheck"
   },
   "devDependencies": {
+    "@solidjs/vite-plugin": "3.0.0-next.35",
+    "@solidjs/web": "2.0.0-rc.9",
     "@types/node": "25.6.2",
     "canvas": "3.2.3",
     "oxfmt": "0.68.0",
     "oxlint": "1.83.0",
     "oxlint-tsgolint": "7.0.2001",
     "sass-embedded": "1.104.1",
+    "solid-js": "2.0.0-rc.9",
     "typescript": "6.0.3",
     "vite": "8.3.0",
-    "vite-plugin-solid": "2.11.14",
     "vitest": "5.0.1"
   },
   "packageManager": "pnpm@12.4.1"

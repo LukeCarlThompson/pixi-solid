@@ -2,7 +2,7 @@ import { cpSync } from "node:fs";
 import path from "node:path";
 
 import type { Plugin } from "vite";
-import solidPlugin from "vite-plugin-solid";
+import solidPlugin from "@solidjs/vite-plugin";
 import { defineConfig } from "vitest/config";
 
 const copySkillFilesPlugin: Plugin = {
@@ -38,13 +38,9 @@ export default defineConfig({
     rollupOptions: {
       external: [
         "solid-js",
-        "solid-js/web",
-        "solid-js/universal",
-        "solid-js/store",
-        "solid-js/h",
-        "solid-js/html",
-        "solid-js/jsx-runtime",
-        "solid-js/jsx-dev-runtime",
+        "@solidjs/web",
+        "@solidjs/web/jsx-runtime",
+        "@solidjs/web/jsx-dev-runtime",
         "pixi.js",
       ],
       output: {
