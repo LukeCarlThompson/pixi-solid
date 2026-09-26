@@ -5,7 +5,7 @@ description: Reference for all publicly exported providers (PixiCanvas, PixiAppl
 
 # Application context (providers)
 
-This subskill covers every publicly exported provider from `pixi-solid`. Use it when setting up a Pixi application, choosing how to provide context, or accessing application state from outside the canvas.
+This reference covers `pixi-solid` providers and the contexts they provide. Use it to choose how to create an application, mount its canvas, or supply an external ticker.
 
 ## Import
 
@@ -26,7 +26,7 @@ Three providers exist. Choose based on your application's needs:
 
 ## `PixiCanvas`
 
-The simplest way to get started. Mounts the Pixi canvas inside a positioned wrapper `div`, accepts standard DOM props on that wrapper, and automatically resizes to the wrapper's bounds.
+The simplest setup. Mounts the Pixi canvas inside a positioned wrapper `div`, forwards supported wrapper props, and automatically resizes to the wrapper's bounds.
 
 ```tsx
 import { PixiCanvas, Sprite } from "pixi-solid";
@@ -41,24 +41,22 @@ export const DemoApp = () => (
 
 ### `PixiCanvasProps`
 
-```ts
-type PixiCanvasProps = {
-  children: JSX.Element;
-  ref?: (el: HTMLDivElement) => void;
-} & Omit<JSX.HTMLAttributes<HTMLDivElement>, "children" | "ref"> &
-  Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">>;
-```
+Requires `children`. Also accepts a callback `ref` for the wrapper, supported wrapper props, and Pixi application initialization options.
 
 Props accepted:
 
-- `children` — JSX content to render inside the canvas (pixi-solid components).
-- DOM props — Any standard HTML `div` attributes (`style`, `class`, `id`, `aria-*`, `data-*`, etc.) are passed to the wrapper element.
-- Pixi `ApplicationOptions` — Any option except `children` and `resizeTo` (handled internally).
+- `children` — JSX content rendered into the Pixi stage.
+- Wrapper props currently routed at runtime — `ref`, `class`, `classList`, `style`, `id`, `title`, `role`, `tabIndex`, `aria-*`, `data-*`, and camel-case DOM handlers such as `onClick`.
+- Pixi `ApplicationOptions` — Initialization options except `children` and `resizeTo` (handled internally). They are not runtime-reactive.
+
+Although the TypeScript type includes `JSX.HTMLAttributes<HTMLDivElement>`, other DOM attributes are not currently routed to the wrapper.
 
 `PixiCanvas` works with or without a surrounding `PixiApplicationProvider`:
 
-- If used inside `PixiApplicationProvider`, it uses the provided context.
+- If used inside `PixiApplicationProvider`, it uses the provided app; `PixiCanvas` application options are ignored in this case.
 - If used standalone, it creates its own `Pixi.Application` and provides context.
+
+Give the wrapper non-zero dimensions with `style` or CSS so automatic resizing has a usable size.
 
 ## `PixiApplicationProvider`
 
@@ -67,9 +65,18 @@ Creates a `Pixi.Application` instance and provides it through context. Does **no
 ```tsx
 import { PixiApplicationProvider, PixiCanvas, usePixiScreen, Text } from "pixi-solid";
 
+function HtmlOverlay() {
+  const screen = usePixiScreen();
+  return (
+    <div>
+      {screen.width} × {screen.height}
+    </div>
+  );
+}
+
 export const DemoApp = () => (
   <PixiApplicationProvider background="#1099bb">
-    <HtmlComponent />
+    <HtmlOverlay />
     <PixiCanvas style={{ width: "100%", height: "500px" }}>
       <Text text="Hello from Pixi!" style={{ fill: "white", fontSize: 24 }} />
     </PixiCanvas>
@@ -80,6 +87,9 @@ export const DemoApp = () => (
 ### `PixiApplicationProps`
 
 ```ts
+import type * as Pixi from "pixi.js";
+import type { JSX } from "solid-js";
+
 type PixiApplicationProps = Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">> & {
   children?: JSX.Element;
   existingApp?: Pixi.Application;
@@ -88,8 +98,8 @@ type PixiApplicationProps = Partial<Omit<Pixi.ApplicationOptions, "children" | "
 
 Props accepted:
 
-- Standard `ApplicationOptions` (except `children` and `resizeTo`).
-- `existingApp` — An already-created `Pixi.Application` instance. When provided, the provider reuses it instead of creating a new one. The application must be initialized before rendering, and you handle lifecycle/cleanup yourself.
+- Standard `ApplicationOptions` (except `children` and `resizeTo`). They apply only when this provider creates the app and are initialization-only.
+- `existingApp` — An already-created `Pixi.Application` instance. When provided, the provider reuses it; other app options are ignored. The application must be initialized before rendering, and you handle lifecycle/cleanup yourself.
 
 `PixiApplicationProvider` also provides context for:
 
@@ -109,14 +119,15 @@ Use `PixiApplicationProvider` when:
 Wraps an existing `Pixi.Ticker` instance in context. Does **not** create an application or canvas — it only provides ticker context.
 
 ```tsx
-import { TickerProvider, onTick } from "pixi-solid";
+import { TickerProvider } from "pixi-solid";
 import { Ticker } from "pixi.js";
+import type { ParentProps } from "solid-js";
 import type * as Pixi from "pixi.js";
 
 const myTicker = new Ticker();
 
-export const TestApp = ({ children }) => (
-  <TickerProvider ticker={myTicker}>{children}</TickerProvider>
+export const TestApp = (props: ParentProps) => (
+  <TickerProvider ticker={myTicker}>{props.children}</TickerProvider>
 );
 ```
 
@@ -128,7 +139,7 @@ type TickerProviderProps = ParentProps<{ ticker: Pixi.Ticker }>;
 
 Props accepted:
 
-- `ticker` — An existing `Pixi.Ticker` instance. This is the only required prop.
+- `ticker` — An existing `Pixi.Ticker` instance. This is the only required prop. The provider does not start, stop, or destroy it; the caller owns ticker lifecycle.
 
 Use `TickerProvider` mainly when:
 
@@ -137,7 +148,7 @@ Use `TickerProvider` mainly when:
 - You need to integrate an existing ticker owned by another system.
 - A non-standard integration must populate ticker context for descendants outside the normal application provider tree.
 
-These are edge cases. `PixiCanvas` and `PixiApplicationProvider` provide ticker context for normal scenes. Use `createManualTicker` and `createTestContext` for testing instead of using `TickerProvider` as a test harness.
+Use `createTestContext` when tests need app, renderer, and screen contexts. For ticker-only tests, combine `TickerProvider` with `createManualTicker`.
 
 `TickerProvider` provides context for:
 

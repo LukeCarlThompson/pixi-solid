@@ -1,10 +1,24 @@
+import { cpSync } from "node:fs";
 import path from "node:path";
 
+import type { Plugin } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import { defineConfig } from "vitest/config";
 
+const copySkillFilesPlugin: Plugin = {
+  name: "copy-pixi-solid-skill-files",
+  apply: "build",
+  closeBundle() {
+    cpSync(
+      path.resolve(import.meta.dirname, "src/skills"),
+      path.resolve(import.meta.dirname, "dist/skills"),
+      { recursive: true },
+    );
+  },
+};
+
 export default defineConfig({
-  plugins: [solidPlugin()],
+  plugins: [solidPlugin(), copySkillFilesPlugin],
   test: {
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     pool: "threads",

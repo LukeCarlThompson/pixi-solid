@@ -12,7 +12,7 @@ For detailed contribution workflow (commands, TypeScript conventions, naming, te
 
 ## Consumer skill
 
-For consumer API docs (components, hooks, utils, testing patterns), see [packages/pixi-solid/src/skill/pixi-solid/](packages/pixi-solid/src/skill/pixi-solid/).
+For consumer API docs (components, hooks, assets, utils, testing patterns), see [packages/pixi-solid/src/skills/pixi-solid/](packages/pixi-solid/src/skills/pixi-solid/).
 
 ## Architecture
 

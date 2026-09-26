@@ -62,14 +62,13 @@ packages/
 
 ### `packages/pixi-solid`
 
-| Command                   | Description                                                         |
-| ------------------------- | ------------------------------------------------------------------- |
-| `pnpm build`              | Vite build + TypeScript declarations                                |
-| `pnpm test`               | Vitest                                                              |
-| `pnpm test:bench`         | Run benchmarks                                                      |
-| `pnpm test:bench:save`    | Save benchmark results as baseline                                  |
-| `pnpm test:bench:compare` | Compare benchmarks against baseline                                 |
-| `pnpm build:skill`        | Copy LLM skill files to dist/skill (runs automatically after build) |
+| Command                   | Description                                                               |
+| ------------------------- | ------------------------------------------------------------------------- |
+| `pnpm build`              | Vite build + TypeScript declarations; copies skill files to `dist/skills` |
+| `pnpm test`               | Vitest                                                                    |
+| `pnpm test:bench`         | Run benchmarks                                                            |
+| `pnpm test:bench:save`    | Save benchmark results as baseline                                        |
+| `pnpm test:bench:compare` | Compare benchmarks against baseline                                       |
 
 ---
 
@@ -252,7 +251,7 @@ Located in `packages/pixi-solid/src/testing/`:
 - `getByLabel(root, label)` / `queryByLabel(root, label)` / `getAllByLabel(root, label)` — scene graph queries.
 - `cleanup()` — run all registered disposers (wire into `afterEach`).
 
-See `packages/pixi-solid/src/testing/README.md` for full usage.
+See the [testing docs](./packages/pixi-solid-docs/src/content/docs/testing/overview.mdx) for consumer usage examples.
 
 Use `afterEach(() => vi.restoreAllMocks())` to clean up mocks between tests.
 
