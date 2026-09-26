@@ -7,15 +7,13 @@ metadata:
 
 # Pixi-solid guidelines
 
-You are an expert pixi-solid AI assistant. You write highly performant, type-safe code tailored to Solid's compiled fine-grained reactivity system and Pixi's high performance rendering capabilities.
+Use this skill for `pixi-solid` APIs and integration only. Prefer its components, providers, hooks, and utilities for scene integration; import PixiJS classes from `pixi.js` and Solid primitives from `solid-js`.
 
 ## Overview
 
-`pixi-solid` is a SolidJS library that provides a set of JSX components and utilities for creating PixiJS applications. It allows developers to use SolidJS's declarative syntax to create and manage PixiJS objects, while also leveraging SolidJS's reactivity system of stores and signals for state management.
+`pixi-solid` wraps PixiJS display objects in SolidJS components and adds context, lifecycle, and utility APIs. It does not re-export PixiJS or SolidJS APIs. The package supports `pixi.js >=8.14.3 <9` and `solid-js >=1.9.10 <2`. Three providers exist:
 
-It works with pixi.js v8 and SolidJS v1.9.10 or later. Three providers exist:
-
-- **`PixiCanvas`** — simplest setup; owns the canvas and resizes to its wrapper.
+- **`PixiCanvas`** — mounts the application canvas and resizes it to its wrapper.
 - **`PixiApplicationProvider`** — provides app context without mounting a canvas; use when HTML outside the canvas needs hooks, or when passing an `existingApp`.
 - **`TickerProvider`** — context wrapper around an existing `Pixi.Ticker`; use for testing or subtrees that need an independent ticker.
 
@@ -47,8 +45,14 @@ function App() {
   const [x, setX] = createSignal(100);
 
   return (
-    <PixiCanvas>
-      <Sprite texture={Texture.WHITE} positionX={x()} />
+    <PixiCanvas style={{ width: "100%", height: "100vh" }}>
+      <Sprite
+        texture={Texture.WHITE}
+        scale={50}
+        positionX={x()}
+        eventMode="static"
+        onpointertap={() => setX((current) => current + 10)}
+      />
     </PixiCanvas>
   );
 }
@@ -62,22 +66,24 @@ For details, see [application-context.md](./application-context.md), [asset-load
 
 Exports from `pixi-solid` and its public subpaths:
 
-| Area | Exports | Reference |
-| --- | --- | --- |
-| Providers | `PixiCanvas`, `PixiApplicationProvider`, `TickerProvider` | [application-context.md](./application-context.md) |
-| Hooks and lifecycle | `getPixiApp`, `getRenderer`, `getTicker`, `onResize`, `onTick`, `usePixiScreen` | [hooks-lifecycle.md](./hooks-lifecycle.md) |
-| Components | `AnimatedSprite`, `BitmapText`, `Container`, `Graphics`, `HTMLText`, `MeshPlane`, `MeshRope`, `NineSliceSprite`, `ParticleContainer`, `PerspectiveMesh`, `RenderContainer`, `RenderLayer`, `Sprite`, `SplitBitmapText`, `SplitText`, `Text`, `TilingSprite` | [component-types.md](./component-types.md) |
-| Root types | `AnimatedSpriteProps`, `BitmapTextProps`, `ContainerProps`, `GraphicsProps`, `HTMLTextProps`, `MeshPlaneProps`, `MeshRopeProps`, `NineSliceSpriteProps`, `ParticleContainerProps`, `PerspectiveMeshProps`, `PixiApplicationProps`, `PixiCanvasProps`, `PixiComponentProps`, `PixiScreenDimensions`, `RenderContainerProps`, `RenderLayerProps`, `SpriteProps`, `SplitBitmapTextProps`, `SplitTextProps`, `TextProps`, `TilingSpriteProps` | [application-context.md](./application-context.md), [component-types.md](./component-types.md), [hooks-lifecycle.md](./hooks-lifecycle.md) |
-| `pixi-solid/utils` values | `createAsyncDelay`, `createDelay`, `objectFit`, `ObjectFitContainer`, `useSmoothDamp`, `useSpring` | [utils-reference.md](./utils-reference.md) |
-| `pixi-solid/utils` types | `AsyncDelayFunction`, `DelayFunction`, `ObjectFitContainerProps`, `ObjectFitMode`, `ObjectPosition`, `Spring`, `UseSpringProps` | [utils-reference.md](./utils-reference.md) |
-| `pixi-solid/testing` values | `cleanup`, `createManualTicker`, `createTestContext`, `getAllByLabel`, `getByLabel`, `mountScene`, `queryByLabel`, `renderHook` | [testing.md](./testing.md) |
-| `pixi-solid/testing` types | `ManualTicker`, `MountSceneResult`, `RenderHookOptions`, `RenderHookResult`, `TestContext`, `TestRenderer` | [testing.md](./testing.md) |
+| Area                        | Exports                                                                                                                                                                                                                                                                                                                                                                                                                                   | Reference                                                                                                                                  |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Providers                   | `PixiCanvas`, `PixiApplicationProvider`, `TickerProvider`                                                                                                                                                                                                                                                                                                                                                                                 | [application-context.md](./application-context.md)                                                                                         |
+| Hooks and lifecycle         | `getPixiApp`, `getRenderer`, `getTicker`, `onResize`, `onTick`, `usePixiScreen`                                                                                                                                                                                                                                                                                                                                                           | [hooks-lifecycle.md](./hooks-lifecycle.md)                                                                                                 |
+| Components                  | `AnimatedSprite`, `BitmapText`, `Container`, `Graphics`, `HTMLText`, `MeshPlane`, `MeshRope`, `NineSliceSprite`, `ParticleContainer`, `PerspectiveMesh`, `RenderContainer`, `RenderLayer`, `Sprite`, `SplitBitmapText`, `SplitText`, `Text`, `TilingSprite`                                                                                                                                                                               | [component-types.md](./component-types.md)                                                                                                 |
+| Root types                  | `AnimatedSpriteProps`, `BitmapTextProps`, `ContainerProps`, `GraphicsProps`, `HTMLTextProps`, `MeshPlaneProps`, `MeshRopeProps`, `NineSliceSpriteProps`, `ParticleContainerProps`, `PerspectiveMeshProps`, `PixiApplicationProps`, `PixiCanvasProps`, `PixiComponentProps`, `PixiScreenDimensions`, `RenderContainerProps`, `RenderLayerProps`, `SpriteProps`, `SplitBitmapTextProps`, `SplitTextProps`, `TextProps`, `TilingSpriteProps` | [application-context.md](./application-context.md), [component-types.md](./component-types.md), [hooks-lifecycle.md](./hooks-lifecycle.md) |
+| `pixi-solid/utils` values   | `createAsyncDelay`, `createDelay`, `objectFit`, `ObjectFitContainer`, `useSmoothDamp`, `useSpring`                                                                                                                                                                                                                                                                                                                                        | [utils-reference.md](./utils-reference.md)                                                                                                 |
+| `pixi-solid/utils` types    | `AsyncDelayFunction`, `DelayFunction`, `ObjectFitContainerProps`, `ObjectFitMode`, `ObjectPosition`, `Spring`, `UseSpringProps`                                                                                                                                                                                                                                                                                                           | [utils-reference.md](./utils-reference.md)                                                                                                 |
+| `pixi-solid/testing` values | `cleanup`, `createManualTicker`, `createTestContext`, `getAllByLabel`, `getByLabel`, `mountScene`, `queryByLabel`, `renderHook`                                                                                                                                                                                                                                                                                                           | [testing.md](./testing.md)                                                                                                                 |
+| `pixi-solid/testing` types  | `ManualTicker`, `MountSceneResult`, `RenderHookOptions`, `RenderHookResult`, `TestContext`, `TestRenderer`                                                                                                                                                                                                                                                                                                                                | [testing.md](./testing.md)                                                                                                                 |
 
 ## Quick rules
 
-- Pixi events use lowercase `on*` props (`onpointerdown`), not DOM `on:` listeners.
-- Interactive events require `eventMode="static"` or `eventMode="dynamic"`.
 - Use axis props (`positionX`, `positionY`, `scaleX`, etc.) for fine-grained reactivity instead of replacing whole point objects.
-- Child components are automatically added to parent containers.
-- `onResize` fires a callback; `usePixiScreen` returns a reactive store. Use `usePixiScreen` when you need dimensions as values.
-- All hooks require being inside the appropriate provider context — see [hooks-lifecycle.md](./hooks-lifecycle.md#provider-requirements) for the table.
+- `Container`, `RenderContainer`, and `RenderLayer` accept children; child components attach automatically. Leaf components do not accept children.
+- `as` uses a caller-owned Pixi instance. `pixi-solid` does not destroy that instance on unmount.
+- Pixi options initialize the instance; changed values update writable instance properties. Constructor-only options may not update after mount.
+- `AnimatedSprite` uses the current ticker by default; set `autoUpdate={false}` to manage updates yourself.
+- Pixi events use lowercase `on*` props (`onpointerdown`), not DOM `on:` listeners. Pointer interaction needs `eventMode="static"` or `"dynamic"`.
+- `onResize` fires a callback; `usePixiScreen` returns reactive screen dimensions. Use the store when dimensions are needed as values.
+- Context-dependent APIs must run under their required provider. See [hooks-lifecycle.md](./hooks-lifecycle.md#provider-requirements).

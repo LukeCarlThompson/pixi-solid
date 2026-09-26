@@ -1,105 +1,39 @@
 ---
 name: asset-loading
-description: Patterns for loading and managing assets with pixi-solid. Covers createResource, PixiJS manifests, bundle loading, and scene-gated asset patterns.
+description: Patterns for loading PixiJS assets for pixi-solid components. Covers createResource, manifests, bundles, and scene-gated rendering.
 ---
 
-# Asset loading with pixi-solid
+# Loading assets for pixi-solid
 
-This subskill covers patterns for loading textures, spritesheets, and other assets when using `pixi-solid`. It integrates PixiJS's asset system with SolidJS's reactive primitives.
+PixiJS `Assets` and SolidJS `createResource` are not exported by `pixi-solid`. Use PixiJS to load resources, then pass them to pixi-solid components. Neither component cleanup nor disposing a Solid resource unloads assets from PixiJS's shared cache.
 
-## Import
+## Load one asset
 
-```ts
-import { Assets } from "pixi.js";
-import { createResource, Show } from "solid-js";
-```
-
-## Loading a single asset
-
-For small scenes or individual assets, use Solid's `createResource` to load the asset and gate rendering with `<Show>`:
+Use a Solid resource to gate mounting until texture is ready. Mount this component under `PixiCanvas` or another application provider:
 
 ```tsx
 import { createResource, Show } from "solid-js";
 import { Assets, Texture } from "pixi.js";
 import { Sprite } from "pixi-solid";
 
-function MySprite() {
-  const [texture] = createResource(() =>
-    Assets.load<Texture>("https://example.com/my-texture.png"),
-  );
+function HeroScene() {
+  const [texture] = createResource(() => Assets.load<Texture>("/images/hero.png"));
 
   return (
-    <Show when={texture()}>
-      <Sprite texture={texture()!} />
-    </Show>
+    <Show when={texture()}>{(loadedTexture) => <HeroSprite texture={loadedTexture()} />}</Show>
   );
+}
+
+function HeroSprite(props: { texture: Texture }) {
+  return <Sprite texture={props.texture} />;
 }
 ```
 
-`createResource` returns a reactive signal that resolves when the asset loads. The `<Show>` wrapper ensures the `Sprite` is only mounted once the texture is ready. The resource is created inside the component so it's properly scoped and cleaned up on unmount.
+`Assets.load()` does not require `Assets.init()` for a direct URL. Keep the loading boundary at the route or scene level: load its resources together, then render display components with loaded values. Avoid adding separate resources and loading gates to every `Sprite`. A failed load is available through the resource's `error` accessor; add an error or loading state if your UI needs one.
 
-## Loading with manifests and bundles
+## Load scene bundles
 
-For larger apps, use PixiJS asset manifests and bundle loading to organise assets by scene or feature.
-
-### 1. Generate a manifest (preferred: with AssetPack)
-
-In production projects, use [AssetPack](https://pixijs.io/assetpack/) to generate manifests automatically rather than writing them by hand.
-
-### 2. Init the manifest and load bundles on demand
-
-Initialise the manifest and load a bundle together inside a single `createResource`. Return `true` so the signal is truthy when done:
-
-```tsx
-import { Assets, Texture } from "pixi.js";
-import { createResource, Show } from "solid-js";
-import { Sprite } from "pixi-solid";
-
-const manifest = {
-  bundles: [
-    {
-      name: "menu-scene",
-      assets: [
-        { alias: "menu-bg", src: "textures/menu-bg.png" },
-        { alias: "play-btn", src: "textures/play-btn.png" },
-      ],
-    },
-  ],
-};
-
-function MenuScene() {
-  const [ready] = createResource(async () => {
-    await Assets.init({ manifest });
-    await Assets.loadBundle("menu-scene");
-    // Assets.init and loadBundle return void promises.
-    // <Show when={}> gates on truthiness, so return true to open the gate.
-    return true;
-  });
-
-  return (
-    <Show when={ready()}>
-      <Sprite texture={Assets.get<Texture>("menu-bg")} />
-      <Sprite texture={Assets.get<Texture>("play-btn")} />
-    </Show>
-  );
-}
-```
-
-This keeps loading focused — the game-scene textures aren't fetched until the user navigates to that scene.
-
-## Accessing loaded assets from the cache
-
-Once loaded, PixiJS caches the asset under the key used to load or register it. Use the manifest alias for bundle assets (such as `"player"`); when loading a URL directly with `Assets.load(url)`, use that URL unless you registered a separate alias. You can access the cached asset synchronously:
-
-```tsx
-import { Assets, Texture } from "pixi.js";
-
-const texture = Assets.get<Texture>("player");
-```
-
-This is useful for assets loaded by a parent or provider — children can reference them by the same key without awaiting them again.
-
-## Keeping asset loading separate from scene rendering
+For larger pipelines, PixiJS [AssetPack](https://pixijs.io/assetpack/) can generate manifests. It is optional and independent of pixi-solid.
 
 Avoid mixing asset loading logic inside render-heavy Pixi components. Prefer to:
 
@@ -108,106 +42,56 @@ Avoid mixing asset loading logic inside render-heavy Pixi components. Prefer to:
 - Keep scene components focused on display and interaction logic.
 
 ```tsx
-import { Assets, Texture } from "pixi.js";
 import { createResource, Show } from "solid-js";
-import { Sprite } from "pixi-solid";
-
-// Good: loading is handled by the parent
-function GameScreen() {
-  const [ready] = createResource(async () => {
-    await Assets.loadBundle("game-scene");
-    return true;
-  });
-
-  return (
-    <Show when={ready()}>
-      <GameScene />
-    </Show>
-  );
-}
-
-function GameScene() {
-  // Assets are already cached — retrieve via Assets.get
-  return <Sprite texture={Assets.get<Texture>("player")} />;
-}
-```
-
-## Full example: scene-based loading
-
-```tsx
 import { Assets, Texture } from "pixi.js";
-import { createResource, createSignal, Show, Switch, Match } from "solid-js";
-import { PixiCanvas, Container, Sprite } from "pixi-solid";
+import { PixiCanvas, Sprite } from "pixi-solid";
 
 const manifest = {
   bundles: [
     {
-      name: "intro",
-      assets: [
-        { alias: "logo", src: "textures/logo.png" },
-        { alias: "bg", src: "textures/background.png" },
-      ],
-    },
-    {
-      name: "gameplay",
-      assets: [
-        { alias: "hero", src: "sprites/hero.json" },
-        { alias: "tiles", src: "textures/tileset.png" },
-      ],
+      name: "menu",
+      assets: [{ alias: "menu-bg", src: "/images/menu.png" }],
     },
   ],
 };
 
 function App() {
-  const [scene, setScene] = createSignal("intro");
-  // Assets.init returns void, so we return true so the signal is truthy when ready
-  const [initialised] = createResource(async () => {
+  const [initialized] = createResource(async () => {
     await Assets.init({ manifest });
     return true;
   });
 
   return (
-    <Show when={initialised()}>
-      <PixiCanvas background="#000">
-        <Switch>
-          <Match when={scene() === "intro"}>
-            <IntroScene onStart={() => setScene("gameplay")} />
-          </Match>
-          <Match when={scene() === "gameplay"}>
-            <GameplayScene />
-          </Match>
-        </Switch>
+    <Show when={initialized()}>
+      <PixiCanvas style={{ width: "100%", height: "100vh" }}>
+        <MenuRoute />
       </PixiCanvas>
     </Show>
   );
 }
 
-function IntroScene(props: { onStart: () => void }) {
+function MenuRoute() {
   const [ready] = createResource(async () => {
-    await Assets.loadBundle("intro");
+    await Assets.loadBundle("menu");
     return true;
   });
 
   return (
     <Show when={ready()}>
-      <Container>
-        <Sprite texture={Assets.get<Texture>("bg")} />
-        <Sprite texture={Assets.get<Texture>("logo")} x={100} y={50} />
-      </Container>
+      <MenuScene />
     </Show>
   );
 }
 
-function GameplayScene() {
-  const [ready] = createResource(async () => {
-    await Assets.loadBundle("gameplay");
-    return true;
-  });
-
-  return (
-    <Show when={ready()}>
-      <Sprite texture={Assets.get<Texture>("hero")} />
-    </Show>
-  );
+function MenuScene() {
+  return <Sprite texture={Assets.get<Texture>("menu-bg")} />;
 }
 ```
+
+`Assets.init()` resolves to `void`; `Assets.loadBundle()` resolves to loaded resources. Returning `true` makes each resource truthy for `<Show>` after loading.
+
+## Cache keys and ownership
+
+`Assets.get()` uses the same key used to register or load an asset. For bundle assets, use the manifest alias. For a direct `Assets.load(url)`, use the URL unless you registered an alias.
+
+pixi-solid does not own PixiJS assets and does not call `Assets.unload()` when a Sprite unmounts. Keep shared assets loaded while any scene uses them. Unload an exclusive bundle with PixiJS `Assets.unloadBundle()` when it is no longer needed.

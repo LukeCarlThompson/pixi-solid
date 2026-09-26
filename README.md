@@ -17,7 +17,7 @@ A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your sce
 
 - 📦 **Full component coverage** — Every major PixiJS display object has a corresponding component.
 - ⚡ **Signals-driven reactivity** — State changes automatically update your scene.
-- 🧹 **Automatic cleanup** — Components clean up after themselves on unmount (display objects, event listeners, ticker subscriptions, textures).
+- 🧹 **Automatic cleanup** — Components destroy Pixi instances they own and remove subscriptions on unmount. Instances passed through `as` and shared textures/assets remain caller-owned.
 - 🧪 **Testable without a browser** — Context, hooks, and ticker are built for simulation. `pixi-solid/testing` provides mountScene, scene graph queries, and manual ticker helpers.
 - ✨ **All PixiJS events supported** — Every federated event from PixiJS works as a component prop.
 - 🛠️ **Utilities included** — Animation helpers (spring, smooth damp), layout (object-fit), and async timing. Available via `pixi-solid/utils`.

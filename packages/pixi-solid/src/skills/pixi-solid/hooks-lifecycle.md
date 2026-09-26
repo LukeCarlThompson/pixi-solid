@@ -5,19 +5,21 @@ description: Reference for all publicly exported hooks (onTick, onResize, usePix
 
 # Hooks and lifecycle
 
-This subskill covers every publicly exported hook from `pixi-solid`. Use it when reacting to ticks, responding to resize events, or accessing the application, renderer, or ticker.
+This reference covers `pixi-solid` context hooks and lifecycle callbacks. Call these hooks synchronously from a Solid component or owned computation under the required provider; do not call them later from an event handler or async continuation.
 
 ## Import
 
 ```ts
 import { getPixiApp, getTicker, getRenderer, onResize, onTick, usePixiScreen } from "pixi-solid";
+import type { PixiScreenDimensions } from "pixi-solid";
+import type * as Pixi from "pixi.js";
 ```
 
 ## Hooks
 
 ### `getPixiApp`
 
-Returns the root `PIXI.Application` instance created by `PixiApplicationProvider` or `PixiCanvas`.
+Returns the app instance supplied by the nearest `PixiApplicationProvider` or `PixiCanvas`, including `existingApp` when provided.
 
 ```ts
 type getPixiApp = () => Pixi.Application;
@@ -33,7 +35,7 @@ type getPixiApp = () => Pixi.Application;
 
 ### `getRenderer`
 
-Returns the `PIXI.Renderer` instance created by `PixiApplicationProvider` or `PixiCanvas`.
+Returns the renderer from the app supplied by `PixiApplicationProvider` or `PixiCanvas`.
 
 ```ts
 type getRenderer = () => Pixi.Renderer;
@@ -136,36 +138,11 @@ type PixiScreenDimensions = {
 
 **Throws:** `"usePixiScreen must be used within a PixiApplicationProvider or PixiCanvas"` if no context is available.
 
-## Memory management & cleanup
+## Lifecycle ownership
 
-Pixi resources generally are managed by the objects that own them. For typical usage, applying a Texture to a `Sprite` or other display object will not usually require manual destruction — when the display object is destroyed, Pixi will release associated resources as appropriate.
+pixi-solid destroys instances it creates when their Solid owner is disposed. If you pass an instance through `as`, pixi-solid does not destroy it; you own its lifecycle. `RenderLayer` does not destroy its children because those children are managed elsewhere in the scene tree.
 
-You only need to manually destroy resources that you explicitly create and retain outside of a managed display object (for example, creating a `RenderTexture`, a custom `Geometry`, or a `BaseTexture` for an offscreen buffer). In those cases, destroy them in an unmount/cleanup handler.
-
-General guidance:
-
-- If you create standalone resources (RenderTexture, Geometry, custom Mesh, BaseTexture/Texture you manage yourself), call `destroy()` in an `onCleanup` handler or when you remove the object from the display list.
-- If you pass a Texture into a child `Sprite` that is owned by the component tree, you usually do not need to destroy it yourself.
-- When passing an `existingApp` into `PixiApplicationProvider`, the caller is responsible for that application's lifecycle (start/stop/destroy).
-
-Example — render texture created imperatively and cleaned up on unmount:
-
-```tsx
-<Container
-  ref={(c) => {
-    const rt = PIXI.RenderTexture.create({ width: 256, height: 256 });
-    const s = new PIXI.Sprite(rt);
-    c.addChild(s);
-
-    onCleanup(() => {
-      s.destroy(); // removes sprite from stage and disposes display object
-      rt.destroy(true); // destroy the render texture and underlying base texture
-    });
-  }}
-/>
-```
-
-> Note: APIs vary by Pixi class (options for destroy differ). When in doubt consult the PixiJS docs and prefer attaching resources to managed display objects when possible.
+`PixiApplicationProvider` destroys an app it creates. If you pass `existingApp`, you own that app's lifecycle. Shared textures and assets are not owned by a Sprite component; load and unload them through PixiJS `Assets` when appropriate. See [asset-loading.md](./asset-loading.md).
 
 ### Testing
 

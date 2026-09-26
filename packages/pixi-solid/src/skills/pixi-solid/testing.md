@@ -5,7 +5,7 @@ description: Testing patterns for pixi-solid components and hooks using mountSce
 
 # Testing pixi-solid
 
-This subskill documents recommended patterns for unit testing code that uses `pixi-solid`.
+This reference covers the test helpers exported by `pixi-solid/testing` and how they provide pixi-solid contexts.
 
 ## Quick reference
 
@@ -31,11 +31,24 @@ import {
 } from "pixi-solid/testing";
 ```
 
+## Cleanup setup
+
+`mountScene` and `renderHook` register disposers. Add this once in your test setup to clean up after each test:
+
+```ts
+import { afterEach } from "vitest";
+import { cleanup } from "pixi-solid/testing";
+
+afterEach(cleanup);
+```
+
 ## mountScene
 
-`mountScene(setup)` mounts JSX in a temporary Solid root and returns the root Container. Use this for component tests.
+`mountScene(setup)` mounts JSX in a temporary Solid root and returns the root Pixi node. It does not create application or ticker context; use `createTestContext` or `TickerProvider` when the component needs context.
 
 ```tsx
+import type * as Pixi from "pixi.js";
+
 type MountSceneResult<TRoot = Pixi.Container> = {
   container: TRoot;
   dispose: () => void;
@@ -48,7 +61,7 @@ The returned `container` is the root PixiJS node — access properties directly 
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { mountScene, createTestContext } from "pixi-solid/testing";
+import { getByLabel, mountScene } from "pixi-solid/testing";
 import { Container, Sprite } from "pixi-solid";
 
 describe("scene", () => {
@@ -66,39 +79,59 @@ describe("scene", () => {
 });
 ```
 
-### With onTick
+### Testing a ticker-dependent component
+
+Mount component under `ctx.Provider` so its `onTick` call sees ticker context. Advance test ticker, then assert component output:
 
 ```tsx
+import { createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
-import { mountScene, createTestContext } from "pixi-solid/testing";
-import { onTick } from "pixi-solid";
+import { Container, onTick, Sprite } from "pixi-solid";
+import { createTestContext, getByLabel, mountScene } from "pixi-solid/testing";
+import { Texture } from "pixi.js";
 
-describe("Component with onTick", () => {
-  it("calls the tick callback each frame", async () => {
+function TickerDrivenSprite() {
+  const [x, setX] = createSignal(0);
+  onTick((ticker) => setX((current) => current + ticker.deltaMS));
+
+  return <Sprite label="moving" texture={Texture.WHITE} x={x()} />;
+}
+
+describe("ticker-dependent component", () => {
+  it("GIVEN a mounted scene WHEN five ticker frames advance THEN sprite position reflects elapsed time", async () => {
+    // GIVEN
     const ctx = createTestContext();
-    let calls = 0;
-
-    mountScene(() => (
+    const { container, dispose } = mountScene(() => (
       <ctx.Provider>
-        {onTick(() => {
-          calls++;
-        })}
+        <Container label="scene">
+          <TickerDrivenSprite />
+        </Container>
       </ctx.Provider>
     ));
+    const sprite = getByLabel(container, "moving");
 
+    // WHEN
     await ctx.ticker.fastForwardFrames(5);
-    expect(calls).toBe(5);
+
+    // THEN
+    expect(sprite.x).toBe(80);
+    dispose();
   });
 });
 ```
 
-### Non-Container roots (AnimatedSprite, etc.)
+### Typing a specific component root
 
-For component types that are not `Pixi.Container`, specify the type via the generic parameter:
+`mountScene` defaults its root type to `Pixi.Container`. Specify a component's instance type when you need class-specific properties:
 
 ```tsx
+import { AnimatedSprite } from "pixi-solid";
+import { Texture } from "pixi.js";
+import type * as Pixi from "pixi.js";
+import { mountScene } from "pixi-solid/testing";
+
 const { container } = mountScene<Pixi.AnimatedSprite>(() => (
-  <AnimatedSprite textures={textures} playing />
+  <AnimatedSprite textures={[Texture.WHITE]} playing autoUpdate={false} />
 ));
 
 container.playing; // typed as Pixi.AnimatedSprite
@@ -109,13 +142,15 @@ container.playing; // typed as Pixi.AnimatedSprite
 `renderHook<T>(callback, options?)` runs a hook (or store factory) in a temporary Solid root and exposes its return value as a reactive accessor. Use this for hook and store tests.
 
 ```tsx
+import type { Accessor } from "solid-js";
+
 type RenderHookResult<T> = {
   result: Accessor<T>; // call result() to read the current value
   dispose: () => void;
 };
 ```
 
-The callback runs exactly once inside an optional `wrapper`, so hooks that register side effects (`onTick`, `onResize`) are cleaned up on dispose. If the callback reads reactive values, `result` re-evaluates when they change.
+The callback runs initially inside an optional `wrapper` and re-runs when reactive values it reads change. Hooks that register side effects (`onTick`, `onResize`) are cleaned up on `dispose`.
 
 ### Testing hooks with context
 
@@ -225,7 +260,7 @@ mountScene(() => (
 
 ```tsx
 import { describe, expect, it } from "vitest";
-import { renderHook, createTestContext } from "pixi-solid/testing";
+import { createTestContext } from "pixi-solid/testing";
 import { usePixiScreen } from "pixi-solid";
 
 describe("resize handling", () => {
@@ -287,7 +322,7 @@ await manual.fastForwardTime(500, 50); // 500ms in 50ms steps
 
 The drivers own a monotonic absolute clock, so successive calls are exactly additive — `await fastForwardTime(100)` then `await fastForwardTime(50)` delivers 100ms then 50ms of accumulated `deltaMS` with no dropped first frame.
 
-> **Note:** the returned `ticker` wraps a real PixiJS `Ticker`, so the same defaults apply (e.g. per-step deltas are capped at 100ms via the default `minFPS = 10`) and can be overridden on the instance after creation — e.g. `ticker.ticker.minFPS = 4` to allow larger step deltas.
+> **Note:** the returned `ticker` wraps a real PixiJS `Ticker`, so the same defaults apply (e.g. per-step deltas are capped at 100ms via the default `minFPS = 10`) and can be overridden on the instance after creation — e.g. `manual.ticker.minFPS = 4` to allow larger step deltas.
 
 Step-based advancement avoids the footgun of single large deltas that can break spring physics, smooth-damp interpolation, or sequenced animations.
 
@@ -329,11 +364,9 @@ describe("getByLabel", () => {
 ## Testing createAsyncDelay
 
 ```tsx
-import { afterEach, describe, expect, it } from "vitest";
-import { cleanup, createTestContext } from "pixi-solid/testing";
+import { describe, expect, it } from "vitest";
+import { createTestContext } from "pixi-solid/testing";
 import { createAsyncDelay } from "pixi-solid/utils";
-
-afterEach(() => cleanup());
 
 describe("createAsyncDelay", () => {
   it("resolves after the requested time passes on the ticker", async () => {
@@ -372,46 +405,17 @@ describe("createAsyncDelay", () => {
 });
 ```
 
-## Cleanup
+## Manual cleanup
 
-All disposers are registered with a global registry. Wire `cleanup()` into your test framework's lifecycle:
-
-```tsx
-import { afterEach } from "vitest";
-import { cleanup } from "pixi-solid/testing";
-
-afterEach(() => cleanup());
-```
-
-Once wired, you no longer need to track `dispose`:
-
-```tsx
-it("some test", () => {
-  mountScene(() => <Container label="root" />);
-  // cleanup runs automatically in afterEach
-});
-```
-
-To disable automatic cleanup for a specific test, pass your own dispose:
-
-```tsx
-it("manual cleanup", () => {
-  const { dispose } = mountScene(() => <Container />);
-  // ... test logic ...
-  dispose(); // manual cleanup, cleanup() won't double-dispose
-});
-```
+Use each helper's returned `dispose()` when you do not install the global `afterEach(cleanup)` setup. Calling `dispose()` unregisters that root, so later global cleanup will not dispose it twice.
 
 ## jsdom / renderer caveats
 
 - jsdom does not provide WebGL contexts. Tests that rely on WebGL-only renderer features should either mock Pixi renderer behavior or run in an environment that supports WebGL.
 - For most logic that depends on ticks (animations, timers, callbacks), the testing utilities in `pixi-solid/testing` don't need a real canvas at all.
 
-## Practical tips
+## Practical notes
 
-- Keep tests deterministic: avoid `ticker.start()` — use `fastForwardFrames()` or `fastForwardTime()` for precise control.
-- Use `mountScene` for component tests — it returns the root Container directly, no ref callbacks needed.
-- Use `renderHook` for hook and store tests — `ctx.renderHook(cb)` when context is needed.
-- Use `getByLabel` over `.children[index]` to decouple tests from scene graph layout.
-- When testing components that create resources imperatively, advance frames and then dispose to exercise cleanup paths.
-- All mocks (`ticker`, `renderer`, `app`) are plain objects — spy with `vi.spyOn`, `jest.fn()`, or any framework.
+- Avoid `ticker.start()` in tests; advance frames with the manual ticker.
+- Use `getByLabel` instead of `.children[index]` to keep tests independent of child order.
+- Dispose roots after testing resource cleanup. Mocks are plain objects and can be spied on with your test framework.

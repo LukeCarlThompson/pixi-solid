@@ -5,7 +5,7 @@ description: Reference for publicly exported component prop types from pixi-soli
 
 # Component prop types
 
-This subskill covers every publicly exported type from `pixi-solid` that defines what props a component accepts. Use it when building custom components, forwarding props, or understanding what values a component accepts.
+This reference covers public component prop types and the behavior that affects how pixi-solid components are written. Use PixiJS docs for underlying class options not specific to pixi-solid.
 
 ## Import
 
@@ -30,6 +30,8 @@ import type {
   TextProps,
   TilingSpriteProps,
 } from "pixi-solid";
+import type * as Pixi from "pixi.js";
+import type { JSX, Ref } from "solid-js";
 ```
 
 ## Component prop types
@@ -79,7 +81,13 @@ Available concrete prop types:
 - `TextProps`
 - `TilingSpriteProps`
 
-`AnimatedSpriteProps` includes `autoUpdate`. Container prop types include `children`. Leaf prop types do not.
+`AnimatedSpriteProps` includes `autoUpdate`. `Container`, `RenderContainer`, and `RenderLayer` accept `children`; other component prop types do not.
+
+## Prop updates
+
+Pixi options are passed to the Pixi constructor when the component mounts. pixi-solid tracks changed props and updates the corresponding instance property when that property exists and is writable. Constructor-only options cannot be updated after mount. Prefer axis props when updating one coordinate or scale axis.
+
+`AnimatedSprite` is an exception: pixi-solid disables Pixi's automatic ticker update and registers updates with the current ticker unless `autoUpdate={false}`. It therefore needs ticker context by default.
 
 ## Point-axis reference table
 
@@ -95,7 +103,7 @@ The table below shows which axis props are available on each component:
 
 ### Why axis props?
 
-SolidJS tracks changes by reference. Passing `position={{ x: 100, y: 200 }}` allocates a new object on every update, which both triggers the entire point to rebind and creates GC pressure. Axis props like `positionX` and `positionY` are plain `number` values — no allocations, and only the changed axis triggers an update.
+When a reactive update rebuilds `position={{ x, y }}`, pixi-solid rebinds the point as a whole. Axis props such as `positionX` and `positionY` update only the changed coordinate and avoid creating a point object.
 
 ## Event props
 
@@ -114,7 +122,7 @@ Interactive events require `eventMode="static"` or `eventMode="dynamic"` on the 
 | Touch    | `ontouchstart`, `ontouchend`, `ontouchmove`, `ontouchcancel`                                        |
 | Wheel    | `onwheel`                                                                                           |
 
-All events also have **capture variants** with a `capture` suffix — e.g. `onpointerdowncapture`. These fire during the capture phase before the target phase. The full event list is available in PixiJS's `FederatedEventEmitterTypes`.
+Most non-global events also have **capture variants** with a `capture` suffix — e.g. `onpointerdowncapture`. They fire during capture before the target phase. Global movement events have no capture variants. Event names are typed from PixiJS's `FederatedEventEmitterTypes`.
 
 ## Using these types
 
@@ -182,7 +190,7 @@ All pixi-solid components accept an optional `as` prop to use a **pre-existing P
 
 ```tsx
 import { Container, Sprite } from "pixi-solid";
-import { Container as PixiContainer } from "pixi.js";
+import { Container as PixiContainer, Texture } from "pixi.js";
 
 const existingContainer = new PixiContainer();
 existingContainer.label = "my-container";
@@ -192,7 +200,7 @@ existingContainer.label = "my-container";
 </Container>;
 ```
 
-**Lifecycle note:** When `as` is provided, pixi-solid assumes you own the instance's lifecycle and will **not** destroy it on unmount. You must destroy it manually when no longer needed.
+**Lifecycle note:** When `as` is provided, pixi-solid assumes you own the instance's lifecycle and will **not** destroy it on unmount. You must destroy it manually when no longer needed. Child components still follow their own lifecycle.
 
 ## Deliberate omissions
 
@@ -211,6 +219,6 @@ import {
 } from "pixi.js";
 ```
 
-`Particle` is omitted because `ParticleContainer` is designed for high-volume, imperative particle updates rather than fine-grained Solid reactivity. Use `ParticleContainer` from `pixi-solid` and manage particle instances imperatively.
+`Particle` is omitted because `ParticleContainer` is designed for high-volume, imperative updates rather than per-particle Solid reactivity. Use `ParticleContainer` from `pixi-solid`, then manage `Particle` instances from `pixi.js` imperatively.
 
-The other omitted classes are low-level geometry classes used when building custom meshes. Create them imperatively with PixiJS and wrap in a custom `pixi-solid` component when needed.
+`MeshGeometry`, `NineSliceGeometry`, `PerspectivePlaneGeometry`, `PlaneGeometry`, and `RopeGeometry` are low-level geometry types for custom meshes. `Rectangle` and `Culler` are PixiJS utilities. Import these directly from `pixi.js` when needed; `pixi-solid` does not re-export PixiJS classes.

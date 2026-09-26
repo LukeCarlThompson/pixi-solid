@@ -5,7 +5,7 @@ description: Reference for all publicly exported utility functions, hooks, and c
 
 # Utils reference
 
-This subskill covers every publicly exported utility from `pixi-solid/utils`. Use it for delays, animations, and object fitting.
+This reference covers the public `pixi-solid/utils` API. Ticker-bound helpers need the provider context described below; they are not standalone PixiJS or SolidJS utilities.
 
 ## Import
 
@@ -32,6 +32,9 @@ import type {
   DelayFunction,
   AsyncDelayFunction,
 } from "pixi-solid/utils";
+import type { PixiComponentProps } from "pixi-solid";
+import type * as Pixi from "pixi.js";
+import type { Accessor, JSX } from "solid-js";
 ```
 
 ## Delay utilities
@@ -52,11 +55,12 @@ Call `createDelay` synchronously inside a descendant of `PixiCanvas`, `PixiAppli
 - `delayMs` — Number of milliseconds to wait (measured in the ticker's time units).
 - `callback` — A callback function that fires when `delayMs` has passed.
 
-**Note:** Does not run if the ticker is paused or stopped.
+**Note:** Does not run if the ticker is paused or stopped. Scheduled callbacks have no cancellation handle and remain registered until their delay elapses.
 
 **Example:**
 
 ```tsx
+import { Text } from "pixi-solid";
 import { createDelay } from "pixi-solid/utils";
 
 const DelayedCallbackComponent = () => {
@@ -72,7 +76,7 @@ const DelayedCallbackComponent = () => {
     });
   };
 
-  return <Text text="Click me" onpointerdown={handleClick} />;
+  return <Text text="Click me" eventMode="static" onpointerdown={handleClick} />;
 };
 ```
 
@@ -87,25 +91,34 @@ type createAsyncDelay = () => AsyncDelayFunction;
 
 **Returns:** An async function we can `await` to delay events in sync with the ticker.
 
-**Constraints:** `createAsyncDelay` must be called synchronously inside a tracked descendant of `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`. The returned function can be called in an async context later.
+**Constraints:** Create it synchronously inside a component under `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`. The returned function can be called later from an event handler or async function.
 
 **Parameters (returned function):**
 
 - `delayMs` — Number of milliseconds to wait.
 - `signal` — Optional `AbortSignal` to resolve the delay early.
 
-**Note:** Does not resolve if the ticker is paused or stopped.
+**Note:** Does not resolve while the ticker is paused or stopped unless the `AbortSignal` aborts.
 
 **Example:**
 
 ```tsx
+import { onCleanup } from "solid-js";
+import { Text } from "pixi-solid";
 import { createAsyncDelay } from "pixi-solid/utils";
 
-const delay = createAsyncDelay();
+const DelayedAsyncComponent = () => {
+  const delay = createAsyncDelay();
+  const controller = new AbortController();
+  onCleanup(() => controller.abort());
 
-const handleClick = async (signal?: AbortSignal) => {
-  await delay(500, signal);
-  console.log("Resumed after 500ms, ticker-synced");
+  const handleClick = async () => {
+    await delay(500, controller.signal);
+    if (controller.signal.aborted) return;
+    console.log("Resumed after 500ms, ticker-synced");
+  };
+
+  return <Text text="Click me" eventMode="static" onpointerdown={handleClick} />;
 };
 ```
 
@@ -133,22 +146,23 @@ type objectFit = (
 
 **`ObjectFitMode`:** `"cover" | "contain" | "fill" | "scale-down" | "none"`
 
-| Mode           | Behavior                                                                                     |
-| -------------- | -------------------------------------------------------------------------------------------- |
-| `"cover"`      | Scale to fill bounds, may crop. Uses `Math.max(widthRatio, heightRatio)`.                    |
-| `"contain"`    | Scale to fit inside bounds, may leave empty space. Uses `Math.min(widthRatio, heightRatio)`. |
-| `"fill"`       | Stretch to fill bounds, may distort aspect ratio.                                            |
-| `"scale-down"` | Scale to cover or contain, whichever is smaller.                                             |
-| `"none"`       | No scaling applied.                                                                          |
+| Mode           | Behavior                                                                                                                |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `"cover"`      | Scale to fill bounds; content may overflow and is not clipped by this helper. Uses `Math.max(widthRatio, heightRatio)`. |
+| `"contain"`    | Scale to fit inside bounds, may leave empty space. Uses `Math.min(widthRatio, heightRatio)`.                            |
+| `"fill"`       | Stretch to fill bounds, may distort aspect ratio.                                                                       |
+| `"scale-down"` | Contain without scaling above `1`; never enlarges the object.                                                           |
+| `"none"`       | Set scale to `1`; existing scale is replaced.                                                                           |
 
-**`ObjectPosition`:** `"center" | "top" | "right" | "bottom" | "left" | "top-left" | "top-right" | "bottom-left" | "bottom-right" | { x: number; y: number }`
+**`ObjectPosition`:** `"center" | "top" | "right" | "bottom" | "left" | "top-left" | "top-right" | "bottom-left" | "bottom-right" | { x: number; y: number }`. Custom `x`/`y` values are alignment fractions: `0` start, `0.5` center, `1` end.
 
 **Example:**
 
 ```tsx
+import { Container } from "pixi.js";
 import { objectFit } from "pixi-solid/utils";
 
-// Imperative one-shot fit
+const container = new Container();
 objectFit(container, { width: 800, height: 600 }, "contain", "top-left");
 ```
 
@@ -157,16 +171,15 @@ objectFit(container, { width: 800, height: 600 }, "contain", "top-left");
 A reactive component that accepts children and fits them into a fixed area using `fitMode`, `objectPosition`, and optional `observeBounds`.
 
 ```tsx
-<ObjectFitContainer
-  x={100}
-  y={100}
-  width={800}
-  height={600}
-  fitMode="contain"
-  objectPosition="top-left"
->
-  <Sprite texture={texture} />
-</ObjectFitContainer>
+import { PixiCanvas, Sprite } from "pixi-solid";
+import { ObjectFitContainer } from "pixi-solid/utils";
+import { Texture } from "pixi.js";
+
+<PixiCanvas style={{ width: "800px", height: "600px" }}>
+  <ObjectFitContainer width={800} height={600} fitMode="contain" objectPosition="top-left">
+    <Sprite texture={Texture.WHITE} />
+  </ObjectFitContainer>
+</PixiCanvas>;
 ```
 
 **`ObjectFitContainerProps`:**
@@ -187,7 +200,7 @@ Props accepted:
 - `width`, `height` — The bounding area dimensions.
 - `fitMode` — How children are scaled (see `ObjectFitMode` above).
 - `objectPosition` — How children are positioned within the bounds (see `ObjectPosition` above).
-- `observeBounds` — If `true`, remeasures children's local bounds every tick and re-fits. **Performance concern** — runs on every frame. Only use when children's bounds change dynamically.
+- `observeBounds` — If `true`, checks each child's local bounds every tick and re-fits only when bounds change. This adds per-frame work; use only when child bounds change dynamically. Requires ticker context.
 - Standard pixi-solid `Container` props (position, scale, mask, events, etc.) on the outer container.
 
 **Behavior:**
@@ -222,26 +235,38 @@ type useSpring = (props: UseSpringProps) => Spring;
 **Parameters (`UseSpringProps`):**
 
 - `to` — Accessor for the target value.
-- `stiffness` — Effective range 0–100. Controls resistance to displacement. Default: 10.
-- `damping` — Effective range 0–100. Controls friction/resistance. Default: 30.
-- `mass` — Effective range 0–100. Controls inertia. Default: 20.
+- `stiffness` — Tuning range 0–100. Controls resistance to displacement. Default: 10.
+- `damping` — Tuning range 0–100. Controls friction/resistance. Default: 30.
+- `mass` — Tuning range 0–100. Controls inertia. Default: 20. Values are not clamped.
 
 **Returns (`Spring`):**
 
 - `value` — The current spring-animated value (reactive accessor).
 - `velocity` — The current velocity (reactive accessor).
-- `setValue` — Sets the value directly (teleport). The next frame still calculates physics based on the target.
+- `setValue` — Sets the value directly (teleport) without resetting velocity. The next frame continues physics toward the target.
 
-**Example:**
+**Example:** Use under a ticker-providing component such as `PixiCanvas`.
 
 ```tsx
+import { Sprite } from "pixi-solid";
+import { Texture } from "pixi.js";
 import { useSpring } from "pixi-solid/utils";
 import { createSignal } from "solid-js";
 
-const [target, setTarget] = createSignal(100);
-const spring = useSpring({ to: target });
+function SpringSprite() {
+  const [target, setTarget] = createSignal(100);
+  const spring = useSpring({ to: target });
 
-<Sprite x={spring.value()} />;
+  return (
+    <Sprite
+      texture={Texture.WHITE}
+      scale={50}
+      x={spring.value()}
+      eventMode="static"
+      onpointertap={() => setTarget((value) => value + 50)}
+    />
+  );
+}
 ```
 
 ### `useSmoothDamp(props)`
@@ -264,47 +289,56 @@ type SmoothDamp = {
 type useSmoothDamp = (props: UseSmoothDampProps) => SmoothDamp;
 ```
 
+`UseSmoothDampProps` and `SmoothDamp` are not exported from `pixi-solid/utils`; TypeScript infers them from `useSmoothDamp`.
+
 **Parameters (`UseSmoothDampProps`):**
 
 - `to` — Accessor for the target value.
-- `smoothTimeMs` — Time to reach the target in milliseconds. Smaller = faster. Default: 300.
+- `smoothTimeMs` — Approximate time to approach the target in milliseconds. Smaller = faster. Default: 300.
 - `maxSpeed` — Maximum speed in units per second. Default: `Infinity`.
 
 **Returns (`SmoothDamp`):**
 
 - `value` — The current damped value (reactive accessor).
 - `velocity` — The current velocity (reactive accessor).
-- `setValue` — Sets the value directly (teleport). The next frame still calculates damping physics based on the target.
+- `setValue` — Sets the value directly (teleport) without resetting velocity. The next frame continues damping toward the target.
 
-**Example:**
+**Example:** Use under a ticker-providing component such as `PixiCanvas`.
 
 ```tsx
+import { Sprite } from "pixi-solid";
+import { Texture } from "pixi.js";
 import { useSmoothDamp } from "pixi-solid/utils";
 import { createSignal } from "solid-js";
 
-const [target, setTarget] = createSignal(100);
-const damp = useSmoothDamp({ to: target, smoothTimeMs: 500 });
+function SmoothSprite() {
+  const [target, setTarget] = createSignal(100);
+  const damp = useSmoothDamp({ to: target, smoothTimeMs: 500 });
 
-<Sprite x={damp.value()} />;
+  return (
+    <Sprite
+      texture={Texture.WHITE}
+      scale={50}
+      x={damp.value()}
+      eventMode="static"
+      onpointertap={() => setTarget((value) => value + 50)}
+    />
+  );
+}
 ```
 
 ## `useSpring` vs `useSmoothDamp`
 
-| Feature    | `useSpring`                            | `useSmoothDamp`                          |
-| ---------- | -------------------------------------- | ---------------------------------------- |
-| Behavior   | Physically-based spring oscillation    | Soft damped interpolation (no overshoot) |
-| Parameters | `stiffness`, `damping`, `mass`         | `smoothTimeMs`, `maxSpeed`               |
-| Returns    | `value`, `velocity`, `setValue`        | `value`, `velocity`, `setValue`          |
-| Use when   | You want spring physics with overshoot | You want smooth, non-oscillating motion  |
+| Feature    | `useSpring`                               | `useSmoothDamp`                                          |
+| ---------- | ----------------------------------------- | -------------------------------------------------------- |
+| Behavior   | Spring motion that can oscillate          | Smooth damped motion, typically without oscillation      |
+| Parameters | `stiffness`, `damping`, `mass`            | `smoothTimeMs`, `maxSpeed`                               |
+| Returns    | `value`, `velocity`, `setValue`           | `value`, `velocity`, `setValue`                          |
+| Use when   | You want spring motion that can overshoot | You want smooth motion that typically does not oscillate |
 
-## Utility usage patterns
+## Lifecycle considerations
 
-- **`createDelay`** — Create once inside provider context when you need callback-based ticker-synced waits, including nested delays from event handlers or async continuations.
-- **`createAsyncDelay`** — Use when you need to `await` a ticker-synced wait from async code. Create it synchronously inside a tracked descendant of `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`, then reuse it later.
-- **`ObjectFitContainer`** — Use when children should be laid out reactively inside a fixed region.
-- **`objectFit`** — Use when you want the same behavior imperatively on a container.
-- **`useSpring`** — Use when you want physically based motion with overshoot.
-- **`useSmoothDamp`** — Use when you want softer damped interpolation without overshoot.
-- **`observeBounds`** — Only use when the container size changes dynamically. It remeasures every tick, which runs on every frame and is a performance concern.
-- Ticker-synced utilities do not advance while the ticker is paused or stopped.
-- Both `createDelay` and `createAsyncDelay` throw if called outside of a `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` context.
+- Ticker-bound utilities require `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` and pause when the ticker stops.
+- `createDelay` has no cancellation handle. Use `createAsyncDelay` with an `AbortSignal` when owner cleanup must cancel a pending delay; abort resolves its promise, so check `signal.aborted` after `await`.
+- `useSpring` can overshoot; `useSmoothDamp` typically does not oscillate.
+- `ObjectFitContainer` needs ticker context only when `observeBounds` is enabled; that option checks bounds every tick.
