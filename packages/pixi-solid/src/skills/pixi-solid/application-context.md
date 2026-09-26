@@ -97,6 +97,8 @@ Props accepted:
 - Standard `ApplicationOptions` (except `children` and `resizeTo`). They apply only when this provider creates the app and are initialization-only.
 - `existingApp` — An already-created `Pixi.Application` instance. When provided, the provider reuses it; other app options are ignored. The application must be initialized before rendering, and you handle lifecycle/cleanup yourself.
 
+If options are passed while `existingApp` or an ancestor provider supplies the app, pixi-solid warns in development because those options are ignored.
+
 `PixiApplicationProvider` also provides context for:
 
 - `getPixiApp` — returns the `PIXI.Application` instance.

@@ -71,6 +71,7 @@ describe("PixiApplicationProvider application ownership", () => {
     ctx.app.destroy = destroy;
     const addRendererListener = vi.spyOn(ctx.renderer, "addListener");
     const createAppSpy = vi.spyOn(pixiApplicationFactory, "createPixiApplication");
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const { dispose } = mountScene(() => <PixiApplicationProvider existingApp={ctx.app} />);
     await vi.waitFor(() => expect(addRendererListener).toHaveBeenCalled());
@@ -79,6 +80,41 @@ describe("PixiApplicationProvider application ownership", () => {
 
     expect(destroy).not.toHaveBeenCalled();
     expect(createAppSpy).not.toHaveBeenCalled();
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("GIVEN an external app and initialization options WHEN provider mounts THEN it warns that the options are ignored", async () => {
+    const ctx = createTestContext();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const addRendererListener = vi.spyOn(ctx.renderer, "addListener");
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app} background="#1099bb" />
+    ));
+    await vi.waitFor(() => expect(addRendererListener).toHaveBeenCalled());
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Application options were provided but ignored"),
+    );
+    dispose();
+  });
+
+  it("GIVEN an ancestor app provider and nested initialization options WHEN nested provider mounts THEN it warns that the options are ignored", async () => {
+    const ctx = createTestContext();
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const addRendererListener = vi.spyOn(ctx.renderer, "addListener");
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app}>
+        <PixiApplicationProvider background="#1099bb" />
+      </PixiApplicationProvider>
+    ));
+    await vi.waitFor(() => expect(addRendererListener).toHaveBeenCalledTimes(2));
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Application options were provided but ignored"),
+    );
+    dispose();
   });
 });
 

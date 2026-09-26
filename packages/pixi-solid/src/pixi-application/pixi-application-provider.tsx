@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import type { JSX, ParentProps } from "solid-js";
-import { createResource, onCleanup, Show, splitProps, useContext } from "solid-js";
+import { createResource, DEV, onCleanup, Show, splitProps, useContext } from "solid-js";
 
 import { createPixiScreenStore } from "../use-pixi-screen/pixi-screen-store";
 
@@ -35,6 +35,23 @@ export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Elemen
   let ownedAppInitialized = false;
   let ownerDisposed = false;
 
+  const warnAboutIgnoredOptions = () => {
+    if (!DEV) return;
+
+    const hasOptions = Object.keys(props).some(
+      (key) =>
+        key !== "children" &&
+        key !== "existingApp" &&
+        props[key as keyof PixiApplicationProps] !== undefined,
+    );
+
+    if (hasOptions) {
+      console.warn(
+        "[pixi-solid] Application options were provided but ignored because an app already exists in context. Pass them to the provider that creates the app.",
+      );
+    }
+  };
+
   const destroyOwnedApp = () => {
     const app = ownedApp;
     ownedApp = undefined;
@@ -43,12 +60,14 @@ export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Elemen
 
   const [appResource] = createResource(async () => {
     if (externallyProvidedApp) {
+      warnAboutIgnoredOptions();
       return externallyProvidedApp;
     }
 
     const existingContext = useContext(PixiAppContext);
     if (existingContext) {
       externallyProvidedApp = existingContext;
+      warnAboutIgnoredOptions();
       return existingContext;
     }
 

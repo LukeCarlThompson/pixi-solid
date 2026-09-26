@@ -48,7 +48,9 @@ export const App = () => (
 
 #### PixiJS Application Options
 
-Any valid `Pixi.ApplicationOptions` property:
+Application options initialize an app created by `PixiCanvas`. If it uses an app from a surrounding `PixiApplicationProvider`, these options are ignored and pixi-solid warns in development. Put initialization options on the app-owning provider.
+
+Any valid `Pixi.ApplicationOptions` property except `children` and `resizeTo` (managed by pixi-solid):
 
 - `background` - Background color (hex or CSS color)
 - `antialias` - Enable antialiasing

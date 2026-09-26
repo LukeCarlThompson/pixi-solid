@@ -20,8 +20,9 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  // Restore the previous global so the mock doesn't leak into other suites
+  // Restore globals and spies so mocks don't leak into other suites
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe("PixiCanvas stage binding cleanup", () => {
@@ -190,9 +191,34 @@ describe("PixiCanvas application ownership", () => {
 
     await vi.waitFor(() => expect(duplicateCanvasError).toBeInstanceOf(Error));
     expect(duplicateCanvasError).toMatchObject({
-      message: expect.stringContaining("Only one PixiCanvas can be mounted per Pixi.Application"),
+      message: expect.stringContaining(
+        "Only one PixiCanvas may be mounted at a time per Pixi.Application",
+      ),
     });
 
+    dispose();
+  });
+});
+
+describe("PixiCanvas application options", () => {
+  it("GIVEN PixiCanvas is nested under an app provider WHEN app options are passed THEN it warns that they are ignored", async () => {
+    const ctx = createTestContext();
+    (ctx.app as any).queueResize = () => {};
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app}>
+        <PixiCanvas background="#1099bb">
+          <Sprite texture={Texture.WHITE} />
+        </PixiCanvas>
+      </PixiApplicationProvider>
+    ));
+
+    await vi.waitFor(() => {
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining("Application options were provided but ignored"),
+      );
+    });
     dispose();
   });
 });
