@@ -163,3 +163,68 @@ describe("PixiCanvas stage binding cleanup", () => {
     dispose();
   });
 });
+
+describe("PixiCanvas wrapper props", () => {
+  it("GIVEN wrapper class and string style WHEN PixiCanvas mounts THEN they apply to its wrapper", async () => {
+    const ctx = createTestContext();
+    (ctx.app as any).queueResize = () => {};
+    let wrapper: HTMLDivElement | undefined;
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app}>
+        <PixiCanvas
+          ref={(element) => {
+            wrapper = element;
+          }}
+          class="scene-wrapper"
+          style="width: 320px"
+        >
+          <Sprite texture={Texture.WHITE} />
+        </PixiCanvas>
+      </PixiApplicationProvider>
+    ));
+
+    await vi.waitFor(() => expect(wrapper).toBeDefined());
+
+    expect(wrapper?.className).toBe("scene-wrapper");
+    expect(wrapper?.style.width).toBe("320px");
+    expect(wrapper?.style.position).toBe("relative");
+    dispose();
+  });
+
+  it("GIVEN reactive wrapper class and style WHEN their signals change THEN the wrapper updates", async () => {
+    const ctx = createTestContext();
+    (ctx.app as any).queueResize = () => {};
+    const [className, setClassName] = createSignal("initial");
+    const [active, setActive] = createSignal(false);
+    const [width, setWidth] = createSignal(100);
+    let wrapper: HTMLDivElement | undefined;
+
+    const { dispose } = mountScene(() => (
+      <PixiApplicationProvider existingApp={ctx.app}>
+        <PixiCanvas
+          ref={(element) => {
+            wrapper = element;
+          }}
+          class={className()}
+          classList={{ active: active() }}
+          style={{ width: `${width()}px` }}
+        >
+          <Sprite texture={Texture.WHITE} />
+        </PixiCanvas>
+      </PixiApplicationProvider>
+    ));
+
+    await vi.waitFor(() => expect(wrapper?.className).toBe("initial"));
+
+    setClassName("updated");
+    setActive(true);
+    setWidth(240);
+
+    expect(wrapper?.classList.contains("updated")).toBe(true);
+    expect(wrapper?.classList.contains("active")).toBe(true);
+    expect(wrapper?.style.width).toBe("240px");
+    expect(wrapper?.style.position).toBe("relative");
+    dispose();
+  });
+});

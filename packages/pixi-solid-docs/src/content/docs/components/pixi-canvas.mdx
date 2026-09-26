@@ -38,23 +38,12 @@ export const App = () => (
 
 ### Props
 
-`PixiCanvas` accepts two types of props:
+`PixiCanvas` accepts Pixi application initialization options and a small set of wrapper props:
 
-```tsx
-import type { PixiCanvasProps } from "pixi-solid";
-```
-
-#### DOM Props (for the wrapper div)
-
-Standard HTML element props that control the wrapper container:
-
-- `style` - CSS styles for the wrapper div
-- `class` / `classList` - CSS classes
-- `id`, `title`, `role`, `tabIndex` - Standard HTML attributes
-- `aria-*` attributes - ARIA accessibility attributes
-- `data-*` attributes - Data attributes
-- `ref` - Reference to the wrapper `HTMLDivElement`
-- DOM event handlers (without the `on:` prefix)
+- `style` — CSS styles for the wrapper `div`; accepts a CSS object or string.
+- `class` — CSS class for the wrapper.
+- `classList` — Reactive class map for the wrapper.
+- `ref` — Callback that receives the wrapper `HTMLDivElement`.
 
 #### PixiJS Application Options
 
@@ -91,20 +80,11 @@ See the [PixiJS docs](https://pixijs.com/8.x/guides/components/application) for 
 </PixiCanvas>
 ```
 
-#### Canvas with Data Attributes
-
-```tsx
-<PixiCanvas
-  data-testid="pixi-canvas"
-  style={{ width: "100%", height: "100%", backgroundColor: "black" }}
->
-  <MyContent />
-</PixiCanvas>
-```
+Other DOM attributes and event handlers belong on a caller-owned parent element; `PixiCanvas` does not forward them.
 
 ### How It Works
 
-1. Creates an internal wrapper `<div>` element with the provided DOM props
+1. Creates an internal wrapper `<div>` element with the provided `class`, `style`, and `ref`
 2. Automatically creates a `Pixi.Application` instance with the provided options
 3. Mounts the Pixi canvas into the internal wrapper div
 4. Sets up automatic resizing based on the internal wrapper div's size (not just the window size)
