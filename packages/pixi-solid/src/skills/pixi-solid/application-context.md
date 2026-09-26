@@ -56,7 +56,7 @@ Give the wrapper non-zero dimensions with `style` or CSS so automatic resizing h
 
 ## `PixiApplicationProvider`
 
-Creates a `Pixi.Application` instance and provides it through context. Does **not** mount a canvas or set its resize target. Use `PixiCanvas` as a child to mount and resize the canvas; without one, the caller must mount the canvas and manage resizing. `resizeTo` is omitted from provider props.
+Creates a `Pixi.Application` instance and provides it through context. It does **not** mount or resize a canvas; the supported rendering setup is to use `PixiCanvas` as a child. `resizeTo` is omitted from provider props because `PixiCanvas` controls the resize target.
 
 ```tsx
 import { PixiApplicationProvider, PixiCanvas, usePixiScreen, Text } from "pixi-solid";

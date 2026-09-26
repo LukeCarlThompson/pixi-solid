@@ -116,7 +116,7 @@ import type { PixiApplicationProps } from "pixi-solid";
 - `existingApp?: Pixi.Application` - An optional initialized Pixi application to reuse instead of creating a new one.
 - `Pixi.ApplicationOptions` properties except `children` and `resizeTo`. They are used only when this provider creates the app.
 
-If an existing app is reused, any passed application options are ignored; pixi-solid warns about this in development. `PixiApplicationProvider` does not set a resize target. `PixiCanvas` manages resizing when mounted as its child; otherwise, manage resizing through the app yourself.
+If an existing app is reused, any passed application options are ignored; pixi-solid warns about this in development. The supported rendering setup is to mount `PixiCanvas` as a child; it owns the resize target.
 
 See the [PixiJS ApplicationOptions](https://pixijs.com/8.x/guides/components/application) documentation for the complete list of options.
 
