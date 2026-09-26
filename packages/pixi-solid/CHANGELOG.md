@@ -11,20 +11,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
-## 1.0.0 - [UNRELEASED]
+## 1.0.0
 
-- ✅ Added `setValue` method to `useSpring` hook for directly setting the current value, bypassing physics calculations for that frame.
-- ✅ Added `setValue` method to `useSmoothDamp` hook for directly setting the current value, bypassing damping calculations for that frame.
-- ✅ **Testing utilities** — Added `pixi-solid/testing` subpath export with `mountScene` (returns `{ container, dispose }` for component tests), `renderHook` (returns `{ result, dispose }` for hook/store tests — `result` is a reactive accessor; run inside mock contexts via `ctx.renderHook(callback)` or `renderHook(callback, { wrapper: ctx.Provider })`), `cleanup` (automatic disposal in `afterEach`), `createTestContext` (mock provider with ticker, renderer, app, renderHook), `createManualTicker` (step-based frame advancement), and scene graph query helpers `getByLabel`, `queryByLabel`, `getAllByLabel`.
-- 💀 Removed `createTestRoot` from the testing utilities — `renderHook` supersedes it (`renderHook(callback).result()` replaces `createTestRoot(callback).value`).
-- 🐞 Fixed `createManualTicker` first-frame delta being one millisecond too large — PixiJS seeds `Ticker.lastTime` to `-1`, so the first `fastForwardFrames`/`fastForwardTime` step reported `deltaMS + 1`.
-- 🐞 Fixed `createManualTicker` successive calls not being additive — the drivers re-created a local time from `0` on every call, so PixiJS's `update()` (which always writes `lastTime`) dropped the first frame and rewound the ticker clock. The drivers now own a monotonic absolute clock.
-- ⚙️ `createManualTicker` drivers (`fastForwardFrames`/`fastForwardTime`) are now async and flush microtasks after every tick, so promise-based continuations (awaited `delay`, animation `onEnded` chains) receive subsequent ticks without manual `await Promise.resolve()` in tests. Existing tests must `await` the driver calls.
-- ✅ **`as` prop lifecycle** — Components no longer destroy instances provided via the `as` prop. The caller owns the lifecycle.
-- ✅ Added `SplitText` and `SplitBitmapText` components.
-- 💀 Removed `llms.txt` from package files and source.
-- Updated the docs
-- 🐞 Added `browser` export path so vite won't try to bundle it in the server build in SSR frameworks.
+### Added
+
+- ✅ Added `SplitText` and `SplitBitmapText` components and `setValue` methods to `useSpring` and `useSmoothDamp`.
+- ✅ Added the `pixi-solid/testing` subpath with scene and hook helpers, mock contexts, manual ticker, scene queries, and cleanup. Manual ticker drivers now advance asynchronously and consistently.
+- ✅ Packaged the pixi-solid consumer skill at `dist/skills/pixi-solid` and added a browser export condition for Vite SSR bundling.
+
+### Changed
+
+- ⚙️ Renamed the ticker-based `delay` factory to `createDelay`; import it from `pixi-solid/utils`.
+- ⚙️ Exported component-specific prop types; removed factory helper types from the root exports.
+- ⚙️ Components no longer destroy instances passed through `as`; callers own those instances.
+- ⚙️ Limited `PixiCanvas` wrapper props to `class`, `classList`, `style`, and `ref`; put other DOM props on a caller-owned element. Only one canvas can be mounted per application at a time.
+- ⚙️ Application options apply only when the provider creates the app; ignored options warn in development when an app is reused.
+
+### Removed
+
+- 💀 Removed the public `createTestRoot` testing utility. Replace `createTestRoot(callback).value` with `renderHook(callback).result()`; use `ctx.renderHook(callback)` when the hook needs test context.
+
+### Fixed
+
+- 🐞 Cleaned up app initialization failures and apps whose provider unmounts while initialization is pending; detached scene children when `PixiCanvas` unmounts.
 
 ## 0.2.0
 
