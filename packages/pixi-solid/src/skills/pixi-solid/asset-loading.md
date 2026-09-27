@@ -1,35 +1,33 @@
 ---
 name: asset-loading
-description: Patterns for loading PixiJS assets for pixi-solid components. Covers createResource, manifests, bundles, and scene-gated rendering.
+description: Patterns for loading PixiJS assets for pixi-solid components. Covers async memos, manifests, bundles, and scene-gated rendering.
 ---
 
 # Loading assets for pixi-solid
 
-PixiJS `Assets` and SolidJS `createResource` are not exported by `pixi-solid`. Use PixiJS to load resources, then pass them to pixi-solid components. Neither component cleanup nor disposing a Solid resource unloads assets from PixiJS's shared cache.
+PixiJS `Assets` is not exported by `pixi-solid`. Use PixiJS to load resources, then pass them to pixi-solid components. Neither component cleanup nor discarding a loading computation unloads assets from PixiJS's shared cache.
 
 ## Load one asset
 
-Use a Solid resource to gate mounting until texture is ready. Mount this component under `PixiCanvas` or another application provider:
+Solid 2 removed `createResource`. Async is now "any computation that returns a Promise": return one from `createMemo` and read it inside a `<Loading>` boundary, which renders its `fallback` until the read settles. Mount this component under `PixiCanvas` or another application provider:
 
 ```tsx
-import { createResource, Show } from "solid-js";
+import { createMemo, Loading } from "solid-js";
 import { Assets, Texture } from "pixi.js";
-import { Sprite } from "pixi-solid";
+import { Sprite, Text } from "pixi-solid";
 
 function HeroScene() {
-  const [texture] = createResource(() => Assets.load<Texture>("/images/hero.png"));
+  const texture = createMemo(() => Assets.load<Texture>("/images/hero.png"));
 
   return (
-    <Show when={texture()}>{(loadedTexture) => <HeroSprite texture={loadedTexture()} />}</Show>
+    <Loading fallback={<Text text="Loading…" />}>
+      <Sprite label="hero" texture={texture()} />
+    </Loading>
   );
-}
-
-function HeroSprite(props: { texture: Texture }) {
-  return <Sprite texture={props.texture} />;
 }
 ```
 
-`Assets.load()` does not require `Assets.init()` for a direct URL. Keep the loading boundary at the route or scene level: load its resources together, then render display components with loaded values. Avoid adding separate resources and loading gates to every `Sprite`. A failed load is available through the resource's `error` accessor; add an error or loading state if your UI needs one.
+`Assets.load()` does not require `Assets.init()` for a direct URL. Keep the loading boundary at the route or scene level: load its resources together, then render display components with loaded values. Avoid adding a separate boundary to every `Sprite`. Async errors flow to an `<Errored>` boundary instead of an inline `resource.error`.
 
 ## Load scene bundles
 
@@ -42,9 +40,9 @@ Avoid mixing asset loading logic inside render-heavy Pixi components. Prefer to:
 - Keep scene components focused on display and interaction logic.
 
 ```tsx
-import { createResource, Show } from "solid-js";
+import { createMemo, Loading, Show } from "solid-js";
 import { Assets, Texture } from "pixi.js";
-import { PixiCanvas, Sprite } from "pixi-solid";
+import { PixiCanvas, Sprite, Text } from "pixi-solid";
 
 const manifest = {
   bundles: [
@@ -56,30 +54,34 @@ const manifest = {
 };
 
 function App() {
-  const [initialized] = createResource(async () => {
+  const initialized = createMemo(async () => {
     await Assets.init({ manifest });
     return true;
   });
 
   return (
-    <Show when={initialized()}>
-      <PixiCanvas style={{ width: "100%", height: "100vh" }}>
-        <MenuRoute />
-      </PixiCanvas>
-    </Show>
+    <Loading fallback={<Text text="Loading…" />}>
+      <Show when={initialized()}>
+        <PixiCanvas style={{ width: "100%", height: "100vh" }}>
+          <MenuRoute />
+        </PixiCanvas>
+      </Show>
+    </Loading>
   );
 }
 
 function MenuRoute() {
-  const [ready] = createResource(async () => {
+  const ready = createMemo(async () => {
     await Assets.loadBundle("menu");
     return true;
   });
 
   return (
-    <Show when={ready()}>
-      <MenuScene />
-    </Show>
+    <Loading fallback={<Text text="Loading…" />}>
+      <Show when={ready()}>
+        <MenuScene />
+      </Show>
+    </Loading>
   );
 }
 
@@ -88,7 +90,7 @@ function MenuScene() {
 }
 ```
 
-`Assets.init()` resolves to `void`; `Assets.loadBundle()` resolves to loaded resources. Returning `true` makes each resource truthy for `<Show>` after loading.
+`Assets.init()` resolves to `void` and `Assets.loadBundle()` resolves to the loaded resources. Returning `true` gives `<Show>` a truthy value to render on; the pending read inside `<Loading>` shows the fallback until the memo settles.
 
 ## Cache keys and ownership
 

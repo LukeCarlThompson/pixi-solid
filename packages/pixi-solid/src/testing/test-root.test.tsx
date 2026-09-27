@@ -12,7 +12,6 @@ import {
   mountScene,
   queryByLabel,
   renderHook,
-  waitFor,
 } from "./index";
 
 afterEach(() => {
@@ -219,13 +218,14 @@ describe("mountScene", () => {
     expect(get("width-800")).toBeDefined();
   });
 
-  it("GIVEN a signal write WHEN asserted with waitFor THEN it observes the flushed value", async () => {
+  it("GIVEN a signal write WHEN flushed THEN it observes the updated value", () => {
     const [x, setX] = createSignal(0);
     const { container } = mountScene(() => <Container x={x()} />);
 
     setX(42);
+    flush();
 
-    await waitFor(() => expect(container.x).toBe(42));
+    expect(container.x).toBe(42);
   });
 
   it("GIVEN container is accessed via return value THEN properties are directly accessible (no ref callback needed)", () => {

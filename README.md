@@ -34,9 +34,12 @@ Peer dependencies of
 ```json
 {
   "pixi.js": ">=8.14.3 <9",
-  "solid-js": ">=1.9.10 <2"
+  "@solidjs/web": ">=2.0.0-rc.9 <3",
+  "solid-js": ">=2.0.0-rc.9 <3"
 }
 ```
+
+pixi-solid 2.x targets **SolidJS 2**, which splits the core (`solid-js`) from the web renderer (`@solidjs/web`). Point your JSX compiler at the renderer with `"jsxImportSource": "@solidjs/web"` in `tsconfig.json`, and use `@solidjs/vite-plugin` in your Vite config. The 1.x line remains available for SolidJS 1 projects.
 
 ## Basic usage
 

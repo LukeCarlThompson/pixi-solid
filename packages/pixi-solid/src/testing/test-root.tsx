@@ -48,8 +48,8 @@ export type RenderHookOptions = {
 export type RenderHookResult<T> = {
   /**
    * Accessor for the value returned by the hook callback. The callback runs
-   * once; return a store or another accessor from it to observe updates.
-   * Use `waitFor` when asserting on a value that changes over time.
+   * once; return a store or another accessor from it to observe updates. Solid 2
+   * batches reactive writes, so call `flush()` before asserting on a change.
    */
   result: () => T;
   /**
@@ -140,8 +140,9 @@ const registerDisposer = (dispose: () => void): (() => void) => {
 /**
  * Run a hook (or store factory) once inside a temporary Solid root and expose
  * its return value as an accessor. Return a reactive accessor or store from
- * the callback to observe updates; use `waitFor` when asserting on those
- * updates. An optional `wrapper` provides context to the callback.
+ * the callback to observe updates; Solid 2 batches reactive writes, so call
+ * `flush()` before asserting on a change. An optional `wrapper` provides
+ * context to the callback.
  *
  * Errors thrown while the hook runs surface synchronously from `renderHook`,
  * so missing-context tests can use a plain `expect(() => renderHook(...)).toThrow()`.

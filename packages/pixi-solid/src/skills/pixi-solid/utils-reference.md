@@ -34,7 +34,8 @@ import type {
 } from "pixi-solid/utils";
 import type { PixiComponentProps } from "pixi-solid";
 import type * as Pixi from "pixi.js";
-import type { Accessor, JSX } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import type { Accessor } from "solid-js";
 ```
 
 ## Delay utilities

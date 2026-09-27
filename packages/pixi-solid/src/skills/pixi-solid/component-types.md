@@ -31,7 +31,8 @@ import type {
   TilingSpriteProps,
 } from "pixi-solid";
 import type * as Pixi from "pixi.js";
-import type { JSX, Ref } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import type { Ref } from "solid-js";
 ```
 
 ## Component prop types
@@ -130,7 +131,7 @@ When building a custom component:
 
 1. Import `PixiComponentProps<Pixi.YourOptionsType>` as the base.
 2. Narrow with `Pick` for specific props, or `Omit` to exclude props you handle yourself.
-3. Combine with `splitProps` and `{...rest}` spreading to separate custom props from Pixi props.
+3. Combine with `omit` and `{...rest}` spreading to separate custom props from Pixi props.
 
 ```tsx
 import type { PixiComponentProps } from "pixi-solid";
@@ -141,19 +142,19 @@ type MyComponentProps = PixiComponentProps<Pixi.SpriteOptions> & {
 };
 ```
 
-Example — forwarding Pixi props while handling custom props with `splitProps`:
+Example — forwarding Pixi props while handling custom props with `omit`. Solid 2 removed `splitProps`; `omit` returns a reactive view of the remaining props:
 
 ```tsx
-import { splitProps } from "solid-js";
+import { omit } from "solid-js";
 import { Container, Sprite } from "pixi-solid";
 import type { PixiComponentProps } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 
 function MySprite(props: PixiComponentProps<Pixi.SpriteOptions> & { label: string }) {
-  const [local, pixiProps] = splitProps(props, ["label"]);
+  const pixiProps = omit(props, "label");
 
   return (
-    <Container label={local.label}>
+    <Container label={props.label}>
       <Sprite {...pixiProps} />
     </Container>
   );
@@ -164,7 +165,7 @@ function MySprite(props: PixiComponentProps<Pixi.SpriteOptions> & { label: strin
 
 ### `ref` usage
 
-All pixi-solid components support a `ref` callback that receives the underlying PixiJS object when mounted:
+All pixi-solid components accept a `ref` (a callback, or an array of callbacks) that receives the underlying PixiJS object when mounted:
 
 ```tsx
 <Container
