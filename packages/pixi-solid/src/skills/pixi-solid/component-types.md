@@ -223,6 +223,22 @@ createEffect(
 <AnimatedSprite ref={animation} textures={textures} />;
 ```
 
+`currentFrame` behaves the same way. It is an instance property and not an `AnimatedSpriteOptions` member, so a prop does not typecheck, and passing it anyway crashes inside the PixiJS constructor because the value is assigned before the textures are set up. Seek with `gotoAndStop(frame)` or `gotoAndPlay(frame)` instead:
+
+```tsx
+const [frame, setFrame] = createSignal(0);
+let animation: Pixi.AnimatedSprite | undefined;
+
+createEffect(
+  () => frame(),
+  (value) => animation?.gotoAndStop(value),
+);
+
+<AnimatedSprite ref={animation} textures={textures} />;
+```
+
+`gotoAndStop` also pauses playback, so the frame holds. Use `autoPlay` with `gotoAndPlay(frame)` to start from a chosen frame instead.
+
 #### Setup and teardown for an instance
 
 Use `onSettled`, which is owned and runs after the ref has been assigned. Return a cleanup function, because `onCleanup` is not allowed inside `onSettled`:
