@@ -11,9 +11,9 @@
     "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
-    "@astrojs/starlight": "0.39.3",
+    "@astrojs/starlight": "0.42.4",
     "@solidjs/web": "2.0.0-rc.9",
-    "astro": "6.4.3",
+    "astro": "7.3.5",
     "pixi-filters": "6.1.5",
     "pixi-solid": "workspace:*",
     "pixi.js": "*",
@@ -21,6 +21,7 @@
     "solid-js": "2.0.0-rc.9"
   },
   "devDependencies": {
-    "@solidjs/vite-plugin": "3.0.0-next.30"
+    "@astrojs/markdown-remark": "^7.3.0",
+    "@solidjs/vite-plugin": "3.0.0-next.35"
   }
 }

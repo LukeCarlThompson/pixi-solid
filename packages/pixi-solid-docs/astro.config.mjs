@@ -13,9 +13,6 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 export default defineConfig({
   site: "https://lukecarlthompson.github.io",
   base: "/pixi-solid",
-  markdown: {
-    gfm: true,
-  },
   integrations: [
     starlight({
       title: "Pixi Solid",
@@ -59,9 +56,6 @@ export default defineConfig({
     }),
   ],
   vite: {
-    // `@solidjs/vite-plugin` types against Vite 8 while Astro 6 ships Vite 7. The plugin
-    // declares `^6 || ^7 || ^8` and runs on Vite 7; only the bundled type definitions differ.
-    // @ts-expect-error cross-version Plugin type mismatch (remove when Astro ships Vite 8)
     plugins: [solidPlugin()],
     resolve: {
       alias: {
