@@ -6,8 +6,8 @@ allowBuilds:
   esbuild: true
   sharp: true
 minimumReleaseAgeExclude:
-  - '@vitest/mocker@5.0.1'
-  - '@vitest/spy@5.0.1'
+  - "@vitest/mocker@5.0.1"
+  - "@vitest/spy@5.0.1"
   - vitest@5.0.1
 overrides:
   pixi.js: 8.20.1

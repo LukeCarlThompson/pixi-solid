@@ -1,4 +1,5 @@
 import { Ticker } from "pixi.js";
+import { flush } from "solid-js";
 
 /**
  * A manually-controlled ticker for tests. Created stopped by default so you
@@ -81,6 +82,7 @@ export const createManualTicker = (): ManualTicker => {
       for (let i = 0; i < frames; i++) {
         tickerTime += deltaTime;
         ticker.update(tickerTime);
+        flush();
         await flushMicrotasks();
       }
     },
@@ -89,6 +91,7 @@ export const createManualTicker = (): ManualTicker => {
       while (tickerTime < targetTime) {
         tickerTime = Math.min(tickerTime + stepSizeMS, targetTime);
         ticker.update(tickerTime);
+        flush();
         await flushMicrotasks();
       }
     },

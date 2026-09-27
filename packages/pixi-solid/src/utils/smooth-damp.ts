@@ -1,6 +1,5 @@
 import type { Accessor } from "solid-js";
 import { createSignal } from "solid-js";
-import { createMutable } from "solid-js/store";
 
 import { onTick } from "../on-tick";
 
@@ -94,26 +93,31 @@ export type SmoothDamp = {
  */
 export const useSmoothDamp = (props: UseSmoothDampProps): SmoothDamp => {
   const [current, setCurrent] = createSignal(props.to());
-  const velocity = createMutable({ value: 0 });
+  const [velocity, setVelocity] = createSignal(0);
+  // `smoothDamp` mutates a `{ value }` ref, so reuse one object per hook rather
+  // than allocating (or proxying a signal) on every tick.
+  const velocityRef = { value: 0 };
 
   const update = (deltaTimeMS: number) => {
     const currentValue = current();
     const currentTarget = props.to();
 
     if (currentValue === currentTarget) {
-      velocity.value = 0;
+      setVelocity(0);
       return;
     }
 
     const deltaTime = deltaTimeMS / 1000; // Convert milliseconds to seconds
+    velocityRef.value = velocity();
     const newCurrent = smoothDamp(
       currentValue,
       currentTarget,
-      velocity,
+      velocityRef,
       props.smoothTimeMs?.(),
       props.maxSpeed?.(),
       deltaTime,
     );
+    setVelocity(velocityRef.value);
     setCurrent(newCurrent);
   };
 
@@ -123,7 +127,7 @@ export const useSmoothDamp = (props: UseSmoothDampProps): SmoothDamp => {
 
   return {
     value: current,
-    velocity: () => velocity.value,
+    velocity,
     setValue: setCurrent,
   };
 };

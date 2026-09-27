@@ -1,7 +1,7 @@
 import type * as Pixi from "pixi.js";
 import { useContext } from "solid-js";
 
-import { TickerContext } from "../pixi-application";
+import { TickerContext } from "../pixi-application/context";
 
 export type DelayFunction = (delayMs: number, callback: () => void) => void;
 
@@ -28,15 +28,13 @@ const scheduleDelay = (ticker: Pixi.Ticker, delayMs: number, callback: () => voi
 };
 
 const getDelayTicker = (): Pixi.Ticker => {
-  const ticker = useContext(TickerContext);
-
-  if (!ticker) {
+  try {
+    return useContext(TickerContext);
+  } catch {
     throw new Error(
       "`createDelay` and `createAsyncDelay` must be used within a PixiCanvas, PixiApplicationProvider, or TickerProvider.",
     );
   }
-
-  return ticker;
 };
 
 /**

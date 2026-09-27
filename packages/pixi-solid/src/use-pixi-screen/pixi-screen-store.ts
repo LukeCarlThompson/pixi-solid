@@ -1,6 +1,10 @@
-import type * as Pixi from "pixi.js";
-import { batch, onCleanup } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createStore, onCleanup } from "solid-js";
+
+type ResizeRenderer = {
+  screen: { width: number; height: number; x: number; y: number };
+  addListener: (event: "resize", listener: () => void) => unknown;
+  removeListener: (event: "resize", listener: () => void) => unknown;
+};
 
 export type PixiScreenDimensions = {
   width: number;
@@ -13,7 +17,7 @@ export type PixiScreenDimensions = {
   y: number;
 };
 
-export const createPixiScreenStore = (renderer: Pixi.Renderer): Readonly<PixiScreenDimensions> => {
+export const createPixiScreenStore = (renderer: ResizeRenderer): Readonly<PixiScreenDimensions> => {
   const [pixiScreen, setPixiScreen] = createStore<PixiScreenDimensions>({
     width: renderer.screen.width,
     height: renderer.screen.height,
@@ -34,11 +38,11 @@ export const createPixiScreenStore = (renderer: Pixi.Renderer): Readonly<PixiScr
   });
 
   const handleResize = () => {
-    batch(() => {
-      setPixiScreen("width", renderer.screen.width);
-      setPixiScreen("height", renderer.screen.height);
-      setPixiScreen("x", renderer.screen.x);
-      setPixiScreen("y", renderer.screen.y);
+    setPixiScreen((screen) => {
+      screen.width = renderer.screen.width;
+      screen.height = renderer.screen.height;
+      screen.x = renderer.screen.x;
+      screen.y = renderer.screen.y;
     });
   };
 

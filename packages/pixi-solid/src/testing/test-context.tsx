@@ -1,14 +1,15 @@
+import type { JSX } from "@solidjs/web";
 import { Container, Ticker } from "pixi.js";
 import type * as Pixi from "pixi.js";
-import type { JSX, ParentProps } from "solid-js";
+import type { ParentProps } from "solid-js";
 
 import { PixiAppContext, ScreenStoreContext, TickerContext } from "../pixi-application";
 import { createPixiScreenStore } from "../use-pixi-screen";
 
 import type { ManualTicker } from "./manual-ticker";
 import { createManualTicker } from "./manual-ticker";
-import type { RenderHookResult } from "./test-root";
-import { renderHook as createRenderHook } from "./test-root";
+import type { MountSceneResult, RenderHookResult } from "./test-root";
+import { mountScene as createMountScene, renderHook as createRenderHook } from "./test-root";
 
 export type TestRenderer = {
   screen: { width: number; height: number; x: number; y: number };
@@ -32,6 +33,12 @@ export type TestContext = {
   /** Minimal Pixi.Application stub wired to `renderer`. */
   app: Pixi.Application;
   /**
+   * Mount a scene wrapped in the mock `Provider`. Equivalent to
+   * `mountScene(setup, { wrapper: Provider })`. Prefer this when the scene
+   * needs Pixi context.
+   */
+  mount: <TRoot = Pixi.Container>(setup: () => JSX.Element) => MountSceneResult<TRoot>;
+  /**
    * Run a hook (or store factory) inside the mock Pixi contexts and expose
    * its return value as a reactive accessor. Equivalent to
    * `renderHook(callback, { wrapper: Provider })`.
@@ -40,16 +47,19 @@ export type TestContext = {
 };
 
 /**
- * Create mock Pixi contexts for testing. Returns `{ Provider, ticker, renderer, app }`.
+ * Create a mock Pixi environment for testing. Returns the context `Provider`,
+ * the driver fixtures (`ticker`, `renderer`, `app`), and `mount`/`renderHook`
+ * helpers bound to the `Provider`.
+ *
+ * Use `ctx.mount` / `ctx.renderHook` when the scene or hook needs Pixi context;
+ * use the top-level `mountScene` / `renderHook` (with an optional custom
+ * `wrapper`) when it does not.
  *
  * ```tsx
  * const ctx = createTestContext();
  *
- * mountScene(() => (
- *   <ctx.Provider>
- *     <MyComponent />
- *   </ctx.Provider>
- * ));
+ * const { getByLabel } = ctx.mount(() => <MyComponent />);
+ * const { result } = ctx.renderHook(() => usePixiScreen());
  *
  * // Advance time frame-by-frame
  * await ctx.ticker.fastForwardFrames(10);
@@ -118,13 +128,11 @@ export const createTestContext = (options?: {
     const pixiScreenStore = createPixiScreenStore(renderer as unknown as Pixi.Renderer);
 
     return (
-      <PixiAppContext.Provider value={app}>
-        <TickerContext.Provider value={manualTicker.ticker}>
-          <ScreenStoreContext.Provider value={pixiScreenStore}>
-            {props.children}
-          </ScreenStoreContext.Provider>
-        </TickerContext.Provider>
-      </PixiAppContext.Provider>
+      <PixiAppContext value={app}>
+        <TickerContext value={manualTicker.ticker}>
+          <ScreenStoreContext value={pixiScreenStore}>{props.children}</ScreenStoreContext>
+        </TickerContext>
+      </PixiAppContext>
     );
   };
 
@@ -133,6 +141,8 @@ export const createTestContext = (options?: {
     ticker: manualTicker,
     renderer,
     app,
+    mount: <TRoot = Pixi.Container,>(setup: () => JSX.Element) =>
+      createMountScene<TRoot>(setup, { wrapper: Provider }),
     renderHook: <T,>(callback: () => T) => createRenderHook(callback, { wrapper: Provider }),
   };
 };

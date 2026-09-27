@@ -1,8 +1,9 @@
+import type { JSX } from "@solidjs/web";
 import type * as Pixi from "pixi.js";
-import type { JSX, Ref } from "solid-js";
-import { createRenderEffect, on, splitProps, onCleanup } from "solid-js";
+import type { Ref } from "solid-js";
+import { createRenderEffect, onCleanup, untrack, useContext } from "solid-js";
 
-import { getTicker } from "../pixi-application";
+import { TickerContext } from "../pixi-application/context";
 
 import { bindInitialisationProps, bindRuntimeProps } from "./bind-props";
 import { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./event-properties";
@@ -124,34 +125,69 @@ const TILING_SPRITE_RUNTIME_KEYS = [
   ...TILING_POINT_PROP_AXIS_NAMES,
 ] as const;
 
+const ANIMATED_SPRITE_INITIALISATION_RUNTIME_KEYS = [...SPRITE_RUNTIME_KEYS, "autoUpdate"] as const;
+
+const CONTAINER_RUNTIME_KEY_SET: ReadonlySet<string> = new Set(CONTAINER_RUNTIME_KEYS);
+const SPRITE_RUNTIME_KEY_SET: ReadonlySet<string> = new Set(SPRITE_RUNTIME_KEYS);
+const TILING_SPRITE_RUNTIME_KEY_SET: ReadonlySet<string> = new Set(TILING_SPRITE_RUNTIME_KEYS);
+const ANIMATED_SPRITE_INITIALISATION_RUNTIME_KEY_SET: ReadonlySet<string> = new Set(
+  ANIMATED_SPRITE_INITIALISATION_RUNTIME_KEYS,
+);
+
+/**
+ * Copy the props that are not owned by the runtime binder into a mutable
+ * options object for the Pixi constructor. Built directly from the props
+ * object rather than an `omit()` view: measurements show the direct loop is
+ * faster, and the excluded-key set is precomputed per component type.
+ */
+const getInstanceOptions = <Props extends object>(
+  props: Props,
+  excludedKeys: ReadonlySet<string>,
+): Record<string, unknown> => {
+  const propsRecord = props as Record<string, unknown>;
+  const options: Record<string, unknown> = {};
+
+  for (const key in propsRecord) {
+    if (excludedKeys.has(key)) continue;
+
+    options[key] = propsRecord[key];
+  }
+
+  return options;
+};
+
 export const createContainerComponent = <
   InstanceType extends Pixi.Container,
   OptionsType extends object,
 >(
   PixiClass: new (props: OptionsType) => InstanceType,
 ): PixiComponent<Omit<OptionsType, "children"> & ContainerProps<InstanceType>, InstanceType> => {
-  return (props): InstanceType & JSX.Element => {
-    const [runtimeProps, initialisationProps] = splitProps(props, CONTAINER_RUNTIME_KEYS);
+  // `createComponent` runs the body with a strict-read label, which warns on any
+  // reactive read here. The body is entirely one-time setup, so run it under
+  // `untrack`; the binder effects created inside establish their own tracking.
+  return (props): InstanceType & JSX.Element =>
+    untrack(() => {
+      const as = props.as;
+      const isUserOwnedInstance = as !== undefined;
+      const options = getInstanceOptions(props, CONTAINER_RUNTIME_KEY_SET);
+      const instance = as || new PixiClass(options as any);
 
-    const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new PixiClass({ ...initialisationProps } as any);
+      bindInitialisationProps(instance, props, CONTAINER_RUNTIME_KEY_SET);
+      bindRuntimeProps(instance, props, CONTAINER_RUNTIME_KEY_SET);
 
-    bindInitialisationProps(instance, initialisationProps);
-    bindRuntimeProps(instance, runtimeProps);
+      onCleanup(() => {
+        if (isUserOwnedInstance) return;
 
-    onCleanup(() => {
-      if (isUserOwnedInstance) return;
+        if ("attach" in instance) {
+          // Means it's a render layer so we don't want to destroy children as they are managed elsewhere in the tree.
+          instance.destroy({ children: false });
+        } else {
+          instance.destroy({ children: true });
+        }
+      });
 
-      if ("attach" in instance) {
-        // Means it's a render layer so we don't want to destroy children as they are managed elsewhere in the tree.
-        instance.destroy({ children: false });
-      } else {
-        instance.destroy({ children: true });
-      }
+      return instance as InstanceType & JSX.Element;
     });
-
-    return instance as InstanceType & JSX.Element;
-  };
 };
 
 export const createLeafComponent = <
@@ -176,20 +212,22 @@ export const createSpriteComponent = <
   return (
     props: Omit<OptionsType, "children"> & SpriteProps<InstanceType>,
   ): InstanceType & JSX.Element => {
-    const [runtimeProps, initialisationProps] = splitProps(props, SPRITE_RUNTIME_KEYS);
+    return untrack(() => {
+      const as = props.as;
+      const isUserOwnedInstance = as !== undefined;
+      const options = getInstanceOptions(props, SPRITE_RUNTIME_KEY_SET);
+      const instance = as || new PixiClass(options as any);
 
-    const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new PixiClass({ ...initialisationProps } as any);
+      bindInitialisationProps(instance, props, SPRITE_RUNTIME_KEY_SET);
+      bindRuntimeProps(instance, props, SPRITE_RUNTIME_KEY_SET);
 
-    bindInitialisationProps(instance, initialisationProps);
-    bindRuntimeProps(instance, runtimeProps);
+      onCleanup(() => {
+        if (isUserOwnedInstance) return;
+        instance.destroy({ children: true });
+      });
 
-    onCleanup(() => {
-      if (isUserOwnedInstance) return;
-      instance.destroy({ children: true });
+      return instance as InstanceType & JSX.Element;
     });
-
-    return instance as InstanceType & JSX.Element;
   };
 };
 
@@ -205,45 +243,51 @@ export const createAnimatedSpriteComponent = <
   return (
     props: Omit<OptionsType, "children"> & AnimatedSpriteProps<InstanceType>,
   ): InstanceType & JSX.Element => {
-    // Specifically separate `autoUpdate` as we handle it manually below.
-    const [runtimeProps, update, initialisationProps] = splitProps(props, SPRITE_RUNTIME_KEYS, [
-      "autoUpdate",
-    ]);
+    return untrack(() => {
+      const as = props.as;
+      const isUserOwnedInstance = as !== undefined;
+      const options = getInstanceOptions(props, ANIMATED_SPRITE_INITIALISATION_RUNTIME_KEY_SET);
+      const instance = as || new PixiClass(options as any);
 
-    const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new PixiClass({ ...initialisationProps } as any);
+      // Set this to false to override Pixi's default shared ticker behaviour.
+      instance.autoUpdate = false;
+      let ticker: Pixi.Ticker | undefined;
+      try {
+        ticker = useContext(TickerContext);
+      } catch {
+        // No TickerProvider; `autoUpdate` has no ticker to attach to.
+      }
 
-    // Set this to false to override Pixi's default shared ticker behaviour.
-    instance.autoUpdate = false;
-
-    createRenderEffect(
-      on(
-        () => update.autoUpdate,
+      createRenderEffect(
+        () => props.autoUpdate,
         (autoUpdate) => {
-          const updateInstance = (ticker: Pixi.Ticker) => {
-            instance.update(ticker);
+          if (autoUpdate === false) return;
+
+          if (!ticker) {
+            throw new Error(
+              "getTicker must be used within a PixiApplicationProvider, PixiCanvas, or TickerProvider",
+            );
+          }
+
+          const updateInstance = (currentTicker: Pixi.Ticker) => {
+            instance.update(currentTicker);
           };
 
-          if (autoUpdate !== false) {
-            const ticker = getTicker();
-            ticker.add(updateInstance);
-            onCleanup(() => {
-              ticker.remove(updateInstance);
-            });
-          }
+          ticker.add(updateInstance);
+          return () => ticker.remove(updateInstance);
         },
-      ),
-    );
+      );
 
-    bindInitialisationProps(instance, initialisationProps);
-    bindRuntimeProps(instance, runtimeProps);
+      bindInitialisationProps(instance, props, ANIMATED_SPRITE_INITIALISATION_RUNTIME_KEY_SET);
+      bindRuntimeProps(instance, props, SPRITE_RUNTIME_KEY_SET);
 
-    onCleanup(() => {
-      if (isUserOwnedInstance) return;
-      instance.destroy({ children: true });
+      onCleanup(() => {
+        if (isUserOwnedInstance) return;
+        instance.destroy({ children: true });
+      });
+
+      return instance as InstanceType & JSX.Element;
     });
-
-    return instance as InstanceType & JSX.Element;
   };
 };
 
@@ -256,20 +300,21 @@ export const createTilingSpriteComponent = <
   return (
     props: Omit<OptionsType, "children"> & TilingSpriteProps<InstanceType>,
   ): InstanceType & JSX.Element => {
-    const [runtimeProps, initialisationProps] = splitProps(props, TILING_SPRITE_RUNTIME_KEYS);
+    return untrack(() => {
+      const as = props.as;
+      const isUserOwnedInstance = as !== undefined;
+      const options = getInstanceOptions(props, TILING_SPRITE_RUNTIME_KEY_SET);
+      const instance = as || new PixiClass(options as any);
 
-    const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new PixiClass({ ...initialisationProps } as any);
+      bindInitialisationProps(instance, props, TILING_SPRITE_RUNTIME_KEY_SET);
+      bindRuntimeProps(instance, props, TILING_SPRITE_RUNTIME_KEY_SET);
 
-    bindInitialisationProps(instance, initialisationProps);
-    bindRuntimeProps(instance, runtimeProps);
+      onCleanup(() => {
+        if (isUserOwnedInstance) return;
+        instance.destroy({ children: true });
+      });
 
-    onCleanup(() => {
-      if (isUserOwnedInstance) return;
-      instance.destroy({ children: true });
+      return instance as InstanceType & JSX.Element;
     });
-
-    return instance as InstanceType & JSX.Element;
   };
 };
-

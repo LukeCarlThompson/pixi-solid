@@ -1,4 +1,4 @@
-import { createEffect } from "solid-js";
+import { createRenderEffect, flush } from "solid-js";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { cleanup, createTestContext, renderHook } from "../testing";
@@ -43,15 +43,18 @@ describe("usePixiScreen", () => {
     const { dispose } = ctx.renderHook(() => {
       const screen = usePixiScreen();
 
-      createEffect(() => {
-        snapshots.push({
+      createRenderEffect(
+        () => ({
           width: screen.width,
           x: screen.x,
           right: screen.right,
           bottom: screen.bottom,
-        });
-        effectRuns += 1;
-      });
+        }),
+        (snapshot) => {
+          snapshots.push(snapshot);
+          effectRuns += 1;
+        },
+      );
 
       return screen;
     });
@@ -59,6 +62,7 @@ describe("usePixiScreen", () => {
     expect(effectRuns).toBe(1);
 
     ctx.renderer.emitResize({ width: 900, x: 10, y: 20 });
+    flush();
     await Promise.resolve();
 
     expect(effectRuns).toBe(2);
@@ -79,18 +83,23 @@ describe("usePixiScreen", () => {
     const { dispose } = ctx.renderHook(() => {
       const screen = usePixiScreen();
 
-      createEffect(() => {
-        void screen.width;
-        void screen.height;
-        void screen.x;
-        void screen.y;
-        effectRuns += 1;
-      });
+      createRenderEffect(
+        () => ({
+          width: screen.width,
+          height: screen.height,
+          x: screen.x,
+          y: screen.y,
+        }),
+        () => {
+          effectRuns += 1;
+        },
+      );
     });
 
     expect(effectRuns).toBe(1);
 
     ctx.renderer.emitResize();
+    flush();
     await Promise.resolve();
 
     expect(effectRuns).toBe(1);

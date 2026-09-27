@@ -1,4 +1,12 @@
-import { createRoot, createSignal, createContext, useContext, onMount } from "solid-js";
+import {
+  createComponent,
+  createContext,
+  createRoot,
+  createSignal,
+  flush,
+  onSettled,
+  useContext,
+} from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import { renderHook } from "../testing";
@@ -64,6 +72,7 @@ describe("bindRuntimeProps()", () => {
         y: 20,
         children: [childA, childB] as any,
       });
+      flush();
 
       expect(instance.x).toBe(10);
       expect(instance.y).toBe(20);
@@ -79,6 +88,7 @@ describe("bindRuntimeProps()", () => {
       const ref = vi.fn();
 
       bindRuntimeProps(instance as any, { ref } as any);
+      flush();
 
       return { instance, ref };
     });
@@ -103,6 +113,7 @@ describe("bindRuntimeProps()", () => {
 
       // Then bind the parent with the child
       bindRuntimeProps(parent as any, { children: [child] } as any);
+      flush();
 
       return { child, childRef, childParentAtRefTime };
     });
@@ -114,51 +125,63 @@ describe("bindRuntimeProps()", () => {
     dispose();
   });
 
-  it("GIVEN a ref callback that uses a context provider WHEN bindRuntimeProps is called THEN the ref can access the context", () => {
+  it("GIVEN a ref array WHEN bindRuntimeProps is called THEN every callback receives the instance", () => {
     const { result, dispose } = renderHook(() => {
-      const TestContext = createContext<string>();
       const instance = new MockContainer();
-      let contextValue: string | undefined;
+      const first = vi.fn();
+      const second = vi.fn();
 
-      const ref = vi.fn(() => {
-        // Try to access the context in the ref callback
-        contextValue = useContext(TestContext);
-      });
+      bindRuntimeProps(instance as any, { ref: [first, [second]] } as any);
+      flush();
 
-      // Create a context provider
-      const Provider = TestContext.Provider;
-
-      // Bind props within the context
-      Provider({
-        value: "test-value",
-        get children() {
-          bindRuntimeProps(instance as any, { ref } as any);
-          return null;
-        },
-      });
-
-      return { instance, ref, contextValue };
+      return { instance, first, second };
     });
 
-    // The ref should have been called
-    expect(result().ref).toHaveBeenCalledWith(result().instance);
-    // And it should have access to the context
-    expect(result().contextValue).toBe("test-value");
+    expect(result().first).toHaveBeenCalledWith(result().instance);
+    expect(result().second).toHaveBeenCalledWith(result().instance);
     dispose();
   });
 
-  it("GIVEN a ref callback WHEN onMount runs THEN the ref value is available", () => {
+  it("GIVEN a ref callback that uses a context provider WHEN bindRuntimeProps is called THEN the ref can access the context", () => {
+    const TestContext = createContext<string>();
+    const instance = new MockContainer();
+    let contextValue: string | undefined;
+    const ref = vi.fn(() => {
+      contextValue = useContext(TestContext);
+    });
+
+    const { dispose } = renderHook(
+      () => {
+        bindRuntimeProps(instance as any, { ref } as any);
+      },
+      {
+        wrapper: (wrapperProps) =>
+          createComponent(TestContext, {
+            value: "test-value",
+            get children() {
+              return wrapperProps.children;
+            },
+          }),
+      },
+    );
+
+    expect(ref).toHaveBeenCalledWith(instance);
+    expect(contextValue).toBe("test-value");
+    dispose();
+  });
+
+  it("GIVEN a ref callback WHEN the effect settles THEN the ref value is available", () => {
     const { result, dispose } = renderHook(() => {
       const instance = new MockContainer();
       let refValue: MockContainer | undefined;
-      const state: { refValueAtMount?: MockContainer } = {};
+      const state: { refValueAtSettle?: MockContainer } = {};
 
       const ref = vi.fn((value: MockContainer) => {
         refValue = value;
       });
 
-      onMount(() => {
-        state.refValueAtMount = refValue;
+      onSettled(() => {
+        state.refValueAtSettle = refValue;
       });
 
       bindRuntimeProps(instance as any, { ref } as any);
@@ -167,7 +190,7 @@ describe("bindRuntimeProps()", () => {
     });
 
     expect(result().ref).toHaveBeenCalledWith(result().instance);
-    expect(result().state.refValueAtMount).toBe(result().instance);
+    expect(result().state.refValueAtSettle).toBe(result().instance);
     dispose();
   });
 
@@ -177,6 +200,7 @@ describe("bindRuntimeProps()", () => {
       const handler = vi.fn();
 
       bindRuntimeProps(instance as any, { onclick: handler } as any);
+      flush();
 
       return { instance, handler };
     });
@@ -191,7 +215,7 @@ describe("bindRuntimeProps()", () => {
       const instance = new MockContainer();
       const handlerA = vi.fn();
       const handlerB = vi.fn();
-      const [handler, setHandler] = createSignal(handlerA);
+      const [handler, setHandler] = createSignal(() => handlerA);
 
       const props = {
         get onclick() {
@@ -200,11 +224,13 @@ describe("bindRuntimeProps()", () => {
       };
 
       bindRuntimeProps(instance as any, props as any);
+      flush();
 
       return { instance, handlerA, handlerB, setHandler };
     });
 
     result().setHandler(() => result().handlerB);
+    flush();
 
     expect(result().instance.off).toHaveBeenCalledTimes(1);
     expect(result().instance.off).toHaveBeenCalledWith("click", result().handlerA);
@@ -217,7 +243,7 @@ describe("bindRuntimeProps()", () => {
     const { result, dispose } = renderHook(() => {
       const instance = new MockContainer();
       const handlerA = vi.fn();
-      const [handler, setHandler] = createSignal<(() => void) | undefined>(handlerA);
+      const [handler, setHandler] = createSignal<(() => void) | undefined>(() => handlerA);
 
       const props = {
         get onclick() {
@@ -226,11 +252,13 @@ describe("bindRuntimeProps()", () => {
       };
 
       bindRuntimeProps(instance as any, props as any);
+      flush();
 
       return { instance, handlerA, setHandler };
     });
 
     result().setHandler(undefined);
+    flush();
 
     expect(result().instance.off).toHaveBeenCalledTimes(1);
     expect(result().instance.off).toHaveBeenCalledWith("click", result().handlerA);
@@ -238,11 +266,28 @@ describe("bindRuntimeProps()", () => {
     dispose();
   });
 
+  it("GIVEN a bound event handler WHEN the owner is disposed THEN the listener is removed", () => {
+    const { result, dispose } = renderHook(() => {
+      const instance = new MockContainer();
+      const handler = vi.fn();
+
+      bindRuntimeProps(instance as any, { onclick: handler } as any);
+      flush();
+
+      return { instance, handler };
+    });
+
+    dispose();
+
+    expect(result().instance.off).toHaveBeenCalledWith("click", result().handler);
+  });
+
   it("GIVEN a point prop object WHEN bindRuntimeProps is called THEN it sets the point values", () => {
     const { result, dispose } = renderHook(() => {
       const instance = new MockPointContainer();
 
       bindRuntimeProps(instance as any, { position: { x: 3, y: 7 } } as any);
+      flush();
 
       return { instance };
     });
@@ -263,6 +308,7 @@ describe("bindRuntimeProps()", () => {
       };
 
       bindRuntimeProps(instance as any, props as any);
+      flush();
 
       return { instance, setPositionX };
     });
@@ -270,6 +316,7 @@ describe("bindRuntimeProps()", () => {
     expect(result().instance.position.x).toBe(4);
 
     result().setPositionX(9);
+    flush();
     expect(result().instance.position.x).toBe(9);
     dispose();
   });
@@ -281,6 +328,7 @@ describe("bindRuntimeProps()", () => {
       const childB = new MockContainer();
 
       bindRuntimeProps(instance as any, { children: [childA, childB] } as any);
+      flush();
 
       return { instance, childA, childB };
     });
@@ -296,6 +344,7 @@ describe("bindRuntimeProps()", () => {
       const instance = new MockContainer();
 
       bindRuntimeProps(instance as any, { notAProp: 1 } as any);
+      flush();
 
       return { instance };
     });
@@ -318,6 +367,7 @@ describe("bindInitialisationProps()", () => {
       };
 
       bindInitialisationProps(instance as any, props as any);
+      flush();
 
       return { instance };
     });
@@ -338,6 +388,7 @@ describe("bindInitialisationProps()", () => {
       };
 
       bindInitialisationProps(instance as any, props as any);
+      flush();
 
       return { instance, setX };
     });
@@ -345,6 +396,7 @@ describe("bindInitialisationProps()", () => {
     expect(result().instance.x).toBe(0);
 
     result().setX(5);
+    flush();
     expect(result().instance.x).toBe(5);
     dispose();
   });
@@ -361,6 +413,7 @@ describe("bindInitialisationProps()", () => {
       };
 
       bindInitialisationProps(instance as any, props as any);
+      flush();
 
       return { instance, setPosition };
     });
@@ -368,6 +421,7 @@ describe("bindInitialisationProps()", () => {
     expect(result().instance.position.set).not.toHaveBeenCalled();
 
     result().setPosition({ x: 8, y: 9 });
+    flush();
     expect(result().instance.position.set).toHaveBeenCalledWith(8, 9);
     dispose();
   });
@@ -384,6 +438,7 @@ describe("bindInitialisationProps()", () => {
       };
 
       bindInitialisationProps(instance as any, props as any);
+      flush();
 
       return { instance, setProp };
     });

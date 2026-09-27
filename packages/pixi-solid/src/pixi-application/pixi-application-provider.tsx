@@ -1,10 +1,11 @@
+import type { JSX } from "@solidjs/web";
 import type * as Pixi from "pixi.js";
-import type { JSX, ParentProps } from "solid-js";
-import { createResource, DEV, onCleanup, Show, splitProps, useContext } from "solid-js";
+import type { ParentProps } from "solid-js";
+import { createMemo, DEV, omit, onCleanup, Show, untrack, useContext } from "solid-js";
 
 import { createPixiScreenStore } from "../use-pixi-screen/pixi-screen-store";
 
-import { PixiAppContext, TickerContext, ScreenStoreContext } from "./context";
+import { PixiAppContext, ScreenStoreContext, TickerContext } from "./context";
 import { createPixiApplication } from "./pixi-application";
 
 /**
@@ -27,92 +28,97 @@ export type PixiApplicationProps = Partial<
  * This component should only be used once in your application.
  *
  * @param props The properties to configure the Pixi.js Application.
- *
  */
-export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Element => {
-  let externallyProvidedApp: Pixi.Application | undefined = props.existingApp;
-  let ownedApp: Pixi.Application | undefined;
-  let ownedAppInitialized = false;
-  let ownerDisposed = false;
+export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Element =>
+  // `createComponent` runs the body with a strict-read label, which warns on any
+  // reactive read here. The body is entirely one-time setup, so run it under
+  // `untrack`; the effects and memos created inside keep their own tracking.
+  untrack(() => {
+    const externallyProvidedApp = props.existingApp;
+    let ownedApp: Pixi.Application | undefined;
+    let ownedAppInitialized = false;
+    let ownerDisposed = false;
 
-  const warnAboutIgnoredOptions = () => {
-    if (!DEV) return;
+    const warnAboutIgnoredOptions = () => {
+      if (!DEV) return;
 
-    const hasOptions = Object.keys(props).some(
-      (key) =>
-        key !== "children" &&
-        key !== "existingApp" &&
-        props[key as keyof PixiApplicationProps] !== undefined,
+      const hasOptions = Object.keys(props).some(
+        (key) =>
+          key !== "children" &&
+          key !== "existingApp" &&
+          props[key as keyof PixiApplicationProps] !== undefined,
+      );
+
+      if (hasOptions) {
+        console.warn(
+          "[pixi-solid] Application options were provided but ignored because an app already exists in context. Pass them to the provider that creates the app.",
+        );
+      }
+    };
+
+    const destroyOwnedApp = () => {
+      const app = ownedApp;
+      ownedApp = undefined;
+      if (app) app.destroy(true, { children: true });
+    };
+
+    const ApplicationContents = (contentProps: { app: Pixi.Application }): JSX.Element => {
+      const pixiScreenStore = createPixiScreenStore(contentProps.app.renderer);
+
+      return (
+        <PixiAppContext value={contentProps.app}>
+          <ScreenStoreContext value={pixiScreenStore}>
+            <TickerContext value={contentProps.app.ticker}>{props.children}</TickerContext>
+          </ScreenStoreContext>
+        </PixiAppContext>
+      );
+    };
+
+    let existingContext: Pixi.Application | undefined;
+    try {
+      existingContext = useContext(PixiAppContext);
+    } catch {
+      // No enclosing provider; a new application will be created below.
+    }
+    const existingApp = externallyProvidedApp ?? existingContext;
+
+    if (existingApp) {
+      warnAboutIgnoredOptions();
+      return <ApplicationContents app={existingApp} />;
+    }
+
+    const initialisationProps = { ...omit(props, "children", "existingApp") };
+    const app = createMemo<Pixi.Application | undefined>(
+      async (): Promise<Pixi.Application> => {
+        try {
+          const createdApp = await createPixiApplication(initialisationProps, (created) => {
+            ownedApp = created;
+          });
+          ownedAppInitialized = true;
+
+          if (ownerDisposed) destroyOwnedApp();
+
+          return createdApp;
+        } catch (error) {
+          // createPixiApplication destroys instances whose initialization fails.
+          ownedApp = undefined;
+          throw error;
+        }
+      },
+      { loadingValue: undefined },
     );
 
-    if (hasOptions) {
-      console.warn(
-        "[pixi-solid] Application options were provided but ignored because an app already exists in context. Pass them to the provider that creates the app.",
-      );
-    }
-  };
+    onCleanup(() => {
+      ownerDisposed = true;
+      if (ownedAppInitialized) destroyOwnedApp();
+    });
 
-  const destroyOwnedApp = () => {
-    const app = ownedApp;
-    ownedApp = undefined;
-    if (app) app.destroy(true, { children: true });
-  };
-
-  const [appResource] = createResource(async () => {
-    if (externallyProvidedApp) {
-      warnAboutIgnoredOptions();
-      return externallyProvidedApp;
-    }
-
-    const existingContext = useContext(PixiAppContext);
-    if (existingContext) {
-      externallyProvidedApp = existingContext;
-      warnAboutIgnoredOptions();
-      return existingContext;
-    }
-
-    const [, initialisationProps] = splitProps(props, ["children", "existingApp"]);
-
-    try {
-      const app = await createPixiApplication(initialisationProps, (createdApp) => {
-        ownedApp = createdApp;
-      });
-      ownedAppInitialized = true;
-
-      if (ownerDisposed) {
-        destroyOwnedApp();
-        return undefined;
-      }
-
-      return app;
-    } catch (error) {
-      // createPixiApplication destroys instances whose initialization fails.
-      ownedApp = undefined;
-      throw error;
-    }
+    return (
+      <Show when={app()} keyed>
+        {(resolvedApp) => <ApplicationContents app={resolvedApp} />}
+      </Show>
+    );
   });
-
-  onCleanup(() => {
-    ownerDisposed = true;
-    if (ownedAppInitialized) destroyOwnedApp();
-  });
-
-  return (
-    <Show when={appResource()}>
-      {(app) => {
-        const pixiScreenStore = createPixiScreenStore(app().renderer);
-
-        return (
-          <PixiAppContext.Provider value={app()}>
-            <ScreenStoreContext.Provider value={pixiScreenStore}>
-              <TickerContext.Provider value={app().ticker}>{props.children}</TickerContext.Provider>
-            </ScreenStoreContext.Provider>
-          </PixiAppContext.Provider>
-        );
-      }}
-    </Show>
-  );
-};
 
 export type TickerProviderProps = ParentProps<{ ticker: Pixi.Ticker }>;
 
@@ -124,5 +130,5 @@ export type TickerProviderProps = ParentProps<{ ticker: Pixi.Ticker }>;
  * The ticker instance you want to use needs to be passed in as a prop so it can be manually controlled from the outside for testing.
  */
 export const TickerProvider = (props: TickerProviderProps): JSX.Element => {
-  return <TickerContext.Provider value={props.ticker}>{props.children}</TickerContext.Provider>;
+  return <TickerContext value={props.ticker}>{props.children}</TickerContext>;
 };

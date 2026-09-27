@@ -1,10 +1,17 @@
+import type { JSX } from "@solidjs/web";
 import type * as Pixi from "pixi.js";
-import type { JSX } from "solid-js";
-import { createEffect, splitProps, children, Index, onCleanup, on } from "solid-js";
+import {
+  children as resolveChildren,
+  createRenderEffect,
+  For,
+  omit,
+  onCleanup,
+  useContext,
+} from "solid-js";
 
 import type { PixiComponentProps } from "../components";
 import { Container } from "../components/components";
-import { onTick } from "../on-tick";
+import { TickerContext } from "../pixi-application";
 
 export type ObjectFitMode = "cover" | "contain" | "fill" | "scale-down" | "none";
 
@@ -136,6 +143,20 @@ export type ObjectFitContainerProps = PixiComponentProps & {
   observeBounds?: boolean;
 };
 
+type LocalObjectFitProps = Pick<
+  ObjectFitContainerProps,
+  "width" | "height" | "fitMode" | "objectPosition" | "observeBounds" | "children"
+>;
+
+const LOCAL_PROP_NAMES = [
+  "width",
+  "height",
+  "fitMode",
+  "objectPosition",
+  "observeBounds",
+  "children",
+] as const;
+
 /**
  * This component allows the parent container to dictate the size of its children.
  *
@@ -157,102 +178,121 @@ export type ObjectFitContainerProps = PixiComponentProps & {
  * ```
  */
 export const ObjectFitContainer = (props: ObjectFitContainerProps): JSX.Element => {
-  const [local, containerProps] = splitProps(props, [
-    "width",
-    "height",
-    "fitMode",
-    "objectPosition",
-    "observeBounds",
-    "children",
-  ]);
-
-  const resolvedChildren = children(() => local.children);
+  const localKeySet = new Set<string>(LOCAL_PROP_NAMES);
+  const local = omit(
+    props,
+    (key) => typeof key !== "string" || !localKeySet.has(key),
+  ) as LocalObjectFitProps;
+  const containerProps = omit(props, ...LOCAL_PROP_NAMES);
+  const resolvedChildren = resolveChildren(() => local.children);
+  let tickerContext: Pixi.Ticker | undefined;
+  try {
+    tickerContext = useContext(TickerContext);
+  } catch {
+    // No TickerProvider; `observeBounds` simply stays inactive.
+  }
   const innerContainerSet = new Set<Pixi.Container>();
   const cachedBoundsMap = new WeakMap<
     Pixi.Container,
     { x: number; y: number; width: number; height: number }
   >();
+  const applyFit = (child: Pixi.Container): void => {
+    objectFit(child, local, local.fitMode, local.objectPosition);
+  };
 
-  createEffect(() => {
-    void local.width;
-    void local.height;
-    void local.fitMode;
-    void local.objectPosition;
-    void resolvedChildren();
+  createRenderEffect(
+    () => {
+      void local.width;
+      void local.height;
+      void local.fitMode;
+      void local.objectPosition;
+      void resolvedChildren();
+    },
+    () => {
+      for (const child of innerContainerSet) applyFit(child);
+    },
+  );
 
-    for (const child of innerContainerSet) {
-      objectFit(child, local, local.fitMode, local.objectPosition);
-    }
-  });
+  createRenderEffect(
+    () => local.observeBounds,
+    (observeBounds) => {
+      if (observeBounds !== true) return;
 
-  createEffect(
-    on(
-      () => local.observeBounds,
-      (observeBounds) => {
-        if (observeBounds !== true) {
-          return;
-        }
+      if (!tickerContext) {
+        throw new Error(
+          "getTicker must be used within a PixiApplicationProvider, PixiCanvas, or TickerProvider",
+        );
+      }
 
-        onTick(() => {
-          for (const child of innerContainerSet) {
-            const nextLocalBounds = child.getLocalBounds();
-            let previousLocalBounds = cachedBoundsMap.get(child);
+      const ticker = tickerContext;
+      const updateBounds = () => {
+        for (const child of innerContainerSet) {
+          const nextLocalBounds = child.getLocalBounds();
+          let previousLocalBounds = cachedBoundsMap.get(child);
 
-            if (
-              !previousLocalBounds ||
-              previousLocalBounds.x !== nextLocalBounds.x ||
-              previousLocalBounds.y !== nextLocalBounds.y ||
-              previousLocalBounds.width !== nextLocalBounds.width ||
-              previousLocalBounds.height !== nextLocalBounds.height
-            ) {
-              if (!previousLocalBounds) {
-                previousLocalBounds = {
-                  x: nextLocalBounds.x,
-                  y: nextLocalBounds.y,
-                  width: nextLocalBounds.width,
-                  height: nextLocalBounds.height,
-                };
-                cachedBoundsMap.set(child, previousLocalBounds);
-              } else {
-                previousLocalBounds.x = nextLocalBounds.x;
-                previousLocalBounds.y = nextLocalBounds.y;
-                previousLocalBounds.width = nextLocalBounds.width;
-                previousLocalBounds.height = nextLocalBounds.height;
-              }
-
-              objectFitWithLocalBounds(
-                child,
-                local,
-                local.fitMode,
-                local.objectPosition ?? "center",
-                nextLocalBounds,
-              );
+          if (
+            !previousLocalBounds ||
+            previousLocalBounds.x !== nextLocalBounds.x ||
+            previousLocalBounds.y !== nextLocalBounds.y ||
+            previousLocalBounds.width !== nextLocalBounds.width ||
+            previousLocalBounds.height !== nextLocalBounds.height
+          ) {
+            if (!previousLocalBounds) {
+              previousLocalBounds = {
+                x: nextLocalBounds.x,
+                y: nextLocalBounds.y,
+                width: nextLocalBounds.width,
+                height: nextLocalBounds.height,
+              };
+              cachedBoundsMap.set(child, previousLocalBounds);
+            } else {
+              previousLocalBounds.x = nextLocalBounds.x;
+              previousLocalBounds.y = nextLocalBounds.y;
+              previousLocalBounds.width = nextLocalBounds.width;
+              previousLocalBounds.height = nextLocalBounds.height;
             }
+
+            objectFitWithLocalBounds(
+              child,
+              local,
+              local.fitMode,
+              local.objectPosition ?? "center",
+              nextLocalBounds,
+            );
           }
-        });
-      },
-    ),
+        }
+      };
+
+      ticker.add(updateBounds);
+      return () => ticker.remove(updateBounds);
+    },
   );
 
   return (
     <Container {...containerProps}>
-      <Index each={resolvedChildren.toArray()}>
+      {/* `keyed={false}` matches Solid 1's `Index`: wrappers stay stable per position. */}
+      <For each={resolvedChildren.toArray()} keyed={false}>
         {(child, index) => {
+          let wrapper: Pixi.Container | undefined;
+
+          onCleanup(() => {
+            if (wrapper) innerContainerSet.delete(wrapper);
+          });
+
           return (
             <Container
               label={`object-fit-child-wrapper-${index}`}
-              ref={(el) => {
-                innerContainerSet.add(el);
-                onCleanup(() => {
-                  innerContainerSet.delete(el);
-                });
+              ref={(instance) => {
+                wrapper = instance;
+                innerContainerSet.add(instance);
+                applyFit(instance);
               }}
             >
               {child()}
             </Container>
           );
         }}
-      </Index>
+      </For>
     </Container>
   );
 };

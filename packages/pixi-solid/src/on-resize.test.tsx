@@ -1,4 +1,4 @@
-import { createEffect } from "solid-js";
+import { createRenderEffect, flush } from "solid-js";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { onResize } from "./on-resize";
@@ -39,6 +39,7 @@ describe("onResize + usePixiScreen", () => {
     });
 
     ctx.renderer.emitResize({ width: 1024 });
+    flush();
     await Promise.resolve();
 
     const latestSnapshot = onResizeSnapshots[onResizeSnapshots.length - 1];
@@ -53,14 +54,17 @@ describe("onResize + usePixiScreen", () => {
     ctx.renderHook(() => {
       const pixiScreen = usePixiScreen();
 
-      createEffect(() => {
-        // Track all primitive screen fields to count reactive re-runs.
-        void pixiScreen.width;
-        void pixiScreen.height;
-        void pixiScreen.x;
-        void pixiScreen.y;
-        pixiScreenEffectRuns += 1;
-      });
+      createRenderEffect(
+        () => ({
+          width: pixiScreen.width,
+          height: pixiScreen.height,
+          x: pixiScreen.x,
+          y: pixiScreen.y,
+        }),
+        () => {
+          pixiScreenEffectRuns += 1;
+        },
+      );
 
       onResize(() => {
         onResizeCalls += 1;
@@ -71,6 +75,7 @@ describe("onResize + usePixiScreen", () => {
     expect(onResizeCalls).toBe(1);
 
     ctx.renderer.emitResize();
+    flush();
     await Promise.resolve();
 
     expect(onResizeCalls).toBe(2);

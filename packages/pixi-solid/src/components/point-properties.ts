@@ -76,11 +76,6 @@ export type PointAxisPropName = (typeof POINT_PROP_AXIS_NAMES)[number];
 
 export const POINT_PROP_AXIS_NAMES_SET: Set<string> = new Set(POINT_PROP_AXIS_NAMES);
 
-export const ALL_VALID_PROP_NAMES_SET: Set<string> = new Set([
-  ...POINT_PROP_NAMES_SET,
-  ...POINT_PROP_AXIS_NAMES_SET,
-]);
-
 export const POINT_PROP_AXIS_MAP = POINT_PROP_AXIS_NAMES.reduce((map, name) => {
   const axisName = name[name.length - 1].toLowerCase() as "x" | "y";
   const propertyName = name.slice(0, -1);
@@ -91,22 +86,29 @@ export const POINT_PROP_AXIS_MAP = POINT_PROP_AXIS_NAMES.reduce((map, name) => {
 export const isPointProperty = (propName: string): propName is PointPropName =>
   POINT_PROP_NAMES_SET.has(propName);
 
-export const setPointProperty = <T>(node: Pixi.Container, name: PointPropName, value: T): void => {
+export const setPointProperty = (
+  node: Pixi.Container,
+  name: PointPropName,
+  value: unknown,
+): void => {
+  const point = (node as any)[name] as Pixi.ObservablePoint;
+
   if (typeof value === "number") {
-    (node as any)[name].set(value);
+    point.set(value);
     return;
   }
 
-  (node as any)[name].set((value as any).x, (value as any).y);
+  const { x, y } = value as { x: number; y: number };
+  point.set(x, y);
 };
 
 export const isPointAxisProperty = (propName: string): propName is PointAxisPropName =>
   POINT_PROP_AXIS_NAMES_SET.has(propName);
 
-export const setPointAxisProperty = <T>(
+export const setPointAxisProperty = (
   node: Pixi.Container,
   name: PointAxisPropName,
-  value: T,
+  value: unknown,
 ): void => {
   const axisInfo = POINT_PROP_AXIS_MAP.get(name);
   if (axisInfo) {

@@ -1,5 +1,6 @@
+import type { JSX } from "@solidjs/web";
 import type * as Pixi from "pixi.js";
-import type { JSX, Ref } from "solid-js";
+import type { Ref } from "solid-js";
 
 import type { PixiSolidEventHandlerMap } from "./event-properties";
 import type { AnchorPointAxisProps, CommonPointAxisProps, TilingPointAxisProps } from "./factories";

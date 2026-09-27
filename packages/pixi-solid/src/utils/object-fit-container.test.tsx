@@ -1,13 +1,18 @@
 import type * as Pixi from "pixi.js";
 import { Ticker, Texture } from "pixi.js";
-import { createSignal } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { createSignal, flush, resetErrorHalt } from "solid-js";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { Sprite } from "../components/components";
 import { TickerProvider } from "../pixi-application";
 import { mountScene } from "../testing";
 
 import { ObjectFitContainer } from "./object-fit";
+
+// Solid 2 halts the reactive system after an uncaught error. The
+// "observeBounds is true without a ticker" case throws on purpose, so reset
+// the halt between tests to keep the later ticker-driven cases reactive.
+afterEach(() => resetErrorHalt());
 
 describe("ObjectFitContainer", () => {
   it("GIVEN observeBounds is false and no ticker context WHEN mounted THEN it does not throw", () => {
@@ -72,6 +77,7 @@ describe("ObjectFitContainer", () => {
     expect(wrapper?.scale.y).toBeCloseTo(2);
 
     setSpriteWidth(100);
+    flush();
     ticker.update();
 
     expect(wrapper?.scale.x).toBeCloseTo(2);
@@ -106,6 +112,7 @@ describe("ObjectFitContainer", () => {
     expect(wrapper?.scale.y).toBeCloseTo(2);
 
     setSpriteWidth(100);
+    flush();
     ticker.update();
 
     expect(wrapper?.scale.x).toBeCloseTo(1);
@@ -181,6 +188,7 @@ describe("ObjectFitContainer", () => {
 
     // Change first sprite size
     setSprite1Width(200);
+    flush();
     ticker.update();
 
     // Scale should change to accommodate the larger sprite

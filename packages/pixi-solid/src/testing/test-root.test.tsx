@@ -1,5 +1,4 @@
-import { createSignal, onCleanup } from "solid-js";
-import { createStore } from "solid-js/store";
+import { createSignal, createStore, flush, onCleanup } from "solid-js";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Container } from "../components";
@@ -13,6 +12,7 @@ import {
   mountScene,
   queryByLabel,
   renderHook,
+  waitFor,
 } from "./index";
 
 afterEach(() => {
@@ -44,26 +44,34 @@ describe("renderHook", () => {
     dispose();
   });
 
-  it("GIVEN callback reads an external signal WHEN the signal changes THEN result re-evaluates", () => {
+  it("GIVEN a callback returns an external signal WHEN the signal changes THEN result reads its latest value", () => {
     const [count, setCount] = createSignal(1);
 
-    const { result } = renderHook(() => count());
-    expect(result()).toBe(1);
+    const { result } = renderHook(() => count);
+    expect(result()()).toBe(1);
 
     setCount(2);
-    expect(result()).toBe(2);
+    flush();
+    expect(result()()).toBe(2);
   });
 
-  it("GIVEN a wrapper AND a callback that derives a primitive WHEN the source changes THEN result re-evaluates", () => {
+  it("GIVEN a wrapper AND a callback that returns a screen accessor WHEN the source changes THEN the accessor reads the latest width", () => {
     const ctx = createTestContext();
 
-    const { result } = renderHook(() => usePixiScreen().width, { wrapper: ctx.Provider });
+    const { result } = renderHook(
+      () => {
+        const screen = usePixiScreen();
+        return () => screen.width;
+      },
+      { wrapper: ctx.Provider },
+    );
 
-    expect(result()).toBe(800);
+    expect(result()()).toBe(800);
 
     ctx.renderer.emitResize({ width: 1024 });
+    flush();
 
-    expect(result()).toBe(1024);
+    expect(result()()).toBe(1024);
   });
 
   it("GIVEN a hook requiring context WHEN run with a wrapper THEN context resolves", () => {
@@ -94,7 +102,11 @@ describe("renderHook", () => {
 
     const { result } = ctx.renderHook(() => {
       const [store, setStore] = createStore({ time: 0 });
-      onTick((ticker) => setStore("time", (t) => t + ticker.deltaMS));
+      onTick((ticker) => {
+        setStore((state) => {
+          state.time += ticker.deltaMS;
+        });
+      });
       return store;
     });
 
@@ -166,6 +178,56 @@ describe("mountScene", () => {
     dispose();
   });
 
+  it("GIVEN bound queries WHEN used THEN they resolve against the mounted scene", () => {
+    const {
+      getByLabel: get,
+      queryByLabel: query,
+      getAllByLabel: getAll,
+      dispose,
+    } = mountScene(() => (
+      <Container label="root">
+        <Container label="item" />
+        <Container label="item" />
+      </Container>
+    ));
+
+    expect(get("item")).toBeDefined();
+    expect(query("missing")).toBeUndefined();
+    expect(getAll("item")).toHaveLength(2);
+    dispose();
+  });
+
+  it("GIVEN a wrapper WHEN mounted THEN the scene reads the wrapper context", () => {
+    const ctx = createTestContext();
+
+    const ScreenWidthLabel = () => <Container label={`width-${usePixiScreen().width}`} />;
+
+    const { getByLabel: get } = mountScene(() => <ScreenWidthLabel />, {
+      wrapper: ctx.Provider,
+    });
+
+    expect(get("width-800")).toBeDefined();
+  });
+
+  it("GIVEN ctx.mount WHEN used THEN the scene reads the mock context and exposes bound queries", () => {
+    const ctx = createTestContext();
+
+    const ScreenWidthLabel = () => <Container label={`width-${usePixiScreen().width}`} />;
+
+    const { getByLabel: get } = ctx.mount(() => <ScreenWidthLabel />);
+
+    expect(get("width-800")).toBeDefined();
+  });
+
+  it("GIVEN a signal write WHEN asserted with waitFor THEN it observes the flushed value", async () => {
+    const [x, setX] = createSignal(0);
+    const { container } = mountScene(() => <Container x={x()} />);
+
+    setX(42);
+
+    await waitFor(() => expect(container.x).toBe(42));
+  });
+
   it("GIVEN container is accessed via return value THEN properties are directly accessible (no ref callback needed)", () => {
     const { container } = mountScene(() => (
       <Container label="scene">
@@ -216,6 +278,7 @@ describe("mountScene stability and reactivity", () => {
 
     // Signal changes after mount — properties update via bindRuntimeProps effects
     setLabel("second");
+    flush();
 
     // Same container instance, not destroyed
     expect(container.label).toBe("second");
@@ -259,6 +322,7 @@ describe("mountScene stability and reactivity", () => {
     // Change signal — container stays the same, but the instance updates reactively
     setX(50);
     setLabel("second");
+    flush();
 
     // Setup did NOT re-run (createRoot callback only executes once)
     expect(setupCalls).toBe(1);

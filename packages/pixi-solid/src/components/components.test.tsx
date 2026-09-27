@@ -1,3 +1,4 @@
+import type { JSX } from "@solidjs/web";
 import type * as Pixi from "pixi.js";
 import {
   AnimatedSprite as PixiAnimatedSprite,
@@ -7,8 +8,7 @@ import {
   Ticker,
   TilingSprite as PixiTilingSprite,
 } from "pixi.js";
-import type { JSX } from "solid-js";
-import { createSignal } from "solid-js";
+import { createSignal, flush, resetErrorHalt } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { TickerProvider } from "../pixi-application";
@@ -31,6 +31,7 @@ import {
 } from "./components";
 
 afterEach(() => {
+  resetErrorHalt();
   vi.restoreAllMocks();
 });
 
@@ -206,6 +207,7 @@ describe("Component Factory Cleanup on Unmount", () => {
 
     // WHEN: Hide the component (triggers cleanup)
     setShouldShow(false);
+    flush();
 
     // THEN: The container and its child should be destroyed
     expect(destroyedInstances).toContain(firstContainerRef);
@@ -213,6 +215,7 @@ describe("Component Factory Cleanup on Unmount", () => {
 
     // WHEN: Show a new component
     setShouldShow(true);
+    flush();
 
     // THEN: A new instance should be created
     expect(currentContainerRef).not.toBe(firstContainerRef);
@@ -258,6 +261,7 @@ describe("Component Factory Cleanup on Unmount", () => {
     expect(destroyedChildren.length).toBe(0);
 
     setShowContainer(false);
+    flush();
 
     expect(destroyedChildren.length).toBe(2);
 
@@ -285,12 +289,15 @@ describe("Component Factory Cleanup on Unmount", () => {
     expect(destroyedInstances.length).toBe(0);
 
     setShouldShow(false);
+    flush();
     expect(destroyedInstances.length).toBe(1);
 
     setShouldShow(true);
+    flush();
     expect(destroyedInstances.length).toBe(1);
 
     setShouldShow(false);
+    flush();
     expect(destroyedInstances.length).toBe(2);
 
     dispose();
@@ -327,6 +334,7 @@ describe("RenderLayer Component Cleanup", () => {
     expect(detachedChildren.length).toBe(0);
 
     setShowChild(false);
+    flush();
 
     expect(detachedChildren.length).toBe(1);
 
@@ -355,10 +363,12 @@ describe("Reactive children binding — stale children are not left attached", (
     expect(containerRef?.children).toEqual([red]);
 
     setCond(false);
+    flush();
 
     expect(containerRef?.children).toEqual([green]);
 
     setCond(true);
+    flush();
 
     expect(containerRef?.children).toEqual([red]);
     dispose();
@@ -387,10 +397,12 @@ describe("Reactive children binding — stale children are not left attached", (
     expect(containerRef?.children).toEqual([red]);
 
     setCond(false);
+    flush();
 
     expect(containerRef?.children).toEqual([green]);
 
     setCond(true);
+    flush();
 
     expect(containerRef?.children).toEqual([red]);
     dispose();
@@ -418,6 +430,7 @@ describe("Container unmount — unowned children are detached, not destroyed", (
 
     // WHEN: the Container unmounts
     setShow(false);
+    flush();
 
     // THEN: the raw child is detached from the container…
     expect(rawChild.parent).toBeNull();
@@ -448,6 +461,7 @@ describe("Container unmount — unowned children are detached, not destroyed", (
     expect(rawSprite.parent).not.toBeNull();
 
     setShow(false);
+    flush();
 
     // The user-owned instance is detached but never destroyed
     expect(rawSprite.parent).toBeNull();
@@ -522,7 +536,6 @@ describe("AnimatedSprite ticker integration", () => {
   it("GIVEN autoUpdate changes reactively WHEN toggled from false to true and back THEN ticker subscription follows latest value", () => {
     const contextTicker = new Ticker();
     const [autoUpdate, setAutoUpdate] = createSignal(false);
-
     const contextTickerAddSpy = vi.spyOn(contextTicker, "add");
     const contextTickerRemoveSpy = vi.spyOn(contextTicker, "remove");
 
@@ -535,12 +548,14 @@ describe("AnimatedSprite ticker integration", () => {
     expect(contextTickerAddSpy).toHaveBeenCalledTimes(0);
 
     setAutoUpdate(true);
+    flush();
     expect(contextTickerAddSpy).toHaveBeenCalledTimes(1);
 
     const updateCallback = contextTickerAddSpy.mock.calls[0]?.[0];
     expect(updateCallback).toBeTypeOf("function");
 
     setAutoUpdate(false);
+    flush();
     expect(contextTickerRemoveSpy).toHaveBeenCalledWith(updateCallback);
 
     return dispose();
@@ -592,7 +607,9 @@ describe("TilingSprite-specific point props", () => {
     expect(tilingSpriteRef.tileScale.y).toBe(3);
 
     setTilePosition({ x: 30, y: 40 });
+    flush();
     setTileScale({ x: 4, y: 5 });
+    flush();
 
     expect(tilingSpriteRef.tilePosition.x).toBe(30);
     expect(tilingSpriteRef.tilePosition.y).toBe(40);

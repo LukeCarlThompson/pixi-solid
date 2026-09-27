@@ -1,6 +1,6 @@
 import { useContext } from "solid-js";
 
-import { ScreenStoreContext } from "../pixi-application";
+import { ScreenStoreContext } from "../pixi-application/context";
 
 import type { PixiScreenDimensions } from "./pixi-screen-store";
 
@@ -15,9 +15,10 @@ import type { PixiScreenDimensions } from "./pixi-screen-store";
  * `x`, `y`, `left`, `right`, `top`, `bottom` properties.
  */
 export const usePixiScreen = (): Readonly<PixiScreenDimensions> => {
-  const pixiScreenStore = useContext(ScreenStoreContext);
-  if (!pixiScreenStore) {
+  try {
+    return useContext(ScreenStoreContext);
+  } catch {
+    // Solid 2 throws a message-less error when the context has no provider.
     throw new Error("usePixiScreen must be used within a PixiApplicationProvider or PixiCanvas");
   }
-  return pixiScreenStore;
 };
