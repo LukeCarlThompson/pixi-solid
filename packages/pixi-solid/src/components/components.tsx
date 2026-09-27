@@ -48,23 +48,14 @@ import {
   createTilingSpriteComponent,
 } from "./factories";
 
-/**
- * A SolidJS component that renders a `PIXI.AnimatedSprite`.
- */
 export const AnimatedSprite: Component<AnimatedSpriteProps> = createAnimatedSpriteComponent<
   PixiAnimatedSprite,
   Pixi.AnimatedSpriteOptions
 >(PixiAnimatedSprite);
-/**
- * A SolidJS component that renders a `PIXI.BitmapText`.
- */
 export const BitmapText: Component<BitmapTextProps> = createSpriteComponent<
   PixiBitmapText,
   Pixi.TextOptions
 >(PixiBitmapText);
-/**
- * A SolidJS component that renders a `PIXI.Container`.
- */
 export const Container: Component<ContainerProps> = createContainerComponent<
   PixiContainer,
   Pixi.ContainerOptions
@@ -98,33 +89,21 @@ export const Graphics: Component<GraphicsProps> = (props) => {
 
   return instance;
 };
-/**
- * A SolidJS component that renders a `PIXI.HTMLText`.
- */
 export const HTMLText: Component<HTMLTextProps> = createSpriteComponent<
   PixiHTMLText,
   Pixi.HTMLTextOptions
 >(PixiHTMLText);
 
-/**
- * A SolidJS component that renders a `PIXI.MeshPlane`.
- */
 export const MeshPlane: Component<MeshPlaneProps> = createLeafComponent<
   PixiMeshPlane,
   Pixi.MeshPlaneOptions
 >(PixiMeshPlane);
 
-/**
- * A SolidJS component that renders a `PIXI.MeshRope`.
- */
 export const MeshRope: Component<MeshRopeProps> = createLeafComponent<
   PixiMeshRope,
   Pixi.MeshRopeOptions
 >(PixiMeshRope);
 
-/**
- * A SolidJS component that renders a `PIXI.NineSliceSprite`.
- */
 export const NineSliceSprite: Component<NineSliceSpriteProps> = createSpriteComponent<
   PixiNineSliceSprite,
   Pixi.NineSliceSpriteOptions
@@ -140,63 +119,39 @@ export const ParticleContainer: Component<ParticleContainerProps> = createLeafCo
   Pixi.ParticleContainerOptions
 >(PixiParticleContainer);
 
-/**
- * A SolidJS component that renders a `PIXI.PerspectiveMesh`.
- */
 export const PerspectiveMesh: Component<PerspectiveMeshProps> = createLeafComponent<
   PixiPerspectiveMesh,
   Pixi.PerspectivePlaneOptions
 >(PixiPerspectiveMesh);
 
-/**
- * A SolidJS component that renders a `PIXI.RenderContainer`.
- */
 export const RenderContainer: Component<RenderContainerProps> = createContainerComponent<
   PixiRenderContainer,
   Pixi.RenderContainerOptions
 >(PixiRenderContainer);
 
-/**
- * A SolidJS component that renders a `PIXI.RenderLayer`.
- */
 export const RenderLayer: Component<RenderLayerProps> = createContainerComponent<
   PixiRenderLayer,
   Pixi.RenderLayerOptions
 >(PixiRenderLayer);
 
-/**
- * A SolidJS component that renders a `PIXI.Sprite`.
- */
 export const Sprite: Component<SpriteProps> = createSpriteComponent<PixiSprite, Pixi.SpriteOptions>(
   PixiSprite,
 );
 
-/**
- * A SolidJS component that renders a `PIXI.Text`.
- */
 export const Text: Component<TextProps> = createSpriteComponent<PixiText, Pixi.CanvasTextOptions>(
   PixiText,
 );
 
-/**
- * A SolidJS component that renders a `PIXI.SplitText`.
- */
 export const SplitText: Component<SplitTextProps> = createLeafComponent<
   PixiSplitText,
   Pixi.SplitTextOptions
 >(PixiSplitText);
 
-/**
- * A SolidJS component that renders a `PIXI.SplitBitmapText`.
- */
 export const SplitBitmapText: Component<SplitBitmapTextProps> = createLeafComponent<
   PixiSplitBitmapText,
   Pixi.SplitBitmapTextOptions
 >(PixiSplitBitmapText);
 
-/**
- * A SolidJS component that renders a `PIXI.TilingSprite`.
- */
 export const TilingSprite: Component<TilingSpriteProps> = createTilingSpriteComponent<
   PixiTilingSprite,
   Pixi.TilingSpriteOptions

@@ -41,13 +41,11 @@ export const COMMON_POINT_PROP_AXIS_NAMES = [
   "skewY",
 ] as const;
 
-/** A single axis-specific point property name available on all Container-based components. */
 export type CommonPointAxisPropName = (typeof COMMON_POINT_PROP_AXIS_NAMES)[number];
 
 /** Axis-specific anchor property names available on Sprite-like components: `anchorX`, `anchorY`. */
 export const ANCHOR_POINT_PROP_AXIS_NAMES = ["anchorX", "anchorY"] as const;
 
-/** A single axis-specific anchor property name available on Sprite-like components. */
 export type AnchorPointAxisPropName = (typeof ANCHOR_POINT_PROP_AXIS_NAMES)[number];
 
 /**
@@ -61,7 +59,6 @@ export const TILING_POINT_PROP_AXIS_NAMES = [
   "tileScaleY",
 ] as const;
 
-/** A single axis-specific tiling property name available on TilingSprite. */
 export type TilingPointAxisPropName = (typeof TILING_POINT_PROP_AXIS_NAMES)[number];
 
 // All axis properties (for runtime checking)
@@ -71,7 +68,6 @@ export const POINT_PROP_AXIS_NAMES = [
   ...TILING_POINT_PROP_AXIS_NAMES,
 ] as const;
 
-/** Any axis-specific point property name across all component types. */
 export type PointAxisPropName = (typeof POINT_PROP_AXIS_NAMES)[number];
 
 export const POINT_PROP_AXIS_NAMES_SET: Set<string> = new Set(POINT_PROP_AXIS_NAMES);

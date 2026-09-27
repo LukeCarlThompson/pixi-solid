@@ -27,7 +27,7 @@ export type PixiApplicationProps = Partial<
  *
  * This component should only be used once in your application.
  *
- * @param props The properties to configure the Pixi.js Application.
+ * @param props The properties to configure the PixiJS Application.
  */
 export const PixiApplicationProvider = (props: PixiApplicationProps): JSX.Element =>
   // `createComponent` runs the body with a strict-read label, which warns on any

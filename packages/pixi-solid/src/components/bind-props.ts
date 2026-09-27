@@ -45,8 +45,11 @@ const assignInstanceProp = (instance: Pixi.Container, key: string, value: unknow
  * that key's effect and allocates nothing.
  *
  * A single effect that reads every prop (the shape Solid's own `spread` uses)
- * would re-enumerate and re-read all props on every change; per-key effects keep
- * an update proportional to what changed.
+ * has to rewrite every prop it read, because an apply callback cannot read
+ * reactive values and so re-applies what the compute captured. That makes a
+ * sparse update cost the whole prop set. `bind-props-strategies.bench.ts`
+ * measures sparse updates about 2x to 4x faster per-key, and an update that
+ * changes nearly every prop about 1.3x slower.
  *
  * Key additions are handled by a separate reconcile effect that adds the missing
  * keys instead of rebuilding them. This matters for `merge()`/spread views:
@@ -63,7 +66,7 @@ const assignInstanceProp = (instance: Pixi.Container, key: string, value: unknow
  * @param deferInitialRun Keys bound during the first reconcile pass are the ones
  * the constructor already received, so they are not written until they change.
  */
-const bindPropsByKey = (
+export const bindPropsByKey = (
   props: PropRecord,
   include: (key: string) => boolean,
   bindKey: PropKeyBinder,

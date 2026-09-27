@@ -253,7 +253,7 @@ export const createAnimatedSpriteComponent = <
       const options = getInstanceOptions(props, ANIMATED_SPRITE_INITIALISATION_RUNTIME_KEY_SET);
       const instance = as || new PixiClass(options as any);
 
-      // Set this to false to override Pixi's default shared ticker behaviour.
+      // Set this to false to override Pixi's default shared ticker behavior.
       instance.autoUpdate = false;
       let ticker: Pixi.Ticker | undefined;
       try {

@@ -18,7 +18,7 @@ export type Spring = {
   value: Accessor<number>;
   /**
    * Sets the current value of the spring directly. This can be used to "teleport" the spring to a specific value.
-   * The next frame will still calculate the spring physics as normal based on the current to value so you may want to set the to value at the same time to control the behaviour.
+   * The next frame will still calculate the spring physics as normal based on the current to value so you may want to set the to value at the same time to control the behavior.
    */
   setValue: (value: number) => void;
   velocity: Accessor<number>;

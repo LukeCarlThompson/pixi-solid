@@ -56,7 +56,7 @@ export const createManualTicker = (): ManualTicker => {
   const ticker = new Ticker();
 
   // Seed `lastTime` so the first driver step produces exactly the requested
-  // delta. PixiJS initialises `lastTime` to `-1`, which would otherwise make
+  // delta. PixiJS initializes `lastTime` to `-1`, which would otherwise make
   // the first frame's delta one millisecond too large
   // (`deltaMS = currentTime - (-1)`).
   ticker.lastTime = 0;

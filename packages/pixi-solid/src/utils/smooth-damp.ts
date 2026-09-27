@@ -52,18 +52,6 @@ export const smoothDamp = (
   return result;
 };
 
-/**
- * A SolidJS hook that provides a smoothly damped signal towards a target value.
- * Internally manages velocity with continuous updates synced to the Pixi ticker.
- *
- * @example
- * ```tsx
- * const pos = useSmoothDamp({ to: () => targetX() });
- *
- * return <Sprite x={pos.value()} />;
- * ```
- */
-
 export type UseSmoothDampProps = {
   to: () => number;
   smoothTimeMs?: () => number;
@@ -75,7 +63,7 @@ export type SmoothDamp = {
   velocity: Accessor<number>;
   /**
    * Sets the current value of the smooth damp directly. This can be used to "teleport" the value to a specific point.
-   * The next frame will still calculate the smooth damp physics as normal based on the current to value so you may want to set the to value at the same time to control the behaviour.
+   * The next frame will still calculate the smooth damp physics as normal based on the current to value so you may want to set the to value at the same time to control the behavior.
    */
   setValue: (value: number) => void;
 };
