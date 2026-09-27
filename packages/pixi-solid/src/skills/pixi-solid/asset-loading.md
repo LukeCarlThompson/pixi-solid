@@ -35,6 +35,24 @@ function HeroScene() {
 
 `fallback` is optional. Without one, the boundary renders nothing while pending, which makes `<Loading>` a direct replacement for the old `Show when={undefined}` pattern.
 
+Inside a Pixi tree the `fallback` must be a Pixi element, or nothing at all. A DOM element such as `<div>` is not a Pixi object, so pixi-solid rejects it as a child and the error halts reactivity. Keep a DOM fallback outside `PixiCanvas`, where it is a sibling of the canvas rather than a child of the scene:
+
+```tsx
+// DOM fallback: the boundary wraps the canvas.
+<Loading fallback={<div>Loading…</div>}>
+  <Show when={assetsReady()}>
+    <PixiCanvas>
+      <Scene />
+    </PixiCanvas>
+  </Show>
+</Loading>
+
+// Pixi fallback: the boundary lives inside the scene.
+<Loading fallback={<Text text="Loading…" />}>
+  <Sprite texture={texture()} />
+</Loading>
+```
+
 The boundary covers its **whole subtree** and catches a pending read from any descendant. Place it around the smallest subtree that should wait, and never wrap a subtree that belongs to your caller. A provider or wrapper whose children are the caller's should gate its own computation narrowly instead:
 
 ```tsx

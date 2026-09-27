@@ -82,22 +82,24 @@ export const Demo = () => {
         onToggleDirectionClicked={playerStore.toggleDirection}
         onToggleRunningClicked={playerStore.toggleRunning}
       />
-      <PixiCanvas
-        style={{
-          "aspect-ratio": "16/9",
-          overflow: "hidden",
-          "border-radius": "10px",
-        }}
-      >
-        <Loading fallback={<div>Loading...</div>}>
-          <Show when={assetsReady()}>
+      {/* The fallback is a DOM element, so the boundary sits outside the canvas. A `<Loading>`
+          inside `PixiCanvas` would add its fallback as a Pixi child. */}
+      <Loading fallback={<div>Loading...</div>}>
+        <Show when={assetsReady()}>
+          <PixiCanvas
+            style={{
+              "aspect-ratio": "16/9",
+              overflow: "hidden",
+              "border-radius": "10px",
+            }}
+          >
             <DemoScene
               isRunning={playerStore.state.isRunning}
               direction={playerStore.state.direction}
             />
-          </Show>
-        </Loading>
-      </PixiCanvas>
+          </PixiCanvas>
+        </Show>
+      </Loading>
     </div>
   );
 };
