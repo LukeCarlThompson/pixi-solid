@@ -5,7 +5,7 @@ description: An example of using masks in solid-pixi.
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/masks.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 Masks work the same way as in PixiJS.
 The object being used as a masks needs to be added to the `Stage` and set as a `mask` property on the object to be masked.
@@ -16,7 +16,7 @@ Please see the [PixiJS docs](https://pixijs.com/8.x/guides/components/scene-obje
 
 Move your mouse across the screen to change the mask position.
 
-<ClientOnly fileName="masks" client:load />
+<DemoMount name="masks" />
 
 ### Code example
 

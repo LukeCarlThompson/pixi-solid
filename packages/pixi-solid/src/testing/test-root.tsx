@@ -18,8 +18,12 @@ export type MountSceneOptions = {
 
 export type MountSceneResult<TRoot = Pixi.Container> = {
   /**
-   * The root PixiJS Container of the rendered scene graph. Access properties
-   * directly or use the bound query helpers below.
+   * The root PixiJS Container as it was right after mounting. Access properties
+   * directly, or use the bound query helpers below.
+   *
+   * If the scene's root node can be replaced — a `<Loading>` boundary or a
+   * `<Show>` at the top level — this snapshot points at the replaced node. The
+   * bound query helpers read the current root instead, so prefer them.
    */
   container: TRoot;
   /** Find a descendant by `label`. Throws if not found. */
@@ -205,11 +209,16 @@ export const mountScene = <TRoot = Pixi.Container,>(
 
   const container = root() as unknown as TRoot;
 
+  // The queries read the root lazily. A conditional in the scene can replace the root node,
+  // and a captured snapshot would then point at a detached instance that they would search
+  // in vain.
+  const currentContainer = () => root() as unknown as Pixi.Container;
+
   return {
     container,
-    getByLabel: (label) => getByLabel(container as unknown as Pixi.Container, label),
-    queryByLabel: (label) => queryByLabel(container as unknown as Pixi.Container, label),
-    getAllByLabel: (label) => getAllByLabel(container as unknown as Pixi.Container, label),
+    getByLabel: (label) => getByLabel(currentContainer(), label),
+    queryByLabel: (label) => queryByLabel(currentContainer(), label),
+    getAllByLabel: (label) => getAllByLabel(currentContainer(), label),
     dispose: registerDisposer(dispose),
   };
 };

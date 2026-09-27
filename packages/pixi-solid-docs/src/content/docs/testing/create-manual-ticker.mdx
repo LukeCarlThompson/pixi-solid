@@ -45,9 +45,9 @@ await manual.fastForwardTime(500, 50); // 500ms in 50ms steps
 import { Aside } from "@astrojs/starlight/components";
 
 <Aside type="note">
-  The returned `ticker` wraps a real PixiJS `Ticker`, so the same defaults apply (e.g. per-step deltas
-  are capped at 100ms via the default `minFPS = 10`) and can be overridden on the instance after
-  creation — e.g. `ticker.ticker.minFPS = 4` to allow larger step deltas.
+  The returned `ticker` wraps a real PixiJS `Ticker`, so the same defaults apply (e.g. per-step
+  deltas are capped at 100ms via the default `minFPS = 10`) and can be overridden on the instance
+  after creation — e.g. `ticker.ticker.minFPS = 4` to allow larger step deltas.
 </Aside>
 
 <Aside type="note">

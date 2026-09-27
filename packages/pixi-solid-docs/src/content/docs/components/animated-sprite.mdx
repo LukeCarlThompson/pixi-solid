@@ -5,7 +5,7 @@ description: A SolidJS component that renders a PixiJS AnimatedSprite.
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/animated-sprite.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 A SolidJS component that renders a PixiJS `AnimatedSprite`.
 
@@ -47,7 +47,7 @@ This avoids accidentally mixing multiple tickers and makes `AnimatedSprite` beha
 
 ### Demo
 
-<ClientOnly fileName="animated-sprite" client:load />
+<DemoMount name="animated-sprite" />
 
 ### Code example
 

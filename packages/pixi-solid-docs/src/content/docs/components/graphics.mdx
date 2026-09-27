@@ -5,7 +5,7 @@ description: A SolidJS component that renders a PixiJS Graphics.
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/graphics.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 A SolidJS component that renders a PixiJS `Graphics`.
 
@@ -13,7 +13,7 @@ See the [PixiJS docs](https://pixijs.download/release/docs/scene.Graphics.html) 
 
 ### Demo
 
-<ClientOnly fileName="graphics" client:load />
+<DemoMount name="graphics" />
 
 ### Code example
 

@@ -79,7 +79,7 @@ const DraggingDemo = () => {
   );
 };
 
-export const DemoApp = () => (
+export const Demo = () => (
   <PixiCanvas style={{ "aspect-ratio": "2/1.5" }} antialias={true}>
     <DraggingDemo />
   </PixiCanvas>

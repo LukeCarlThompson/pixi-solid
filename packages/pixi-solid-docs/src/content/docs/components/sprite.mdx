@@ -5,7 +5,7 @@ description: A SolidJS component that renders a PixiJS Sprite.
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/sprite.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 A SolidJS component that renders a PixiJS `Sprite`.
 
@@ -13,7 +13,7 @@ Please see the [PixiJS docs](https://pixijs.download/release/docs/scene.Sprite.h
 
 ### Demo
 
-<ClientOnly fileName="sprite" client:load />
+<DemoMount name="sprite" />
 
 ### Code example
 

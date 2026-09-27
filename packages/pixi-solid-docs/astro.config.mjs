@@ -2,8 +2,8 @@
 
 import path from "path";
 
-import solidJs from "@astrojs/solid-js";
 import starlight from "@astrojs/starlight";
+import solidPlugin from "@solidjs/vite-plugin";
 import { defineConfig } from "astro/config";
 
 // Get the current working directory to resolve paths correctly
@@ -57,9 +57,12 @@ export default defineConfig({
         },
       ],
     }),
-    solidJs(),
   ],
   vite: {
+    // `@solidjs/vite-plugin` types against Vite 8 while Astro 6 ships Vite 7. The plugin
+    // declares `^6 || ^7 || ^8` and runs on Vite 7; only the bundled type definitions differ.
+    // @ts-expect-error cross-version Plugin type mismatch (remove when Astro ships Vite 8)
+    plugins: [solidPlugin()],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

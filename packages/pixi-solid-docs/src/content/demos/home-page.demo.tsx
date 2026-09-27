@@ -1,1 +1,1 @@
-export { DemoApp } from "./home-page-demo";
+export { Demo } from "./home-page-demo";

@@ -1,6 +1,6 @@
 import { AnimatedSprite, Container } from "pixi-solid";
 import type * as Pixi from "pixi.js";
-import { createEffect, Match, Switch, splitProps } from "solid-js";
+import { createEffect, Match, omit, Switch } from "solid-js";
 
 import { getIdleAnimationTextures, getRunAnimationTextures } from "./get-animation-textures";
 
@@ -10,7 +10,7 @@ export type CharacterProps = Omit<Pixi.ContainerOptions, "children"> & {
 };
 
 export const Character = (props: CharacterProps) => {
-  const [, pixiProps] = splitProps(props, ["isRunning", "direction"]);
+  const pixiProps = omit(props, "isRunning", "direction");
 
   return (
     <Container {...pixiProps} label={"Character"}>
@@ -19,13 +19,16 @@ export const Character = (props: CharacterProps) => {
           <AnimatedSprite
             autoPlay={props.isRunning}
             ref={(instance) => {
-              createEffect(() => {
-                if (props.isRunning) {
-                  instance.play();
-                } else {
-                  instance.stop();
-                }
-              });
+              createEffect(
+                () => props.isRunning,
+                (isRunning) => {
+                  if (isRunning) {
+                    instance.play();
+                  } else {
+                    instance.stop();
+                  }
+                },
+              );
             }}
             textures={getRunAnimationTextures()}
             scaleX={props.direction === "left" ? -1 : 1}

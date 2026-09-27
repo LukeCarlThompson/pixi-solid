@@ -5,7 +5,7 @@ description: An example of using filters in solid-pixi.
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/filters.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 To use PixiJS filters we should instantiate them directly from the PixiJS classes and then bind them to any properties we want to change with signals.
 
@@ -18,7 +18,7 @@ Please see the [PixiJS docs](https://pixijs.download/release/docs/filters.html) 
 
 Move your mouse left to right across the sky to adjust the strength of the blur filter.
 
-<ClientOnly fileName="filters" client:load />
+<DemoMount name="filters" />
 
 ### Code example
 

@@ -29,6 +29,27 @@ function HeroScene() {
 
 `Assets.load()` does not require `Assets.init()` for a direct URL. Keep the loading boundary at the route or scene level: load its resources together, then render display components with loaded values. Avoid adding a separate boundary to every `Sprite`. Async errors flow to an `<Errored>` boundary instead of an inline `resource.error`.
 
+### How `<Loading>` behaves
+
+`<Loading>` renders its `fallback` while a read inside its subtree is pending. While it waits, the children are **not** constructed: the pending read throws, the boundary discards that attempt, and the children are built once when the read settles. No half-built Pixi objects survive.
+
+`fallback` is optional. Without one, the boundary renders nothing while pending, which makes `<Loading>` a direct replacement for the old `Show when={undefined}` pattern.
+
+The boundary covers its **whole subtree** and catches a pending read from any descendant. Place it around the smallest subtree that should wait, and never wrap a subtree that belongs to your caller. A provider or wrapper whose children are the caller's should gate its own computation narrowly instead:
+
+```tsx
+import { createMemo, Show } from "solid-js";
+
+// `loadingValue` supplies the value to read while the computation is pending, so the read
+// returns that value instead of suspending. `Show` then gates only this computation.
+const app = createMemo<Pixi.Application | undefined>(
+  async (): Promise<Pixi.Application> => createApp(),
+  { loadingValue: undefined },
+);
+
+return <Show when={app()}>{(resolvedApp) => <Contents app={resolvedApp} />}</Show>;
+```
+
 ## Load scene bundles
 
 For larger pipelines, PixiJS [AssetPack](https://pixijs.io/assetpack/) can generate manifests. It is optional and independent of pixi-solid.

@@ -1,8 +1,8 @@
+import type { JSX } from "@solidjs/web";
 import { Container, Graphics, PixiCanvas, usePixiScreen } from "pixi-solid";
 import type { ObjectFitMode, ObjectPosition } from "pixi-solid/utils";
 import { objectFit } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
-import type { JSX } from "solid-js";
 import { createEffect, createSignal } from "solid-js";
 
 const fitModes: ObjectFitMode[] = ["contain", "cover", "fill", "scale-down", "none"];
@@ -25,10 +25,14 @@ const DemoScene = (props: { fitMode: ObjectFitMode; objectPosition: ObjectPositi
   const pixiScreen = usePixiScreen();
   let graphicsRef: Pixi.Graphics | undefined;
 
-  createEffect(() => {
-    if (!graphicsRef) return;
-    objectFit(graphicsRef, bounds, props.fitMode, props.objectPosition);
-  });
+  // Solid 2 removed the single-argument `createEffect`; name the dependencies in the compute phase.
+  createEffect(
+    () => [props.fitMode, props.objectPosition] as const,
+    ([fitMode, objectPosition]) => {
+      if (!graphicsRef) return;
+      objectFit(graphicsRef, bounds, fitMode, objectPosition);
+    },
+  );
 
   return (
     <Container
@@ -51,7 +55,7 @@ const DemoScene = (props: { fitMode: ObjectFitMode; objectPosition: ObjectPositi
   );
 };
 
-export const DemoApp = (): JSX.Element => {
+export const Demo = (): JSX.Element => {
   const [fitMode, setFitMode] = createSignal<ObjectFitMode>("contain");
   const [objectPosition, setObjectPosition] = createSignal<ObjectPositionPreset>("center");
 

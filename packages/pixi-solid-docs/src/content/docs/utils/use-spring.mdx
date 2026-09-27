@@ -8,7 +8,7 @@ sidebar:
 import { Code } from "@astrojs/starlight/components";
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 import demoCode from "../../demos/use-spring.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 The `useSpring` function provides reactive SolidJS signals for creating physically-based spring animations for numeric values.
 
@@ -30,7 +30,7 @@ It must be called within a SolidJS tracking scope, such as a component or anothe
 
 Taking our earlier `useSmoothDamp` demo and applying `useSpring` gives us an altogether different feeling motion.
 
-<ClientOnly fileName="use-spring" client:load />
+<DemoMount name="use-spring" />
 
 ### Code example
 

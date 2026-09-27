@@ -5,7 +5,7 @@ description: A SolidJS component that renders a PixiJS SplitBitmapText container
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/split-bitmap-text.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 `SplitBitmapText` renders text as separate bitmap text segments. Use the exposed `chars`, `words`, and `lines` arrays when you need to animate many text segments efficiently.
 
@@ -17,7 +17,7 @@ Please see the [PixiJS SplitBitmapText docs](https://pixijs.download/release/doc
 
 ### Demo
 
-<ClientOnly fileName="split-bitmap-text" client:load />
+<DemoMount name="split-bitmap-text" />
 
 ### Code example
 
@@ -42,7 +42,7 @@ BitmapFont.install({
 <SplitBitmapText
   text="Fast per-character animation"
   style={{ fontFamily: "GameFont", fontSize: 40, fill: "white" }}
-/>
+/>;
 ```
 
 The component exposes the same `chars`, `words`, `lines`, `autoSplit`, and transform-origin props as [`SplitText`](../split-text/). The character segments use bitmap text, so they inherit BitmapText's font atlas and glyph coverage requirements.

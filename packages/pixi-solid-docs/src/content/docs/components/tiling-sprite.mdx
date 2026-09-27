@@ -6,7 +6,7 @@ description: A SolidJS component that renders a PixiJS TilingSprite.
 import { Code } from "@astrojs/starlight/components";
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 import demoCode from "../../demos/tiling-sprite.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 A SolidJS component that renders a PixiJS `TilingSprite`.
 
@@ -14,7 +14,7 @@ Please see the [PixiJS docs](https://pixijs.download/release/docs/scene.TilingSp
 
 ### Demo
 
-<ClientOnly fileName="tiling-sprite" client:load />
+<DemoMount name="tiling-sprite" />
 
 ### Code example
 

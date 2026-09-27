@@ -5,7 +5,7 @@ description: A utility component that scales and aligns children to fit a fixed 
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/object-fit-container.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 `ObjectFitContainer` is a utility component from `pixi-solid/utils` that applies object-fit style scaling and positioning to its children inside a fixed width and height region.
 
@@ -42,7 +42,7 @@ import { ObjectFitContainer } from "pixi-solid/utils";
 
 Use the controls to switch fit mode and position and compare the behaviour.
 
-<ClientOnly fileName="object-fit-container" client:load />
+<DemoMount name="object-fit-container" />
 
 ### Code example
 

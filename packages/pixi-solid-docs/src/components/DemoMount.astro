@@ -1,0 +1,44 @@
+---
+type Props = {
+  name: string;
+};
+
+const { name } = Astro.props;
+---
+
+<div class="demo-mount" data-demo={name}></div>
+
+<script>
+  import { createComponent } from "solid-js";
+  import { render } from "@solidjs/web";
+
+  // Resolved at build time, so the browser only downloads the demo a page mounts.
+  const demos = import.meta.glob("../content/demos/*.demo.tsx");
+
+  const mount = async (host) => {
+    const name = host.dataset.demo;
+    const load = name ? demos[`../content/demos/${name}.demo.tsx`] : undefined;
+
+    if (!load) {
+      host.textContent = `Demo "${name}" not found.`;
+      console.error(`[pixi-solid docs] no demo module for "${name}"`);
+      return;
+    }
+
+    const module = await load();
+    // Demos export `Demo`. Fall back to the module's only export for safety.
+    const Demo = module.Demo ?? Object.values(module)[0];
+
+    if (typeof Demo !== "function") {
+      host.textContent = `Demo "${name}" has no component export.`;
+      console.error(`[pixi-solid docs] demo "${name}" exports no component`, module);
+      return;
+    }
+
+    render(() => createComponent(Demo, {}), host);
+  };
+
+  for (const host of document.querySelectorAll("[data-demo]")) {
+    void mount(host);
+  }
+</script>

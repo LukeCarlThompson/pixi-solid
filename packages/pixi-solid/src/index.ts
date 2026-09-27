@@ -51,3 +51,4 @@ export {
 } from "./components";
 export { usePixiScreen } from "./use-pixi-screen";
 export type { PixiScreenDimensions } from "./use-pixi-screen";
+export { PIXI_SOLID_EVENT_HANDLER_NAMES } from "./components";

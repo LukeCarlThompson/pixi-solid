@@ -1,5 +1,5 @@
+import type { JSX } from "@solidjs/web";
 import { Graphics, PixiApplicationProvider, PixiCanvas, usePixiScreen } from "pixi-solid";
-import type { JSX } from "solid-js";
 import { createSignal, For } from "solid-js";
 
 type ControlsProps = {
@@ -32,7 +32,7 @@ const Controls = (props: ControlsProps) => (
       step="0.1"
       id={"scale"}
       value={props.scale}
-      oninput={(e) => props.onScaleChanged(parseFloat(e.currentTarget.value))}
+      onInput={(e) => props.onScaleChanged(parseFloat(e.currentTarget.value))}
       style={{
         cursor: "pointer",
         width: "150px",
@@ -48,7 +48,7 @@ const Controls = (props: ControlsProps) => (
       step="1"
       id={"angle"}
       value={props.angle}
-      oninput={(e) => props.onAngleChanged(parseFloat(e.currentTarget.value))}
+      onInput={(e) => props.onAngleChanged(parseFloat(e.currentTarget.value))}
       style={{
         cursor: "pointer",
         width: "150px",
@@ -64,7 +64,7 @@ const Controls = (props: ControlsProps) => (
       step="1"
       id={"numSquares"}
       value={props.numSquares}
-      oninput={(e) => props.onNumSquaresChanged(parseInt(e.currentTarget.value))}
+      onInput={(e) => props.onNumSquaresChanged(parseInt(e.currentTarget.value))}
       style={{
         cursor: "pointer",
         width: "150px",

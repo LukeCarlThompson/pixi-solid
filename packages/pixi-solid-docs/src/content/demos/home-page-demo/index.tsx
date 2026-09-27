@@ -3,7 +3,7 @@ import { Container, onTick, PixiCanvas, Sprite, usePixiScreen, TilingSprite } fr
 import { objectFit, ObjectFitContainer } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets, BlurFilter, Rectangle } from "pixi.js";
-import { createResource, onCleanup, Show } from "solid-js";
+import { createMemo, Loading, onCleanup, Show } from "solid-js";
 
 import { Character } from "./character";
 import { Controls } from "./controls";
@@ -68,9 +68,11 @@ const DemoScene = (props: { isRunning: boolean; direction: "left" | "right" }) =
   );
 };
 
-export const DemoApp = () => {
+export const Demo = () => {
   const playerStore = createPlayerStore();
-  const [textureResource] = createResource(loadSceneAssets);
+  // Solid 2 removed `createResource`. The loader already reports success, so an async
+  // `createMemo` plus a read inside `<Loading>` gates the scene until the assets arrive.
+  const assetsReady = createMemo(() => loadSceneAssets());
 
   return (
     <div style={{ position: "relative" }}>
@@ -87,12 +89,14 @@ export const DemoApp = () => {
           "border-radius": "10px",
         }}
       >
-        <Show when={textureResource()}>
-          <DemoScene
-            isRunning={playerStore.state.isRunning}
-            direction={playerStore.state.direction}
-          />
-        </Show>
+        <Loading fallback={<div>Loading...</div>}>
+          <Show when={assetsReady()}>
+            <DemoScene
+              isRunning={playerStore.state.isRunning}
+              direction={playerStore.state.direction}
+            />
+          </Show>
+        </Loading>
       </PixiCanvas>
     </div>
   );

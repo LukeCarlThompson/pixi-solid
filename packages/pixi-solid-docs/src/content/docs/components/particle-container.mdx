@@ -6,7 +6,7 @@ description: A SolidJS component that renders a PixiJS ParticleContainer.
 import { Code } from "@astrojs/starlight/components";
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 import demoCode from "../../demos/particle-container.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 A SolidJS component that renders a PixiJS `ParticleContainer`.
 
@@ -14,7 +14,7 @@ Please see the [PixiJS docs](https://pixijs.download/release/docs/scene.Particle
 
 ### Demo
 
-<ClientOnly fileName="particle-container" client:load />
+<DemoMount name="particle-container" />
 
 Food icons by [Darina Grant](https://darinagrant.itch.io/pixel-art-food-icon-pack-32x32).
 

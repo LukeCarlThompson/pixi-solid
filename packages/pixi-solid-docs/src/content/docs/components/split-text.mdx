@@ -5,7 +5,7 @@ description: A SolidJS component that renders a PixiJS SplitText container for p
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/split-text.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 `SplitText` renders text as separate line, word, and character objects. Use the exposed `chars`, `words`, and `lines` arrays when you need to animate text segments independently.
 
@@ -17,7 +17,7 @@ Please see the [PixiJS SplitText docs](https://pixijs.download/release/docs/text
 
 ### Demo
 
-<ClientOnly fileName="split-text" client:load />
+<DemoMount name="split-text" />
 
 ### Code example
 

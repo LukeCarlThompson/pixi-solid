@@ -1,4 +1,4 @@
-import { createStore } from "solid-js/store";
+import { createStore } from "solid-js";
 
 export type PlayerStore = {
   state: Readonly<AppState>;
@@ -19,12 +19,17 @@ export const createPlayerStore = (): PlayerStore => {
     direction: "right",
   });
 
+  // Solid 2 setters take a single draft callback; per-path setters are gone.
   const toggleRunning = () => {
-    setState("isRunning", (value) => !value);
+    setState((state) => {
+      state.isRunning = !state.isRunning;
+    });
   };
 
   const toggleDirection = () => {
-    setState("direction", (value) => (value === "left" ? "right" : "left"));
+    setState((state) => {
+      state.direction = state.direction === "left" ? "right" : "left";
+    });
   };
 
   return {

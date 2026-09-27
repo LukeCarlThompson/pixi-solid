@@ -2,20 +2,19 @@ import { MeshPlane, onTick, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { createResource, Show } from "solid-js";
+import { createMemo, Loading } from "solid-js";
 
 import assetUrl from "@/assets/sky.png";
 
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
-  // Create a resource to load the sky texture
-  const [textureResource] = createResource(() =>
-    Assets.load<Pixi.Texture>({ alias: "sky", src: assetUrl }),
-  );
+  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
+  // suspends, so the enclosing `<Loading>` holds the scene until the texture arrives.
+  const texture = createMemo(() => Assets.load<Pixi.Texture>(assetUrl));
   return (
-    <Show when={textureResource()}>
+    <Loading>
       <MeshPlane
-        texture={Assets.get("sky")}
+        texture={texture()}
         verticesX={10}
         verticesY={10}
         ref={(mesh) => {
@@ -41,7 +40,7 @@ const DemoComponent = () => {
           });
         }}
       />
-    </Show>
+    </Loading>
   );
 };
 

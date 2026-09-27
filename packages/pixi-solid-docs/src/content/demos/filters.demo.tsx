@@ -1,9 +1,9 @@
+import type { JSX } from "@solidjs/web";
 import { PixiCanvas, Sprite, usePixiScreen } from "pixi-solid";
 import { ObjectFitContainer } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets, BlurFilter, TextureStyle } from "pixi.js";
-import { createEffect, createResource, createSignal, onCleanup, Show } from "solid-js";
-import type { JSX } from "solid-js";
+import { createEffect, createMemo, createSignal, Loading, onCleanup, Show } from "solid-js";
 
 import birdAssetUrl from "@/assets/bird_03.png";
 import skyAssetUrl from "@/assets/sky.png";
@@ -13,21 +13,27 @@ const DemoComponent = () => {
   // Set scale mode for crisp pixel art
   TextureStyle.defaultOptions.scaleMode = "nearest";
 
-  const [textureResource] = createResource(() =>
-    Assets.load<Pixi.Texture>([
+  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
+  // suspends, so the enclosing `<Loading>` holds the scene until the textures arrive.
+  const assetsReady = createMemo(async () => {
+    await Assets.load<Pixi.Texture>([
       { alias: "sky", src: skyAssetUrl },
       { alias: "bird", src: birdAssetUrl },
-    ]),
-  );
+    ]);
+    return true;
+  });
 
   // Create the filter using the Pixi class
   const blurFilter = new BlurFilter({ strength: 0 });
 
   // Assign a signal and use a createEffect to bind it to the Pixi class.
   const [blurAmount, setBlurAmount] = createSignal(1);
-  createEffect(() => {
-    blurFilter.strength = blurAmount();
-  });
+  createEffect(
+    () => blurAmount(),
+    (amount) => {
+      blurFilter.strength = amount;
+    },
+  );
 
   // Any time we create Pixi classes directly we need to remember to destroy them when our component is cleaned up.
   onCleanup(() => {
@@ -48,27 +54,28 @@ const DemoComponent = () => {
   };
 
   return (
-    <Show when={textureResource()}>
-      {/* Show our Stage when the assets are loaded */}
-      <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode="cover">
-        <Sprite
-          label="sky"
-          texture={Assets.get<Pixi.Texture>("sky")}
-          filters={blurFilter}
-          eventMode="static"
-          onglobalpointermove={handlePointerMove}
-        />
-      </ObjectFitContainer>
+    <Loading>
+      <Show when={assetsReady()}>
+        <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode="cover">
+          <Sprite
+            label="sky"
+            texture={Assets.get<Pixi.Texture>("sky")}
+            filters={blurFilter}
+            eventMode="static"
+            onglobalpointermove={handlePointerMove}
+          />
+        </ObjectFitContainer>
 
-      <Sprite
-        label="bird"
-        texture={Assets.get<Pixi.Texture>("bird")}
-        scale={2}
-        anchor={0.5}
-        x={pixiScreen.width * 0.5}
-        y={pixiScreen.height * 0.5}
-      />
-    </Show>
+        <Sprite
+          label="bird"
+          texture={Assets.get<Pixi.Texture>("bird")}
+          scale={2}
+          anchor={0.5}
+          x={pixiScreen.width * 0.5}
+          y={pixiScreen.height * 0.5}
+        />
+      </Show>
+    </Loading>
   );
 };
 

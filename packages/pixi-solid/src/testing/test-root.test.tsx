@@ -1,4 +1,4 @@
-import { createSignal, createStore, flush, onCleanup } from "solid-js";
+import { createMemo, createSignal, createStore, flush, Loading, onCleanup } from "solid-js";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { Container } from "../components";
@@ -226,6 +226,28 @@ describe("mountScene", () => {
     flush();
 
     expect(container.x).toBe(42);
+  });
+
+  it("GIVEN a conditional replaces the root WHEN queried THEN the bound queries track the new root", async () => {
+    const pending = Promise.resolve("ok");
+
+    const { queryByLabel } = mountScene(() => {
+      const value = createMemo(() => pending);
+      return (
+        <Loading fallback={<Container label="fallback" />}>
+          <Container label="loaded">
+            <Container label="child" x={value().length} />
+          </Container>
+        </Loading>
+      );
+    });
+
+    expect(queryByLabel("child")).toBeUndefined();
+
+    await Promise.resolve();
+    flush();
+
+    expect(queryByLabel("child")?.x).toBe(2);
   });
 
   it("GIVEN container is accessed via return value THEN properties are directly accessible (no ref callback needed)", () => {

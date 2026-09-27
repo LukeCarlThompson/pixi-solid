@@ -2,13 +2,30 @@ import { Graphics, PixiCanvas } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { FillGradient } from "pixi.js";
 import { createSignal } from "solid-js";
-import { createMutable } from "solid-js/store";
 
 const DraggingDemo = () => {
   const [isDragging, setIsDragging] = createSignal(false);
-  const pointerPosition = createMutable({ x: 100, y: 100 });
+  const [x, setX] = createSignal(100);
+  const [y, setY] = createSignal(100);
 
   const scale = () => (isDragging() ? 1.1 : 1);
+
+  // A point-shaped object backed by signals. Pixi writes into it directly (`toLocal` assigns
+  // `point.x`/`point.y`), so the handlers below need no copying and allocate nothing per frame.
+  const pointerPosition = {
+    get x() {
+      return x();
+    },
+    set x(value: number) {
+      setX(value);
+    },
+    get y() {
+      return y();
+    },
+    set y(value: number) {
+      setY(value);
+    },
+  };
 
   let dragTarget: Pixi.Container | undefined;
 
@@ -57,7 +74,7 @@ const DraggingDemo = () => {
   );
 };
 
-export const DemoApp = () => (
+export const Demo = () => (
   <PixiCanvas
     style={{ "aspect-ratio": "2/1.5" }}
     antialias={true}

@@ -6,7 +6,7 @@ description: An example of using click events in solid-pixi.
 import { Code } from "@astrojs/starlight/components";
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 import demoCode from "../../demos/clicking.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 import { Aside } from "@astrojs/starlight/components";
 
 An example of using the `onclick` event handler on a pixi-solid element.
@@ -18,7 +18,7 @@ An example of using the `onclick` event handler on a pixi-solid element.
 
 ### Demo
 
-<ClientOnly fileName="clicking" client:load />
+<DemoMount name="clicking" />
 
 ### Code example
 
