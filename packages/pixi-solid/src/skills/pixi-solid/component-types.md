@@ -237,7 +237,7 @@ createEffect(
 <AnimatedSprite ref={animation} textures={textures} />;
 ```
 
-`gotoAndStop` also pauses playback, so the frame holds. Use `autoPlay` with `gotoAndPlay(frame)` to start from a chosen frame instead.
+`gotoAndStop` also pauses playback, so the frame holds. Use `autoPlay` with `gotoAndPlay(frame)` to start from a chosen frame instead. Seeking is an action rather than a value: playback keeps changing the frame, so a value would go stale, and a request for the frame it already holds would be dropped. `playing` and `totalFrames` are read-only for the same reason — playback owns them.
 
 #### Setup and teardown for an instance
 
