@@ -5,7 +5,7 @@ description: Testing patterns for pixi-solid components and hooks using mountSce
 
 # Testing pixi-solid
 
-This reference covers the test helpers exported by `pixi-solid/testing` and how they provide pixi-solid contexts.
+This reference covers the test helpers that `pixi-solid/testing` exports and the pixi-solid contexts they provide.
 
 ## Quick reference
 
@@ -42,11 +42,11 @@ import { cleanup } from "pixi-solid/testing";
 afterEach(cleanup);
 ```
 
-`cleanup()` disposes every registered root **and clears Solid 2's error halt**. Solid 2 stops the whole reactive system after an uncaught error, which would otherwise silently break every later test in the file, so a test that throws on purpose cannot poison its neighbours.
+`cleanup()` disposes every registered root **and clears Solid 2's error halt**. Solid 2 stops the whole reactive system after an uncaught error. Without the reset, one test that throws on purpose would break every later test in the file.
 
 ## mountScene
 
-`mountScene(setup, options?)` mounts JSX in a temporary Solid root and returns the root Pixi node plus query helpers bound to it. It does not create application or ticker context; pass `options.wrapper` (usually `ctx.Provider`) or use `createTestContext` when the component needs context.
+`mountScene(setup, options?)` mounts JSX in a temporary Solid root. It returns the root Pixi node and query helpers bound to that node. It does not create application or ticker context. When the component needs context, pass `options.wrapper` (usually `ctx.Provider`) or use `createTestContext`.
 
 ```tsx
 import type * as Pixi from "pixi.js";
@@ -60,7 +60,7 @@ type MountSceneResult<TRoot = Pixi.Container> = {
 };
 ```
 
-The returned `container` is the root PixiJS node — access properties directly. The bound `getByLabel`/`queryByLabel`/`getAllByLabel` query relative to `container`, so you do not have to pass the root around. No ref callback needed.
+The returned `container` is the root PixiJS node. Access its properties directly. The bound `getByLabel`/`queryByLabel`/`getAllByLabel` query relative to `container`, so you do not have to pass the root around. You do not need a ref callback.
 
 ### Basic component test
 
@@ -168,9 +168,9 @@ type RenderHookResult<T> = {
 };
 ```
 
-The callback runs once inside an optional `wrapper`. It does **not** re-run when reactive values change; to observe updates, return a reactive value from the callback (an accessor or a store) and read it through `result()`. Hooks that register side effects (`onTick`, `onResize`) are cleaned up on `dispose`.
+The callback runs once inside an optional `wrapper`. It does **not** re-run when reactive values change. To observe updates, return a reactive value from the callback (an accessor or a store) and read it through `result()`. Hooks that register side effects (`onTick`, `onResize`) are cleaned up on `dispose`.
 
-Errors thrown while the callback runs surface synchronously from `renderHook`, so missing-context tests can use a plain `expect(() => renderHook(...)).toThrow()`.
+Errors thrown while the callback runs surface synchronously from `renderHook`. A missing-context test can therefore use a plain `expect(() => renderHook(...)).toThrow()`.
 
 ### Testing hooks with context
 
@@ -195,7 +195,7 @@ describe("usePixiScreen", () => {
 });
 ```
 
-`ctx.renderHook` is equivalent — the mock `Provider` is applied automatically:
+`ctx.renderHook` is equivalent. The mock `Provider` is applied automatically:
 
 ```tsx
 const ctx = createTestContext();
@@ -218,7 +218,7 @@ await ctx.ticker.fastForwardFrames(3);
 expect(result().time).toBe(48);
 ```
 
-> **Note:** the ticker driver methods (`fastForwardFrames`, `fastForwardTime`) are **async** — always `await` them. They flush microtasks after every tick so promise-based continuations (awaited `createAsyncDelay`, animation `onEnded` chains) receive subsequent ticks without manual `await Promise.resolve()` in tests. Successive calls are additive: they share one monotonic absolute clock.
+> **Note:** the ticker driver methods (`fastForwardFrames`, `fastForwardTime`) are **async**. Always `await` them. They flush microtasks after every tick. A promise-based continuation (an awaited `createAsyncDelay`, an animation `onEnded` chain) therefore receives later ticks without a manual `await Promise.resolve()` in the test. Successive calls are additive, because they share one monotonic absolute clock.
 
 ### Reactivity
 
@@ -238,7 +238,7 @@ flush();
 expect(result().width).toBe(1024);
 ```
 
-Solid 2 batches reactive writes and flushes them on a microtask, so an assertion that runs immediately after a write can still see the previous value. Call `flush()` before asserting to apply pending work synchronously.
+Solid 2 batches reactive writes and flushes them on a microtask. An assertion that runs immediately after a write can therefore still see the previous value. Call `flush()` before asserting to apply pending work synchronously.
 
 > **Tip:** return stable reactive objects (stores, screen dimensions) rather than deriving primitives inside the callback. A derived primitive is read only once, so later changes would not be visible through `result()`.
 
@@ -260,7 +260,7 @@ describe("usePixiScreen error", () => {
 
 ## Flushing updates
 
-Solid 2 batches reactive writes and flushes them on a microtask, so an assertion that runs immediately after a write can still see the previous value. Call `flush()` from `solid-js` to apply pending work synchronously before asserting:
+Solid 2 batches reactive writes and flushes them on a microtask. An assertion that runs immediately after a write can therefore still see the previous value. Call `flush()` from `solid-js` to apply pending work synchronously before asserting:
 
 ```tsx
 import { createSignal, flush } from "solid-js";
@@ -276,9 +276,9 @@ flush();
 expect(container.x).toBe(100);
 ```
 
-`flush()` is deterministic: it asserts that the change was applied by the reactive system, rather than that it eventually becomes true. Prefer it over polling/retry helpers, which can hide an extra async hop or a leaked effect instead of failing the test.
+`flush()` is deterministic. It asserts that the reactive system applied the change, not that the change eventually becomes true. Prefer it over polling or retry helpers, which can hide an extra async step or a leaked effect instead of failing the test.
 
-The test helpers already flush where they need to: `mountScene` and `renderHook` flush after mounting, and the manual ticker flushes microtasks after every frame.
+The test helpers already flush where they need to. `mountScene` and `renderHook` flush after mounting, and the manual ticker flushes microtasks after every frame.
 
 ## createTestContext
 
@@ -327,7 +327,7 @@ describe("resize handling", () => {
 
 ### Spying on mocks
 
-All mocks are plain objects — spy with any framework:
+All mocks are plain objects. Spy with any framework:
 
 ```tsx
 const addSpy = vi.spyOn(ctx.ticker.ticker, "add");
@@ -345,7 +345,7 @@ const ctx = createTestContext({ ticker: customTicker });
 
 ## createManualTicker
 
-Creates a stopped `Pixi.Ticker` with step-based frame advancement. The ticker starts stopped so you control exactly when frames advance.
+Creates a stopped `Pixi.Ticker` with step-based frame advancement. The ticker starts stopped, so you control exactly when frames advance.
 
 ```ts
 import { createManualTicker } from "pixi-solid/testing";
@@ -367,15 +367,15 @@ await manual.fastForwardTime(1000); // 1 second in ~16ms steps
 await manual.fastForwardTime(500, 50); // 500ms in 50ms steps
 ```
 
-The drivers own a monotonic absolute clock, so successive calls are exactly additive — `await fastForwardTime(100)` then `await fastForwardTime(50)` delivers 100ms then 50ms of accumulated `deltaMS` with no dropped first frame.
+The drivers own a monotonic absolute clock, so successive calls are exactly additive. `await fastForwardTime(100)` followed by `await fastForwardTime(50)` delivers 100ms then 50ms of accumulated `deltaMS`, with no dropped first frame.
 
-> **Note:** the returned `ticker` wraps a real PixiJS `Ticker`, so the same defaults apply (e.g. per-step deltas are capped at 100ms via the default `minFPS = 10`) and can be overridden on the instance after creation — e.g. `manual.ticker.minFPS = 4` to allow larger step deltas.
+> **Note:** the returned `ticker` wraps a real PixiJS `Ticker`, so the same defaults apply. For example, the default `minFPS = 10` caps each step delta at 100ms. You can override the defaults on the instance after creation, for example `manual.ticker.minFPS = 4` to allow larger step deltas.
 
-Step-based advancement avoids the footgun of single large deltas that can break spring physics, smooth-damp interpolation, or sequenced animations.
+Step-based advancement avoids the problem of a single large delta, which can break spring physics, smooth-damp interpolation, or sequenced animations.
 
 ## Scene graph queries
 
-Use query helpers to find nodes by `label` instead of navigating `.children[index]` paths. `mountScene` returns them bound to the mounted root; the standalone `getByLabel(root, label)` form works on any Pixi container.
+Use query helpers to find nodes by `label`, instead of navigating `.children[index]` paths. `mountScene` returns them bound to the mounted root. The standalone `getByLabel(root, label)` form works on any Pixi container.
 
 ```tsx
 import { describe, expect, it } from "vitest";
@@ -471,10 +471,10 @@ Use each helper's returned `dispose()` when you do not install the global `after
 ## jsdom / renderer caveats
 
 - jsdom does not provide WebGL contexts. Tests that rely on WebGL-only renderer features should either mock Pixi renderer behavior or run in an environment that supports WebGL.
-- For most logic that depends on ticks (animations, timers, callbacks), the testing utilities in `pixi-solid/testing` don't need a real canvas at all.
+- For most logic that depends on ticks (animations, timers, callbacks), the testing utilities in `pixi-solid/testing` do not need a real canvas at all.
 
 ## Practical notes
 
-- Avoid `ticker.start()` in tests; advance frames with the manual ticker.
+- Do not call `ticker.start()` in tests. Advance frames with the manual ticker.
 - Use `getByLabel` instead of `.children[index]` to keep tests independent of child order.
-- Dispose roots after testing resource cleanup. Mocks are plain objects and can be spied on with your test framework.
+- Dispose roots after testing resource cleanup. Mocks are plain objects, and you can spy on them with your test framework.

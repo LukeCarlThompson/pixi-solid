@@ -5,7 +5,7 @@ description: Reference for all publicly exported utility functions, hooks, and c
 
 # Utils reference
 
-This reference covers the public `pixi-solid/utils` API. Ticker-bound helpers need the provider context described below; they are not standalone PixiJS or SolidJS utilities.
+This reference covers the public `pixi-solid/utils` API. Ticker-bound helpers need the provider context described below. They are not standalone PixiJS or SolidJS utilities.
 
 ## Import
 
@@ -49,14 +49,14 @@ type DelayFunction = (delayMs: number, callback: () => void) => void;
 type createDelay = () => DelayFunction;
 ```
 
-Call `createDelay` synchronously inside a descendant of `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider`. The returned function captures that ticker and can be called later from event handlers, ticker callbacks, async continuations, or nested delay callbacks.
+Call `createDelay` synchronously inside a descendant of `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider`. The returned function captures that ticker. Call it later from an event handler, a ticker callback, an async continuation, or a nested delay callback.
 
 **Parameters (returned function):**
 
 - `delayMs` — Number of milliseconds to wait (measured in the ticker's time units).
 - `callback` — A callback function that fires when `delayMs` has passed.
 
-**Note:** Does not run if the ticker is paused or stopped. Scheduled callbacks have no cancellation handle and remain registered until their delay elapses.
+**Note:** Does not run if the ticker is paused or stopped. Scheduled callbacks have no cancellation handle and stay registered until their delay elapses.
 
 **Example:**
 
@@ -90,7 +90,7 @@ type AsyncDelayFunction = (delayMs: number, signal?: AbortSignal) => Promise<voi
 type createAsyncDelay = () => AsyncDelayFunction;
 ```
 
-**Returns:** An async function we can `await` to delay events in sync with the ticker.
+**Returns:** An async function that you can `await` to delay work in sync with the ticker.
 
 **Constraints:** Create it synchronously inside a component under `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`. The returned function can be called later from an event handler or async function.
 
@@ -99,7 +99,7 @@ type createAsyncDelay = () => AsyncDelayFunction;
 - `delayMs` — Number of milliseconds to wait.
 - `signal` — Optional `AbortSignal` to resolve the delay early.
 
-**Note:** Does not resolve while the ticker is paused or stopped unless the `AbortSignal` aborts.
+**Note:** Does not resolve while the ticker is paused or stopped, unless the `AbortSignal` aborts.
 
 **Example:**
 
@@ -147,13 +147,13 @@ type objectFit = (
 
 **`ObjectFitMode`:** `"cover" | "contain" | "fill" | "scale-down" | "none"`
 
-| Mode           | Behavior                                                                                                                |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `"cover"`      | Scale to fill bounds; content may overflow and is not clipped by this helper. Uses `Math.max(widthRatio, heightRatio)`. |
-| `"contain"`    | Scale to fit inside bounds, may leave empty space. Uses `Math.min(widthRatio, heightRatio)`.                            |
-| `"fill"`       | Stretch to fill bounds, may distort aspect ratio.                                                                       |
-| `"scale-down"` | Contain without scaling above `1`; never enlarges the object.                                                           |
-| `"none"`       | Set scale to `1`; existing scale is replaced.                                                                           |
+| Mode           | Behavior                                                                                                                    |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `"cover"`      | Scale to fill the bounds. Content can overflow, and this helper does not clip it. Uses `Math.max(widthRatio, heightRatio)`. |
+| `"contain"`    | Scale to fit inside the bounds, and may leave empty space. Uses `Math.min(widthRatio, heightRatio)`.                        |
+| `"fill"`       | Stretch to fill the bounds, and may distort the aspect ratio.                                                               |
+| `"scale-down"` | Contain without scaling above `1`. Never enlarges the object.                                                               |
+| `"none"`       | Set scale to `1`. The existing scale is replaced.                                                                           |
 
 **`ObjectPosition`:** `"center" | "top" | "right" | "bottom" | "left" | "top-left" | "top-right" | "bottom-left" | "bottom-right" | { x: number; y: number }`. Custom `x`/`y` values are alignment fractions: `0` start, `0.5` center, `1` end.
 
@@ -201,20 +201,20 @@ Props accepted:
 - `width`, `height` — The bounding area dimensions.
 - `fitMode` — How children are scaled (see `ObjectFitMode` above).
 - `objectPosition` — How children are positioned within the bounds (see `ObjectPosition` above).
-- `observeBounds` — If `true`, checks each child's local bounds every tick and re-fits only when bounds change. This adds per-frame work; use only when child bounds change dynamically. Requires ticker context.
+- `observeBounds` — If `true`, checks each child's local bounds every tick and re-fits only when the bounds change. This adds per-frame work, so use it only when child bounds change dynamically. Requires ticker context.
 - Standard pixi-solid `Container` props (position, scale, mask, events, etc.) on the outer container.
 
 **Behavior:**
 
-- Each child is wrapped in a container and object-fit scaling is applied based on `width`, `height`, `fitMode`, and `objectPosition`.
-- If multiple children are passed, each one is wrapped, scaled, and positioned independently.
+- The component wraps each child in a container and applies object-fit scaling from `width`, `height`, `fitMode`, and `objectPosition`.
+- If you pass multiple children, the component wraps, scales, and positions each one independently.
 - To apply the same object-fit behavior to multiple children as a group, wrap them in a parent `Container` and pass that single container as the child to `ObjectFitContainer`.
 
 ## Animation utilities
 
 ### `useSpring(props)`
 
-A SolidJS hook that provides a spring-animated signal towards a target value. Internally manages spring physics and continuous updates synced to the Pixi ticker.
+A SolidJS hook that provides a spring-animated signal towards a target value. It manages spring physics and continuous updates, synced to the Pixi ticker.
 
 ```ts
 type UseSpringProps = {
@@ -272,7 +272,7 @@ function SpringSprite() {
 
 ### `useSmoothDamp(props)`
 
-A SolidJS hook that provides a smoothly damped signal towards a target value. Similar to Unity's `Mathf.SmoothDamp`.
+A SolidJS hook that provides a smoothly damped signal towards a target value. It is similar to Unity's `Mathf.SmoothDamp`.
 
 ```ts
 type UseSmoothDampProps = {
@@ -290,12 +290,12 @@ type SmoothDamp = {
 type useSmoothDamp = (props: UseSmoothDampProps) => SmoothDamp;
 ```
 
-`UseSmoothDampProps` and `SmoothDamp` are not exported from `pixi-solid/utils`; TypeScript infers them from `useSmoothDamp`.
+`UseSmoothDampProps` and `SmoothDamp` are not exported from `pixi-solid/utils`. TypeScript infers them from `useSmoothDamp`.
 
 **Parameters (`UseSmoothDampProps`):**
 
 - `to` — Accessor for the target value.
-- `smoothTimeMs` — Approximate time to approach the target in milliseconds. Smaller = faster. Default: 300.
+- `smoothTimeMs` — Approximate time to approach the target in milliseconds. A smaller value is faster. Default: 300.
 - `maxSpeed` — Maximum speed in units per second. Default: `Infinity`.
 
 **Returns (`SmoothDamp`):**
@@ -339,7 +339,7 @@ function SmoothSprite() {
 
 ## Lifecycle considerations
 
-- Ticker-bound utilities require `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider` and pause when the ticker stops.
-- `createDelay` has no cancellation handle. Use `createAsyncDelay` with an `AbortSignal` when owner cleanup must cancel a pending delay; abort resolves its promise, so check `signal.aborted` after `await`.
-- `useSpring` can overshoot; `useSmoothDamp` typically does not oscillate.
-- `ObjectFitContainer` needs ticker context only when `observeBounds` is enabled; that option checks bounds every tick.
+- Ticker-bound utilities require `PixiCanvas`, `PixiApplicationProvider`, or `TickerProvider`, and pause when the ticker stops.
+- `createDelay` has no cancellation handle. Use `createAsyncDelay` with an `AbortSignal` when owner cleanup must cancel a pending delay. Aborting resolves the promise, so check `signal.aborted` after `await`.
+- `useSpring` can overshoot. `useSmoothDamp` typically does not oscillate.
+- `ObjectFitContainer` needs ticker context only when `observeBounds` is enabled. That option checks bounds every tick.

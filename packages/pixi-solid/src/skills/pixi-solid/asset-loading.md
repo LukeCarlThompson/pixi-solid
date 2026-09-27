@@ -90,7 +90,7 @@ function MenuScene() {
 }
 ```
 
-`Assets.init()` resolves to `void` and `Assets.loadBundle()` resolves to the loaded resources. Returning `true` gives `<Show>` a truthy value to render on; the pending read inside `<Loading>` shows the fallback until the memo settles.
+`Assets.init()` resolves to `void` and `Assets.loadBundle()` resolves to the loaded resources. Returning `true` gives `<Show>` a truthy value to render on. The pending read inside `<Loading>` shows the fallback until the memo settles.
 
 ## Cache keys and ownership
 

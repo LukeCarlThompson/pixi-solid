@@ -5,7 +5,7 @@ description: Reference for all publicly exported hooks (onTick, onResize, usePix
 
 # Hooks and lifecycle
 
-This reference covers `pixi-solid` context hooks and lifecycle callbacks. Call these hooks synchronously from a Solid component or owned computation under the required provider; do not call them later from an event handler or async continuation.
+This reference covers `pixi-solid` context hooks and lifecycle callbacks. Call these hooks synchronously from a Solid component or an owned computation under the required provider. Do not call them later from an event handler or an async continuation.
 
 ## Import
 
@@ -67,7 +67,7 @@ type getTicker = () => Pixi.Ticker;
 
 ### `onResize`
 
-Registers a callback to be called whenever the Pixi.js renderer is resized. The callback is automatically removed when the component is unmounted.
+Registers a callback that runs whenever the Pixi.js renderer is resized. pixi-solid removes the callback when the component unmounts.
 
 ```ts
 type onResize = (resizeCallback: (screen: Pixi.Rectangle) => void) => void;
@@ -75,19 +75,19 @@ type onResize = (resizeCallback: (screen: Pixi.Rectangle) => void) => void;
 
 **Parameters:**
 
-- `resizeCallback` — A callback that receives `(screen: Pixi.Rectangle) => void`, giving you `.width`, `.height`, `.x`, and `.y`. The callback is called immediately upon hook initialization and then on every subsequent resize event.
+- `resizeCallback` — A callback that receives `(screen: Pixi.Rectangle) => void`, giving you `.width`, `.height`, `.x`, and `.y`. The callback runs immediately on hook initialization, then on every later resize event.
 
 **Constraints:** Must be called from a component that is a descendant of `PixiCanvas` or `PixiApplicationProvider`.
 
 **Use when:** You need to react to the canvas being resized (e.g. to update layout, reposition elements, or recalculate dimensions).
 
-**Note:** Listens for the renderer's "resize" event, so this works correctly whether the window is resized or just the DOM element the `PixiCanvas` is inside of changes size.
+**Note:** The hook listens for the renderer's "resize" event. It therefore works whether the window resizes, or only the DOM element that contains `PixiCanvas` changes size.
 
 **Throws:** `"onResize must be used within a PixiApplicationProvider or a PixiCanvas"` if no context is available.
 
 ### `onTick`
 
-Registers a callback to be called on each tick of the Pixi.js ticker. The callback is automatically removed when the component is unmounted.
+Registers a callback that runs on each tick of the Pixi.js ticker. pixi-solid removes the callback when the component unmounts.
 
 ```ts
 type onTick = (
@@ -134,15 +134,15 @@ type PixiScreenDimensions = {
 
 **Constraints:** Must be called from a component that is a descendant of `PixiCanvas` or `PixiApplicationProvider`.
 
-**Use when:** You need reactive screen dimensions as a SolidJS store — to subscribe to, pass as component props, or create derived signals from. Prefer this over `onResize` when you need the dimensions as a reactive value rather than just reacting to changes.
+**Use when:** You need the screen dimensions as a SolidJS store, to subscribe to, to pass as component props, or to derive signals from. Prefer this over `onResize` when you need the dimensions as a reactive value instead of a single reaction to each change.
 
 **Throws:** `"usePixiScreen must be used within a PixiApplicationProvider or PixiCanvas"` if no context is available.
 
 ## Lifecycle ownership
 
-pixi-solid destroys instances it creates when their Solid owner is disposed. If you pass an instance through `as`, pixi-solid does not destroy it; you own its lifecycle. `RenderLayer` does not destroy its children because those children are managed elsewhere in the scene tree.
+pixi-solid destroys the instances that it creates when their Solid owner is disposed. If you pass an instance through `as`, pixi-solid does not destroy it. You own its lifecycle. `RenderLayer` does not destroy its children, because other parts of the scene tree manage those children.
 
-`PixiApplicationProvider` destroys an app it creates. If you pass `existingApp`, you own that app's lifecycle. Shared textures and assets are not owned by a Sprite component; load and unload them through PixiJS `Assets` when appropriate. See [asset-loading.md](./asset-loading.md).
+`PixiApplicationProvider` destroys an app that it creates. If you pass `existingApp`, you own that app's lifecycle. A Sprite component does not own shared textures and assets. Load and unload them through PixiJS `Assets` when appropriate. See [asset-loading.md](./asset-loading.md).
 
 ### Testing
 
@@ -164,4 +164,4 @@ See [testing.md](./testing.md) for patterns and examples of testing pixi-solid c
 - **`onResize`** — Use when you just need to react to resize events. The callback fires on every resize. No reactive store.
 - **`usePixiScreen`** — Use when you need the current screen dimensions as a reactive SolidJS store. The returned store updates automatically and can be subscribed to or passed as component props.
 
-Both hooks are triggered by the renderer's "resize" event. They can be used together — `onResize` schedules its callback via `queueMicrotask` to ensure `usePixiScreen` listeners have synchronized their reactive values first.
+Both hooks use the renderer's "resize" event, so you can use them together. `onResize` schedules its callback with `queueMicrotask`, which makes sure the `usePixiScreen` listeners synchronize their reactive values first.

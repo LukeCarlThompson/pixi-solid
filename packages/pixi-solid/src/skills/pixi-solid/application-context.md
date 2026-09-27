@@ -18,15 +18,15 @@ import type { PixiCanvasProps, PixiApplicationProps } from "pixi-solid";
 
 Three providers exist. Choose based on your application's needs:
 
-| Provider                  | Creates canvas? | Creates app?        | Provides ticker? | Use when...                                                |
-| ------------------------- | --------------- | ------------------- | ---------------- | ---------------------------------------------------------- |
-| `PixiCanvas`              | Yes             | Yes (if no context) | Yes              | Simplest setup; canvas owned directly by component tree    |
-| `PixiApplicationProvider` | No              | Yes (if no context) | Yes              | HTML outside canvas needs hooks, or you pass `existingApp` |
-| `TickerProvider`          | No              | No                  | Yes              | You have an existing ticker; testing or independent ticker |
+| Provider                  | Creates canvas? | Creates app?        | Provides ticker? | Use when...                                                              |
+| ------------------------- | --------------- | ------------------- | ---------------- | ------------------------------------------------------------------------ |
+| `PixiCanvas`              | Yes             | Yes (if no context) | Yes              | Simplest setup. The component tree owns the canvas.                      |
+| `PixiApplicationProvider` | No              | Yes (if no context) | Yes              | HTML outside canvas needs hooks, or you pass `existingApp`               |
+| `TickerProvider`          | No              | No                  | Yes              | You have an existing ticker. Use it for testing or an independent ticker |
 
 ## `PixiCanvas`
 
-The simplest setup. Mounts the Pixi canvas inside a positioned wrapper `div`, applies `class`/`style`, and automatically resizes to the wrapper's bounds.
+The simplest setup. It mounts the Pixi canvas inside a positioned wrapper `div`, applies `class` and `style`, and resizes the canvas to the wrapper's bounds automatically.
 
 ```tsx
 import { PixiCanvas, Sprite } from "pixi-solid";
@@ -43,21 +43,21 @@ export const DemoApp = () => (
 
 Requires `children`. Wrapper-specific props are `class`, `style`, and `ref`, which receives the internal wrapper `div`.
 
-- `class` accepts a `JSX.ClassValue` — a string, number, array, or object — and `style` accepts Solid's CSS object or CSS string. Solid 2 folded `classList` into `class`: pass an object (for example `class={{ active: isActive() }}`) instead of the removed `classList` prop.
+- `class` accepts a `JSX.ClassValue`, which can be a string, number, array, or object. `style` accepts Solid's CSS object or a CSS string. Solid 2 folded `classList` into `class`, so pass an object (for example `class={{ active: isActive() }}`) instead of the removed `classList` prop.
 - `ref` is a `Ref<HTMLDivElement>` (a callback, or an array of callbacks).
-- Pixi `ApplicationOptions` configure app initialization, except `children` and `resizeTo` (handled internally). They are not runtime-reactive.
+- Pixi `ApplicationOptions` configure app initialization, except `children` and `resizeTo`, which pixi-solid handles internally. They are not runtime-reactive.
 - Other DOM attributes and event handlers are not forwarded. Wrap `PixiCanvas` in your own element when you need them.
 
 `PixiCanvas` works with or without a surrounding `PixiApplicationProvider`:
 
-- If used inside `PixiApplicationProvider`, it uses the provided app; `PixiCanvas` application options are ignored in this case.
+- Inside `PixiApplicationProvider`, it uses the provided app and ignores the `PixiCanvas` application options.
 - If used standalone, it creates its own `Pixi.Application` and provides context.
 
-Give the wrapper non-zero dimensions with `style` or CSS so automatic resizing has a usable size. Only one `PixiCanvas` may be mounted per application at a time; it can be unmounted and remounted under a persistent provider.
+Give the wrapper non-zero dimensions with `style` or CSS, so automatic resizing has a usable size. Only one `PixiCanvas` may be mounted per application at a time. You can unmount and remount it under a persistent provider.
 
 ## `PixiApplicationProvider`
 
-Creates a `Pixi.Application` instance and provides it through context. It does **not** mount or resize a canvas; the supported rendering setup is to use `PixiCanvas` as a child. `resizeTo` is omitted from provider props because `PixiCanvas` controls the resize target.
+Creates a `Pixi.Application` instance and provides it through context. It does **not** mount or resize a canvas. The supported rendering setup uses `PixiCanvas` as a child. `resizeTo` is omitted from provider props, because `PixiCanvas` controls the resize target.
 
 ```tsx
 import { PixiApplicationProvider, PixiCanvas, usePixiScreen, Text } from "pixi-solid";
@@ -96,9 +96,9 @@ type PixiApplicationProps = Partial<Omit<Pixi.ApplicationOptions, "children" | "
 Props accepted:
 
 - Standard `ApplicationOptions` (except `children` and `resizeTo`). They apply only when this provider creates the app and are initialization-only.
-- `existingApp` — An already-created `Pixi.Application` instance. When provided, the provider reuses it; other app options are ignored. The application must be initialized before rendering, and you handle lifecycle/cleanup yourself.
+- `existingApp` — An already-created `Pixi.Application` instance. When you provide it, the provider reuses it and ignores the other app options. The application must be initialized before rendering, and you handle its lifecycle and cleanup yourself.
 
-If options are passed while `existingApp` or an ancestor provider supplies the app, pixi-solid warns in development because those options are ignored.
+If you pass options while `existingApp` or an ancestor provider supplies the app, pixi-solid warns in development, because it ignores those options.
 
 `PixiApplicationProvider` also provides context for:
 
@@ -115,7 +115,7 @@ Use `PixiApplicationProvider` when:
 
 ## `TickerProvider`
 
-Wraps an existing `Pixi.Ticker` instance in context. Does **not** create an application or canvas — it only provides ticker context.
+Wraps an existing `Pixi.Ticker` instance in context. It does **not** create an application or canvas. It only provides ticker context.
 
 ```tsx
 import { TickerProvider } from "pixi-solid";
@@ -138,7 +138,7 @@ type TickerProviderProps = ParentProps<{ ticker: Pixi.Ticker }>;
 
 Props accepted:
 
-- `ticker` — An existing `Pixi.Ticker` instance. This is the only required prop. The provider does not start, stop, or destroy it; the caller owns ticker lifecycle.
+- `ticker` — An existing `Pixi.Ticker` instance. This is the only required prop. The provider does not start, stop, or destroy it. The caller owns the ticker lifecycle.
 
 Use `TickerProvider` mainly when:
 
@@ -157,9 +157,9 @@ Use `createTestContext` when tests need app, renderer, and screen contexts. For 
 
 ## Choosing the right provider
 
-- **`PixiCanvas`** — default for most apps. Simplest setup; canvas owned directly by the component tree.
+- **`PixiCanvas`** — the default for most apps. Simplest setup. The component tree owns the canvas directly.
 - **`PixiApplicationProvider`** — flexible choice for shared app context. Use when HTML outside the canvas needs hooks, or when passing `existingApp`.
-- **`TickerProvider`** — overrides ticker context for descendants, mainly for independent ticker scene branches and other edge-case integrations.
+- **`TickerProvider`** — overrides ticker context for descendants, mainly for independent ticker scene branches and other uncommon integrations.
 
 ## Provider requirements
 

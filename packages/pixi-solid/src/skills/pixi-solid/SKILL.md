@@ -7,15 +7,15 @@ metadata:
 
 # Pixi-solid guidelines
 
-Use this skill for `pixi-solid` APIs and integration only. Prefer its components, providers, hooks, and utilities for scene integration; import PixiJS classes from `pixi.js` and Solid primitives from `solid-js`.
+Use this skill for `pixi-solid` APIs and integration only. Prefer its components, providers, hooks, and utilities for scene integration. Import PixiJS classes from `pixi.js` and Solid primitives from `solid-js`.
 
 ## Overview
 
 `pixi-solid` wraps PixiJS display objects in SolidJS components and adds context, lifecycle, and utility APIs. It does not re-export PixiJS or SolidJS APIs. The package supports `pixi.js >=8.14.3 <9`, `solid-js >=2.0.0-rc.9 <3`, and `@solidjs/web >=2.0.0-rc.9 <3`. Three providers exist:
 
 - **`PixiCanvas`** — mounts the application canvas and resizes it to its wrapper.
-- **`PixiApplicationProvider`** — provides app context without mounting a canvas; use when HTML outside the canvas needs hooks, or when passing an `existingApp`.
-- **`TickerProvider`** — context wrapper around an existing `Pixi.Ticker`; use for testing or subtrees that need an independent ticker.
+- **`PixiApplicationProvider`** — provides app context without mounting a canvas. Use it when HTML outside the canvas needs hooks, or when you pass an `existingApp`.
+- **`TickerProvider`** — a context wrapper around an existing `Pixi.Ticker`. Use it for testing, or for subtrees that need an independent ticker.
 
 ## Getting started
 
@@ -58,7 +58,7 @@ function App() {
 }
 ```
 
-> **Note:** Both `x`/`y` and `positionX`/`positionY` are equivalent and work for static and reactive values. Axis props (`positionX`, `positionY`, `scaleX`, etc.) enable fine-grained reactivity — only the changed axis triggers an update instead of the whole point object.
+> **Note:** Both `x`/`y` and `positionX`/`positionY` are equivalent and work for static and reactive values. Axis props (`positionX`, `positionY`, `scaleX`, etc.) enable fine-grained reactivity. Only the changed axis triggers an update, instead of the whole point object.
 
 For details, see [application-context.md](./application-context.md), [asset-loading.md](./asset-loading.md), [component-types.md](./component-types.md), [hooks-lifecycle.md](./hooks-lifecycle.md), [testing.md](./testing.md), and [utils-reference.md](./utils-reference.md).
 
@@ -80,10 +80,10 @@ Exports from `pixi-solid` and its public subpaths:
 ## Quick rules
 
 - Use axis props (`positionX`, `positionY`, `scaleX`, etc.) for fine-grained reactivity instead of replacing whole point objects.
-- `Container`, `RenderContainer`, and `RenderLayer` accept children; child components attach automatically. Leaf components do not accept children.
+- `Container`, `RenderContainer`, and `RenderLayer` accept children. Child components attach automatically. Leaf components do not accept children.
 - `as` uses a caller-owned Pixi instance. `pixi-solid` does not destroy that instance on unmount.
-- Pixi options initialize the instance; changed values update writable instance properties. Constructor-only options may not update after mount.
-- `AnimatedSprite` uses the current ticker by default; set `autoUpdate={false}` to manage updates yourself.
+- Pixi options initialize the instance. Changed values update writable instance properties. Constructor-only options may not update after mount.
+- `AnimatedSprite` uses the current ticker by default. Set `autoUpdate={false}` to manage updates yourself.
 - Pixi events use lowercase `on*` props (`onpointerdown`), not DOM `on:` listeners. Pointer interaction needs `eventMode="static"` or `"dynamic"`.
-- `onResize` fires a callback; `usePixiScreen` returns reactive screen dimensions. Use the store when dimensions are needed as values.
+- `onResize` fires a callback. `usePixiScreen` returns reactive screen dimensions. Use the store when you need the dimensions as values.
 - Context-dependent APIs must run under their required provider. See [hooks-lifecycle.md](./hooks-lifecycle.md#provider-requirements).

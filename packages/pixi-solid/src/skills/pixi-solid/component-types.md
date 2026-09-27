@@ -41,9 +41,9 @@ import type { Ref } from "solid-js";
 
 Generic base type for a Pixi-backed component. It combines Pixi options with typed event props and common point-axis props. It also adds `anchorX`/`anchorY` when the options include `anchor`, and `tilePositionX`/`tilePositionY` plus `tileScaleX`/`tileScaleY` when options include `tilePosition`.
 
-Use this when building your own Pixi-backed component and you want consumers to pass through Pixi-style props to the underlying instance. If you don't require all props, narrow with `Pick` or `Omit`.
+Use this type when you build your own Pixi-backed component and want consumers to pass Pixi-style props to the underlying instance. If you do not need all props, narrow the type with `Pick` or `Omit`.
 
-**Examples:** `PixiComponentProps<Pixi.SpriteOptions>` or `PixiComponentProps<Pixi.ContainerOptions>`. The first includes anchor axes; the second does not.
+**Examples:** `PixiComponentProps<Pixi.SpriteOptions>` or `PixiComponentProps<Pixi.ContainerOptions>`. The first includes anchor axes. The second does not.
 
 Each component has a concrete prop type. These types match component signatures and include Pixi options, Solid props, event props, and axis props.
 
@@ -82,11 +82,11 @@ Available concrete prop types:
 - `TextProps`
 - `TilingSpriteProps`
 
-`AnimatedSpriteProps` includes `autoUpdate`. `Container`, `RenderContainer`, and `RenderLayer` accept `children`; other component prop types do not.
+`AnimatedSpriteProps` includes `autoUpdate`. `Container`, `RenderContainer`, and `RenderLayer` accept `children`. Other component prop types do not.
 
 ## Prop updates
 
-Pixi options are passed to the Pixi constructor when the component mounts. pixi-solid tracks changed props and updates the corresponding instance property when that property exists and is writable. Constructor-only options cannot be updated after mount. Prefer axis props when updating one coordinate or scale axis.
+pixi-solid passes the Pixi options to the Pixi constructor when the component mounts. It tracks changed props and updates the matching instance property when that property exists and is writable. Constructor-only options cannot be updated after mount. Prefer axis props when you update one coordinate or scale axis.
 
 `AnimatedSprite` is an exception: pixi-solid disables Pixi's automatic ticker update and registers updates with the current ticker unless `autoUpdate={false}`. It therefore needs ticker context by default.
 
@@ -112,7 +112,7 @@ All concrete component prop types include typed PixiJS event props. Use lowercas
 
 Supported events include pointer, mouse, touch, wheel, tap, global movement, and capture variants such as `onpointerdowncapture`.
 
-Interactive events require `eventMode="static"` or `eventMode="dynamic"` on the component to be received.
+To receive an interactive event, set `eventMode="static"` or `eventMode="dynamic"` on the component.
 
 ### Common events by category
 
@@ -123,7 +123,7 @@ Interactive events require `eventMode="static"` or `eventMode="dynamic"` on the 
 | Touch    | `ontouchstart`, `ontouchend`, `ontouchmove`, `ontouchcancel`                                        |
 | Wheel    | `onwheel`                                                                                           |
 
-Most non-global events also have **capture variants** with a `capture` suffix — e.g. `onpointerdowncapture`. They fire during capture before the target phase. Global movement events have no capture variants. Event names are typed from PixiJS's `FederatedEventEmitterTypes`.
+Most non-global events also have **capture variants** with a `capture` suffix, for example `onpointerdowncapture`. They fire during the capture phase, before the target phase. Global movement events have no capture variants. Event names are typed from PixiJS's `FederatedEventEmitterTypes`.
 
 ## Using these types
 
@@ -142,7 +142,7 @@ type MyComponentProps = PixiComponentProps<Pixi.SpriteOptions> & {
 };
 ```
 
-Example — forwarding Pixi props while handling custom props with `omit`. Solid 2 removed `splitProps`; `omit` returns a reactive view of the remaining props:
+Example — forwarding Pixi props while handling custom props with `omit`. Solid 2 removed `splitProps`. `omit` returns a reactive view of the remaining props:
 
 ```tsx
 import { omit } from "solid-js";
@@ -201,7 +201,7 @@ existingContainer.label = "my-container";
 </Container>;
 ```
 
-**Lifecycle note:** When `as` is provided, pixi-solid assumes you own the instance's lifecycle and will **not** destroy it on unmount. You must destroy it manually when no longer needed. Child components still follow their own lifecycle.
+**Lifecycle note:** When you provide `as`, pixi-solid assumes that you own the instance's lifecycle and will **not** destroy it on unmount. Destroy it manually when you no longer need it. Child components still follow their own lifecycle.
 
 ## Deliberate omissions
 
@@ -222,4 +222,4 @@ import {
 
 `Particle` is omitted because `ParticleContainer` is designed for high-volume, imperative updates rather than per-particle Solid reactivity. Use `ParticleContainer` from `pixi-solid`, then manage `Particle` instances from `pixi.js` imperatively.
 
-`MeshGeometry`, `NineSliceGeometry`, `PerspectivePlaneGeometry`, `PlaneGeometry`, and `RopeGeometry` are low-level geometry types for custom meshes. `Rectangle` and `Culler` are PixiJS utilities. Import these directly from `pixi.js` when needed; `pixi-solid` does not re-export PixiJS classes.
+`MeshGeometry`, `NineSliceGeometry`, `PerspectivePlaneGeometry`, `PlaneGeometry`, and `RopeGeometry` are low-level geometry types for custom meshes. `Rectangle` and `Culler` are PixiJS utilities. Import these directly from `pixi.js` when needed. `pixi-solid` does not re-export PixiJS classes.
