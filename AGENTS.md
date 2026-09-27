@@ -25,6 +25,12 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md#component-architecture) for the full arc
 - **Context providers** — `PixiCanvas`, `PixiApplicationProvider`, `TickerProvider`
 - **Testing utilities** — `mountScene`, `renderHook`, `createTestContext`, `createManualTicker`, scene graph queries
 
+## Writing style
+
+Prose in JSDoc comments, docs pages, the consumer skill files, the README, the changelog, and migration notes uses ASD-STE100 Simplified Technical English in the STE-flavored mode. Code, identifiers, API names, type signatures, and tables are exempt.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md#writing-style) for the rules.
+
 ## Resources
 
 - **Philosophy**: [PHILOSOPHY.md](PHILOSOPHY.md) — high-level design principles and library values

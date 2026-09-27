@@ -14,6 +14,7 @@ Thank you for contributing! This document covers the conventions, standards, and
 - [Component Architecture](#component-architecture)
 - [Testing](#testing)
 - [Styling](#styling)
+- [Writing Style](#writing-style)
 - [Pull Requests](#pull-requests)
 - [Versioning & Changelog](#versioning--changelog)
 
@@ -275,6 +276,34 @@ Use `afterEach(() => vi.restoreAllMocks())` to clean up mocks between tests.
   }
 }
 ```
+
+---
+
+## Writing Style
+
+Write all prose in ASD-STE100 Simplified Technical English, in the STE-flavored mode. The `ste-writing` skill holds the full rule set when it is available.
+
+This applies to:
+
+- JSDoc comments in the library source
+- Docs pages, the consumer skill files, and the README
+- The changelog, migration notes, release notes, and pull request descriptions
+
+It does not apply to code, identifiers, API names, type signatures, tables, or command syntax.
+
+### Rules
+
+- Use the short common word. Write "use", not "utilize". Write "make sure", not "ensure". Write "start", not "begin".
+- Write in active voice. Write "the parser reads the file", not "the file is read by the parser".
+- Keep one instruction per sentence, at 20 words or fewer. Keep a descriptive sentence at 25 words or fewer.
+- Do not use contractions. Write "does not", not "doesn't".
+- Do not use semicolons in prose. Write two sentences.
+- Use American spelling. Write "behavior" and "synchronize".
+- Use one name for one thing across a page.
+- Do not use marketing adjectives such as "seamless", "robust", and "powerful".
+- Keep the reasoning. Explain why a design works the way it does, and do not flatten an explanation into a list of steps.
+
+Check your prose against these rules before you commit it.
 
 ---
 
