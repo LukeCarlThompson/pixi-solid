@@ -1,21 +1,30 @@
-import { bench, describe } from "vitest";
+import { test } from "vitest";
+
+import { runBenchmarks } from "../baselines";
 
 import { arrayLookup, setLookup } from "./point-property-lookup.variant";
 
-describe("isPointProperty - mixed hits and misses", () => {
-  bench("array includes variant", () => {
-    arrayLookup("position");
-    arrayLookup("tileScaleY");
-    arrayLookup("invalidProp1");
-    arrayLookup("anchor");
-    arrayLookup("pivotY");
-  });
-
-  bench("set has variant", () => {
-    setLookup("position");
-    setLookup("tileScaleY");
-    setLookup("invalidProp1");
-    setLookup("anchor");
-    setLookup("pivotY");
-  });
+test("isPointProperty - mixed hits and misses", async ({ bench }) => {
+  await runBenchmarks(bench, [
+    {
+      name: "array includes variant",
+      fn: () => {
+        arrayLookup("position");
+        arrayLookup("tileScaleY");
+        arrayLookup("invalidProp1");
+        arrayLookup("anchor");
+        arrayLookup("pivotY");
+      },
+    },
+    {
+      name: "set has variant",
+      fn: () => {
+        setLookup("position");
+        setLookup("tileScaleY");
+        setLookup("invalidProp1");
+        setLookup("anchor");
+        setLookup("pivotY");
+      },
+    },
+  ]);
 });

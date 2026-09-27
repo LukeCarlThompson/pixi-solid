@@ -1,7 +1,8 @@
 import { createRoot, createSignal } from "solid-js";
-import { bench, describe } from "vitest";
+import { test } from "vitest";
 
 import { Container } from "../../components";
+import { runBenchmarks } from "../baselines";
 
 const handlers = {
   a: () => undefined,
@@ -59,61 +60,95 @@ const createJsxState = () => {
   return { ...state, dispose };
 };
 
-const jsxState = createJsxState();
-let jsxIteration = 0;
+test("Container prop updates", async ({ bench }) => {
+  const state = createJsxState();
+  let jsxIteration = 0;
 
-describe("Container", () => {
-  bench("mixed props updates", () => {
-    jsxIteration += 1;
-    const i = jsxIteration;
-    const toggle = i % 2 === 0;
+  // The common game case: a single prop changes per frame. A binder that reads
+  // every prop on each update (for example one effect that diffs all of them)
+  // shows up here as a large regression, so keep this granular.
+  await runBenchmarks(bench, [
+    {
+      name: "single prop update",
+      fn: () => {
+        jsxIteration += 1;
 
-    jsxState.setX(i);
-    jsxState.setY(i + 1);
-    jsxState.setAlpha((i % 100) / 100);
-    jsxState.setRotation(i * 0.01);
-    jsxState.setVisible(toggle);
-    jsxState.setLabel(toggle ? "alpha" : "beta");
-    jsxState.setPosition({ x: i, y: i + 2 });
-    jsxState.setScale({ x: 1 + i * 0.001, y: 1 + i * 0.002 });
-    jsxState.setSkewX(i * 0.0001);
-    jsxState.setPivotY(i * 0.0002);
-    jsxState.setOnclick(toggle ? handlers.a : handlers.b);
-  });
+        state.setX(jsxIteration);
+      },
+    },
+    {
+      name: "three prop updates",
+      fn: () => {
+        jsxIteration += 1;
+        const i = jsxIteration;
+
+        state.setX(i);
+        state.setAlpha((i % 100) / 100);
+        state.setOnclick(i % 2 === 0 ? handlers.a : handlers.b);
+      },
+    },
+    {
+      name: "mixed props updates",
+      fn: () => {
+        jsxIteration += 1;
+        const i = jsxIteration;
+        const toggle = i % 2 === 0;
+
+        state.setX(i);
+        state.setY(i + 1);
+        state.setAlpha((i % 100) / 100);
+        state.setRotation(i * 0.01);
+        state.setVisible(toggle);
+        state.setLabel(toggle ? "alpha" : "beta");
+        state.setPosition({ x: i, y: i + 2 });
+        state.setScale({ x: 1 + i * 0.001, y: 1 + i * 0.002 });
+        state.setSkewX(i * 0.0001);
+        state.setPivotY(i * 0.0002);
+        state.setOnclick(toggle ? handlers.a : handlers.b);
+      },
+    },
+  ]);
+
+  state.dispose();
 });
 
-describe("Container", () => {
-  bench("creation only", () => {
-    createRoot((dispose) => {
-      const [x] = createSignal(0);
-      const [y] = createSignal(0);
-      const [alpha] = createSignal(1);
-      const [rotation] = createSignal(0);
-      const [visible] = createSignal(true);
-      const [label] = createSignal("init");
-      const [position] = createSignal({ x: 0, y: 0 });
-      const [scale] = createSignal({ x: 1, y: 1 });
-      const [skewX] = createSignal(0);
-      const [pivotY] = createSignal(0);
-      const [onclick] = createSignal<(() => void) | undefined>(handlers.a);
+test("Container creation", async ({ bench }) => {
+  await runBenchmarks(bench, [
+    {
+      name: "creation only",
+      fn: () => {
+        createRoot((dispose) => {
+          const [x] = createSignal(0);
+          const [y] = createSignal(0);
+          const [alpha] = createSignal(1);
+          const [rotation] = createSignal(0);
+          const [visible] = createSignal(true);
+          const [label] = createSignal("init");
+          const [position] = createSignal({ x: 0, y: 0 });
+          const [scale] = createSignal({ x: 1, y: 1 });
+          const [skewX] = createSignal(0);
+          const [pivotY] = createSignal(0);
+          const [onclick] = createSignal<(() => void) | undefined>(handlers.a);
 
-      void (
-        <Container
-          x={x()}
-          y={y()}
-          alpha={alpha()}
-          rotation={rotation()}
-          visible={visible()}
-          label={label()}
-          position={position()}
-          scale={scale()}
-          skewX={skewX()}
-          pivotY={pivotY()}
-          onclick={onclick()}
-        />
-      );
+          void (
+            <Container
+              x={x()}
+              y={y()}
+              alpha={alpha()}
+              rotation={rotation()}
+              visible={visible()}
+              label={label()}
+              position={position()}
+              scale={scale()}
+              skewX={skewX()}
+              pivotY={pivotY()}
+              onclick={onclick()}
+            />
+          );
 
-      dispose();
-    });
-  });
+          dispose();
+        });
+      },
+    },
+  ]);
 });
