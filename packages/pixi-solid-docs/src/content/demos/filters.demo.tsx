@@ -40,7 +40,7 @@ const DemoComponent = () => {
     blurFilter.destroy();
   });
 
-  // Listen to pointer and set the blur amoutn signal to demonstrate binding PixiJS classes with signals
+  // Listen to pointer and set the blur amount signal to demonstrate binding PixiJS classes with signals
   const handlePointerMove = (e: Pixi.FederatedPointerEvent) => {
     const notInsideCanvas =
       e.global.x < 0 ||

@@ -52,6 +52,10 @@ export default defineConfig({
           label: "Testing",
           items: [{ autogenerate: { directory: "testing" } }],
         },
+        {
+          label: "Migration",
+          items: [{ autogenerate: { directory: "migration" } }],
+        },
       ],
     }),
   ],

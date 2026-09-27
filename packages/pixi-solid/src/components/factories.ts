@@ -172,7 +172,9 @@ export const createContainerComponent = <
       const options = getInstanceOptions(props, CONTAINER_RUNTIME_KEY_SET);
       const instance = as || new PixiClass(options as any);
 
-      bindInitialisationProps(instance, props, CONTAINER_RUNTIME_KEY_SET);
+      bindInitialisationProps(instance, props, CONTAINER_RUNTIME_KEY_SET, {
+        deferInitialRun: !isUserOwnedInstance,
+      });
       bindRuntimeProps(instance, props, CONTAINER_RUNTIME_KEY_SET);
 
       onCleanup(() => {
@@ -218,7 +220,9 @@ export const createSpriteComponent = <
       const options = getInstanceOptions(props, SPRITE_RUNTIME_KEY_SET);
       const instance = as || new PixiClass(options as any);
 
-      bindInitialisationProps(instance, props, SPRITE_RUNTIME_KEY_SET);
+      bindInitialisationProps(instance, props, SPRITE_RUNTIME_KEY_SET, {
+        deferInitialRun: !isUserOwnedInstance,
+      });
       bindRuntimeProps(instance, props, SPRITE_RUNTIME_KEY_SET);
 
       onCleanup(() => {
@@ -278,7 +282,9 @@ export const createAnimatedSpriteComponent = <
         },
       );
 
-      bindInitialisationProps(instance, props, ANIMATED_SPRITE_INITIALISATION_RUNTIME_KEY_SET);
+      bindInitialisationProps(instance, props, ANIMATED_SPRITE_INITIALISATION_RUNTIME_KEY_SET, {
+        deferInitialRun: !isUserOwnedInstance,
+      });
       bindRuntimeProps(instance, props, SPRITE_RUNTIME_KEY_SET);
 
       onCleanup(() => {
@@ -306,7 +312,9 @@ export const createTilingSpriteComponent = <
       const options = getInstanceOptions(props, TILING_SPRITE_RUNTIME_KEY_SET);
       const instance = as || new PixiClass(options as any);
 
-      bindInitialisationProps(instance, props, TILING_SPRITE_RUNTIME_KEY_SET);
+      bindInitialisationProps(instance, props, TILING_SPRITE_RUNTIME_KEY_SET, {
+        deferInitialRun: !isUserOwnedInstance,
+      });
       bindRuntimeProps(instance, props, TILING_SPRITE_RUNTIME_KEY_SET);
 
       onCleanup(() => {

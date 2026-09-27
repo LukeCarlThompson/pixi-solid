@@ -4,6 +4,7 @@ import {
   createRoot,
   createSignal,
   flush,
+  getOwner,
   onSettled,
   useContext,
 } from "solid-js";
@@ -142,12 +143,20 @@ describe("bindRuntimeProps()", () => {
     dispose();
   });
 
-  it("GIVEN a ref callback that uses a context provider WHEN bindRuntimeProps is called THEN the ref can access the context", () => {
+  it("GIVEN a ref callback WHEN it runs THEN it has no owner, so context is unavailable", () => {
     const TestContext = createContext<string>();
     const instance = new MockContainer();
-    let contextValue: string | undefined;
+    let owner: unknown = "not-called";
+    let thrown: unknown;
+
     const ref = vi.fn(() => {
-      contextValue = useContext(TestContext);
+      owner = getOwner();
+
+      try {
+        useContext(TestContext);
+      } catch (error) {
+        thrown = error;
+      }
     });
 
     const { dispose } = renderHook(
@@ -166,7 +175,50 @@ describe("bindRuntimeProps()", () => {
     );
 
     expect(ref).toHaveBeenCalledWith(instance);
+    // A ref callback is unowned, matching @solidjs/web. Move context reads and
+    // cleanup to `onSettled` in the component body.
+    expect(owner).toBeNull();
+    expect(thrown).toBeInstanceOf(Error);
+    dispose();
+  });
+
+  it("GIVEN a context-dependent ref WHEN the work moves to onSettled THEN the context is available", () => {
+    const TestContext = createContext<string>();
+    let contextValue: string | undefined;
+    let refValue: MockContainer | undefined;
+
+    const { dispose } = renderHook(
+      () => {
+        const instance = new MockContainer();
+
+        onSettled(() => {
+          contextValue = useContext(TestContext);
+        });
+
+        bindRuntimeProps(
+          instance as any,
+          {
+            ref: (value: MockContainer) => {
+              refValue = value;
+            },
+          } as any,
+        );
+
+        return { instance };
+      },
+      {
+        wrapper: (wrapperProps) =>
+          createComponent(TestContext, {
+            value: "test-value",
+            get children() {
+              return wrapperProps.children;
+            },
+          }),
+      },
+    );
+
     expect(contextValue).toBe("test-value");
+    expect(refValue).toBeDefined();
     dispose();
   });
 
@@ -374,6 +426,22 @@ describe("bindInitialisationProps()", () => {
 
     expect(result().instance.x).toBe(0);
     dispose();
+  });
+
+  it("GIVEN deferInitialRun false WHEN bindInitialisationProps is called THEN the initial values are applied", () => {
+    const instance = new MockContainer();
+
+    createRoot((dispose) => {
+      bindInitialisationProps(instance as any, { x: 8, y: 9 } as any, new Set<string>(), {
+        deferInitialRun: false,
+      });
+
+      flush();
+
+      expect(instance.x).toBe(8);
+      expect(instance.y).toBe(9);
+      dispose();
+    });
   });
 
   it("GIVEN deferred reactive props WHEN the prop value changes THEN the instance is updated", () => {

@@ -19,6 +19,7 @@ import {
   TilingSprite as PixiTilingSprite,
 } from "pixi.js";
 import type { Component } from "solid-js";
+import { createEffect, omit } from "solid-js";
 
 import type {
   AnimatedSpriteProps,
@@ -70,13 +71,33 @@ export const Container: Component<ContainerProps> = createContainerComponent<
 >(PixiContainer);
 /**
  * A SolidJS component that renders a `PIXI.Graphics`.
- * Use a ref to access the underlying instance and call its imperative
- * draw methods (e.g. `rect()`, `fill()`, `stroke()`).
+ *
+ * Use the `draw` prop for drawing, which re-runs when its reactive reads change.
+ * Use a ref to reach the instance for anything else, such as reading bounds.
  */
-export const Graphics: Component<GraphicsProps> = createLeafComponent<
-  PixiGraphics,
-  Pixi.GraphicsOptions
->(PixiGraphics);
+export const Graphics: Component<GraphicsProps> = (props) => {
+  // `draw` is consumed here rather than by the instance, so keep it out of the
+  // constructor options and out of the prop binding.
+  const instance = createLeafComponent<PixiGraphics, Pixi.GraphicsOptions>(PixiGraphics)(
+    omit(props, "draw") as GraphicsProps,
+  );
+
+  createEffect(
+    () => {
+      const draw = props.draw;
+
+      if (!draw) return;
+
+      // Clear first: the callback describes the whole content, so a re-run must
+      // replace the previous drawing instead of adding to it.
+      instance.clear();
+      draw(instance);
+    },
+    () => {},
+  );
+
+  return instance;
+};
 /**
  * A SolidJS component that renders a `PIXI.HTMLText`.
  */

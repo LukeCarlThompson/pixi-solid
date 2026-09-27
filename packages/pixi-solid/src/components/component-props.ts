@@ -30,7 +30,21 @@ export type ContainerProps = CommonComponentProps &
 
 export type GraphicsProps = CommonComponentProps &
   Omit<Pixi.GraphicsOptions, "children"> &
-  InstanceProps<Pixi.Graphics>;
+  InstanceProps<Pixi.Graphics> & {
+    /**
+     * Draws the content of this `Graphics`.
+     *
+     * The callback runs once on mount, then again whenever a reactive value it
+     * reads changes. The instance is cleared before every run, so the callback
+     * describes the whole content and a re-run replaces the previous drawing
+     * instead of adding to it.
+     *
+     * ```tsx
+     * <Graphics draw={(graphics) => graphics.rect(0, 0, size(), size()).fill("#ff0000")} />
+     * ```
+     */
+    draw?: (graphics: Pixi.Graphics) => void;
+  };
 
 export type HTMLTextProps = SpriteComponentProps &
   Omit<Pixi.HTMLTextOptions, "children"> &

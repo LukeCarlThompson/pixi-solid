@@ -165,24 +165,78 @@ function MySprite(props: PixiComponentProps<Pixi.SpriteOptions> & { label: strin
 
 ### `ref` usage
 
-All pixi-solid components accept a `ref` (a callback, or an array of callbacks) that receives the underlying PixiJS object when mounted:
+All pixi-solid components accept a `ref` that receives the underlying PixiJS object when mounted. The value may be a callback, an array of callbacks, or a variable:
+
+```tsx
+let container: Pixi.Container | undefined;
+
+<Container ref={container} />;
+```
+
+A ref callback **captures, and nothing else**. It runs once, without an owner. `onCleanup` inside one never runs, an effect created inside one never disposes, and `useContext` inside one throws. Reading a signal inside one does not re-run it.
 
 ```tsx
 <Container
   ref={(container) => {
-    // do something with the container instance
+    // capture or touch the instance only
   }}
 />
 ```
 
-`Graphics` is typically used imperatively through `ref` for drawing commands:
+#### Drawing with `Graphics`
+
+`Graphics` draws through the `draw` prop. The callback receives the instance, and the instance is cleared before every run, so the callback describes the whole content. It runs once on mount, then again whenever a reactive value it reads changes:
 
 ```tsx
 <Graphics
-  ref={(graphics) => {
+  draw={(graphics) => {
     graphics.rect(50, 50, 100, 200).fill(0xff0000).circle(200, 200, 50).stroke(0x00ff00);
   }}
 />
+```
+
+Read a prop or a signal inside `draw` to redraw when it changes:
+
+```tsx
+const Circle = (props: { radius: number }) => (
+  <Graphics draw={(graphics) => graphics.circle(0, 0, props.radius).fill("#ffd500ff")} />
+);
+```
+
+Do not call `clear()` yourself. A value that changes every frame redraws every frame, so animate per-frame work from `onTick` with the instance from `ref` instead.
+
+#### Calling instance methods
+
+Most PixiJS state has a matching prop, and pixi-solid binds those props reactively. Some state does not. `Pixi.AnimatedSprite#playing` is a getter with no setter, so passing it as a prop throws, and starting or stopping playback needs a method call. Capture the instance in a variable and drive it from a split effect: the compute function tracks the read, and the apply function calls the method:
+
+```tsx
+let animation: Pixi.AnimatedSprite | undefined;
+
+createEffect(
+  () => isPlaying(),
+  (playing) => {
+    if (playing) animation?.play();
+    else animation?.stop();
+  },
+);
+
+<AnimatedSprite ref={animation} textures={textures} />;
+```
+
+#### Setup and teardown for an instance
+
+Use `onSettled`, which is owned and runs after the ref has been assigned. Return a cleanup function, because `onCleanup` is not allowed inside `onSettled`:
+
+```tsx
+let sprite: Pixi.Sprite | undefined;
+
+onSettled(() => {
+  sprite?.on("pointerdown", handleDown);
+
+  return () => sprite?.off("pointerdown", handleDown);
+});
+
+<Sprite ref={sprite} texture={texture} />;
 ```
 
 ### `as` prop (advanced)
@@ -199,6 +253,13 @@ existingContainer.label = "my-container";
 <Container as={existingContainer}>
   <Sprite texture={Texture.WHITE} />
 </Container>;
+```
+
+Props on the component are still applied to the given instance, including initialisation props such as `texture` or `label`:
+
+```tsx
+// The texture is applied to `existingSprite` on mount.
+<Sprite as={existingSprite} texture={texture} x={40} />
 ```
 
 **Lifecycle note:** When you provide `as`, pixi-solid assumes that you own the instance's lifecycle and will **not** destroy it on unmount. Destroy it manually when you no longer need it. Child components still follow their own lifecycle.

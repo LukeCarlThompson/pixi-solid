@@ -206,6 +206,9 @@ export const bindRuntimeProps = <
  * @param props The component props object.
  * @param runtimeKeys Keys owned by `bindRuntimeProps`, precomputed by component
  * factories. When omitted, every prop is treated as an initialization prop.
+ * @param options.deferInitialRun Skip the initial apply because the constructor
+ * already received the values. Pass `false` when the caller supplied the
+ * instance through `as`, because then the constructor never saw them.
  */
 export const bindInitialisationProps = <
   InstanceType extends Pixi.Container,
@@ -214,6 +217,7 @@ export const bindInitialisationProps = <
   instance: InstanceType,
   props: OptionsType,
   runtimeKeys: ReadonlySet<string> = EMPTY_KEYS,
+  options: { deferInitialRun?: boolean } = {},
 ): void => {
   const propsRecord = props as PropRecord;
   const include = (key: string) => !runtimeKeys.has(key);
@@ -222,6 +226,6 @@ export const bindInitialisationProps = <
     propsRecord,
     include,
     (key, value) => assignInstanceProp(instance, key, value),
-    true,
+    options.deferInitialRun ?? true,
   );
 };

@@ -1,0 +1,195 @@
+---
+title: Migrating to Solid 2
+description: Upgrade a pixi-solid 1 project to pixi-solid 2 and SolidJS 2.
+sidebar:
+  order: 1
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+`pixi-solid` 2 requires SolidJS 2. Component, hook, and utility names stay the same. Almost all of the work is in the SolidJS APIs around them.
+
+SolidJS publishes a [complete migration guide](https://github.com/solidjs/solid/blob/next/documentation/solid-2.0/MIGRATION.md). Read that for the full list. This page covers the parts that meet a pixi-solid project, and the changes to `pixi-solid` itself.
+
+### Upgrade the packages
+
+Install SolidJS 2 and its web renderer, then add the compiler plugin:
+
+```bash
+npm i solid-js@2.0.0-rc.9 @solidjs/web@2.0.0-rc.9
+npm i -D @solidjs/vite-plugin@3.0.0-next.35
+```
+
+`pixi-solid` declares all three as peers. The supported range for `solid-js` and `@solidjs/web` is `>=2.0.0-rc.9 <3`.
+
+The compiler must use `@solidjs/web` as the JSX renderer. See [Project setup](../getting-started/project-setup) for the `tsconfig.json` and Vite settings.
+
+### Update the import paths
+
+`solid-js` no longer owns the JSX types or the store helpers.
+
+| Import                                   | Solid 1 path     | Solid 2 path   |
+| ---------------------------------------- | ---------------- | -------------- |
+| `render`, `hydrate`, and the DOM helpers | `solid-js/web`   | `@solidjs/web` |
+| The `JSX` types                          | `solid-js`       | `@solidjs/web` |
+| `createStore` and the store helpers      | `solid-js/store` | `solid-js`     |
+
+### Renamed and removed APIs
+
+These are the ones that turn up in a pixi-solid scene. The SolidJS guide covers the rest.
+
+| Solid 1                            | Solid 2                                                 |
+| ---------------------------------- | ------------------------------------------------------- |
+| `onMount`                          | `onSettled`, which can return a cleanup function        |
+| `splitProps`                       | `omit`                                                  |
+| `mergeProps`                       | `merge`                                                 |
+| `classList`                        | `class` with an object or array value                   |
+| `Suspense`                         | `Loading`                                               |
+| `ErrorBoundary`                    | `Errored`                                               |
+| `Index`                            | `<For keyed={false}>`                                   |
+| `createMutable`                    | `createStore` with draft setters                        |
+| `createSelector`                   | `createProjection`, or `createStore(fn)`                |
+| `batch`                            | Writes batch on their own. Call `flush()` to apply them |
+| `createResource`                   | An async computation read inside `<Loading>`            |
+| `startTransition`, `useTransition` | Built-in transitions with `isPending` and `<Loading>`   |
+| `Context.Provider`                 | Use the context directly as the provider                |
+
+`createDeferred` is removed with no replacement.
+
+### Effects are split
+
+`createEffect` and `createRenderEffect` take a compute function and an effect function. The compute returns the value that the effect receives, and it is the only part that tracks. This is the pattern for binding a signal to a PixiJS class property:
+
+```tsx
+// Solid 1
+createEffect(() => {
+  blurFilter.strength = blurAmount();
+});
+
+// Solid 2
+createEffect(
+  () => blurAmount(),
+  (amount) => {
+    blurFilter.strength = amount;
+  },
+);
+```
+
+### Async work and `<Loading>`
+
+Async work is a computation that returns a Promise. Create it with `createMemo` and read it inside a `<Loading>` boundary:
+
+```tsx
+const texture = createMemo(async () => Assets.load<Pixi.Texture>("/sprite.png"));
+
+<PixiCanvas>
+  <Loading>
+    <Sprite texture={texture()} />
+  </Loading>
+</PixiCanvas>;
+```
+
+<Aside type="caution">
+  A `<Loading>` boundary covers its whole subtree and catches a pending read from any descendant. Place it
+  around the smallest group that should wait.
+
+The `fallback` is optional and replaces the children, so it sits wherever the boundary sits. Inside a Pixi
+tree the fallback must be a Pixi element, and a DOM element in that position throws
+`InvalidChildTypeError`. Put the boundary above the canvas to use a DOM fallback.
+
+</Aside>
+
+See [Asset loading](../asset-loading/individual-assets) and [Asset manifests](../asset-loading/asset-manifest) for the two loading patterns.
+
+### Reactive writes are batched
+
+A signal write does not change what a read returns until the batch flushes. Call `flush()` before you assert:
+
+```tsx
+setCount(1);
+flush();
+
+expect(count()).toBe(1);
+```
+
+The testing helpers rely on this behavior. See [Testing](../testing/overview).
+
+### pixi-solid API changes
+
+| Solid 1                                     | Solid 2                                 |
+| ------------------------------------------- | --------------------------------------- |
+| `<PixiCanvas classList={{ active: true }}>` | `<PixiCanvas class={{ active: true }}>` |
+
+- `class` accepts a `JSX.ClassValue`, so an object or array replaces the removed `classList` prop.
+- `ref` accepts a Solid `Ref<HTMLDivElement>`. The callback form still works. A variable and an array of callbacks also typecheck now. The Solid compiler turns a variable into a callback that assigns to it, so the runtime only ever receives callbacks.
+- `createTestContext` returns a `mount` helper that applies the test providers.
+- `mountScene` and `renderHook` accept an options object with an optional `wrapper`.
+- `renderHook` calls its callback once. `result()` returns the value from that call.
+- `cleanup` resets the Solid error halt in addition to unmounting.
+- `PIXI_SOLID_EVENT_HANDLER_NAMES` is available from the root exports.
+
+#### Ref callbacks
+
+A ref callback is no longer a place for reactive work. In `pixi-solid` 1 it ran inside the component's owner, and it re-ran whenever a prop it read changed. It now runs without an owner, and it runs once.
+
+**It has no owner.** `onCleanup` inside a ref callback never runs, an effect created inside one never disposes, and `useContext` inside one throws, because a context read needs an owner. Move that work into `onSettled` in the component body, which runs after the ref has been assigned, and return a cleanup function:
+
+```tsx
+let sprite: Pixi.Sprite | undefined;
+
+onSettled(() => {
+  const onDown = () => {
+    // handle the press
+  };
+
+  sprite?.on("pointerdown", onDown);
+
+  return () => sprite?.off("pointerdown", onDown);
+});
+
+return <Sprite ref={sprite} texture={texture} />;
+```
+
+The `PixiCanvas` `ref` receives a DOM element, and SolidJS clears the owner for DOM refs for the same reason, so the same rule applies there.
+
+**It runs once.** In `pixi-solid` 1 a ref callback re-ran whenever a prop it read changed, so a drawing command followed a signal. Use the `draw` prop instead:
+
+```tsx
+// pixi-solid 1 — redraws whenever `size` changes
+<Graphics
+  ref={(g) => {
+    g.rect(50, 50, size(), size()).fill(0xff0000);
+  }}
+/>;
+
+// pixi-solid 2 — `draw` clears and redraws whenever its reads change
+<Graphics draw={(g) => g.rect(50, 50, size(), size()).fill(0xff0000)} />;
+```
+
+For any other component, move the read into a split effect: the compute function tracks the read, and the apply function calls into the instance. Reach for this when the value has no matching prop, such as `AnimatedSprite`'s `playing`, which is a getter with no setter. Passing it as a prop throws.
+
+```tsx
+// pixi-solid 1 — the ref re-ran and started or stopped playback
+<AnimatedSprite
+  ref={(sprite) => {
+    if (isPlaying()) sprite.play();
+    else sprite.stop();
+  }}
+  textures={textures}
+/>;
+
+// pixi-solid 2 — capture the instance, and drive it from a split effect
+let animation: Pixi.AnimatedSprite | undefined;
+
+createEffect(
+  () => isPlaying(),
+  (playing) => {
+    if (playing) animation?.play();
+    else animation?.stop();
+  },
+);
+
+return <AnimatedSprite ref={animation} textures={textures} />;
+```
+
+Most PixiJS state does have a prop, and pixi-solid binds those props reactively. `<Sprite tint={tint()} />` needs no effect at all. A read left inside a ref callback also reports `[STRICT_READ_UNTRACKED]` in development.

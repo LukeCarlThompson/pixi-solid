@@ -706,6 +706,33 @@ describe("Sprite-like component cleanup", () => {
 });
 
 describe("as prop lifecycle — user-owned instances are not destroyed on cleanup", () => {
+  it("GIVEN a Container with as prop AND a label WHEN mounted THEN the label is applied to the given instance", () => {
+    const existingContainer = new PixiContainer();
+
+    const { dispose } = mountScene(() => (
+      <Container as={existingContainer} label="provided" x={12} />
+    ));
+
+    flush();
+
+    // The instance was never passed to the constructor, so initialisation props
+    // must be applied on mount rather than deferred.
+    expect(existingContainer.label).toBe("provided");
+    expect(existingContainer.x).toBe(12);
+    dispose();
+  });
+
+  it("GIVEN a Sprite with as prop AND a texture WHEN mounted THEN the texture is applied to the given instance", () => {
+    const existingSprite = new PixiSprite(Texture.EMPTY);
+
+    const { dispose } = mountScene(() => <Sprite as={existingSprite} texture={Texture.WHITE} />);
+
+    flush();
+
+    expect(existingSprite.texture).toBe(Texture.WHITE);
+    dispose();
+  });
+
   it("GIVEN a Container with as prop WHEN root is disposed THEN instance is NOT destroyed", () => {
     const existingContainer = new PixiContainer();
     let destroyCalled = false;

@@ -11,6 +11,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## Unreleased
+
+`pixi-solid` 2 requires SolidJS 2. Component, hook, and utility names stay the same, but SolidJS 2 removed or replaced several of the framework APIs around them, so this is a major release. The [migration guide](https://lukecarlthompson.github.io/pixi-solid/migration/solid-2/) lists every change.
+
+### Added
+
+- ✅ Added a `draw` prop to `Graphics`. It redraws when its reactive reads change, and the instance is cleared before each run.
+- ✅ Added `PIXI_SOLID_EVENT_HANDLER_NAMES` to the root exports.
+- ✅ Added the `MountSceneOptions` type to the `pixi-solid/testing` exports.
+- ✅ Added a `mount` helper to `createTestContext`. It mounts a scene with the test providers already applied.
+- ✅ Added a `wrapper` option to `mountScene` for wrapping the scene in a component.
+
+### Changed
+
+- ⚙️ `solid-js` and `@solidjs/web` are peer dependencies at `>=2.0.0-rc.9 <3`. SolidJS 1 is no longer supported.
+- ⚙️ `PixiCanvas` accepts a Solid `Ref<HTMLDivElement>` for `ref`, so a callback, an array of callbacks, or a variable all work.
+- ⚙️ Ref callbacks no longer run inside the component's owner. `onCleanup` and `useContext` no longer work inside a ref callback, and an effect created inside one never disposes. Move that work to `onSettled` or to an effect beside the ref.
+- ⚙️ A ref callback runs once. It no longer re-runs when a prop it reads changes. Use the new `draw` prop on `Graphics`, and a `createEffect` compute function on other components, to follow a signal.
+- ⚙️ `PixiCanvas` accepts a `JSX.ClassValue` for `class`, so an object or array can replace `classList`.
+- ⚙️ `renderHook` calls its callback once and `result()` returns the value from that call. It no longer recomputes. Read a signal in the assertion instead of expecting `result()` to update.
+- ⚙️ `cleanup` resets the Solid error halt in addition to unmounting the scene.
+
+### Removed
+
+- 💀 Removed the `PixiCanvas` `classList` prop. Pass an object or array to `class`.
+
+### Fixed
+
+- 🐞 Applied initialisation props such as `texture` and `label` to an instance supplied through the `as` prop. They were ignored because the constructor never received them.
+
 ## 1.0.0
 
 ### Added
