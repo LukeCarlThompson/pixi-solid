@@ -27,7 +27,7 @@ import {
 ```tsx
 // Component tests — renders a Pixi display object
 mountScene(() => <Container>...</Container>);
-// => { container: Pixi.Container, dispose: () => void }
+// => { container, getByLabel, queryByLabel, getAllByLabel, dispose }
 
 // Hook/store tests — no scene rendering
 renderHook(() => usePixiScreen(), { wrapper: ctx.Provider });
@@ -35,16 +35,16 @@ renderHook(() => usePixiScreen(), { wrapper: ctx.Provider });
 
 // Mock contexts
 createTestContext();
-// => { Provider, ticker: ManualTicker, renderer: TestRenderer, app: Pixi.Application, renderHook }
+// => { Provider, ticker, renderer, app, mount, renderHook }
 
-// Manual frame advancement
+// Manual frame advancement (both drivers are async)
 createManualTicker();
 // => { ticker: Pixi.Ticker, fastForwardFrames(), fastForwardTime() }
 
-// Scene graph queries
-getByLabel(root, "label"); // throws if not found
-queryByLabel(root, "label"); // returns undefined if not found
-getAllByLabel(root, "label"); // returns Pixi.DisplayObject[]
+// Scene graph queries, bound to the mounted root
+getByLabel("label"); // throws if not found
+queryByLabel("label"); // returns undefined if not found
+getAllByLabel("label"); // returns Pixi.Container[]
 
 // Teardown (wire in afterEach)
 cleanup();

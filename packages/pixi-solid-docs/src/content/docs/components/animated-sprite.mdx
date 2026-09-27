@@ -22,26 +22,26 @@ shorthands) plus the following `AnimatedSprite`-specific options:
 | `playing`        | `boolean`        | Whether the animation is currently playing (default `true`) |
 | `loop`           | `boolean`        | Whether the animation loops (default `true`)                |
 | `animationSpeed` | `number`         | Speed multiplier for the animation (default `1`)            |
-| `autoUpdate`     | `boolean`        | See autoUpdate behaviour below (default `true`)             |
+| `autoUpdate`     | `boolean`        | See autoUpdate behavior below (default `true`)              |
 
-### autoUpdate behaviour
+### autoUpdate behavior
 
-`AnimatedSprite` in `pixi-solid` `autoUpdate` behaviour intentionally differs from PixiJS defaults to integrate with the `pixi-solid` ticker context providers.
+`AnimatedSprite` in `pixi-solid` `autoUpdate` behavior intentionally differs from PixiJS defaults to integrate with the `pixi-solid` ticker context providers.
 
 In PixiJS:
 
-- `AnimatedSprite` default behaviour or with `autoUpdate: true` updates itself with the `Ticker.shared`.
+- `AnimatedSprite` default behavior or with `autoUpdate: true` updates itself with the `Ticker.shared`.
 
 In `pixi-solid`:
 
-- `AnimatedSprite` default behaviour or with `autoUpdate={true}` updates itself with the ticker in the nearest parent `Ticker` context provider.
+- `AnimatedSprite` default behavior or with `autoUpdate={true}` updates itself with the ticker in the nearest parent `Ticker` context provider.
   Either a `PixiCanvas` or `TickerProvider`.
 
-This avoids accidentally mixing multiple tickers and makes `AnimatedSprite` behaviour consistent with the rest of the `pixi-solid` lifecycle utilities.
+This avoids accidentally mixing multiple tickers and makes `AnimatedSprite` behavior consistent with the rest of the `pixi-solid` lifecycle utilities.
 
 ### Practical guidance
 
-- Use the default behaviour (omit `autoUpdate`) for most apps.
+- Use the default behavior (omit `autoUpdate`) for most apps.
   This keeps animation timing bound to your app's configured ticker.
 - Set `autoUpdate={false}` and access the instance via a `ref` and manually call the `update` method if you want full manual control over frame updates.
 

@@ -1,6 +1,6 @@
 ---
 title: PixiApplicationProvider
-description: A Solid.js component that creates and provides a Pixi.js Application instance to child components.
+description: A Solid.js component that creates and provides a PixiJS Application instance to child components.
 sidebar:
   order: 3
 ---
@@ -63,34 +63,32 @@ const CanvasContent = () => {
 
 #### Using an Existing Application
 
-You can pass an already-created `Pixi.Application` instance using the `existingApp` prop, but you must initialize it with `await app.init()` before the provider renders. Use `createResource` to handle the async initialization:
+You can pass an already-created `Pixi.Application` instance using the `existingApp` prop, but you must initialize it with `await app.init()` before the provider renders. Create the app in an async `createMemo` and read it inside a `<Loading>` boundary:
 
 ```tsx
 import { PixiApplicationProvider, PixiCanvas } from "pixi-solid";
-import { createResource, Show } from "solid-js";
+import { createMemo, Loading } from "solid-js";
 import { Application } from "pixi.js";
 
 export const App = () => {
-  const [appResource] = createResource(async () => {
-    const pixiApp = new Application();
-    await pixiApp.init({
+  const pixiApp = createMemo(async () => {
+    const app = new Application();
+    await app.init({
       width: 800,
       height: 600,
       background: "#1099bb",
     });
-    return pixiApp;
+    return app;
   });
 
   return (
-    <Show when={appResource()}>
-      {(pixiApp) => (
-        <PixiApplicationProvider existingApp={pixiApp()}>
-          <PixiCanvas style={{ width: "100%", height: "100%" }}>
-            <YourContent />
-          </PixiCanvas>
-        </PixiApplicationProvider>
-      )}
-    </Show>
+    <Loading fallback={<p>Loading...</p>}>
+      <PixiApplicationProvider existingApp={pixiApp()}>
+        <PixiCanvas style={{ width: "100%", height: "100%" }}>
+          <YourContent />
+        </PixiCanvas>
+      </PixiApplicationProvider>
+    </Loading>
   );
 };
 ```
@@ -142,13 +140,13 @@ Components inside `PixiApplicationProvider` have access to:
 ### When to use PixiCanvas instead
 
 - For simple applications without external HTML components
-- When you don't need to share the application across multiple contexts
+- When you do not need to share the application across multiple contexts
 - For the most straightforward and least verbose setup
 
 ### When to use TickerProvider instead
 
 - When you only need ticker functionality without a full application
-- When you don't need the full Pixi.js rendering context
+- When you do not need the full PixiJS rendering context
 - For lightweight ticker-based utilities only
 
 ### Related Components

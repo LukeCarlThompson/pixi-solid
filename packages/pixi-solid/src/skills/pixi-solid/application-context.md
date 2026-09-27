@@ -43,7 +43,7 @@ export const DemoApp = () => (
 
 Requires `children`. Wrapper-specific props are `class`, `style`, and `ref`, which receives the internal wrapper `div`.
 
-- `class` accepts a `JSX.ClassValue`, which can be a string, number, array, or object. `style` accepts Solid's CSS object or a CSS string. Solid 2 folded `classList` into `class`, so pass an object (for example `class={{ active: isActive() }}`) instead of the removed `classList` prop.
+- `class` accepts a `JSX.ClassValue`, which can be a string, number, array, or object. `style` accepts Solid's CSS object or a CSS string. Pass an object (for example `class={{ active: isActive() }}`) for a reactive class map.
 - `ref` is a `Ref<HTMLDivElement>` (a callback, or an array of callbacks).
 - Pixi `ApplicationOptions` configure app initialization, except `children` and `resizeTo`, which pixi-solid handles internally. They are not runtime-reactive.
 - Other DOM attributes and event handlers are not forwarded. Wrap `PixiCanvas` in your own element when you need them.

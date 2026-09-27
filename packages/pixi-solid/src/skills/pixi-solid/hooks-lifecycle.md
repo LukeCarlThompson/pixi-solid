@@ -29,7 +29,7 @@ type getPixiApp = () => Pixi.Application;
 
 **Constraints:** Must be called from a component that is a descendant of `PixiApplicationProvider` or `PixiCanvas`.
 
-**Use when:** You need to interact directly with the Pixi.js application (e.g. access the stage, modify application-level settings, or access the renderer).
+**Use when:** You need to interact directly with the PixiJS application (e.g. access the stage, modify application-level settings, or access the renderer).
 
 **Throws:** `"getPixiApp must be used within a PixiApplicationProvider or a PixiCanvas"` if no context is available.
 
@@ -45,7 +45,7 @@ type getRenderer = () => Pixi.Renderer;
 
 **Constraints:** Must be called from a component that is a descendant of `PixiApplicationProvider` or `PixiCanvas`.
 
-**Use when:** You need to interact directly with the Pixi.js renderer (e.g. for WebGL context access, renderer plugin registration, or rendering to a specific target).
+**Use when:** You need to interact directly with the PixiJS renderer (e.g. for WebGL context access, renderer plugin registration, or rendering to a specific target).
 
 **Throws:** `"getRenderer must be used within a PixiApplicationProvider or a PixiCanvas"` if no context is available.
 
@@ -67,7 +67,7 @@ type getTicker = () => Pixi.Ticker;
 
 ### `onResize`
 
-Registers a callback that runs whenever the Pixi.js renderer is resized. pixi-solid removes the callback when the component unmounts.
+Registers a callback that runs whenever the PixiJS renderer is resized. pixi-solid removes the callback when the component unmounts.
 
 ```ts
 type onResize = (resizeCallback: (screen: Pixi.Rectangle) => void) => void;
@@ -87,7 +87,7 @@ type onResize = (resizeCallback: (screen: Pixi.Rectangle) => void) => void;
 
 ### `onTick`
 
-Registers a callback that runs on each tick of the Pixi.js ticker. pixi-solid removes the callback when the component unmounts.
+Registers a callback that runs on each tick of the PixiJS ticker. pixi-solid removes the callback when the component unmounts.
 
 ```ts
 type onTick = (
@@ -161,7 +161,7 @@ See [testing.md](./testing.md) for patterns and examples of testing pixi-solid c
 
 ## `onResize` vs `usePixiScreen`
 
-- **`onResize`** — Use when you just need to react to resize events. The callback fires on every resize. No reactive store.
+- **`onResize`** — Use when you only need to react to resize events. The callback fires on every resize. No reactive store.
 - **`usePixiScreen`** — Use when you need the current screen dimensions as a reactive SolidJS store. The returned store updates automatically and can be subscribed to or passed as component props.
 
 Both hooks use the renderer's "resize" event, so you can use them together. `onResize` schedules its callback with `queueMicrotask`, which makes sure the `usePixiScreen` listeners synchronize their reactive values first.

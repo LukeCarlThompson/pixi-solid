@@ -1,6 +1,6 @@
 ---
 title: useSpring
-description: Solid.js function for creating spring-based animations for numeric values, synchronized with the Pixi.js ticker.
+description: Solid.js function for creating spring-based animations for numeric values, synchronized with the PixiJS ticker.
 sidebar:
   order: 2
 ---
@@ -22,7 +22,7 @@ The function returns an object with the following properties:
 
 ### Behavior
 
-The function internally manages the spring physics calculations and keeps its updates synchronized with the Pixi.js application's ticker, ensuring smooth and responsive animations that align with your application's frame rate.
+The function internally manages the spring physics calculations and keeps its updates synchronized with the PixiJS application's ticker, ensuring smooth and responsive animations that align with your application's frame rate.
 
 It must be called within a SolidJS tracking scope, such as a component or another function, that is a descendant of `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`.
 

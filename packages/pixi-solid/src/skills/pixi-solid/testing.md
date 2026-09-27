@@ -42,7 +42,7 @@ import { cleanup } from "pixi-solid/testing";
 afterEach(cleanup);
 ```
 
-`cleanup()` disposes every registered root **and clears Solid 2's error halt**. Solid 2 stops the whole reactive system after an uncaught error. Without the reset, one test that throws on purpose would break every later test in the file.
+`cleanup()` disposes every registered root **and clears Solid's error halt**. Solid stops the whole reactive system after an uncaught error. Without the reset, one test that throws on purpose would break every later test in the file.
 
 ## mountScene
 
@@ -238,7 +238,7 @@ flush();
 expect(result().width).toBe(1024);
 ```
 
-Solid 2 batches reactive writes and flushes them on a microtask. An assertion that runs immediately after a write can therefore still see the previous value. Call `flush()` before asserting to apply pending work synchronously.
+Solid batches reactive writes and flushes them on a microtask. An assertion that runs immediately after a write can therefore still see the previous value. Call `flush()` before asserting to apply pending work synchronously.
 
 > **Tip:** return stable reactive objects (stores, screen dimensions) rather than deriving primitives inside the callback. A derived primitive is read only once, so later changes would not be visible through `result()`.
 
@@ -260,7 +260,7 @@ describe("usePixiScreen error", () => {
 
 ## Flushing updates
 
-Solid 2 batches reactive writes and flushes them on a microtask. An assertion that runs immediately after a write can therefore still see the previous value. Call `flush()` from `solid-js` to apply pending work synchronously before asserting:
+Solid batches reactive writes and flushes them on a microtask. An assertion that runs immediately after a write can therefore still see the previous value. Call `flush()` from `solid-js` to apply pending work synchronously before asserting:
 
 ```tsx
 import { createSignal, flush } from "solid-js";

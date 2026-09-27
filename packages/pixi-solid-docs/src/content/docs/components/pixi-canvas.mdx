@@ -6,7 +6,7 @@ sidebar:
 ---
 
 The `PixiCanvas` component is the primary way to create a PixiJS application in a `pixi-solid` application.
-It handles creating and managing the HTML canvas element, the Pixi.js Application instance, and provides context to child components for accessing the application and ticker.
+It handles creating and managing the HTML canvas element, the PixiJS Application instance, and provides context to child components for accessing the application and ticker.
 
 ### Features
 
@@ -41,10 +41,9 @@ export const App = () => (
 
 `PixiCanvas` accepts Pixi application initialization options and a small set of wrapper props:
 
-- `style` — CSS styles for the wrapper `div`; accepts a CSS object or string.
-- `class` — CSS class for the wrapper.
-- `classList` — Reactive class map for the wrapper.
-- `ref` — Callback that receives the wrapper `HTMLDivElement`.
+- `style` — CSS styles for the wrapper `div`. Accepts a CSS object or a CSS string.
+- `class` — Classes for the wrapper. Accepts a `JSX.ClassValue`, which can be a string, number, array, or object. Pass an object such as `class={{ active: isActive() }}` for a reactive class map.
+- `ref` — A `Ref<HTMLDivElement>` that receives the wrapper `div`.
 
 #### PixiJS Application Options
 
@@ -90,15 +89,15 @@ Other DOM attributes and event handlers belong on a caller-owned parent element;
 1. Creates an internal wrapper `<div>` element with the provided `class`, `style`, and `ref`
 2. Automatically creates a `Pixi.Application` instance with the provided options
 3. Mounts the Pixi canvas into the internal wrapper div
-4. Sets up automatic resizing based on the internal wrapper div's size (not just the window size)
+4. Sets up automatic resizing based on the internal wrapper div's size (not only the window size)
 5. Provides context to child components for accessing the application and ticker
 6. Cleans up the application when the component unmounts
 
 ### When to use it
 
-- For all basic Pixi.js applications in Pixi Solid
+- For all basic PixiJS applications in Pixi Solid
 - When you want the simplest possible setup
-- When you don't need to share the application with external HTML components
+- When you do not need to share the application with external HTML components
 
 ### Related Components
 

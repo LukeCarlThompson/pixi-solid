@@ -11,11 +11,11 @@ Most of the PixiJS display components are available as Solid components in Pixi 
 
 All components are named the same as their PixiJS counterparts and should be imported individually.
 
-This pattern also allows treeshaking when using a bundler that supports it as each component only imports the necessary parts of PixiJS that it needs.
+This pattern also allows tree shaking, because each component imports only the parts of PixiJS that it needs.
 
 All of the components take the same props as their PixiJS counterparts, with the addition of event handlers.
 
-The best reference for the purpose, capabilities and options for the `pixi-solid` components is the [PixiJS docs](https://pixijs.download/release/docs/scene.html) themselves.
+For the purpose, capabilities, and options of each component, see the [PixiJS docs](https://pixijs.download/release/docs/scene.html).
 
 These include:
 
@@ -41,9 +41,9 @@ import {
 } from "pixi-solid";
 ```
 
-This can cause some name clashes if you are also importing classes or types from `pixi.js` directly.
+The names clash if you also import classes or types from `pixi.js` directly.
 
-It's recommended to alias the imports from `pixi.js` in these cases, for example:
+Alias the `pixi.js` imports in that case:
 
 ```ts
 import { Sprite as PixiSprite } from "pixi.js";
@@ -51,7 +51,7 @@ import { Sprite } from "pixi-solid";
 //...
 ```
 
-Or import all Pixi types under a namespace because these will not be bundled into the final build anyway:
+Or import all Pixi types under a namespace. Type-only imports are not bundled:
 
 ```ts
 import type * as Pixi from "pixi.js";
@@ -88,7 +88,7 @@ This allows for more granular control over these properties directly through JSX
 
 ### Accessing the instance with Refs
 
-Just like when using SolidJS with the DOM we can access the rendered object instance with a `ref`.
+As with SolidJS and the DOM, you can access the rendered object instance with a `ref`.
 In our case this is useful for calling methods on the PixiJS objects or interacting directly with PixiJS in an imperative way.
 
 We can use a variable or a callback function to access refs.
@@ -178,7 +178,7 @@ const App = () => {
 
 ### Omissions
 
-Some PixiJS classes are deliberately omitted because wrapping them in a SolidJS component doesn't add much value:
+Some PixiJS classes are deliberately omitted, because wrapping them in a SolidJS component does not add much value:
 
 - `Particle` — Particles inside a `ParticleContainer` are designed for maximum-performance, high-volume imperative updates. A dedicated SolidJS component for individual particles contradicts that goal. Create and manage particle instances imperatively with a `<ParticleContainer />` as the parent.
 - `MeshGeometry`, `NineSliceGeometry`, `PerspectivePlaneGeometry`, `PlaneGeometry`, `RopeGeometry` — These are low-level geometry classes used when building custom meshes. Create them imperatively with PixiJS and wrap in a custom `pixi-solid` component when needed.

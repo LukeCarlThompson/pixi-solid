@@ -9,7 +9,7 @@ PixiJS `Assets` is not exported by `pixi-solid`. Use PixiJS to load resources, t
 
 ## Load one asset
 
-Solid 2 removed `createResource`. Async is now "any computation that returns a Promise": return one from `createMemo` and read it inside a `<Loading>` boundary, which renders its `fallback` until the read settles. Mount this component under `PixiCanvas` or another application provider:
+Async is "any computation that returns a Promise": return one from `createMemo` and read it inside a `<Loading>` boundary, which renders its `fallback` until the read settles. Mount this component under `PixiCanvas` or another application provider:
 
 ```tsx
 import { createMemo, Loading } from "solid-js";
@@ -130,6 +130,8 @@ function MenuScene() {
 ```
 
 `Assets.init()` resolves to `void` and `Assets.loadBundle()` resolves to the loaded resources. Returning `true` gives `<Show>` a truthy value to render on. The pending read inside `<Loading>` shows the fallback until the memo settles.
+
+A manifest is a gate: the load resolves to `void`, the scene does not enumerate its contents, and each component reads the alias it needs. When a scene needs only a few known assets, return them from the memo and read them directly instead. The read then both waits for the load and supplies the value, so no `<Show>` is needed.
 
 ## Cache keys and ownership
 

@@ -142,7 +142,7 @@ type MyComponentProps = PixiComponentProps<Pixi.SpriteOptions> & {
 };
 ```
 
-Example — forwarding Pixi props while handling custom props with `omit`. Solid 2 removed `splitProps`. `omit` returns a reactive view of the remaining props:
+Example — forwarding Pixi props while handling custom props with `omit`, which returns a reactive view of the remaining props:
 
 ```tsx
 import { omit } from "solid-js";

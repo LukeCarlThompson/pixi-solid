@@ -1,11 +1,11 @@
 ---
 title: Loading Individual Assets
-description: Learn how to load individual assets in your pixi-solid application using Solid.js's createResource.
+description: How to load individual assets in a pixi-solid application with an async memo and a loading boundary.
 sidebar:
   order: 1
 ---
 
-Solid.js's `createResource` function handles asynchronous data loading. Pair it with the PixiJS `Assets` class to load assets.
+Async work is a computation that returns a Promise. Return one from `createMemo` and read it inside a `<Loading>` boundary. Pair it with the PixiJS `Assets` class to load assets.
 
 ### Example: Loading a Single Image
 
@@ -15,30 +15,29 @@ This example loads a single background image for a scene.
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
 import { PixiCanvas, Sprite } from "pixi-solid";
-import { createResource, Show } from "solid-js";
+import { createMemo, Loading } from "solid-js";
 
 export const IndividualAssetLoadingDemo = () => {
-  // Use createResource to load a single asset
-  const [backgroundImage] = createResource(async () => {
-    // Initialize Pixi.js Assets manager if not already done globally
-    await Assets.init();
-    // Load a single asset by its path
+  // Load the texture once. Reading the memo suspends, so the boundary below holds the scene
+  // until the texture arrives.
+  const backgroundImage = createMemo(async () => {
     const texture = await Assets.load<Pixi.Texture>("/background.png");
     return texture;
   });
 
   return (
     <PixiCanvas>
-      {/* Use the <Show> component to render the Sprite only when the asset is loaded */}
-      <Show when={backgroundImage()}>
-        {(texture) => <Sprite texture={texture()} anchor={0.5} position={[400, 300]} scale={0.5} />}
-      </Show>
+      <Loading>
+        <Sprite texture={backgroundImage()} anchor={0.5} position={[400, 300]} scale={0.5} />
+      </Loading>
     </PixiCanvas>
   );
 };
 ```
 
+Because the memo returns the texture, reading it both waits for the load and supplies the value, and no `<Show>` is needed. When a load produces many assets that the scene reads individually, gate it with a boolean instead. See [asset manifests](../asset-manifest).
+
 ### Further reading
 
-- See the [Solid.js `createResource` docs](https://docs.solidjs.com/reference/basic-reactivity/create-resource).
+- See [asset manifests](../asset-manifest) for loading several assets together.
 - See the [PixiJS Assets guide](https://pixijs.com/8.x/guides/components/assets) for details.

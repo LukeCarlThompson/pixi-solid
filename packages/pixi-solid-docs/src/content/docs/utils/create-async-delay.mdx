@@ -1,19 +1,19 @@
 ---
 title: createAsyncDelay
-description: A Solid.js function for creating an async delay function in sync with the Pixi.js Ticker.
+description: A Solid.js function for creating an async delay function in sync with the PixiJS Ticker.
 sidebar:
   order: 4
 ---
 
-The `createAsyncDelay` function provides a way to create an async function that will delay execution for a specified number of milliseconds of ticker time.
+`createAsyncDelay()` returns an async function that delays for a number of milliseconds of ticker time.
 
-It ensures that the delay is in sync with the ticker from the nearest context provider, making it ideal for animations or syncing with other actions based on a common ticker time.
+It keeps the delay in sync with the ticker from the nearest context provider, so animations and other actions share one clock.
 
-You can optionally pass an `AbortSignal` to cancel the delay early, allowing you to interrupt waiting operations when needed.
+Pass an optional `AbortSignal` to cancel the delay early.
 
-This function must be called within a SolidJS tracking scope, such as a component or another function, that is a descendant of `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`.
+Call this function in a SolidJS tracking scope, such as a component, that is a descendant of `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`.
 
-The returned function can be called in an async context.
+The returned function can be called from an async context.
 
 ### Usage
 
@@ -23,7 +23,7 @@ import { PixiCanvas, Text } from "pixi-solid";
 import { createSignal } from "solid-js";
 
 const DelayedActionComponent = () => {
-  // This must be called within a synchronous scope that is inside `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`.
+  // Call this in a synchronous scope inside `PixiApplicationProvider`, `PixiCanvas`, or `TickerProvider`.
   const delay = createAsyncDelay();
   const [isWaiting, setIsWaiting] = createSignal(false);
 

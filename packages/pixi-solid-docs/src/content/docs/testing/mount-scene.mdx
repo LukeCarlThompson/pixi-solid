@@ -6,35 +6,37 @@ sidebar:
 ---
 
 `mountScene()` is for testing **view components** that render a Pixi display object (Sprite, Container, Text, etc.).
-It mounts JSX in a temporary Solid root, resolves it to a real Pixi node, and returns the root Container.
+It mounts JSX in a temporary Solid root, resolves it to a real Pixi node, and returns the root Container with query helpers bound to it.
 
 ```tsx
 type MountSceneResult<TRoot = Pixi.Container> = {
   container: TRoot;
+  getByLabel: (label: string) => Pixi.Container;
+  queryByLabel: (label: string) => Pixi.Container | undefined;
+  getAllByLabel: (label: string) => Pixi.Container[];
   dispose: () => void;
 };
 ```
 
-The returned `container` is the root PixiJS node — no ref callback is needed to access it.
+The returned `container` is the root PixiJS node, so no ref callback is needed to access it. It is a snapshot of the root taken right after mounting. If the scene's root node can be replaced (a `<Loading>` boundary or a `<Show>` at the top level), prefer the bound query helpers, which always read the current root.
 
 ## Basic usage
 
 ```tsx
 import { Container, Sprite } from "pixi-solid";
-import { mountScene, getByLabel } from "pixi-solid/testing";
+import { mountScene } from "pixi-solid/testing";
 
-const { container, dispose } = mountScene(() => (
+const { container, getByLabel, dispose } = mountScene(() => (
   <Container label="scene">
     <Sprite label="player" x={100} />
   </Container>
 ));
 
 // Container is Pixi.Container — directly accessible
-container.x;
+expect(container.label).toBe("scene");
 
-// Query children by label
-const player = getByLabel(container, "player");
-expect(player.x).toBe(100);
+// The bound query helper searches from the current root
+expect(getByLabel("player").x).toBe(100);
 
 dispose();
 ```
@@ -50,38 +52,39 @@ const { container } = mountScene<Pixi.AnimatedSprite>(() => (
 container.playing; // typed as Pixi.AnimatedSprite
 ```
 
+## Providing context
+
+Pass the provider as `options.wrapper`, or use `ctx.mount`, which applies `ctx.Provider` for you. The provider supplies a mock ticker (stopped, manually controlled), renderer, and app:
+
+```tsx
+import { createTestContext } from "pixi-solid/testing";
+import { Container, onTick, Sprite } from "pixi-solid";
+
+const ctx = createTestContext();
+let calls = 0;
+
+const TickerCounter = () => {
+  onTick(() => {
+    calls++;
+  });
+  return <Sprite x={100} />;
+};
+
+ctx.mount(() => (
+  <Container>
+    <TickerCounter />
+  </Container>
+));
+
+// The driver methods are async, so always await them
+await ctx.ticker.fastForwardFrames(5);
+expect(calls).toBe(5);
+```
+
 ## When to use
 
 - Testing view components that render a Pixi display object
 - You need to inspect the rendered scene graph
 - You want to query children by label with `getByLabel` / `queryByLabel`
 
-For testing stores or hooks that don't render a scene, use [`renderHook`](../render-hook) instead.
-
-## With context (onTick, onResize, etc.)
-
-Wrap your component in `createTestContext().Provider` to provide a mock ticker (stopped, manually
-controlled), renderer, and app context:
-
-```tsx
-import { mountScene, createTestContext } from "pixi-solid/testing";
-import { Container, Sprite, onTick } from "pixi-solid";
-
-const ctx = createTestContext();
-let calls = 0;
-
-mountScene(() => (
-  <ctx.Provider>
-    <Container>
-      {onTick(() => {
-        calls++;
-      })}
-      <Sprite x={100} />
-    </Container>
-  </ctx.Provider>
-));
-
-// Advance frames with the manual ticker
-ctx.ticker.fastForwardFrames(5);
-expect(calls).toBe(5);
-```
+For testing stores or hooks that do not render a scene, use [`renderHook`](../render-hook) instead.
