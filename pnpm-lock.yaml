@@ -163,7 +163,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  pixi.js: 8.20.1
+  pixi.js: 8.21.0
   solid-js: 1.9.15
 
 importers:
@@ -204,8 +204,23 @@ importers:
   packages/pixi-solid:
     dependencies:
       pixi.js:
-        specifier: 8.20.1
-        version: 8.20.1
+        specifier: 8.21.0
+        version: 8.21.0
+      solid-js:
+        specifier: 1.9.15
+        version: 1.9.15
+
+  packages/pixi-solid-3d:
+    dependencies:
+      '@pixi/3d':
+        specifier: file:../pixi-3d/pixi-3d-0.1.0-beta.1.tgz
+        version: file:packages/pixi-3d/pixi-3d-0.1.0-beta.1.tgz(pixi.js@8.21.0)
+      pixi-solid:
+        specifier: workspace:*
+        version: link:../pixi-solid
+      pixi.js:
+        specifier: 8.21.0
+        version: 8.21.0
       solid-js:
         specifier: 1.9.15
         version: 1.9.15
@@ -218,18 +233,24 @@ importers:
       '@astrojs/starlight':
         specifier: 0.39.3
         version: 0.39.3(astro@6.4.3(@types/node@25.6.2)(lightningcss@1.33.0)(rollup@4.53.3)(sass-embedded@1.104.1)(sass@1.100.0)(supports-color@8.1.1)(yaml@2.8.2))(supports-color@8.1.1)(typescript@6.0.3)
+      '@pixi/3d':
+        specifier: file:../pixi-3d/pixi-3d-0.1.0-beta.1.tgz
+        version: file:packages/pixi-3d/pixi-3d-0.1.0-beta.1.tgz(pixi.js@8.21.0)
       astro:
         specifier: 6.4.3
         version: 6.4.3(@types/node@25.6.2)(lightningcss@1.33.0)(rollup@4.53.3)(sass-embedded@1.104.1)(sass@1.100.0)(supports-color@8.1.1)(yaml@2.8.2)
       pixi-filters:
         specifier: 6.1.5
-        version: 6.1.5(pixi.js@8.20.1)
+        version: 6.1.5(pixi.js@8.21.0)
       pixi-solid:
         specifier: workspace:*
         version: link:../pixi-solid
+      pixi-solid-3d:
+        specifier: workspace:*
+        version: link:../pixi-solid-3d
       pixi.js:
-        specifier: 8.20.1
-        version: 8.20.1
+        specifier: 8.21.0
+        version: 8.21.0
       sharp:
         specifier: 0.34.5
         version: 0.34.5
@@ -1202,6 +1223,12 @@ packages:
   '@parcel/watcher@2.5.1':
     resolution: {integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==}
     engines: {node: '>= 10.0.0'}
+
+  '@pixi/3d@file:packages/pixi-3d/pixi-3d-0.1.0-beta.1.tgz':
+    resolution: {integrity: sha512-n1+7vNn0rKP6rPm5ygm9ReKuE6Zt4CSvzhDp1UGCS7jzUwOr+Db1AC0Ux1qteXFq8KzHndzFuoGMincRAnFxxA==, tarball: file:packages/pixi-3d/pixi-3d-0.1.0-beta.1.tgz}
+    version: 0.1.0-beta.1
+    peerDependencies:
+      pixi.js: 8.21.0
 
   '@pixi/colord@2.9.6':
     resolution: {integrity: sha512-nezytU2pw587fQstUu1AsJZDVEynjskwOL+kibwcdxsMBFqPsFFNA7xl0ii/gXuDi6M0xj3mfRJj8pBSc2jCfA==}
@@ -2361,6 +2388,9 @@ packages:
     resolution: {integrity: sha512-eRtbOb1N5iyH0tkQDAoQ4Ipsp/5qSR79Dzrz8hEPxRX10RWWR/iQXdoKmBSRCThY1Fh5EhISDtpSc93fpxUniQ==}
     engines: {node: '>=12.13'}
 
+  meshoptimizer@1.3.0:
+    resolution: {integrity: sha512-2oZqMAcEEiCtXWUjIGtZ71oPx1B0ZxYGTqIKsXB1wzWFhleNsCFxQuUJzgCV706bRcwPWtMGf1odmQvAcqKkIw==}
+
   micromark-core-commonmark@2.0.3:
     resolution: {integrity: sha512-RDBrHEMSxVFLg6xvnXmb1Ayr2WzLAWjeSATAoxwKYJV94TeNavgoIdA0a9ytzDSVzBy2YKFK+emCPOEibLeCrg==}
 
@@ -2648,10 +2678,10 @@ packages:
   pixi-filters@6.1.5:
     resolution: {integrity: sha512-Ewb/J+kxAbaNN+0/ATJbglAJG+skGJfh7BIDP3ILIDdD6wWk1p0pGa25pVf1T8hGBOQSUNVAmwwJBwkj+cyLLA==}
     peerDependencies:
-      pixi.js: 8.20.1
+      pixi.js: 8.21.0
 
-  pixi.js@8.20.1:
-    resolution: {integrity: sha512-akLVBMLvQbaEViqsmVraK0Njer1q4Q4lm4iNKuzvBiFrV8q+6/+HluJN3sWIwO663IBeQtUUS/CaXFJZs6ffXQ==}
+  pixi.js@8.21.0:
+    resolution: {integrity: sha512-GJ/KqBtUuWDBPMQu2D0ZHsRCYOcWRjjKrpyC+3jPQI5JTqHMC5dH8l9sSyvoUT4qJidvRzs1fwFWRWceno2Ltw==}
 
   postcss-nested@6.2.0:
     resolution: {integrity: sha512-HQbt28KulC5AJzG+cZtj9kvKB93CFCdLvog1WFLf1D+xmMvPGlBstkpTEZfK5+AN9hfJocyBFCNiqyS48bpgzQ==}
@@ -4379,6 +4409,11 @@ snapshots:
       '@parcel/watcher-win32-x64': 2.5.1
     optional: true
 
+  '@pixi/3d@file:packages/pixi-3d/pixi-3d-0.1.0-beta.1.tgz(pixi.js@8.21.0)':
+    dependencies:
+      meshoptimizer: 1.3.0
+      pixi.js: 8.21.0
+
   '@pixi/colord@2.9.6': {}
 
   '@rolldown/binding-android-arm-eabi@1.2.8':
@@ -5752,6 +5787,8 @@ snapshots:
     dependencies:
       is-what: 4.1.16
 
+  meshoptimizer@1.3.0: {}
+
   micromark-core-commonmark@2.0.3:
     dependencies:
       decode-named-character-reference: 1.2.0
@@ -6219,12 +6256,12 @@ snapshots:
 
   picomatch@4.0.7: {}
 
-  pixi-filters@6.1.5(pixi.js@8.20.1):
+  pixi-filters@6.1.5(pixi.js@8.21.0):
     dependencies:
       '@types/gradient-parser': 0.1.5
-      pixi.js: 8.20.1
+      pixi.js: 8.21.0
 
-  pixi.js@8.20.1:
+  pixi.js@8.21.0:
     dependencies:
       '@pixi/colord': 2.9.6
       '@types/earcut': 3.0.0

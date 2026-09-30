@@ -1,0 +1,116 @@
+---
+title: Meshes and Materials
+description: Creating 3D geometries and PBR materials in pixi-solid-3d with automated GPU resource lifecycle management.
+---
+
+`pixi-solid-3d` provides `<Mesh3D>` to render 3D geometry combined with materials.
+
+In 3D rendering engines like PixiJS 3D, GPU resources (buffers, textures, and shader pipeline descriptors) are expensive to allocate. `pixi-solid-3d` gives you two ways to work with geometries and materials:
+
+1. **Declarative Nested Components** _(Recommended for component-scoped resources)_: Full reactive property bindings with **automatic GPU disposal** on unmount.
+2. **Instantiated Object Props** _(Recommended for shared / global resources)_: Pass pre-created class instances where **you retain ownership** and manage lifecycle.
+
+---
+
+### 1. Declarative Nested Components (Automatic Disposal)
+
+When geometries and materials are placed as direct JSX children of `<Mesh3D>`, `pixi-solid-3d` manages their lifecycle for you. When the component unmounts or conditionally swaps, it calls `.destroy()` automatically.
+
+Furthermore, updating properties like `roughness`, `metallic`, or `baseColor` updates the existing GPU material directly with zero allocations.
+
+```tsx
+import { Mesh3D, CubeGeometry, Material3D } from "pixi-solid-3d";
+import { createSignal } from "solid-js";
+
+export const InteractiveCube = () => {
+  const [roughness, setRoughness] = createSignal(0.2);
+  const [color, setColor] = createSignal("#38bdf8");
+
+  return (
+    <Mesh3D x={0} y={1} z={0} castShadow={true} receiveShadow={true}>
+      <CubeGeometry width={1.5} height={1.5} depth={1.5} />
+      <Material3D baseColor={color()} roughness={roughness()} metallic={0.1} />
+    </Mesh3D>
+  );
+};
+```
+
+#### Conditional Swapping with `<Show>` or `<Switch>`
+
+You can conditionally swap materials or geometries using standard SolidJS primitives. When the condition flips, the old material is automatically destroyed, and the new one takes its place:
+
+```tsx
+<Mesh3D>
+  <CubeGeometry width={2} />
+  <Show when={isHovered()} fallback={<Material3D baseColor="#38bdf8" roughness={0.5} />}>
+    <Material3D baseColor="#ff4f4c" roughness={0.1} />
+  </Show>
+</Mesh3D>
+```
+
+---
+
+### 2. Instantiated Object Props (Resource Sharing)
+
+If you have a geometry or material that is **shared across hundreds of meshes** (e.g., enemy particles, terrain tiles, or trees in a forest), you should create a single instance outside the component tree and pass it as a prop.
+
+When passed as a prop, `pixi-solid-3d` treats it as **user-owned** and will **never** destroy it when an individual mesh unmounts:
+
+```tsx
+import { Mesh3D } from "pixi-solid-3d";
+import { SphereGeometry, Material3D } from "@pixi/3d";
+import { For } from "solid-js";
+
+// Instantiated once at module level (shared GPU memory across all instances)
+const SHARED_SPHERE = new SphereGeometry({ radius: 0.5 });
+const ENEMY_MATERIAL = new Material3D({ baseColor: "#ef4444", roughness: 0.3 });
+
+export const EnemySwarm = (props: {
+  enemies: Array<{ id: string; x: number; y: number; z: number }>;
+}) => {
+  return (
+    <For each={props.enemies}>
+      {(enemy) => (
+        // When an individual enemy unmounts, SHARED_SPHERE and ENEMY_MATERIAL remain alive!
+        <Mesh3D
+          x={enemy.x}
+          y={enemy.y}
+          z={enemy.z}
+          geometry={SHARED_SPHERE}
+          material={ENEMY_MATERIAL}
+        />
+      )}
+    </For>
+  );
+};
+```
+
+---
+
+### Summary of Lifecycles
+
+| Usage Pattern        | Syntax                                            | Who Owns Cleanup?    | When is it Destroyed?                       |
+| -------------------- | ------------------------------------------------- | -------------------- | ------------------------------------------- |
+| **Nested JSX Child** | `<Mesh3D><CubeGeometry /><Material3D /></Mesh3D>` | `pixi-solid-3d`      | Automatically on unmount / condition change |
+| **Direct Prop**      | `<Mesh3D geometry={geom} material={mat} />`       | Caller / Application | When caller manually calls `geom.destroy()` |
+
+---
+
+### Available Declarative Geometries
+
+- `<CubeGeometry width={...} height={...} depth={...} />`
+- `<SphereGeometry radius={...} segments={...} />`
+- `<PlaneGeometry width={...} depth={...} />`
+- `<CylinderGeometry radiusTop={...} radiusBottom={...} height={...} />`
+- `<ConeGeometry radius={...} height={...} />`
+- `<CapsuleGeometry radius={...} length={...} />`
+- `<TorusGeometry radius={...} tube={...} />`
+- `<TorusKnotGeometry radius={...} tube={...} />`
+- `<IcosahedronGeometry radius={...} />`
+
+### Available Declarative Materials
+
+- `<Material3D baseColor={...} roughness={...} metallic={...} normalMap={...} />` — PBR metallic-roughness material.
+- `<FlatMaterial baseColor={...} texture={...} />` — Unlit flat color or texture.
+- `<PhongMaterial baseColor={...} specular={...} shininess={...} />` — Classic Blinn-Phong material.
+- `<ParticleMaterial />` — Lightweight material for 3D particle systems.

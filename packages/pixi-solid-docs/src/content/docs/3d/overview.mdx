@@ -1,0 +1,32 @@
+---
+title: 3D Overview (Beta)
+description: Getting started with 3D in pixi-solid using @pixi/3d.
+---
+
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/view-3d.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
+`pixi-solid-3d` extends `pixi-solid` with declarative SolidJS components for PixiJS 3D scenes powered by `@pixi/3d`.
+
+### How 3D works in PixiJS
+
+In PixiJS v8, 3D scenes are hosted inside a 2D viewport container called `View3D`.
+
+- `<View3D>` is a 2D PixiJS display node that you can place inside `<PixiCanvas>` or anywhere in your 2D scene graph.
+- Children placed inside `<View3D>` are automatically attached to its 3D root (`view.root`, a `Container3D`).
+- Inside the 3D scene, you can place 3D containers (`<Container3D>`), meshes (`<Mesh3D>`), models (`<Model3D>`), lights (`<DirectionalLight>`, `<PointLight>`, `<AmbientLight>`), and interactive camera controls (`<OrbitCamera>`).
+
+### Interactive Demo
+
+<ClientOnly fileName="view-3d" client:load />
+
+### Code Example
+
+<Code code={demoCode} lang="tsx" title="demo-3d.tsx" />
+
+### Installation
+
+```bash
+pnpm add pixi-solid-3d @pixi/3d pixi-solid pixi.js solid-js
+```

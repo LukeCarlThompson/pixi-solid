@@ -1,0 +1,49 @@
+{
+  "name": "pixi-solid-3d",
+  "version": "0.1.0-alpha.0",
+  "private": false,
+  "description": "3D components and utilities for writing PixiJS 3D applications with SolidJS",
+  "homepage": "https://lukecarlthompson.github.io/pixi-solid/",
+  "license": "MIT",
+  "author": "Luke Thompson",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LukeCarlThompson/pixi-solid"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "browser": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./utils": {
+      "browser": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js"
+    }
+  },
+  "scripts": {
+    "build": "vite build && tsc --project tsconfig.build.json --emitDeclarationOnly",
+    "prepublishOnly": "pnpm run build",
+    "prepack": "node -e \"require('fs').existsSync('dist/index.js') || (console.error('ERROR: dist/index.js not found') && process.exit(1))\"",
+    "test": "vitest --run",
+    "typecheck": "tsc --project tsconfig.test.json --noEmit"
+  },
+  "dependencies": {
+    "@pixi/3d": "file:../pixi-3d/pixi-3d-0.1.0-beta.1.tgz",
+    "pixi-solid": "workspace:*"
+  },
+  "peerDependencies": {
+    "@pixi/3d": ">=0.1.0-beta.1 <1",
+    "pixi-solid": "workspace:*",
+    "pixi.js": ">=8.20.1 <9",
+    "solid-js": ">=1.9.10 <2"
+  }
+}

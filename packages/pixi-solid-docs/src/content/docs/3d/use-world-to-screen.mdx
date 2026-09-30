@@ -1,0 +1,76 @@
+---
+title: useWorldToScreen
+description: Reactively project 3D world coordinates to 2D screen coordinates for overlays and UI.
+---
+
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/world-to-screen.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
+`useWorldToScreen` is a reactive SolidJS hook that takes a 3D object or coordinate and returns a reactive 2D screen position `{ x, y, visible }` synchronized to the contextual Pixi ticker.
+
+This makes attaching 2D HUD elements (health bars, name tags, targeting reticles, indicators) over 3D scene objects effortless and fully declarative.
+
+### Interactive Demo
+
+Notice how the 2D label tag stays locked above the rotating and oscillating 3D cube, even as you rotate and zoom the scene with `<OrbitCamera>`:
+
+<ClientOnly fileName="world-to-screen" client:load />
+
+### Code Example
+
+<Code code={demoCode} lang="tsx" title="world-to-screen.demo.tsx" />
+
+### Usage with View3DProvider
+
+When rendering 2D overlays alongside a `<View3D>` viewport, wrap both the 3D viewport and your 2D HUD components in a `<View3DProvider>`:
+
+```tsx
+import { useWorldToScreen, View3D, View3DProvider, Mesh3D } from "pixi-solid-3d";
+import { Show } from "solid-js";
+import { Container, Text } from "pixi-solid";
+
+export const GameScene = () => {
+  let characterMesh: any;
+
+  return (
+    <View3DProvider>
+      {/* 3D Viewport */}
+      <View3D width={800} height={600}>
+        <Mesh3D ref={(m) => (characterMesh = m)} ... />
+      </View3D>
+
+      {/* Sibling 2D Overlay HUD */}
+      <PlayerHUD target={() => characterMesh} />
+    </View3DProvider>
+  );
+};
+
+const PlayerHUD = (props: { target: () => any }) => {
+  // Automatically resolves from the parent <View3DProvider> without refs or props!
+  const screenPos = useWorldToScreen(props.target);
+
+  return (
+    <Show when={screenPos().visible}>
+      <Container x={screenPos().x} y={screenPos().y - 40}>
+        <Text text="Player Name" />
+      </Container>
+    </Show>
+  );
+};
+```
+
+### Options
+
+| Parameter      | Type                                          | Description                                                                        |
+| -------------- | --------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `target`       | `Container3D \| PointData3D \| Accessor<...>` | The 3D container or coordinate to project                                          |
+| `options.view` | `View3D`                                      | Optional explicit `View3D` instance. Defaults to the ambient `useView3D()` context |
+
+### Return Value
+
+Returns an Accessor to an object with:
+
+- `x: number` — 2D screen horizontal coordinate.
+- `y: number` — 2D screen vertical coordinate.
+- `visible: boolean` — `false` if the 3D position is behind the camera frustum, `true` when in front.

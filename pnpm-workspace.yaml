@@ -6,9 +6,9 @@ allowBuilds:
   esbuild: true
   sharp: true
 minimumReleaseAgeExclude:
-  - '@vitest/mocker@5.0.1'
-  - '@vitest/spy@5.0.1'
+  - "@vitest/mocker@5.0.1"
+  - "@vitest/spy@5.0.1"
   - vitest@5.0.1
 overrides:
-  pixi.js: 8.20.1
+  pixi.js: 8.21.0
   solid-js: 1.9.15

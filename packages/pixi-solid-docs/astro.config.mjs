@@ -55,6 +55,10 @@ export default defineConfig({
           label: "Testing",
           items: [{ autogenerate: { directory: "testing" } }],
         },
+        {
+          label: "3D (Beta)",
+          items: [{ autogenerate: { directory: "3d" } }],
+        },
       ],
     }),
     solidJs(),

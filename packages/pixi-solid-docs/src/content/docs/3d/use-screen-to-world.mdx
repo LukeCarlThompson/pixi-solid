@@ -1,0 +1,48 @@
+---
+title: useScreenToWorld
+description: Reactively unproject 2D screen coordinates into 3D world space against a plane or ray distance.
+---
+
+`useScreenToWorld` is a reactive SolidJS hook that takes a 2D screen coordinate (such as mouse cursor or touch point) and unprojects it into 3D world space against a given 3D `Plane` (like a floor or wall) or along the camera ray.
+
+### Usage
+
+```tsx
+import { createSignal, Show } from "solid-js";
+import { Plane, Vector3 } from "@pixi/3d";
+import { useScreenToWorld, Mesh3D } from "pixi-solid-3d";
+
+export const GroundReticle = () => {
+  const [screenPos, setScreenPos] = createSignal({ x: 400, y: 300 });
+  const groundPlane = new Plane(new Vector3(0, 1, 0), 0); // y = 0
+
+  // Reactively unprojects screen coordinates onto the 3D ground plane
+  const worldPos = useScreenToWorld(screenPos, groundPlane);
+
+  return (
+    <Show when={worldPos()}>
+      {(pos) => (
+        <Mesh3D
+          x={pos().x}
+          y={pos().y}
+          z={pos().z}
+          geometry={circleGeometry}
+          material={reticleMaterial}
+        />
+      )}
+    </Show>
+  );
+};
+```
+
+### Options
+
+| Parameter      | Type                               | Description                                                                     |
+| -------------- | ---------------------------------- | ------------------------------------------------------------------------------- |
+| `screenPoint`  | `PointData \| Accessor<PointData>` | The 2D screen position to unproject                                             |
+| `target`       | `Plane \| number \| Accessor<...>` | A 3D `Plane` to intersect with, or a number representing distance along the ray |
+| `options.view` | `View3D`                           | Optional explicit `View3D` instance. Defaults to ambient `useView3D()`          |
+
+### Return Value
+
+Returns an Accessor to `{ x: number, y: number, z: number } | null`. Returns `null` if the ray misses or is parallel to the target plane.

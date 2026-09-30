@@ -13,9 +13,11 @@
   "dependencies": {
     "@astrojs/solid-js": "6.0.1",
     "@astrojs/starlight": "0.39.3",
+    "@pixi/3d": "file:../pixi-3d/pixi-3d-0.1.0-beta.1.tgz",
     "astro": "6.4.3",
     "pixi-filters": "6.1.5",
     "pixi-solid": "workspace:*",
+    "pixi-solid-3d": "workspace:*",
     "pixi.js": "*",
     "sharp": "0.34.5",
     "solid-js": "*"

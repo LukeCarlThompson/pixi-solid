@@ -1,0 +1,45 @@
+---
+title: Lighting and Cameras
+description: Setting up 3D lights and camera controllers in pixi-solid-3d.
+---
+
+### Lights
+
+`pixi-solid-3d` exports reactive light components:
+
+- `<AmbientLight intensity={0.5} color={0xffffff} />`
+- `<DirectionalLight intensity={2} color={0xffffff} castShadow={true} lookAt={{ x: 0, y: 0, z: 0 }} />`
+- `<PointLight intensity={5} distance={20} color={0xffaa00} />`
+- `<SpotLight intensity={10} angle={Math.PI / 4} castShadow={true} lookAt={{ x: 0, y: 0, z: 0 }} />`
+
+All lights and containers support the reactive `lookAt` prop as well as individual axis props (`lookAtX`, `lookAtY`, `lookAtZ`) to orient their forward axis toward a 3D coordinate target with fine-grained reactivity.
+
+### Cameras and Controls
+
+`<View3D>` creates a default `Camera3D` automatically. You can also customize or position it, or add `<OrbitCamera>` to enable mouse and touch orbit controls:
+
+```tsx
+import { View3D, OrbitCamera, AmbientLight, DirectionalLight, Container3D } from "pixi-solid-3d";
+
+export const SceneWithOrbit = () => {
+  return (
+    <View3D
+      width={800}
+      height={600}
+      ref={(view) => {
+        view.camera.position.set(0, 5, 10);
+        view.camera.lookAt({ x: 0, y: 0, z: 0 });
+      }}
+    >
+      <OrbitCamera
+        enableDamping={true}
+        minDistance={2}
+        maxDistance={50}
+        target={{ x: 0, y: 0, z: 0 }}
+      />
+      <AmbientLight intensity={0.3} />
+      <DirectionalLight intensity={2} x={5} y={10} z={5} castShadow={true} />
+    </View3D>
+  );
+};
+```

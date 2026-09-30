@@ -1,0 +1,44 @@
+---
+title: Loading 3D Models
+description: Loading glTF and GLB models with Assets.load and rendering them using Model3D in pixi-solid-3d.
+---
+
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/model-3d.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
+`pixi-solid-3d` provides the `<Model3D>` component to instantiate and render 3D scenes loaded from standard **glTF** and **GLB** files.
+
+### How Model Loading Works
+
+1. Load your `.gltf` or `.glb` file using PixiJS's `Assets.load<Scene3DSource>()`.
+2. Wrap the loader with SolidJS's `createResource` to handle the asynchronous loading state reactively.
+3. Pass the resulting `source` to `<Model3D source={source()} />`.
+
+Multiple `<Model3D>` instances can share the exact same `Scene3DSource` without duplicating GPU textures or geometry buffers.
+
+### Interactive Demo
+
+Here is a 3D Knight model loaded from a `.glb` file, rendered with directional and spot lighting. Click and drag across the canvas to smoothly rotate the character to face your pointer:
+
+<ClientOnly fileName="model-3d" client:load />
+
+### Code Example
+
+<Code code={demoCode} lang="tsx" title="model-3d.demo.tsx" />
+
+### Instantiating Named Scenes
+
+If your glTF file contains multiple scenes, specify which one to instantiate using the `scene` prop:
+
+```tsx
+<Model3D source={source()} scene="Showroom" />
+```
+
+### Shadows and Transforms
+
+`<Model3D>` supports the full set of 3D transform props (`x`, `y`, `z`, `scale`, `rotation`, etc.) and shadow options:
+
+```tsx
+<Model3D source={source()} x={0} y={0} z={-5} scale={1.5} castShadow={true} receiveShadow={true} />
+```
