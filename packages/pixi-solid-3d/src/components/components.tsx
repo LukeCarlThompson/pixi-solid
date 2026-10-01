@@ -45,9 +45,14 @@ export type Mesh3DComponentProps = Leaf3DProps<PixiMesh3D> &
     children?: JSX.Element;
   };
 export type Model3DComponentProps = Container3DProps<PixiModel3D> &
-  Omit<Pixi3D.Model3DOptions, "children">;
+  Omit<Pixi3D.Model3DOptions, "children"> & {
+    traverse?: (node: Pixi3D.Container3D) => void;
+  };
 export type Sprite3DComponentProps = Leaf3DProps<PixiSprite3D> &
   Omit<Pixi3D.Sprite3DOptions, "children">;
+
+import { traverse3D } from "../utils/traverse-3d";
+
 import { Mesh3DContext } from "./mesh-3d-context";
 import { useView3D } from "./view-3d-context";
 
@@ -145,12 +150,15 @@ export const Mesh3D: PixiComponent3D<Mesh3DComponentProps, PixiMesh3D> = (props)
   ) as PixiMesh3D & JSX.Element;
 };
 
+const MODEL_3D_RUNTIME_KEYS = [...CONTAINER3D_RUNTIME_KEYS, "traverse"] as const;
+
 /**
  * A SolidJS component that renders a `Model3D` from an asset source.
  * Synchronizes animation playback with the scoped Pixi.Ticker from context.
+ * Supports a `traverse` prop to inspect or customize child meshes/nodes on mount.
  */
 export const Model3D: PixiComponent3D<Model3DComponentProps, PixiModel3D> = (props) => {
-  const [runtimeProps, initialisationProps] = splitProps(props, CONTAINER3D_RUNTIME_KEYS);
+  const [runtimeProps, initialisationProps] = splitProps(props, MODEL_3D_RUNTIME_KEYS);
 
   const isUserOwnedInstance = runtimeProps.as !== undefined;
   // Initialize with autoUpdate: false so Pixi's AnimationPlayer does not bind to global Ticker.shared
@@ -189,8 +197,17 @@ export const Model3D: PixiComponent3D<Model3DComponentProps, PixiModel3D> = (pro
     );
   }
 
+  // Reactive traverse callback to customize model subtrees
+  createRenderEffect(() => {
+    const fn = (props as any).traverse;
+    if (typeof fn === "function") {
+      traverse3D(instance, fn);
+    }
+  });
+
   bindInitialisationProps3D(instance, initialisationProps);
-  bindRuntimeProps3D(instance, runtimeProps as any);
+  const [, runtimeWithoutTraverse] = splitProps(runtimeProps, ["traverse"]);
+  bindRuntimeProps3D(instance, runtimeWithoutTraverse as any);
 
   onCleanup(() => {
     if (isUserOwnedInstance) return;

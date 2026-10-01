@@ -16,7 +16,9 @@
     "LICENSE"
   ],
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/index.js"
+  ],
   "exports": {
     ".": {
       "browser": "./dist/index.js",

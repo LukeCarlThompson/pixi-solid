@@ -3,7 +3,7 @@ title: 3D Overview (Beta)
 description: Getting started with 3D in pixi-solid using @pixi/3d.
 ---
 
-import { Code } from "@astrojs/starlight/components";
+import { Code, Aside } from "@astrojs/starlight/components";
 import demoCode from "../../demos/view-3d.demo.tsx?raw";
 import { ClientOnly } from "../../demos/client-only";
 
@@ -25,8 +25,57 @@ In PixiJS v8, 3D scenes are hosted inside a 2D viewport container called `View3D
 
 <Code code={demoCode} lang="tsx" title="demo-3d.tsx" />
 
+### Viewport ownership
+
+A `View3D` can only be a 2D display node, so it cannot also contain 2D siblings. To render 2D HUD
+or UI elements on top of the 3D scene, those elements must be mounted _beside_ the viewport and
+share its `View3D` instance. `<View3DProvider>` does exactly that: it **creates and owns** the
+`View3D` and shares it through context, and a `<View3D>` beneath it mounts that instance into the
+2D scene graph.
+
+```tsx
+<View3DProvider width={800} height={600} toneMapping="aces">
+  {/* Mounts the provider-owned View3D and holds the 3D scene */}
+  <View3D>
+    <Camera3D z={6} />
+    <Mesh3D geometry={geometry} material={material} />
+  </View3D>
+
+  {/* 2D sibling — resolves the same View3D from context */}
+  <HealthBar />
+</View3DProvider>
+```
+
+Both `<View3D>` and `<View3DProvider>` resolve their instance the same way:
+
+| Case                                 | Who creates the `View3D` | Who destroys it    |
+| ------------------------------------ | ------------------------ | ------------------ |
+| `<View3D>` on its own                | `<View3D>`               | `<View3D>`         |
+| `<View3DProvider>` on its own        | `<View3DProvider>`       | `<View3DProvider>` |
+| `<View3DProvider as={view}>`         | you                      | nothing            |
+| `<View3D as={view}>`                 | you                      | nothing            |
+| `<View3D>` inside `<View3DProvider>` | the provider             | the provider       |
+
+Because the provider owns the instance, every `View3DOptions` prop belongs on the provider rather
+than on the `<View3D>` that mounts it. In development, passing options to a `<View3D>` inside a
+`<View3DProvider>` logs a warning telling you to move them up. Use `as` on the _provider_ to adopt
+a `View3D` you created yourself; combining `as` with a provider throws. For multiple viewports
+(split-screen, minimap PIP), use one provider per viewport.
+
 ### Installation
 
 ```bash
 pnpm add pixi-solid-3d @pixi/3d pixi-solid pixi.js solid-js
 ```
+
+<Aside type="caution" title="Bundle size: @pixi/3d is not tree-shakeable">
+  `pixi-solid-3d` is an all-or-nothing dependency on `@pixi/3d`. Importing **any** component
+  pulls in the entire 3D engine — measured at 346 modules / 504 KB minified / 150 KB gzip for a
+  single `import { Mesh3D } from "@pixi/3d"`. There is no supported way to import a subset:
+  `@pixi/3d` only exposes `.`, `./extras`, `./webgl`, and `./webgpu`, so deep paths such as
+  `@pixi/3d/dist/scene/Mesh3D.mjs` fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`.
+
+If your app does not use 3D, do not install `pixi-solid-3d`. The 2D `pixi-solid` package has
+no dependency on `@pixi/3d`.
+
+</Aside>

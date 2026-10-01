@@ -35,13 +35,22 @@ export const GroundReticle = () => {
 };
 ```
 
-### Options
+### Parameters
 
-| Parameter      | Type                               | Description                                                                     |
-| -------------- | ---------------------------------- | ------------------------------------------------------------------------------- |
-| `screenPoint`  | `PointData \| Accessor<PointData>` | The 2D screen position to unproject                                             |
-| `target`       | `Plane \| number \| Accessor<...>` | A 3D `Plane` to intersect with, or a number representing distance along the ray |
-| `options.view` | `View3D`                           | Optional explicit `View3D` instance. Defaults to ambient `useView3D()`          |
+| Parameter     | Type                               | Description                                                                     |
+| ------------- | ---------------------------------- | ------------------------------------------------------------------------------- |
+| `screenPoint` | `PointData \| Accessor<PointData>` | The 2D screen position to unproject                                             |
+| `target`      | `Plane \| number \| Accessor<...>` | A 3D `Plane` to intersect with, or a number representing distance along the ray |
+
+### Context requirement
+
+`useScreenToWorld` reads the ambient `View3DContext`. Call it inside `<View3D>`, or anywhere within a `<View3DProvider>` (including sibling 2D overlays). Calling it outside both throws:
+
+```text
+useScreenToWorld must be used within a <View3D>, <View3DProvider>, or a component mounted inside one.
+```
+
+`<View3DProvider>` creates the `View3D` up front, so the hook always has an instance to unproject through. The result becomes meaningful once the scene is built and the camera is in the graph, which happens during the first tick after mount.
 
 ### Return Value
 

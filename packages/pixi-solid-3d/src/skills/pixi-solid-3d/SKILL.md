@@ -15,7 +15,40 @@ In PixiJS v8:
 
 - `<View3D>` is a 2D viewport component placed inside `<PixiCanvas>` (or any 2D container).
 - Children of `<View3D>` are mounted into its 3D root (`view.root`, a `Container3D`).
-- `<View3D>` provides `View3DContext` so nested components and hooks (`useView3D()`) access the 3D viewport, active camera, tone mapping, and coordinate projections.
+- `<View3DProvider>` **creates and owns** a `View3D` and shares it through `View3DContext`. A `<View3D>` beneath a provider mounts that same instance instead of creating one; with no provider, `<View3D>` creates and owns its own.
+- Use `<View3DProvider>` when 2D components must sit _beside_ the viewport (overlays, HUDs) — a `View3D` is a 2D display node and cannot contain 2D siblings.
+- Because the provider owns the instance, `View3DOptions` (`width`, `height`, `toneMapping`, `environment`, `root`, ...) belong on `<View3DProvider>`, not on the `<View3D>` that mounts it. Passing options to a provider-owned `<View3D>` logs a DEV warning.
+- Ownership: `<View3D>` / `<View3DProvider>` destroy the view they created; `as={view}` opts out, and combining `as` with a provider throws.
+- `useView3D`, `useWorldToScreen`, and `useScreenToWorld` all read that context and throw if called outside a `<View3D>` or `<View3DProvider>`.
+
+```tsx
+// Shared viewport: 3D scene plus sibling 2D overlay
+<View3DProvider width={800} height={600} toneMapping="aces">
+  <View3D>
+    <Camera3D z={6} />
+    <Mesh3D geometry={geometry} material={material} />
+  </View3D>
+  <HealthBar /> {/* same View3D, no ref passing */}
+</View3DProvider>
+
+// Standalone viewport: <View3D> creates and owns the View3D
+<View3D width={800} height={600}>
+  <Camera3D z={6} />
+</View3D>
+```
+
+## Import cost
+
+`pixi-solid-3d` is an **all-or-nothing dependency on `@pixi/3d`**. Importing any single
+component pulls the whole 3D engine (346 modules, 504 KB minified, 150 KB gzip for one
+`Mesh3D` import). `@pixi/3d`'s entry side-effect-imports every subsystem barrel plus an `init`
+module that mutates Pixi's global extension registries, so bundlers cannot tree-shake it.
+
+Do not attempt deep imports like `@pixi/3d/dist/scene/Mesh3D.mjs` — `@pixi/3d` exposes only
+`.`, `./extras`, `./webgl`, and `./webgpu`, and the shipped `dist` contains circular imports
+that make filesystem-path imports order-dependent.
+
+Tell users who do not need 3D to install `pixi-solid` alone; it has no `@pixi/3d` dependency.
 
 ## Getting started
 
@@ -89,11 +122,13 @@ function Character() {
 
 ## Public API Checklist
 
-| Area                   | Exports                                                                                            | Description                                                     |
-| ---------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| **Viewport & Context** | `<View3D>`, `useView3D`, `View3DContext`                                                           | 2D/3D bridge container and accessor hook                        |
-| **Scene Nodes**        | `<Container3D>`, `<Mesh3D>`, `<Model3D>`, `<Sprite3D>`, `<BatchedMesh3D>`, `<ParticleContainer3D>` | 3D transform nodes                                              |
-| **Cameras & Controls** | `<Camera3D>`, `<OrbitCamera>`                                                                      | Perspective/orthographic cameras and interactive orbit controls |
-| **Lighting**           | `<DirectionalLight>`, `<PointLight>`, `<AmbientLight>`, `<SpotLight>`                              | Real-time scene lights                                          |
-| **Utils**              | `useWorldToScreen`, `useScreenToWorld`                                                             | Reactive 3D-to-2D and 2D-to-3D projection utilities             |
-| **Testing**            | Import directly from `pixi-solid/testing` (`mountScene`, `getByLabel`, `cleanup`)                  | Headless testing utilities                                      |
+| Area                   | Exports                                                                                                                  | Description                                                    |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| **Viewport & Context** | `<View3D>`, `View3DProvider`, `useView3D`, `useWorldToScreen`, `useScreenToWorld`                                        | 2D/3D bridge container, context accessor, and projection hooks |
+| **Scene Nodes**        | `<Container3D>`, `<Mesh3D>`, `<Model3D>`, `<Sprite3D>`, `<BatchedMesh3D>`, `<ParticleContainer3D>`, `<ParticleSystem3D>` | 3D transform nodes & GPU particles                             |
+| **Cameras & Controls** | `<Camera3D>`, `<OrbitCamera>`, `<FPSCamera>`                                                                             | Perspective/orthographic cameras, orbit and FPS controls       |
+| **Materials**          | `<Material3D>`, `<FlatMaterial>`, `<PhongMaterial>`, `<ToonMaterial>`                                                    | Declarative materials with auto-disposal                       |
+| **Geometries**         | `<CubeGeometry>`, `<SphereGeometry>`, `<PlaneGeometry>`, `<CylinderGeometry>`, etc.                                      | Declarative shapes with auto-disposal                          |
+| **Lighting**           | `<DirectionalLight>`, `<PointLight>`, `<AmbientLight>`, `<SpotLight>`                                                    | Real-time scene lights                                         |
+| **Utils**              | `traverse3D`                                                                                                             | Depth-first 3D scene traversal                                 |
+| **Testing**            | Import directly from `pixi-solid/testing` (`mountScene`, `getByLabel`, `cleanup`)                                        | Headless testing utilities                                     |

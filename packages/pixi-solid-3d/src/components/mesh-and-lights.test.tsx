@@ -4,7 +4,7 @@ import { cleanup, mountScene } from "pixi-solid/testing";
 import { createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { Mesh3D, DirectionalLight, CubeGeometry, Material3D } from "../components";
+import { Mesh3D, DirectionalLight, CubeGeometry, Material3D, ToonMaterial } from "../components";
 
 describe("Mesh3D and Lights", () => {
   it("mounts Mesh3D with geometry and material", () => {
@@ -120,6 +120,27 @@ describe("Mesh3D and Lights", () => {
     // Unmount and verify automatic disposal
     cleanup();
     expect(capturedGeom._destroyed).toBe(true);
+    expect(capturedMat.destroyed).toBe(true);
+  });
+
+  it("supports declarative ToonMaterial", () => {
+    let capturedMat: any;
+    const [bands, setBands] = createSignal(3);
+
+    mountScene<Pixi3D.Mesh3D>(() => (
+      <Mesh3D>
+        <CubeGeometry />
+        <ToonMaterial ref={(m) => (capturedMat = m)} bands={bands()} outline={true} />
+      </Mesh3D>
+    ));
+
+    expect(capturedMat).toBeDefined();
+    expect(capturedMat.data.bands).toBe(3);
+
+    setBands(5);
+    expect(capturedMat.data.bands).toBe(5);
+
+    cleanup();
     expect(capturedMat.destroyed).toBe(true);
   });
 });

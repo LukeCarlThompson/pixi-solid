@@ -7,13 +7,14 @@ import {
   FlatMaterial as PixiFlatMaterial,
   IcosahedronGeometry as PixiIcosahedronGeometry,
   Material3D as PixiMaterial3D,
-  ParticleMaterial as PixiParticleMaterial,
   PhongMaterial as PixiPhongMaterial,
   PlaneGeometry as PixiPlaneGeometry,
   SphereGeometry as PixiSphereGeometry,
   TorusGeometry as PixiTorusGeometry,
   TorusKnotGeometry as PixiTorusKnotGeometry,
 } from "@pixi/3d";
+import type * as Pixi3DExtras from "@pixi/3d/extras";
+import { ToonMaterial as PixiToonMaterial } from "@pixi/3d/extras";
 import { createRenderEffect, on, onCleanup, splitProps, type Component, type Ref } from "solid-js";
 
 import { useMesh3D } from "./mesh-3d-context";
@@ -89,8 +90,12 @@ export const createMaterial3DComponent = <
         on(
           () => (props as any)[key],
           (nextVal) => {
-            if (nextVal !== undefined && key in material) {
-              (material as any)[key] = nextVal;
+            if (nextVal !== undefined) {
+              if (key in material) {
+                (material as any)[key] = nextVal;
+              } else if (material.data && key in material.data) {
+                material.data[key] = nextVal;
+              }
             }
           },
           { defer: true },
@@ -183,8 +188,8 @@ export const PhongMaterial: Component<
   PixiPhongMaterial,
 );
 
-export const ParticleMaterial: Component<
-  Partial<Pixi3D.ParticleMaterialOptions> & ResourceRefProps<PixiParticleMaterial>
-> = createMaterial3DComponent<PixiParticleMaterial, Partial<Pixi3D.ParticleMaterialOptions>>(
-  PixiParticleMaterial,
+export const ToonMaterial: Component<
+  Partial<Pixi3DExtras.ToonMaterialOptions> & ResourceRefProps<PixiToonMaterial>
+> = createMaterial3DComponent<PixiToonMaterial, Partial<Pixi3DExtras.ToonMaterialOptions>>(
+  PixiToonMaterial,
 );

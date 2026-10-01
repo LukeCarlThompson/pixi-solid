@@ -1,0 +1,67 @@
+---
+title: 3D Particle System
+description: Rendering high-performance GPU particle effects with ParticleSystem3D in pixi-solid-3d.
+---
+
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/particle-system-3d.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
+`pixi-solid-3d` provides the `<ParticleSystem3D>` component for rendering high-performance GPU-instanced particle effects like fire, sparks, smoke plumes, rain, dust, and explosions.
+
+### Why `<ParticleSystem3D>` in SolidJS?
+
+In `@pixi/3d`, `ParticleSystem3D` defaults to binding its simulation step to Pixi's global `Ticker.shared`.
+
+`<ParticleSystem3D>`:
+
+1. **Context Ticker Synchronization**: Automatically synchronizes particle simulation with the nearest contextual Pixi ticker (from `<PixiCanvas>`, `<PixiApplicationProvider>`, or `<TickerProvider>`) instead of global timers.
+2. **Fine-Grained Reactivity**: Reactive props (`emitRate`, `gravity`, `drag`, `playing`, `frameRate`) update live emitters without tearing down GPU buffers.
+3. **Automated Lifecycle**: When the component unmounts, particle GPU buffers, instanced quad arrays, and ticker bindings are cleaned up automatically.
+
+### Interactive Demo
+
+Rotate and zoom the camera with your mouse/touch to inspect the 3D ember fountain:
+
+<ClientOnly fileName="particle-system-3d" client:load />
+
+### Code Example
+
+<Code code={demoCode} lang="tsx" title="particle-system-3d.demo.tsx" />
+
+### Emitter Shapes
+
+Emitter shapes come directly from `@pixi/3d/extras`:
+
+- `ConeShape({ angle, radius })` — Spawns on an XZ disc and shoots particles upwards in a cone. Perfect for fire plumes, exhaust, fountains, and torches.
+- `SphereShape({ radius, surfaceOnly })` — Spawns within or on the surface of a sphere, shooting radially outward. Ideal for magic orbs, explosions, and bursts.
+- `BoxShape({ width, height, depth })` — Spawns across a 3D volume. Ideal for ambient dust motes, snow, and rain.
+- `PointShape()` — Spawns all particles from a single origin point.
+
+### Spreads: Ranges vs. Fixed Numbers
+
+Properties like `speed`, `life`, `size`, `sizeEnd`, `alpha`, and `alphaEnd` accept **spreads**:
+
+- **Fixed scalar**: `speed={4}` (all particles spawn with speed 4)
+- **Range `[min, max]`**: `speed={[2, 5]}` (randomized between 2 and 5 for each particle)
+
+```tsx
+<ParticleSystem3D
+  capacity={2000}
+  emitRate={80}
+  shape={new ConeShape({ angle: 25, radius: 0.2 })}
+  speed={[3, 6]}
+  life={[1.0, 2.0]}
+  size={[0.3, 0.6]}
+  sizeEnd={0.05} // Shrinks as it dies
+  color={0xff6600}
+  colorEnd={0x220000} // Fades to dark red
+  alphaEnd={0} // Fades out completely
+  blendMode="add" // Additive glow
+/>
+```
+
+### Additive Blending vs Normal
+
+- `blendMode="add"`: Particles brighten whatever is behind them. Best for fire, glowing sparks, laser exhaust, and magic.
+- `blendMode="normal"`: Standard alpha compositing. Best for smoke, dust, leaves, and opaque debris.

@@ -16,6 +16,32 @@ Declarative 3D components and utilities for writing PixiJS 3D applications with 
 pnpm add pixi-solid-3d @pixi/3d pixi-solid pixi.js solid-js
 ```
 
+## Bundle size and tree shaking
+
+`pixi-solid-3d` is an **all-or-nothing dependency on `@pixi/3d`**. Importing any single
+component pulls in the entire 3D engine.
+
+`@pixi/3d`'s public entry eagerly side-effect-imports every subsystem barrel and an `init`
+module that mutates Pixi's global extension and uniform-parser registries. Bundlers cannot
+remove that work. Measured with esbuild 0.28 (`pixi.js` external, minified):
+
+| Import                              | Modules pulled | Minified | Gzip   |
+| ----------------------------------- | -------------- | -------- | ------ |
+| `import { Mesh3D } from "@pixi/3d"` | 346            | 504 KB   | 150 KB |
+
+The same applies to importing any component from `pixi-solid-3d`, because it depends on
+`@pixi/3d`.
+
+There is no supported way to import a subset. `@pixi/3d`'s `exports` map only exposes `.`,
+`./extras`, `./webgl`, and `./webgpu`, so deep paths such as `@pixi/3d/dist/scene/Mesh3D.mjs`
+fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`. The shipped `dist` is a graph of ~316 small modules
+with circular imports, so bypassing `exports` with filesystem paths is unreliable too — module
+evaluation order determines whether it works.
+
+`pixi-solid-3d` itself is tree-shakeable (per-module output, declared `sideEffects`), but the
+engine cost is fixed. **If you do not use 3D, do not install `pixi-solid-3d`.** The 2D
+`pixi-solid` package has no dependency on `@pixi/3d`.
+
 ## Quick Example
 
 ```tsx

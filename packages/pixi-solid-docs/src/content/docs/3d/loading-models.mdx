@@ -42,3 +42,30 @@ If your glTF file contains multiple scenes, specify which one to instantiate usi
 ```tsx
 <Model3D source={source()} x={0} y={0} z={-5} scale={1.5} castShadow={true} receiveShadow={true} />
 ```
+
+### Customizing Model Materials (`traverse`)
+
+When a 3D model loads, `@pixi/3d` builds an internal hierarchy of `Mesh3D` nodes from the glTF file. To inspect or customize individual meshes (such as swapping materials, adjusting roughness, or setting shadow properties), use the `traverse` prop:
+
+```tsx
+import { Model3D, ToonMaterial } from "pixi-solid-3d";
+import { Mesh3D } from "@pixi/3d";
+
+export const CustomKnight = (props: { source: any }) => {
+  return (
+    <Model3D
+      source={props.source}
+      traverse={(node) => {
+        if (node instanceof Mesh3D) {
+          // Customize all meshes or target specific parts by name
+          if (node.label === "Sword") {
+            node.material = new ToonMaterial({ bands: 4 });
+          }
+        }
+      }}
+    />
+  );
+};
+```
+
+You can also import and call `traverse3D(root, callback)` imperatively on any `Container3D` node at any time.

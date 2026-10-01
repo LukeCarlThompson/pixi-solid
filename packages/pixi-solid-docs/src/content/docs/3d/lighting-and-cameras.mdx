@@ -16,10 +16,10 @@ All lights and containers support the reactive `lookAt` prop as well as individu
 
 ### Cameras and Controls
 
-`<View3D>` creates a default `Camera3D` automatically. You can also customize or position it, or add `<OrbitCamera>` to enable mouse and touch orbit controls:
+`<View3D>` creates a default `Camera3D` automatically. You can also customize or position it, or add `<OrbitCamera>` or `<FPSCamera>` to enable interactive camera controls:
 
 ```tsx
-import { View3D, OrbitCamera, AmbientLight, DirectionalLight, Container3D } from "pixi-solid-3d";
+import { View3D, OrbitCamera, AmbientLight, DirectionalLight } from "pixi-solid-3d";
 
 export const SceneWithOrbit = () => {
   return (
@@ -39,6 +39,23 @@ export const SceneWithOrbit = () => {
       />
       <AmbientLight intensity={0.3} />
       <DirectionalLight intensity={2} x={5} y={10} z={5} castShadow={true} />
+    </View3D>
+  );
+};
+```
+
+#### First-Person Camera (`<FPSCamera>`)
+
+For walkthroughs or first-person gameplay, use `<FPSCamera>` for WASD movement and mouse-look:
+
+```tsx
+import { View3D, FPSCamera, Camera3D } from "pixi-solid-3d";
+
+export const FirstPersonScene = () => {
+  return (
+    <View3D width={800} height={600}>
+      <Camera3D x={0} y={1.8} z={0} />
+      <FPSCamera moveSpeed={8} lookSpeed={0.003} pointerLock={true} keyboard={true} />
     </View3D>
   );
 };

@@ -1,7 +1,7 @@
 import type * as Pixi3D from "@pixi/3d";
 import { View3D as PixiView3D } from "@pixi/3d";
 import { cleanup, getByLabel, mountScene } from "pixi-solid/testing";
-import { createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -65,37 +65,123 @@ describe("View3D component", () => {
     cleanup();
   });
 
-  it("View3DProvider provides View3D context to sibling components", () => {
+  it("destroys its own View3D instance on unmount", () => {
+    const [visible, setVisible] = createSignal(true);
+    let viewRef: PixiView3D | undefined;
+
+    mountScene(() => (
+      <Show when={visible()}>
+        <View3D ref={(el) => (viewRef = el)} width={400} height={300} />
+      </Show>
+    ));
+
+    const view = viewRef;
+    expect(view).toBeInstanceOf(PixiView3D);
+
+    setVisible(false);
+
+    expect(view?.destroyed).toBe(true);
+
+    cleanup();
+  });
+});
+
+describe("View3DProvider component", () => {
+  it("creates the View3D and shares it with sibling 2D components", () => {
     let siblingCapturedView: PixiView3D | undefined;
+    let mountedView: PixiView3D | undefined;
 
     const SiblingComponent = () => {
       siblingCapturedView = useView3D();
       return null;
     };
 
-    mountScene(() => (
-      <View3DProvider>
-        <View3D width={400} height={300} />
+    const { container } = mountScene<PixiView3D>(() => (
+      <View3DProvider width={400} height={300} toneMapping="aces">
+        <View3D ref={(el) => (mountedView = el)} />
         <SiblingComponent />
       </View3DProvider>
     ));
 
     expect(siblingCapturedView).toBeInstanceOf(PixiView3D);
+    expect(mountedView).toBe(siblingCapturedView);
     expect(siblingCapturedView?.width).toBe(400);
+    expect(siblingCapturedView?.height).toBe(300);
+    expect(siblingCapturedView?.toneMapping).toBe("aces");
+    expect(container).toContain(siblingCapturedView);
 
     cleanup();
   });
 
-  it("View3DProvider throws if multiple View3D instances attempt to register", () => {
-    expect(() => {
-      mountScene(() => (
-        <View3DProvider>
-          <View3D width={400} height={300} />
-          <View3D width={500} height={400} />
-        </View3DProvider>
-      ));
-    }).toThrow("Multiple <View3D> components detected inside a single <View3DProvider>");
+  it("keeps the provider-owned View3D alive when the mounted View3D unmounts", () => {
+    const [visible, setVisible] = createSignal(true);
+    let viewRef: PixiView3D | undefined;
+
+    mountScene(() => (
+      <View3DProvider width={400} height={300}>
+        <Show when={visible()}>
+          <View3D ref={(el) => (viewRef = el)} />
+        </Show>
+      </View3DProvider>
+    ));
+
+    const view = viewRef;
+    expect(view).toBeInstanceOf(PixiView3D);
+
+    setVisible(false);
+
+    expect(view?.destroyed).toBe(false);
 
     cleanup();
+  });
+
+  it("adopts a View3D passed through as without destroying it", () => {
+    const externalView = new PixiView3D({ width: 320, height: 240 });
+    let viewRef: PixiView3D | undefined;
+
+    mountScene(() => (
+      <View3DProvider as={externalView}>
+        <View3D ref={(el) => (viewRef = el)} />
+      </View3DProvider>
+    ));
+
+    expect(viewRef).toBe(externalView);
+
+    cleanup();
+
+    expect(externalView.destroyed).toBe(false);
+
+    externalView.destroy({ children: true });
+  });
+
+  it("throws when two View3D components mount the same provider-owned view", () => {
+    expect(() => {
+      mountScene(() => (
+        <View3DProvider width={400} height={300}>
+          <View3D />
+          <View3D />
+        </View3DProvider>
+      ));
+    }).toThrow(
+      "Only one <View3D> may be mounted at a time per View3D instance. Unmount it before mounting another.",
+    );
+
+    cleanup();
+  });
+
+  it("throws when View3D combines as with an enclosing View3DProvider", () => {
+    const externalView = new PixiView3D({ width: 320, height: 240 });
+
+    expect(() => {
+      mountScene(() => (
+        <View3DProvider width={400} height={300}>
+          <View3D as={externalView} />
+        </View3DProvider>
+      ));
+    }).toThrow("<View3D> cannot combine the `as` prop with an enclosing <View3DProvider>");
+
+    cleanup();
+
+    externalView.destroy({ children: true });
   });
 });

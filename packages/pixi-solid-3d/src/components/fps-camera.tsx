@@ -1,5 +1,5 @@
 import type * as Pixi3DExtras from "@pixi/3d/extras";
-import { OrbitCamera as PixiOrbitCamera } from "@pixi/3d/extras";
+import { FPSCamera as PixiFPSCamera } from "@pixi/3d/extras";
 import { getTicker } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import {
@@ -14,46 +14,50 @@ import {
 
 import { useView3D } from "./view-3d-context";
 
-export type OrbitCameraProps = Omit<Partial<Pixi3DExtras.OrbitCameraOptions>, "autoUpdate"> & {
+export type FPSCameraProps = Omit<Partial<Pixi3DExtras.FPSCameraOptions>, "autoUpdate"> & {
   autoUpdate?: boolean;
-  ref?: Ref<Pixi3DExtras.OrbitCamera>;
+  ref?: Ref<Pixi3DExtras.FPSCamera>;
   onchange?: () => void;
-  onstart?: () => void;
-  onend?: () => void;
+  onlock?: () => void;
+  onunlock?: () => void;
 };
 
-const ORBIT_CAMERA_KEYS = [
+const FPS_CAMERA_KEYS = [
   "ref",
   "autoUpdate",
   "onchange",
-  "onstart",
-  "onend",
-  "target",
+  "onlock",
+  "onunlock",
   "enabled",
-  "minDistance",
-  "maxDistance",
+  "moveSpeed",
+  "lookSpeed",
+  "maxPitch",
+  "pointerLock",
+  "keyboard",
+  "yaw",
+  "pitch",
 ] as const;
 
 /**
- * SolidJS component to attach an OrbitCamera controller to the current `<View3D>` context.
+ * SolidJS component to attach an FPSCamera (first-person WASD + mouse-look) controller to the current `<View3D>` context.
  *
  * Automatically manages lifecycle and synchronizes frame updates with the scoped Pixi.Ticker
  * from context (e.g. `<PixiCanvas>`, `<PixiApplicationProvider>`, or `<TickerProvider>`)
  * instead of tying to global `Ticker.shared`.
  */
-export const OrbitCamera: Component<OrbitCameraProps> = (props) => {
+export const FPSCamera: Component<FPSCameraProps> = (props) => {
   const view = useView3D();
-  const [local, initialisationOptions] = splitProps(props, ORBIT_CAMERA_KEYS);
+  const [local, initialisationOptions] = splitProps(props, FPS_CAMERA_KEYS);
 
   // Set autoUpdate: false on the engine instance so it doesn't attach to Ticker.shared
-  const controller = new PixiOrbitCamera({
+  const controller = new PixiFPSCamera({
     view,
     autoUpdate: false,
     ...initialisationOptions,
   });
 
   if (local.ref) {
-    (local.ref as unknown as (c: PixiOrbitCamera) => void)(controller);
+    (local.ref as unknown as (c: Pixi3DExtras.FPSCamera) => void)(controller);
   }
 
   // Bind to the scoped Pixi ticker from pixi-solid context
@@ -91,24 +95,18 @@ export const OrbitCamera: Component<OrbitCameraProps> = (props) => {
   });
 
   createRenderEffect(() => {
-    const handler = local.onstart;
+    const handler = local.onlock;
     if (handler) {
-      controller.on("start", handler);
-      onCleanup(() => controller.off("start", handler));
+      controller.on("lock", handler);
+      onCleanup(() => controller.off("lock", handler));
     }
   });
 
   createRenderEffect(() => {
-    const handler = local.onend;
+    const handler = local.onunlock;
     if (handler) {
-      controller.on("end", handler);
-      onCleanup(() => controller.off("end", handler));
-    }
-  });
-
-  createEffect(() => {
-    if (local.target) {
-      controller.target.set(local.target.x ?? 0, local.target.y ?? 0, local.target.z ?? 0);
+      controller.on("unlock", handler);
+      onCleanup(() => controller.off("unlock", handler));
     }
   });
 
@@ -117,11 +115,23 @@ export const OrbitCamera: Component<OrbitCameraProps> = (props) => {
   });
 
   createEffect(() => {
-    if (local.minDistance !== undefined) controller.minDistance = local.minDistance;
+    if (local.moveSpeed !== undefined) controller.moveSpeed = local.moveSpeed;
   });
 
   createEffect(() => {
-    if (local.maxDistance !== undefined) controller.maxDistance = local.maxDistance;
+    if (local.lookSpeed !== undefined) controller.lookSpeed = local.lookSpeed;
+  });
+
+  createEffect(() => {
+    if (local.maxPitch !== undefined) controller.maxPitch = local.maxPitch;
+  });
+
+  createEffect(() => {
+    if (local.yaw !== undefined) controller.yaw = local.yaw;
+  });
+
+  createEffect(() => {
+    if (local.pitch !== undefined) controller.pitch = local.pitch;
   });
 
   onCleanup(() => {

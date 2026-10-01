@@ -3,18 +3,23 @@ import { cleanup, createTestContext, mountScene } from "pixi-solid/testing";
 import { createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { Camera3D, View3D, View3DProvider } from "../components";
-import { useScreenToWorld, useWorldToScreen } from "../utils";
+import {
+  Camera3D,
+  View3D,
+  View3DProvider,
+  useScreenToWorld,
+  useWorldToScreen,
+} from "../components";
+import type { ScreenToWorldPoint, WorldToScreenResult } from "../components";
 
-describe("3D projection utils", () => {
+describe("3D projection hooks", () => {
   it("useWorldToScreen reactively projects 3D coordinates onto 2D screen", async () => {
     const ctx = createTestContext();
     const [pos, setPos] = createSignal({ x: 0, y: 0, z: 0 });
-    let projectedResult: any;
+    let projectedResult: () => WorldToScreenResult = () => ({ x: 0, y: 0, visible: false });
 
     const TestComponent = () => {
-      const screenPos = useWorldToScreen(pos);
-      projectedResult = screenPos;
+      projectedResult = useWorldToScreen(pos);
       return null;
     };
 
@@ -46,11 +51,10 @@ describe("3D projection utils", () => {
     const ctx = createTestContext();
     const node = new Container3D();
     node.position.set(0, 0, 0);
-    let projectedResult: any;
+    let projectedResult: () => WorldToScreenResult = () => ({ x: 0, y: 0, visible: false });
 
     const TestComponent = () => {
-      const screenPos = useWorldToScreen(node);
-      projectedResult = screenPos;
+      projectedResult = useWorldToScreen(node);
       return null;
     };
 
@@ -78,11 +82,10 @@ describe("3D projection utils", () => {
     const ctx = createTestContext();
     const ground = new Plane(new Vector3(0, 1, 0), 0); // y = 0
     const [cursor, setCursor] = createSignal({ x: 400, y: 300 }); // center of 800x600
-    let unprojectedResult: any;
+    let unprojectedResult: () => ScreenToWorldPoint | null = () => null;
 
     const TestComponent = () => {
-      const hit = useScreenToWorld(cursor, ground);
-      unprojectedResult = hit;
+      unprojectedResult = useScreenToWorld(cursor, ground);
       return null;
     };
 
@@ -111,20 +114,19 @@ describe("3D projection utils", () => {
     const ctx = createTestContext();
     const node = new Container3D();
     node.position.set(0, 0, 0);
-    let projectedResult: any;
+    let projectedResult: () => WorldToScreenResult = () => ({ x: 0, y: 0, visible: false });
 
     const SiblingHUD = () => {
       // Notice: no view passed, no ref passed!
-      const screenPos = useWorldToScreen(node);
-      projectedResult = screenPos;
+      projectedResult = useWorldToScreen(node);
       return null;
     };
 
     mountScene(() => (
       <ctx.Provider>
-        <View3DProvider>
+        <View3DProvider width={800} height={600}>
           {/* 3D Viewport */}
-          <View3D width={800} height={600}>
+          <View3D>
             <Camera3D x={0} y={0} z={10} lookAt={{ x: 0, y: 0, z: 0 }} />
           </View3D>
 
@@ -142,6 +144,69 @@ describe("3D projection utils", () => {
     node.position.x = 2;
     await ctx.ticker.fastForwardFrames(1);
     expect(projectedResult().x).toBeGreaterThan(400);
+
+    cleanup();
+  });
+
+  it("useWorldToScreen does not throw for a sibling declared before View3D", async () => {
+    const ctx = createTestContext();
+    const node = new Container3D();
+    node.position.set(0, 0, 0);
+    let projectedResult: () => WorldToScreenResult = () => ({ x: 0, y: 0, visible: false });
+
+    const SiblingHUD = () => {
+      projectedResult = useWorldToScreen(node);
+      return null;
+    };
+
+    mountScene(() => (
+      <ctx.Provider>
+        <View3DProvider width={800} height={600}>
+          {/* Sibling 2D component rendered BEFORE the viewport. The provider creates the
+              View3D, so the view already exists and the hook resolves without throwing. */}
+          <SiblingHUD />
+
+          <View3D>
+            <Camera3D x={0} y={0} z={10} lookAt={{ x: 0, y: 0, z: 0 }} />
+          </View3D>
+        </View3DProvider>
+      </ctx.Provider>
+    ));
+
+    // The camera only exists once View3D has mounted, so the first projection happens on the
+    // next tick rather than during setup.
+    await ctx.ticker.fastForwardFrames(1);
+
+    expect(projectedResult().visible).toBe(true);
+    expect(projectedResult().x).toBeCloseTo(400, -1);
+
+    cleanup();
+  });
+
+  it("useWorldToScreen throws when there is no View3D context", () => {
+    expect(() => {
+      mountScene(() => {
+        const node = new Container3D();
+        useWorldToScreen(node);
+        return null;
+      });
+    }).toThrow(
+      "useWorldToScreen must be used within a <View3D>, <View3DProvider>, or a component mounted inside one.",
+    );
+
+    cleanup();
+  });
+
+  it("useScreenToWorld throws when there is no View3D context", () => {
+    expect(() => {
+      mountScene(() => {
+        const ground = new Plane(new Vector3(0, 1, 0), 0);
+        useScreenToWorld({ x: 0, y: 0 }, ground);
+        return null;
+      });
+    }).toThrow(
+      "useScreenToWorld must be used within a <View3D>, <View3DProvider>, or a component mounted inside one.",
+    );
 
     cleanup();
   });

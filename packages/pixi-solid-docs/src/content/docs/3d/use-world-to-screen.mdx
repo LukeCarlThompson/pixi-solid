@@ -23,32 +23,40 @@ Notice how the 2D label tag stays locked above the rotating and oscillating 3D c
 
 ### Usage with View3DProvider
 
-When rendering 2D overlays alongside a `<View3D>` viewport, wrap both the 3D viewport and your 2D HUD components in a `<View3DProvider>`:
+When rendering 2D overlays alongside a `<View3D>` viewport, wrap both the 3D viewport and your 2D HUD components in a `<View3DProvider>`.
+
+The provider **creates and owns** the `View3D`; the `<View3D>` beneath it just mounts that instance into the 2D scene graph. Viewport configuration therefore belongs on the provider, not on `<View3D>`.
 
 ```tsx
 import { useWorldToScreen, View3D, View3DProvider, Mesh3D } from "pixi-solid-3d";
-import { Show } from "solid-js";
-import { Container, Text } from "pixi-solid";
+import { createSignal, Show } from "solid-js";
+import { Container, onTick, Text } from "pixi-solid";
 
-export const GameScene = () => {
-  let characterMesh: any;
+// The character's transform is the source of truth — the 3D node and the HUD both render it.
+const [position, setPosition] = createSignal({ x: 0, y: 0, z: 0 });
 
-  return (
-    <View3DProvider>
-      {/* 3D Viewport */}
-      <View3D width={800} height={600}>
-        <Mesh3D ref={(m) => (characterMesh = m)} ... />
-      </View3D>
+let elapsed = 0;
+onTick((ticker) => {
+  elapsed += 0.02 * ticker.deltaTime;
+  setPosition({ x: Math.sin(elapsed) * 2, y: 0, z: 0 });
+});
 
-      {/* Sibling 2D Overlay HUD */}
-      <PlayerHUD target={() => characterMesh} />
-    </View3DProvider>
-  );
-};
+export const GameScene = () => (
+  <View3DProvider width={800} height={600} toneMapping="aces">
+    {/* Mounts the provider-owned View3D */}
+    <View3D>
+      <Mesh3D x={position().x} y={position().y} z={position().z} ... />
+    </View3D>
 
-const PlayerHUD = (props: { target: () => any }) => {
-  // Automatically resolves from the parent <View3DProvider> without refs or props!
-  const screenPos = useWorldToScreen(props.target);
+    {/* Sibling 2D Overlay HUD */}
+    <PlayerHUD />
+  </View3DProvider>
+);
+
+const PlayerHUD = () => {
+  // Resolves the View3D from the parent <View3DProvider>, and the position from the same signal.
+  // No refs, no imperative reads.
+  const screenPos = useWorldToScreen(position);
 
   return (
     <Show when={screenPos().visible}>
@@ -60,12 +68,21 @@ const PlayerHUD = (props: { target: () => any }) => {
 };
 ```
 
-### Options
+### Parameters
 
-| Parameter      | Type                                          | Description                                                                        |
-| -------------- | --------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `target`       | `Container3D \| PointData3D \| Accessor<...>` | The 3D container or coordinate to project                                          |
-| `options.view` | `View3D`                                      | Optional explicit `View3D` instance. Defaults to the ambient `useView3D()` context |
+| Parameter | Type                                          | Description                               |
+| --------- | --------------------------------------------- | ----------------------------------------- |
+| `target`  | `Container3D \| PointData3D \| Accessor<...>` | The 3D container or coordinate to project |
+
+### Context requirement
+
+`useWorldToScreen` reads the ambient `View3DContext`. Call it inside `<View3D>`, or anywhere within a `<View3DProvider>` (including sibling 2D overlays). Calling it outside both throws:
+
+```text
+useWorldToScreen must be used within a <View3D>, <View3DProvider>, or a component mounted inside one.
+```
+
+`<View3DProvider>` creates the `View3D` up front, so the hook always has an instance to project through. The projected value becomes meaningful once the scene is built and the camera is in the graph, which happens during the first tick after mount.
 
 ### Return Value
 
