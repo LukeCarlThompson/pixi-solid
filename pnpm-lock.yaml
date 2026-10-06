@@ -163,7 +163,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  pixi.js: 8.21.0
+  pixi.js: 8.22.0
   solid-js: 1.9.15
 
 importers:
@@ -204,8 +204,8 @@ importers:
   packages/pixi-solid:
     dependencies:
       pixi.js:
-        specifier: 8.21.0
-        version: 8.21.0
+        specifier: 8.22.0
+        version: 8.22.0
       solid-js:
         specifier: 1.9.15
         version: 1.9.15
@@ -213,14 +213,14 @@ importers:
   packages/pixi-solid-3d:
     dependencies:
       '@pixi/3d':
-        specifier: file:../pixi-3d/pixi-3d-0.1.0-beta.1.tgz
-        version: file:packages/pixi-3d/pixi-3d-0.1.0-beta.1.tgz(pixi.js@8.21.0)
+        specifier: file:../../pixi-3d/pixi-3d-0.1.0-beta.2.tgz
+        version: file:pixi-3d/pixi-3d-0.1.0-beta.2.tgz(pixi.js@8.22.0)
       pixi-solid:
         specifier: workspace:*
         version: link:../pixi-solid
       pixi.js:
-        specifier: 8.21.0
-        version: 8.21.0
+        specifier: 8.22.0
+        version: 8.22.0
       solid-js:
         specifier: 1.9.15
         version: 1.9.15
@@ -234,14 +234,14 @@ importers:
         specifier: 0.39.3
         version: 0.39.3(astro@6.4.3(@types/node@25.6.2)(lightningcss@1.33.0)(rollup@4.53.3)(sass-embedded@1.104.1)(sass@1.100.0)(supports-color@8.1.1)(yaml@2.8.2))(supports-color@8.1.1)(typescript@6.0.3)
       '@pixi/3d':
-        specifier: file:../pixi-3d/pixi-3d-0.1.0-beta.1.tgz
-        version: file:packages/pixi-3d/pixi-3d-0.1.0-beta.1.tgz(pixi.js@8.21.0)
+        specifier: file:../../pixi-3d/pixi-3d-0.1.0-beta.2.tgz
+        version: file:pixi-3d/pixi-3d-0.1.0-beta.2.tgz(pixi.js@8.22.0)
       astro:
         specifier: 6.4.3
         version: 6.4.3(@types/node@25.6.2)(lightningcss@1.33.0)(rollup@4.53.3)(sass-embedded@1.104.1)(sass@1.100.0)(supports-color@8.1.1)(yaml@2.8.2)
       pixi-filters:
         specifier: 6.1.5
-        version: 6.1.5(pixi.js@8.21.0)
+        version: 6.1.5(pixi.js@8.22.0)
       pixi-solid:
         specifier: workspace:*
         version: link:../pixi-solid
@@ -249,8 +249,8 @@ importers:
         specifier: workspace:*
         version: link:../pixi-solid-3d
       pixi.js:
-        specifier: 8.21.0
-        version: 8.21.0
+        specifier: 8.22.0
+        version: 8.22.0
       sharp:
         specifier: 0.34.5
         version: 0.34.5
@@ -1224,11 +1224,11 @@ packages:
     resolution: {integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==}
     engines: {node: '>= 10.0.0'}
 
-  '@pixi/3d@file:packages/pixi-3d/pixi-3d-0.1.0-beta.1.tgz':
-    resolution: {integrity: sha512-n1+7vNn0rKP6rPm5ygm9ReKuE6Zt4CSvzhDp1UGCS7jzUwOr+Db1AC0Ux1qteXFq8KzHndzFuoGMincRAnFxxA==, tarball: file:packages/pixi-3d/pixi-3d-0.1.0-beta.1.tgz}
-    version: 0.1.0-beta.1
+  '@pixi/3d@file:pixi-3d/pixi-3d-0.1.0-beta.2.tgz':
+    resolution: {integrity: sha512-H5IkESPC3BZsNnvpN8Y2sV4NA0I51RhD9Aq29K9tawk/6bAM0NtMKXFZ0X2akgWDdJ6XQg0dv05y0gZf7eoeoQ==, tarball: file:pixi-3d/pixi-3d-0.1.0-beta.2.tgz}
+    version: 0.1.0-beta.2
     peerDependencies:
-      pixi.js: 8.21.0
+      pixi.js: 8.22.0
 
   '@pixi/colord@2.9.6':
     resolution: {integrity: sha512-nezytU2pw587fQstUu1AsJZDVEynjskwOL+kibwcdxsMBFqPsFFNA7xl0ii/gXuDi6M0xj3mfRJj8pBSc2jCfA==}
@@ -2678,10 +2678,10 @@ packages:
   pixi-filters@6.1.5:
     resolution: {integrity: sha512-Ewb/J+kxAbaNN+0/ATJbglAJG+skGJfh7BIDP3ILIDdD6wWk1p0pGa25pVf1T8hGBOQSUNVAmwwJBwkj+cyLLA==}
     peerDependencies:
-      pixi.js: 8.21.0
+      pixi.js: 8.22.0
 
-  pixi.js@8.21.0:
-    resolution: {integrity: sha512-GJ/KqBtUuWDBPMQu2D0ZHsRCYOcWRjjKrpyC+3jPQI5JTqHMC5dH8l9sSyvoUT4qJidvRzs1fwFWRWceno2Ltw==}
+  pixi.js@8.22.0:
+    resolution: {integrity: sha512-QbTANHMZ751MIjLiLSUSM8a7LNMWwMIf0KbRCqlW+SPS9hNLfSVS+cl1O2SEp9g1K/wyLzj/OJHv+1TUfiPr/w==}
 
   postcss-nested@6.2.0:
     resolution: {integrity: sha512-HQbt28KulC5AJzG+cZtj9kvKB93CFCdLvog1WFLf1D+xmMvPGlBstkpTEZfK5+AN9hfJocyBFCNiqyS48bpgzQ==}
@@ -4409,10 +4409,10 @@ snapshots:
       '@parcel/watcher-win32-x64': 2.5.1
     optional: true
 
-  '@pixi/3d@file:packages/pixi-3d/pixi-3d-0.1.0-beta.1.tgz(pixi.js@8.21.0)':
+  '@pixi/3d@file:pixi-3d/pixi-3d-0.1.0-beta.2.tgz(pixi.js@8.22.0)':
     dependencies:
       meshoptimizer: 1.3.0
-      pixi.js: 8.21.0
+      pixi.js: 8.22.0
 
   '@pixi/colord@2.9.6': {}
 
@@ -6256,12 +6256,12 @@ snapshots:
 
   picomatch@4.0.7: {}
 
-  pixi-filters@6.1.5(pixi.js@8.21.0):
+  pixi-filters@6.1.5(pixi.js@8.22.0):
     dependencies:
       '@types/gradient-parser': 0.1.5
-      pixi.js: 8.21.0
+      pixi.js: 8.22.0
 
-  pixi.js@8.21.0:
+  pixi.js@8.22.0:
     dependencies:
       '@pixi/colord': 2.9.6
       '@types/earcut': 3.0.0
