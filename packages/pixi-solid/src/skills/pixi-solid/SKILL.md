@@ -11,7 +11,7 @@ Use this skill for `pixi-solid` APIs and integration only. Prefer its components
 
 ## Overview
 
-`pixi-solid` wraps PixiJS display objects in SolidJS components and adds context, lifecycle, and utility APIs. It does not re-export PixiJS or SolidJS APIs. The package supports `pixi.js >=8.14.3 <9`, `solid-js >=2.0.0-rc.9 <3`, and `@solidjs/web >=2.0.0-rc.9 <3`. Three providers exist:
+`pixi-solid` wraps PixiJS display objects in SolidJS components and adds context, lifecycle, and utility APIs. It does not re-export PixiJS or SolidJS APIs. The package supports `pixi.js >=8.14.3 <9`, `solid-js >=2.0.0-rc.13 <3`, and `@solidjs/web >=2.0.0-rc.13 <3`. Three providers exist:
 
 - **`PixiCanvas`** — mounts the application canvas and resizes it to its wrapper.
 - **`PixiApplicationProvider`** — provides app context without mounting a canvas. Use it when HTML outside the canvas needs hooks, or when you pass an `existingApp`.

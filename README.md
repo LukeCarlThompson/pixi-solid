@@ -34,8 +34,8 @@ Peer dependencies:
 ```json
 {
   "pixi.js": ">=8.14.3 <9",
-  "@solidjs/web": ">=2.0.0-rc.9 <3",
-  "solid-js": ">=2.0.0-rc.9 <3"
+  "@solidjs/web": ">=2.0.0-rc.13 <3",
+  "solid-js": ">=2.0.0-rc.13 <3"
 }
 ```
 

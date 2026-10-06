@@ -172,11 +172,9 @@ export const createContainerComponent = <
       const options = getInstanceOptions(props, CONTAINER_RUNTIME_KEY_SET);
       const instance = as || new PixiClass(options as any);
 
-      bindInitialisationProps(instance, props, CONTAINER_RUNTIME_KEY_SET, {
-        deferInitialRun: !isUserOwnedInstance,
-      });
-      bindRuntimeProps(instance, props, CONTAINER_RUNTIME_KEY_SET);
-
+      // Register cleanup before binding children. Cleanups run in unwind order,
+      // so the child-detach cleanup from bindRuntimeProps runs before this
+      // destroy. As a result, unowned children are detached but kept alive.
       onCleanup(() => {
         if (isUserOwnedInstance) return;
 
@@ -187,6 +185,11 @@ export const createContainerComponent = <
           instance.destroy({ children: true });
         }
       });
+
+      bindInitialisationProps(instance, props, CONTAINER_RUNTIME_KEY_SET, {
+        deferInitialRun: !isUserOwnedInstance,
+      });
+      bindRuntimeProps(instance, props, CONTAINER_RUNTIME_KEY_SET);
 
       return instance as InstanceType & JSX.Element;
     });
