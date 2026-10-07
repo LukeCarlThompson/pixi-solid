@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 1.0.1
+
+### Fixed
+
+- 🐞 Removed the `preinstall` `only-allow pnpm` script, which failed installs for consumers using npm or yarn.
+
 ## 1.0.0
 
 ### Added
