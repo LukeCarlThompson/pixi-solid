@@ -33,18 +33,21 @@
   },
   "scripts": {
     "build": "vite build && tsc --project tsconfig.build.json --emitDeclarationOnly",
+    "build:tarball": "pnpm run build && pnpm pack",
     "prepublishOnly": "pnpm run build",
     "prepack": "node -e \"require('fs').existsSync('dist/index.js') || (console.error('ERROR: dist/index.js not found') && process.exit(1))\"",
     "test": "vitest --run",
     "typecheck": "tsc --project tsconfig.test.json --noEmit"
   },
   "dependencies": {
-    "@pixi/3d": "file:../../pixi-3d/pixi-3d-0.1.0-beta.2.tgz",
-    "pixi-solid": "workspace:*"
+    "pixi-solid": "workspace:^"
+  },
+  "devDependencies": {
+    "@pixi/3d": "file:../../pixi-3d/pixi-3d-0.1.0-beta.2.tgz"
   },
   "peerDependencies": {
-    "@pixi/3d": "file:../../pixi-3d/pixi-3d-0.1.0-beta.2.tgz",
-    "pixi-solid": "workspace:*",
+    "@pixi/3d": ">=0.1.0-beta.2 <0.2",
+    "pixi-solid": "workspace:^",
     "pixi.js": ">=8.22.0 <9",
     "solid-js": ">=1.9.10 <2"
   }
