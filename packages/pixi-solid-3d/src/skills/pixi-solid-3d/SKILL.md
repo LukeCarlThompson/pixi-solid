@@ -37,19 +37,6 @@ In PixiJS v8:
 </View3D>
 ```
 
-## Import cost
-
-`pixi-solid-3d` is an **all-or-nothing dependency on `@pixi/3d`**. Importing any single
-component pulls the whole 3D engine (346 modules, 504 KB minified, 150 KB gzip for one
-`Mesh3D` import). `@pixi/3d`'s entry side-effect-imports every subsystem barrel plus an `init`
-module that mutates Pixi's global extension registries, so bundlers cannot tree-shake it.
-
-Do not attempt deep imports like `@pixi/3d/dist/scene/Mesh3D.mjs` — `@pixi/3d` exposes only
-`.`, `./extras`, `./webgl`, and `./webgpu`, and the shipped `dist` contains circular imports
-that make filesystem-path imports order-dependent.
-
-Tell users who do not need 3D to install `pixi-solid` alone; it has no `@pixi/3d` dependency.
-
 ## Getting started
 
 Minimal 3D scene with lighting, orbit camera controls, and a PBR mesh:

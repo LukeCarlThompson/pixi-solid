@@ -1,13 +1,26 @@
 ---
 title: 3D Overview (Beta)
 description: Getting started with 3D in pixi-solid using @pixi/3d.
+sidebar:
+  order: 1
 ---
 
-import { Code, Aside } from "@astrojs/starlight/components";
+import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/view-3d.demo.tsx?raw";
 import { ClientOnly } from "../../demos/client-only";
 
 `pixi-solid-3d` extends `pixi-solid` with declarative SolidJS components for PixiJS 3D scenes powered by `@pixi/3d`.
+
+### Installation
+
+Add the 3D package and the 3D engine to your project:
+
+```bash
+pnpm add pixi-solid-3d @pixi/3d
+```
+
+These steps assume `solid-js`, `pixi.js`, and `pixi-solid` are already installed. See
+[Project setup](/getting-started/project-setup) if they are not.
 
 ### How 3D works in PixiJS
 
@@ -61,21 +74,3 @@ than on the `<View3D>` that mounts it. In development, passing options to a `<Vi
 `<View3DProvider>` logs a warning telling you to move them up. Use `as` on the _provider_ to adopt
 a `View3D` you created yourself; combining `as` with a provider throws. For multiple viewports
 (split-screen, minimap PIP), use one provider per viewport.
-
-### Installation
-
-```bash
-pnpm add pixi-solid-3d @pixi/3d pixi-solid pixi.js solid-js
-```
-
-<Aside type="caution" title="Bundle size: @pixi/3d is not tree-shakeable">
-  `pixi-solid-3d` is an all-or-nothing dependency on `@pixi/3d`. Importing **any** component
-  pulls in the entire 3D engine — measured at 346 modules / 504 KB minified / 150 KB gzip for a
-  single `import { Mesh3D } from "@pixi/3d"`. There is no supported way to import a subset:
-  `@pixi/3d` only exposes `.`, `./extras`, `./webgl`, and `./webgpu`, so deep paths such as
-  `@pixi/3d/dist/scene/Mesh3D.mjs` fail with `ERR_PACKAGE_PATH_NOT_EXPORTED`.
-
-If your app does not use 3D, do not install `pixi-solid-3d`. The 2D `pixi-solid` package has
-no dependency on `@pixi/3d`.
-
-</Aside>
