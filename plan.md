@@ -1,6 +1,6 @@
 # Pixi-Solid v2: Solid 2 Migration
 
-Branch `release/solid-2`, baseline `26d03e1` (tag `v1.0.0`). The library, tests, docs, and release
+Branch `release/v2`, baseline `26d03e1` (tag `v1.0.0`). The library, tests, docs, and release
 metadata are migrated and committed. [Remaining work](#remaining-work) follows.
 
 ## Goal and policy
@@ -89,11 +89,11 @@ the current path would move `latest` to `2.0.0-rc.0`, and serve it to every `npm
    workflow runs on pushes to `main` and `release/**`, and it reads the version from
    `packages/pixi-solid/package.json`:
 
-   | Line          | Branch            | Version      | dist-tag    | Result                         |
-   | ------------- | ----------------- | ------------ | ----------- | ------------------------------ |
-   | v2 prerelease | `release/solid-2` | `2.0.0-rc.1` | `next`      | `latest` stays on `1.0.x`      |
-   | v2 stable     | `main`            | `2.0.0`      | `latest`    | `npm i pixi-solid` installs v2 |
-   | v1 patch      | `release/v1`      | `1.0.2`      | `v1-latest` | `npm i pixi-solid@v1-latest`   |
+   | Line          | Branch       | Version      | dist-tag    | Result                         |
+   | ------------- | ------------ | ------------ | ----------- | ------------------------------ |
+   | v2 prerelease | `release/v2` | `2.0.0-rc.1` | `next`      | `latest` stays on `1.0.x`      |
+   | v2 stable     | `main`       | `2.0.0`      | `latest`    | `npm i pixi-solid` installs v2 |
+   | v1 patch      | `release/v1` | `1.0.2`      | `v1-latest` | `npm i pixi-solid@v1-latest`   |
 
    Two rules produce the table. A version with a prerelease suffix maps to `next`. A stable version
    maps to `latest` only from `main`, and to `v<major>-latest` from every other branch. No one types a
@@ -119,13 +119,18 @@ when v2 lands. npm serves the README of the installed version, which covers v1 u
 
 ### Stage 4: Publish
 
-12. **Finalize the changelog heading.** The v2 entry starts with `## Unreleased`. Decide when it
-    becomes `## 2.0.0-rc.0`, then `## 2.0.0`, because the file ships to npm.
-13. **Publish `2.0.0-rc.0`** by pushing to `release/solid-2`, then confirm with
-    `npm view pixi-solid dist-tags` that `next` moved and `latest` still points at 1.x.
-14. **Address RC feedback.** Publish further RCs as needed, repeat the relevant checks, bump
-    `packages/pixi-solid/package.json` to `2.0.0`, and merge to `main`. The merge publishes stable as
-    `latest`. Then branch `release/v1` from the last v1 commit, so v1 patches keep shipping from
-    there.
-15. **Point the migration guide at Solid's `main` branch docs** once Solid 2 ships stable, then delete
-    this file.
+12. **Finalize the changelog heading.** The v2 entry starts with `## Unreleased`. Rename it to
+    `## 2.0.0-rc.N` for each RC, because the file ships to npm.
+13. **Publish `2.0.0-rc.1`** by merging a release PR into `release/v2`, then confirm with
+    `npm view pixi-solid dist-tags` that `next` moved and `latest` still points at 1.x. The registry
+    can lag by a minute, so check `curl -s https://registry.npmjs.org/pixi-solid` if they disagree.
+14. **Stay on `-rc.N` until SolidJS 2.0 ships stable.** The peer range targets `2.0.0-rc.x`, so a
+    stable `2.0.0` would claim support the package does not have. Cut stable only after Solid 2.0 is
+    released and the peer range is updated. Until then, every RC publishes to `next` and nobody
+    installs v2 by accident.
+15. **Address RC feedback.** Publish further RCs by bumping the version and merging a release PR.
+16. **Cut `2.0.0`.** Update the peer range to the released Solid 2 versions, bump
+    `packages/pixi-solid/package.json` to `2.0.0`, and merge `release/v2` into `main`. The merge
+    publishes stable as `latest`. Then branch `release/v1` from the last v1 commit, so v1 patches keep
+    shipping from there.
+17. **Point the migration guide at Solid's released docs**, then delete this file.
