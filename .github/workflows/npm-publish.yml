@@ -4,7 +4,7 @@
 #   - stable version on main           -> latest
 #   - stable version on any other branch -> v<major>-latest (for example v1-latest)
 # Triggers:
-#  - push to main or release/** (real publish)
+#  - push to main or a release line (real publish)
 #  - manual run (workflow_dispatch) — does a dry-run by default
 name: Publish pixi-solid to NPM
 
@@ -12,7 +12,7 @@ on:
   push:
     branches:
       - main
-      - "release/**"
+      - release/*
   workflow_dispatch:
 
 concurrency:
@@ -24,6 +24,8 @@ permissions:
 
 jobs:
   publish:
+    # A branch deletion also fires a push event, and there is nothing to publish.
+    if: github.event_name != 'push' || github.event.deleted == false
     runs-on: ubuntu-latest
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -77,8 +79,8 @@ jobs:
 
       - name: Publish (dry-run for manual runs)
         if: github.event_name == 'workflow_dispatch' && steps.check_published.outputs.published == 'false'
-        run: pnpm --filter "pixi-solid" publish --access public --dry-run --tag "${{ steps.dist_tag.outputs.dist_tag }}"
+        run: pnpm --filter "pixi-solid" publish --access public --no-git-checks --dry-run --tag "${{ steps.dist_tag.outputs.dist_tag }}"
 
       - name: Publish
         if: github.event_name == 'push' && steps.check_published.outputs.published == 'false'
-        run: pnpm --filter "pixi-solid" publish --access public --tag "${{ steps.dist_tag.outputs.dist_tag }}"
+        run: pnpm --filter "pixi-solid" publish --access public --no-git-checks --tag "${{ steps.dist_tag.outputs.dist_tag }}"
