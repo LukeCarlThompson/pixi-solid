@@ -1,6 +1,10 @@
 # Publish pixi-solid to npm (pnpm). Skips publish if the package version is already published.
+# The npm dist-tag is derived from the version in packages/pixi-solid/package.json:
+#   - prerelease version (2.0.0-rc.1) -> next
+#   - stable version on main           -> latest
+#   - stable version on any other branch -> v<major>-latest (for example v1-latest)
 # Triggers:
-#  - push to main (real publish)
+#  - push to main or a release line (real publish)
 #  - manual run (workflow_dispatch) — does a dry-run by default
 name: Publish pixi-solid to NPM
 
@@ -8,13 +12,20 @@ on:
   push:
     branches:
       - main
+      - release/*
   workflow_dispatch:
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
 
 permissions:
   contents: read
 
 jobs:
   publish:
+    # A branch deletion also fires a push event, and there is nothing to publish.
+    if: github.event_name != 'push' || github.event.deleted == false
     runs-on: ubuntu-latest
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -44,14 +55,32 @@ jobs:
         id: check_published
         run: node .github/scripts/check-published-version.mjs
 
+      - name: Resolve npm dist-tag
+        id: dist_tag
+        if: steps.check_published.outputs.published == 'false'
+        run: |
+          set -euo pipefail
+          version=$(node -p "require('./packages/pixi-solid/package.json').version")
+
+          if [[ "$version" == *-* ]]; then
+            dist_tag=next
+          elif [[ "${GITHUB_REF_NAME}" != "main" ]]; then
+            dist_tag="v${version%%.*}-latest"
+          else
+            dist_tag=latest
+          fi
+
+          echo "$version from ${GITHUB_REF_NAME} publishes to $dist_tag"
+          echo "dist_tag=$dist_tag" >> "$GITHUB_OUTPUT"
+
       - name: Verify npm auth (safe)
         if: steps.check_published.outputs.published == 'false'
         run: pnpm whoami --registry=https://registry.npmjs.org/ || true
 
       - name: Publish (dry-run for manual runs)
         if: github.event_name == 'workflow_dispatch' && steps.check_published.outputs.published == 'false'
-        run: pnpm --filter "pixi-solid" publish --access public --dry-run
+        run: pnpm --filter "pixi-solid" publish --access public --no-git-checks --dry-run --tag "${{ steps.dist_tag.outputs.dist_tag }}"
 
       - name: Publish
         if: github.event_name == 'push' && steps.check_published.outputs.published == 'false'
-        run: pnpm --filter "pixi-solid" publish --access public
+        run: pnpm --filter "pixi-solid" publish --access public --no-git-checks --tag "${{ steps.dist_tag.outputs.dist_tag }}"
