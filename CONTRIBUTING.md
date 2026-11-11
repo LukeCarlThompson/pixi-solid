@@ -286,8 +286,7 @@ Every PR must include:
 1. **A version bump** in `packages/pixi-solid/package.json`.
 2. **A changelog entry** in `packages/pixi-solid/CHANGELOG.md`.
 
-Target `main` for the stable line. Target a `release/**` branch for a prerelease line, such as
-`release/solid-2`.
+Target `main` for the stable line. Target a release line, such as `release/v2`, for a prerelease.
 
 On `main`, every PR bumps the version. On a prerelease line, only the release PR bumps it, because a
 merge publishes the version it finds.
@@ -331,11 +330,11 @@ The branch that receives the push publishes the package. The version in
 `packages/pixi-solid/package.json` selects the npm dist-tag. Do not publish from a local machine, and
 do not pass a dist-tag by hand.
 
-| Line           | Branch            | Version      | dist-tag    |
-| -------------- | ----------------- | ------------ | ----------- |
-| Prerelease     | `release/solid-2` | `2.0.0-rc.1` | `next`      |
-| Stable         | `main`            | `2.0.0`      | `latest`    |
-| v1 maintenance | `release/v1`      | `1.0.2`      | `v1-latest` |
+| Line           | Branch       | Version      | dist-tag    |
+| -------------- | ------------ | ------------ | ----------- |
+| Prerelease     | `release/v2` | `2.0.0-rc.1` | `next`      |
+| Stable         | `main`       | `2.0.0`      | `latest`    |
+| v1 maintenance | `release/v1` | `1.0.2`      | `v1-latest` |
 
 Two rules produce the table:
 
@@ -356,14 +355,14 @@ new features.
 
 ### Cutover
 
-When version 2 becomes stable, merge the prerelease branch into `main`, then branch `release/v1` from
-the last version 1 commit. Version 1 patches ship from `release/v1` to `v1-latest` without touching
-`main`.
+When version 2 becomes stable, merge the prerelease branch into `main`, then branch `release/v1`
+from the last version 1 commit. Version 1 patches ship from `release/v1` to `v1-latest` without
+touching `main`.
 
 ### Workflow changes
 
 `.github/workflows/npm-publish.yml` runs from the branch that receives the push, so every line needs
-the same file. Land a change on `main` first, then merge `main` into `release/solid-2` and
+the same file. Land a change on `main` first, then merge `main` into `release/v2` and
 `release/v1`. Do not edit the file separately on two branches, or the copies drift.
 
 The documentation site deploys from `main` only, so the published pages match the stable line.
