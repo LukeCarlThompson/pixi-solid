@@ -16,6 +16,7 @@ Thank you for contributing! This document covers the conventions, standards, and
 - [Styling](#styling)
 - [Pull Requests](#pull-requests)
 - [Versioning & Changelog](#versioning--changelog)
+- [Releasing](#releasing)
 
 ---
 
@@ -285,6 +286,9 @@ Every PR must include:
 1. **A version bump** in `packages/pixi-solid/package.json`.
 2. **A changelog entry** in `packages/pixi-solid/CHANGELOG.md`.
 
+Target `main` for the stable line. Target a `release/**` branch for a prerelease line, such as
+`release/solid-2`.
+
 Follow semantic versioning: `MAJOR.MINOR.PATCH`.
 
 - Bug fix → patch bump
@@ -315,3 +319,47 @@ The changelog follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) f
 ```
 
 New entries go at the top of the file, above previous versions.
+
+---
+
+## Releasing
+
+The branch that receives the push publishes the package. The version in
+`packages/pixi-solid/package.json` selects the npm dist-tag. Do not publish from a local machine, and
+do not pass a dist-tag by hand.
+
+| Line           | Branch            | Version      | dist-tag    |
+| -------------- | ----------------- | ------------ | ----------- |
+| Prerelease     | `release/solid-2` | `2.0.0-rc.1` | `next`      |
+| Stable         | `main`            | `2.0.0`      | `latest`    |
+| v1 maintenance | `v1.x`            | `1.0.2`      | `v1-latest` |
+
+Two rules produce the table:
+
+- A version with a prerelease suffix publishes to `next`, so an `-rc` version cannot reach `latest`.
+- A stable version publishes to `latest` from `main` only. From any other branch it publishes to
+  `v<major>-latest`.
+
+`npm publish` always assigns a dist-tag and defaults to `latest`, so
+`.github/workflows/npm-publish.yml` always passes `--tag`. The workflow skips a version that npm
+already has, so a repeated push is safe.
+
+### Line policy
+
+Version 1 supports Solid 1 and version 2 supports Solid 2, so version 2 is a port rather than a
+superset. Do not cherry-pick a fix between the lines. A security fix or a critical correctness fix
+gets one implementation per line. Everything else is version 2 only, and a version 1 patch takes no
+new features.
+
+### Cutover
+
+When version 2 becomes stable, merge the prerelease branch into `main`, then branch `v1.x` from the
+last version 1 commit. Version 1 patches ship from `v1.x` to `v1-latest` without touching `main`.
+
+### Workflow changes
+
+`.github/workflows/npm-publish.yml` runs from the branch that receives the push, so every line needs
+the same file. Land a change on `main` first, then merge `main` into `release/solid-2` and `v1.x`. Do
+not edit the file separately on two branches, or the copies drift.
+
+The documentation site deploys from `main` only, so the published pages match the stable line.
