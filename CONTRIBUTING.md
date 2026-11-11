@@ -14,7 +14,6 @@ Thank you for contributing! This document covers the conventions, standards, and
 - [Component Architecture](#component-architecture)
 - [Testing](#testing)
 - [Styling](#styling)
-- [Writing Style](#writing-style)
 - [Pull Requests](#pull-requests)
 - [Versioning & Changelog](#versioning--changelog)
 - [Releasing](#releasing)
@@ -280,34 +279,6 @@ Use `afterEach(() => vi.restoreAllMocks())` to clean up mocks between tests.
 
 ---
 
-## Writing Style
-
-Write all prose in ASD-STE100 Simplified Technical English, in the STE-flavored mode. The `ste-writing` skill holds the full rule set when it is available.
-
-This applies to:
-
-- JSDoc comments in the library source
-- Docs pages, the consumer skill files, and the README
-- The changelog, migration notes, release notes, and pull request descriptions
-
-It does not apply to code, identifiers, API names, type signatures, tables, or command syntax.
-
-### Rules
-
-- Use the short common word. Write "use", not "utilize". Write "make sure", not "ensure". Write "start", not "begin".
-- Write in active voice. Write "the parser reads the file", not "the file is read by the parser".
-- Keep one instruction per sentence, at 20 words or fewer. Keep a descriptive sentence at 25 words or fewer.
-- Do not use contractions. Write "does not", not "doesn't".
-- Do not use semicolons in prose. Write two sentences.
-- Use American spelling. Write "behavior" and "synchronize".
-- Use one name for one thing across a page.
-- Do not use marketing adjectives such as "seamless", "robust", and "powerful".
-- Keep the reasoning. Explain why a design works the way it does, and do not flatten an explanation into a list of steps.
-
-Check your prose against these rules before you commit it.
-
----
-
 ## Pull Requests
 
 Every PR must include:
@@ -315,8 +286,7 @@ Every PR must include:
 1. **A version bump** in `packages/pixi-solid/package.json`.
 2. **A changelog entry** in `packages/pixi-solid/CHANGELOG.md`.
 
-Target `main` for the stable line. Target a `release/**` branch for a prerelease line, such as
-`release/solid-2`.
+Target `main` for the stable line. Target a release line, such as `release/v2`, for a prerelease.
 
 On `main`, every PR bumps the version. On a prerelease line, only the release PR bumps it, because a
 merge publishes the version it finds.
@@ -360,11 +330,11 @@ The branch that receives the push publishes the package. The version in
 `packages/pixi-solid/package.json` selects the npm dist-tag. Do not publish from a local machine, and
 do not pass a dist-tag by hand.
 
-| Line           | Branch            | Version      | dist-tag    |
-| -------------- | ----------------- | ------------ | ----------- |
-| Prerelease     | `release/solid-2` | `2.0.0-rc.1` | `next`      |
-| Stable         | `main`            | `2.0.0`      | `latest`    |
-| v1 maintenance | `release/v1`      | `1.0.2`      | `v1-latest` |
+| Line           | Branch       | Version      | dist-tag    |
+| -------------- | ------------ | ------------ | ----------- |
+| Prerelease     | `release/v2` | `2.0.0-rc.1` | `next`      |
+| Stable         | `main`       | `2.0.0`      | `latest`    |
+| v1 maintenance | `release/v1` | `1.0.2`      | `v1-latest` |
 
 Two rules produce the table:
 
@@ -385,14 +355,14 @@ new features.
 
 ### Cutover
 
-When version 2 becomes stable, merge the prerelease branch into `main`, then branch `release/v1` from
-the last version 1 commit. Version 1 patches ship from `release/v1` to `v1-latest` without touching
-`main`.
+When version 2 becomes stable, merge the prerelease branch into `main`, then branch `release/v1`
+from the last version 1 commit. Version 1 patches ship from `release/v1` to `v1-latest` without
+touching `main`.
 
 ### Workflow changes
 
 `.github/workflows/npm-publish.yml` runs from the branch that receives the push, so every line needs
-the same file. Land a change on `main` first, then merge `main` into `release/solid-2` and
+the same file. Land a change on `main` first, then merge `main` into `release/v2` and
 `release/v1`. Do not edit the file separately on two branches, or the copies drift.
 
 The documentation site deploys from `main` only, so the published pages match the stable line.
