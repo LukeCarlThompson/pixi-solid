@@ -86,14 +86,14 @@ the current path would move `latest` to `2.0.0-rc.0`, and serve it to every `npm
 
 9. **Publish from branches, and derive the dist-tag from the version.** `npm publish` always
    assigns a dist-tag and defaults to `latest`, so the workflow passes `--tag` on every publish. The
-   workflow runs on pushes to `main`, `release/**`, and `v1.x`, and it reads the version from
+   workflow runs on pushes to `main` and `release/**`, and it reads the version from
    `packages/pixi-solid/package.json`:
 
    | Line          | Branch            | Version      | dist-tag    | Result                         |
    | ------------- | ----------------- | ------------ | ----------- | ------------------------------ |
    | v2 prerelease | `release/solid-2` | `2.0.0-rc.1` | `next`      | `latest` stays on `1.0.x`      |
    | v2 stable     | `main`            | `2.0.0`      | `latest`    | `npm i pixi-solid` installs v2 |
-   | v1 patch      | `v1.x`            | `1.0.2`      | `v1-latest` | `npm i pixi-solid@v1-latest`   |
+   | v1 patch      | `release/v1`      | `1.0.2`      | `v1-latest` | `npm i pixi-solid@v1-latest`   |
 
    Two rules produce the table. A version with a prerelease suffix maps to `next`. A stable version
    maps to `latest` only from `main`, and to `v<major>-latest` from every other branch. No one types a
@@ -107,8 +107,9 @@ the current path would move `latest` to `2.0.0-rc.0`, and serve it to every `npm
    rejects a dist-tag that parses as a semver range. Users can always install `pixi-solid@1`, because
    npm resolves that range across all published versions.
 
-10. **Rename `release/next` to `v1.x`.** `main` holds the released `1.0.1`, and `release/next` will
-    describe the wrong line once v2 is next. The publish workflow already accepts pushes to `v1.x`.
+10. **Rename `release/next` to `release/v1`.** `main` holds the released `1.0.1`, and
+    `release/next` will describe the wrong line once v2 is next. The publish workflow already accepts
+    pushes to `release/**`.
 11. **Record the change policy in CONTRIBUTING.** A fix cannot be cherry-picked between the lines,
     because v2 is a port rather than a superset. A security or critical correctness fix gets one
     hand-written implementation per line. Everything else is v2 only, and a v1 patch takes no features.
@@ -124,6 +125,7 @@ when v2 lands. npm serves the README of the installed version, which covers v1 u
     `npm view pixi-solid dist-tags` that `next` moved and `latest` still points at 1.x.
 14. **Address RC feedback.** Publish further RCs as needed, repeat the relevant checks, bump
     `packages/pixi-solid/package.json` to `2.0.0`, and merge to `main`. The merge publishes stable as
-    `latest`. Then branch `v1.x` from the last v1 commit, so v1 patches keep shipping from there.
+    `latest`. Then branch `release/v1` from the last v1 commit, so v1 patches keep shipping from
+    there.
 15. **Point the migration guide at Solid's `main` branch docs** once Solid 2 ships stable, then delete
     this file.
