@@ -168,7 +168,9 @@ describe("Graphics draw prop", () => {
     flush();
 
     expect(captured).toBe(queryByLabel("graphics"));
-    expect(widthOf(captured!)).toBe(7);
+    if (captured === undefined) throw new Error("expected a captured Graphics instance");
+
+    expect(widthOf(captured)).toBe(7);
     dispose();
   });
 
