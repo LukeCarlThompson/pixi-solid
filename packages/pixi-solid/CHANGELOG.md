@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
-## Unreleased
+## 2.0.0-rc.1
 
 `pixi-solid` 2 requires SolidJS 2. Component, hook, and utility names stay the same, but SolidJS 2 removed or replaced several of the framework APIs around them, so this is a major release. The [migration guide](https://lukecarlthompson.github.io/pixi-solid/migration/solid-2/) lists every change.
 
@@ -40,6 +40,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - 🐞 Applied initialisation props such as `texture` and `label` to an instance supplied through the `as` prop. They were ignored because the constructor never received them.
+
+## 1.0.1
+
+### Fixed
+
+- 🐞 Removed the `preinstall` `only-allow pnpm` script, which failed installs for consumers using npm or yarn.
 
 ## 1.0.0
 

@@ -23,14 +23,20 @@ export const bindSingleEffectRewrite = (
 ): void => {
   const keys = Object.keys(props).filter(include);
   const length = keys.length;
-  const values = new Array<unknown>(length);
+  const values: unknown[] = keys.map(() => undefined);
 
   createRenderEffect(
     () => {
-      for (let i = 0; i < length; i += 1) values[i] = props[keys[i]!];
+      for (let i = 0; i < length; i += 1) {
+        const key = keys[i];
+        if (key !== undefined) values[i] = props[key];
+      }
     },
     () => {
-      for (let i = 0; i < length; i += 1) bindKey(keys[i]!, values[i]);
+      for (let i = 0; i < length; i += 1) {
+        const key = keys[i];
+        if (key !== undefined) bindKey(key, values[i]);
+      }
     },
   );
 };
@@ -43,19 +49,25 @@ export const bindSingleEffectDiff = (
 ): void => {
   const keys = Object.keys(props).filter(include);
   const length = keys.length;
-  const next = new Array<unknown>(length);
-  const previous = new Array<unknown>(length);
+  const next: unknown[] = keys.map(() => undefined);
+  const previous: unknown[] = keys.map(() => undefined);
   let primed = false;
 
   createRenderEffect(
     () => {
-      for (let i = 0; i < length; i += 1) next[i] = props[keys[i]!];
+      for (let i = 0; i < length; i += 1) {
+        const key = keys[i];
+        if (key !== undefined) next[i] = props[key];
+      }
     },
     () => {
       for (let i = 0; i < length; i += 1) {
         if (primed && Object.is(previous[i], next[i])) continue;
 
-        bindKey(keys[i]!, next[i]);
+        const key = keys[i];
+        if (key === undefined) continue;
+
+        bindKey(key, next[i]);
         previous[i] = next[i];
       }
       primed = true;
