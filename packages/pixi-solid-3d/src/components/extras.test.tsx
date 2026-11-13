@@ -1,7 +1,7 @@
 import type * as Pixi3DExtras from "@pixi/3d/extras";
 import { cleanup, createTestContext, mountScene } from "pixi-solid/testing";
 import { createSignal } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { FPSCamera, ParticleSystem3D, View3D } from "../components";
 
@@ -168,6 +168,28 @@ describe("FPSCamera and ParticleSystem3D extras", () => {
     // THEN
     expect(psRef?.playing).toBe(true);
 
+    cleanup();
+  });
+
+  it("GIVEN a playing prop WHEN the system mounts THEN it does not warn about a read-only prop", () => {
+    // GIVEN
+    const ctx = createTestContext();
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    // WHEN
+    mountScene(() => (
+      <ctx.Provider>
+        <View3D width={400} height={300}>
+          <ParticleSystem3D capacity={64} playing={true} />
+        </View3D>
+      </ctx.Provider>
+    ));
+
+    // THEN `playing` is driven by play()/stop(), not written as a property
+    const playingWarnings = warn.mock.calls.filter((call) => String(call[0]).includes('"playing"'));
+    expect(playingWarnings).toEqual([]);
+
+    warn.mockRestore();
     cleanup();
   });
 });

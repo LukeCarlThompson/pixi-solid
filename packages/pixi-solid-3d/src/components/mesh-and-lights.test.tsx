@@ -3,6 +3,7 @@ import {
   CubeGeometry as PixiCubeGeometry,
   FlatMaterial as PixiFlatMaterial,
   Material3D as PixiMaterial3D,
+  Mesh3D as PixiMesh3D,
   PlaneGeometry as PixiPlaneGeometry,
 } from "@pixi/3d";
 import { PortalMaterial as PixiPortalMaterial } from "@pixi/3d/extras";
@@ -333,5 +334,31 @@ describe("Mesh3D and Lights", () => {
     // THEN
     expect(capturedMat.destroyed).toBe(true);
     feed.destroy(true);
+  });
+
+  it("GIVEN an existing Mesh3D adopted through as WHEN it unmounts THEN it and its geometry survive", () => {
+    // GIVEN
+    const geometry = new PixiCubeGeometry();
+    const owned = new PixiMesh3D({ geometry, label: "owned" });
+
+    const { container } = mountScene<PixiMesh3D>(() => (
+      <Mesh3D as={owned} x={5}>
+        <Material3D />
+      </Mesh3D>
+    ));
+
+    // THEN props still apply to an adopted mesh, and no fallback geometry was substituted
+    expect(container).toBe(owned);
+    expect(owned.x).toBe(5);
+    expect(owned.geometry).toBe(geometry);
+
+    // WHEN
+    cleanup();
+
+    // THEN
+    expect(owned.destroyed).toBe(false);
+    expect(owned.geometry).toBe(geometry);
+
+    owned.destroy({ children: true });
   });
 });

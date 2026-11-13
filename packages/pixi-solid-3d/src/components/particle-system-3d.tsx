@@ -82,7 +82,10 @@ export const ParticleSystem3D: PixiComponent3D<
   );
 
   bindInitialisationProps3D(instance, initialisationProps);
-  bindRuntimeProps3D(instance, runtimeProps as any);
+  // `playing` is a getter with no setter: writing it does nothing and trips the read-only warning,
+  // so the effect above is the only thing that drives it.
+  const [, runtimeWithoutPlaying] = splitProps(runtimeProps, ["playing"]);
+  bindRuntimeProps3D(instance, runtimeWithoutPlaying as any);
 
   onCleanup(() => {
     if (isUserOwnedInstance) return;
