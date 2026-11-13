@@ -46,12 +46,19 @@ export type Mesh3DComponentProps = Leaf3DProps<PixiMesh3D> &
   };
 export type Model3DComponentProps = Container3DProps<PixiModel3D> &
   Omit<Pixi3D.Model3DOptions, "children"> & {
+    /**
+     * Materials the model draws instead of its source's, so one loaded model can be tinted or
+     * re-shaded without touching the shared `Scene3DSource`.
+     *
+     * Accepts a record by material label, an array by source material index, or a function called
+     * once per source material. Set it to `undefined` to go back to the source's materials.
+     */
+    materials?: Pixi3D.MaterialOverrides;
+    /** Runs for this model and every descendant, depth first, whenever it changes. */
     traverse?: (node: Pixi3D.Container3D) => void;
   };
 export type Sprite3DComponentProps = Leaf3DProps<PixiSprite3D> &
   Omit<Pixi3D.Sprite3DOptions, "children">;
-
-import { traverse3D } from "../utils/traverse-3d";
 
 import { Mesh3DContext } from "./mesh-3d-context";
 import { useView3D } from "./view-3d-context";
@@ -84,6 +91,9 @@ export const Container3D: PixiComponent3D<Container3DComponentProps, PixiContain
  * Supports passing `geometry` and `material` as props, or declaring them as nested
  * children (e.g. `<Mesh3D><CubeGeometry /><Material3D /></Mesh3D>`), which manages their lifecycle
  * and automatically disposes them when unmounted.
+ *
+ * When neither is given, the mesh falls back to a `PlaneGeometry` and a `FlatMaterial` that this
+ * component owns and destroys with the mesh.
  */
 export const Mesh3D: PixiComponent3D<Mesh3DComponentProps, PixiMesh3D> = (props) => {
   const [runtimeProps, initialisationProps] = splitProps(props, [
@@ -93,12 +103,23 @@ export const Mesh3D: PixiComponent3D<Mesh3DComponentProps, PixiMesh3D> = (props)
 
   const isUserOwnedInstance = runtimeProps.as !== undefined;
   const initialisation = { ...initialisationProps } as any;
-  if (!initialisation.geometry) {
-    initialisation.geometry = new PixiPlaneGeometry();
+
+  // Track the fallbacks so cleanup frees them; `destroy({ children: true })` leaves geometry and
+  // material alone, so a mesh that never got its own would otherwise leak one of each.
+  let fallbackGeometry: PixiPlaneGeometry | undefined;
+  let fallbackMaterial: PixiFlatMaterial | undefined;
+
+  if (!isUserOwnedInstance) {
+    if (!initialisation.geometry) {
+      fallbackGeometry = new PixiPlaneGeometry();
+      initialisation.geometry = fallbackGeometry;
+    }
+    if (!initialisation.material) {
+      fallbackMaterial = new PixiFlatMaterial();
+      initialisation.material = fallbackMaterial;
+    }
   }
-  if (!initialisation.material) {
-    initialisation.material = new PixiFlatMaterial();
-  }
+
   const instance = props.as || new PixiMesh3D(initialisation);
 
   const initialGeometry = instance.geometry;
@@ -108,7 +129,7 @@ export const Mesh3D: PixiComponent3D<Mesh3DComponentProps, PixiMesh3D> = (props)
     instance.geometry = geometry;
   };
   const unregisterGeometry = (geometry: any) => {
-    if (instance.geometry === geometry) {
+    if (instance.geometry === geometry && initialGeometry) {
       instance.geometry = initialGeometry;
     }
   };
@@ -117,7 +138,7 @@ export const Mesh3D: PixiComponent3D<Mesh3DComponentProps, PixiMesh3D> = (props)
     instance.material = material;
   };
   const unregisterMaterial = (material: any) => {
-    if (instance.material === material) {
+    if (instance.material === material && initialMaterial) {
       instance.material = initialMaterial;
     }
   };
@@ -129,6 +150,8 @@ export const Mesh3D: PixiComponent3D<Mesh3DComponentProps, PixiMesh3D> = (props)
   onCleanup(() => {
     if (isUserOwnedInstance) return;
     instance.destroy({ children: true });
+    fallbackGeometry?.destroy();
+    fallbackMaterial?.destroy();
   });
 
   return (
@@ -155,7 +178,9 @@ const MODEL_3D_RUNTIME_KEYS = [...CONTAINER3D_RUNTIME_KEYS, "traverse"] as const
 /**
  * A SolidJS component that renders a `Model3D` from an asset source.
  * Synchronizes animation playback with the scoped Pixi.Ticker from context.
- * Supports a `traverse` prop to inspect or customize child meshes/nodes on mount.
+ *
+ * `materials` gives this model its own materials, so mutating `mesh.material.roughness` no longer
+ * writes through to the shared `Scene3DSource`. `traverse` inspects or customizes child nodes.
  */
 export const Model3D: PixiComponent3D<Model3DComponentProps, PixiModel3D> = (props) => {
   const [runtimeProps, initialisationProps] = splitProps(props, MODEL_3D_RUNTIME_KEYS);
@@ -201,7 +226,7 @@ export const Model3D: PixiComponent3D<Model3DComponentProps, PixiModel3D> = (pro
   createRenderEffect(() => {
     const fn = (props as any).traverse;
     if (typeof fn === "function") {
-      traverse3D(instance, fn);
+      instance.traverse(fn);
     }
   });
 

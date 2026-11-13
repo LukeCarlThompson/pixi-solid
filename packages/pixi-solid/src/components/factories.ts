@@ -272,4 +272,3 @@ export const createTilingSpriteComponent = <
     return instance as InstanceType & JSX.Element;
   };
 };
-

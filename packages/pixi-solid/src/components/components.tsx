@@ -146,18 +146,16 @@ export const RenderLayer: Component<RenderLayerProps> = createContainerComponent
 /**
  * A SolidJS component that renders a `PIXI.Sprite`.
  */
-export const Sprite: Component<SpriteProps> = createSpriteComponent<
+export const Sprite: Component<SpriteProps> = createSpriteComponent<PixiSprite, Pixi.SpriteOptions>(
   PixiSprite,
-  Pixi.SpriteOptions
->(PixiSprite);
+);
 
 /**
  * A SolidJS component that renders a `PIXI.Text`.
  */
-export const Text: Component<TextProps> = createSpriteComponent<
+export const Text: Component<TextProps> = createSpriteComponent<PixiText, Pixi.CanvasTextOptions>(
   PixiText,
-  Pixi.CanvasTextOptions
->(PixiText);
+);
 
 /**
  * A SolidJS component that renders a `PIXI.SplitText`.

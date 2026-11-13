@@ -1,0 +1,88 @@
+---
+title: Instancing
+description: Drawing thousands of copies of one geometry with BatchedMesh3D in pixi-solid-3d.
+sidebar:
+  order: 6
+---
+
+`<BatchedMesh3D>` draws many copies of a geometry from one GPU batch, with no scene node per copy.
+Reach for it when a scene has thousands of identical objects: grass, trees, bullets, crowd members,
+voxel tiles.
+
+Past a few thousand meshes, a node each costs more to update and draw than the batch saves. Below
+that, plain `<Mesh3D>` is simpler and fast enough.
+
+### Declaring a batch
+
+`size` is required and fixed for the batch's lifetime. Slots stay allocated whether they draw or
+not, so size the batch to the most you will draw at once.
+
+```tsx
+import type { BaseMaterial3D, Geometry3D } from "@pixi/3d";
+import { RenderPassBit } from "@pixi/3d";
+import { BatchedMesh3D } from "pixi-solid-3d";
+
+export const Forest = (props: {
+  count: number;
+  geometry: Geometry3D;
+  material: BaseMaterial3D;
+}) => (
+  <BatchedMesh3D
+    size={props.count}
+    ref={(batch) => {
+      for (let i = 0; i < props.count; i++) {
+        batch.setGeometryAt(i, props.geometry);
+        batch.setMaterialAt(i, props.material);
+        batch.setMatrixAt(i, treeMatrix(i));
+        batch.setPassesAt(i, RenderPassBit.OPAQUE | RenderPassBit.SHADOW);
+      }
+    }}
+  />
+);
+```
+
+A slot needs a geometry and a material only while it is in a pass, so spare slots can stay empty.
+
+### Showing and hiding slots
+
+To spawn and despawn, show and hide slots instead of adding and removing nodes:
+
+```tsx
+batch.setVisibleAt(index, false); // despawn
+batch.setVisibleAt(index, true); // respawn
+```
+
+Moving a slot is a matrix write, cheap enough for every frame:
+
+```tsx
+batch.setMatrixAt(index, nextMatrix);
+```
+
+### Per-slot shader values
+
+`Mesh3D` notices when its material's shader changes; a batch slot does not. After swapping a
+material on a slot, call `batch.invalidate(index)`.
+
+For a value that differs per slot, such as a tint or a fade, declare `instanceData` and write it.
+A field can hold up to four numbers per slot:
+
+```tsx
+<BatchedMesh3D
+  size={count}
+  instanceData={{ tint: { value: [1, 1, 1, 1], type: "vec4<f32>" } }}
+  ref={(batch) => {
+    for (let i = 0; i < count; i++) {
+      batch.setInstanceDataAt(i, "tint", 1, 0.2, 0.2, 1);
+    }
+  }}
+/>
+```
+
+To rewrite many slots in one pass, write into `batch.instanceData.data` and call
+`batch.instanceData.update()`.
+
+### Reactivity
+
+`<BatchedMesh3D>` binds the same 3D transform and event props as every other scene node, so `x`,
+`scaleZ` and `onclick` work as usual. Slot contents are imperative, because the batch holds one
+buffer for all of them.

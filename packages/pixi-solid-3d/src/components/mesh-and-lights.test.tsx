@@ -1,8 +1,13 @@
 import type * as Pixi3D from "@pixi/3d";
-import { CubeGeometry as PixiCubeGeometry, Material3D as PixiMaterial3D } from "@pixi/3d";
+import {
+  CubeGeometry as PixiCubeGeometry,
+  FlatMaterial as PixiFlatMaterial,
+  Material3D as PixiMaterial3D,
+  PlaneGeometry as PixiPlaneGeometry,
+} from "@pixi/3d";
 import { cleanup, mountScene } from "pixi-solid/testing";
 import { createSignal } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { Mesh3D, DirectionalLight, CubeGeometry, Material3D, ToonMaterial } from "../components";
 
@@ -142,5 +147,63 @@ describe("Mesh3D and Lights", () => {
 
     cleanup();
     expect(capturedMat.destroyed).toBe(true);
+  });
+
+  it("binds the oncontextmenu event handler", () => {
+    const onContextMenu = vi.fn();
+
+    const { container } = mountScene<Pixi3D.Mesh3D>(() => (
+      <Mesh3D label="panel" oncontextmenu={onContextMenu} />
+    ));
+
+    container.emit("contextmenu", {} as Pixi3D.Pointer3DEvent);
+    expect(onContextMenu).toHaveBeenCalledTimes(1);
+
+    cleanup();
+  });
+
+  it("binds a capture-phase event handler", () => {
+    const onPointerDownCapture = vi.fn();
+
+    const { container } = mountScene<Pixi3D.Mesh3D>(() => (
+      <Mesh3D label="panel" onpointerdowncapture={onPointerDownCapture} />
+    ));
+
+    container.emit("pointerdowncapture", {} as Pixi3D.Pointer3DEvent);
+    expect(onPointerDownCapture).toHaveBeenCalledTimes(1);
+
+    cleanup();
+  });
+
+  it("frees the fallback geometry and material of a bare Mesh3D on unmount", () => {
+    const { container } = mountScene<Pixi3D.Mesh3D>(() => <Mesh3D label="bare" />);
+
+    const geometry = container.geometry as unknown as { _destroyed: boolean };
+    const material = container.material;
+
+    expect(container.geometry).toBeInstanceOf(PixiPlaneGeometry);
+    expect(material).toBeInstanceOf(PixiFlatMaterial);
+
+    cleanup();
+
+    expect(geometry._destroyed).toBe(true);
+    expect(material.destroyed).toBe(true);
+  });
+
+  it("leaves fallback resources alone when geometry and material are supplied", () => {
+    const geometry = new PixiCubeGeometry();
+    const material = new PixiMaterial3D();
+
+    const { container } = mountScene<Pixi3D.Mesh3D>(() => (
+      <Mesh3D label="shared" geometry={geometry} material={material} />
+    ));
+
+    expect(container.geometry).toBe(geometry);
+    expect(container.material).toBe(material);
+
+    cleanup();
+
+    expect((geometry as unknown as { _destroyed: boolean })._destroyed).toBeFalsy();
+    expect(material.destroyed).toBe(false);
   });
 });

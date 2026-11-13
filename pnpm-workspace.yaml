@@ -9,7 +9,8 @@ minimumReleaseAgeExclude:
   - "@vitest/mocker@5.0.1"
   - "@vitest/spy@5.0.1"
   - vitest@5.0.1
-  - pixi.js@8.22.0
+  - pixi.js@8.23.0
+  - "@pixi/3d@0.1.0"
 overrides:
-  pixi.js: 8.22.0
+  pixi.js: 8.23.0
   solid-js: 1.9.15

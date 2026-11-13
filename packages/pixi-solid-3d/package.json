@@ -24,11 +24,6 @@
       "browser": "./dist/index.js",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./utils": {
-      "browser": "./dist/utils/index.js",
-      "types": "./dist/utils/index.d.ts",
-      "import": "./dist/utils/index.js"
     }
   },
   "scripts": {
@@ -43,12 +38,12 @@
     "pixi-solid": "workspace:^"
   },
   "devDependencies": {
-    "@pixi/3d": "file:../../pixi-3d/pixi-3d-0.1.0-beta.2.tgz"
+    "@pixi/3d": "^0.1.0"
   },
   "peerDependencies": {
-    "@pixi/3d": ">=0.1.0-beta.2 <0.2",
+    "@pixi/3d": ">=0.1.0 <0.2",
     "pixi-solid": "workspace:^",
-    "pixi.js": ">=8.22.0 <9",
+    "pixi.js": ">=8.23.0 <9",
     "solid-js": ">=1.9.10 <2"
   }
 }

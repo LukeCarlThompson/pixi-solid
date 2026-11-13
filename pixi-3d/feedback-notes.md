@@ -1,10 +1,25 @@
 # Feedback Notes for @pixi/3d
 
-This document records architectural observations, developer experience friction points, and feature recommendations gathered while building `pixi-solid-3d` against `@pixi/3d` (`0.1.0-beta.1`).
+This document records architectural observations, developer experience friction points, and feature recommendations gathered while building `pixi-solid-3d` against `@pixi/3d`.
+
+Findings were collected on `0.1.0-beta.1`. Items marked **Resolved** were checked against the
+published `0.1.0` and this note keeps the original text so the history stays readable.
+
+| #   | Topic                                      | Status in 0.1.0                                                  |
+| --- | ------------------------------------------ | ---------------------------------------------------------------- |
+| 1   | Scene traversal on `Container3D`           | **Resolved**: `Container3D.traverse` exists                      |
+| 2   | Shared materials vs per-instance mutation  | **Resolved**: `Model3D.materials` takes overrides                |
+| 3   | `View3D` event dispatching on child leaves | Open                                                             |
+| 4   | Dual constructor forms for `Sprite3D`      | **Resolved**: one flat `Sprite3DOptions`                         |
+| 5   | Package is not tree-shakeable              | Partly: `@pixi/3d/extras` now loads standalone; barrel unchanged |
 
 ---
 
 ## 1. Scene Traversal Method on `Container3D` (`traverse` / `traverse3D`)
+
+> **Resolved in 0.1.0.** `Container3D.traverse(callback)` now walks the subtree depth first, with
+> the documented caveats about mutating the tree during a walk. `pixi-solid-3d` dropped its own
+> `traverse3D` helper and the `pixi-solid-3d/utils` entry point in favour of the built-in method.
 
 ### The Problem
 
@@ -39,6 +54,11 @@ class Container3D {
 
 ## 2. Shared Materials vs Per-Instance Property Mutation on `Model3D`
 
+> **Resolved in 0.1.0.** `Model3D` accepts a `materials` option (and a `materials` setter) typed
+> `MaterialOverrides`: a record by label, an array by source index, or a function called once per
+> source material. `<Model3D materials={...}>` in `pixi-solid-3d` forwards it and re-applies it when
+> the prop changes.
+
 ### The Problem
 
 When `Model3D` instantiates meshes from a `Scene3DSource`, all meshes reference the shared `source.materials` array.
@@ -66,6 +86,10 @@ In `@pixi/3d`, `View3D` listens to Pixi's 2D federated events and casts rays via
 
 ## 4. Dual Constructor Forms for `Sprite3D`
 
+> **Resolved in 0.1.0.** `Sprite3DOptions` is one flat interface. `texture`, `material`, `tint`,
+> `alpha`, `alphaMode`, `alphaCutoff`, `pixelSize`, `anchor` and `billboardMode` all sit side by
+> side and are settable on the instance, so JSX wrappers need no special case.
+
 ### The Problem
 
 `Sprite3DOptions` is split into `TextureForm | MaterialForm` with `never` markers. If a user passes both `texture` and `material`, `@pixi/3d` logs a warning and silently ignores the texture in favor of the material.
@@ -74,6 +98,12 @@ In declarative wrappers (like JSX), having separate setter props for `material` 
 ---
 
 ## 5. Package Is Not Tree-Shakeable (No Partial Imports)
+
+> **Partly resolved in 0.1.0.** `import "@pixi/3d/extras"` on its own now evaluates without the
+> `Cannot access 'GL_GET_LIGHT_HELPER' before initialization` error, so the workaround bare
+> `import "@pixi/3d"` in `pixi-solid-3d` is no longer load-bearing (it is kept because it also runs
+> the package's `init` side effects). `dist/index.mjs` still has 11 bare barrel imports and
+> `sideEffects` still lists `./dist/index.*`, so the size problem below stands.
 
 ### The Problem
 
@@ -99,7 +129,7 @@ import "./scene/index.mjs";
 import "./init.mjs";
 ```
 
-**b) `init.mjs` has real global side effects.** It calls `addUniformParsers()` and `extensions.add({ ... ExtensionType.WebGLLoader ... })` at module scope, and it is imported eagerly by `index.mjs`. Those calls mutate Pixi's global uniform-parser and extension registries, so no bundler may drop them. This is not a metadata problem: re-bundling with esbuild's `--ignore-annotations` (which ignores `package.json#sideEffects` for every package) produced a _larger_ result (528 KB vs 504 KB), because the retained bytes come from genuine top-level statements, not annotations.
+### b) `init.mjs` has real global side effects. It calls `addUniformParsers()` and `extensions.add({ ... ExtensionType.WebGLLoader ... })` at module scope, and it is imported eagerly by `index.mjs`. Those calls mutate Pixi's global uniform-parser and extension registries, so no bundler may drop them. This is not a metadata problem: re-bundling with esbuild's `--ignore-annotations` (which ignores `package.json#sideEffects` for every package) produced a _larger_ result (528 KB vs 504 KB), because the retained bytes come from genuine top-level statements, not annotations.
 
 **c) `exports` blocks all deep entry points.** Only `.`, `./extras`, `./webgl`, and `./webgpu` are exposed, so the natural escape hatch fails:
 

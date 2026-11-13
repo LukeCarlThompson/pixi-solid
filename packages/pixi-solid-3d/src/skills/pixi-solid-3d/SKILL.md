@@ -9,6 +9,10 @@ metadata:
 
 Use this skill for `pixi-solid-3d` APIs and scene integration. It extends `pixi-solid` with 3D components powered by `@pixi/3d` and `pixi.js` (v8).
 
+## Versions
+
+`pixi-solid-3d` requires `@pixi/3d` 0.1.0 or later and `pixi.js` 8.23.0 or later. `@pixi/3d` declares `pixi.js ^8.23.0` as a peer, so an older `pixi.js` can fail at runtime.
+
 ## Architecture
 
 In PixiJS v8:
@@ -107,6 +111,84 @@ function Character() {
 }
 ```
 
+### Per-model materials
+
+By default every `Model3D` built from one `Scene3DSource` draws the **same** material instances, so writing `mesh.material.roughness = 0.9` changes every model made from that source. Give the model its own materials with `materials` instead:
+
+```tsx
+// By material label (glTF material names)
+<Model3D source={src()} materials={{ Paint: redPaint }} />
+
+// By source material index; an empty entry keeps the source's material
+<Model3D source={src()} materials={[undefined, glowMaterial]} />
+
+// One call per source material, so meshes that shared a material still share its replacement
+<Model3D source={src()} materials={(material) => material.clone()} />
+```
+
+`materials` is a setter on `Model3D`, so a signal works. Passing `undefined` puts the source's materials back. The component never destroys the materials you pass in.
+
+### Walking model nodes
+
+Use `traverse` on `<Model3D>`, or call `Container3D.traverse` on any node:
+
+```tsx
+<Model3D
+  source={src()}
+  traverse={(node) => {
+    if (node instanceof Mesh3D) {
+      node.castShadow = true;
+      node.receiveShadow = true;
+    }
+  }}
+/>
+```
+
+## Event handler props
+
+3D event props are lowercase, matching `pixi-solid`: `onclick`, `onpointerdown`, `onwheel`, `oncontextmenu`, `onpointerdowncapture`, `onglobalpointermove`, and so on. The set comes from `@pixi/3d`'s `FederatedEventEmitterTypes3D`, and the event object carries the 3D fields (`e.hit3D.point`, `e.hit3D.uv`) alongside Pixi's 2D ones.
+
+## Viewport options
+
+Every `View3DOptions` key is accepted on `<View3D>` or `<View3DProvider>` and applied reactively. The ones you reach for most:
+
+| Option                           | Purpose                                                      |
+| -------------------------------- | ------------------------------------------------------------ |
+| `width` / `height`               | Viewport size in pixels                                      |
+| `autoResize`                     | Follow the renderer's screen size                            |
+| `toneMapping`                    | `'none'`, `'aces'`, `'reinhard'`, `'uncharted2'`, `'custom'` |
+| `exposure`                       | Exposure multiplier before tone mapping                      |
+| `environment`                    | Sky/ground colours or a cube map that lights the scene       |
+| `fog`                            | `{ type: 'linear' \| 'exponential' \| 'exp2', ... }`         |
+| `cull`                           | `'off'`, `'cpu'` or `'gpu'` frustum culling                  |
+| `shadowQuality` / `shadowFilter` | Shadow map size and filter                                   |
+| `resolution`                     | Texels per logical pixel, or `'inherit'`                     |
+| `passes`                         | Post effects and passes; the array is copied                 |
+
+## Instancing with `<BatchedMesh3D>`
+
+For thousands of copies of one geometry, `<BatchedMesh3D>` draws them without a node each:
+
+```tsx
+<BatchedMesh3D
+  size={count}
+  ref={(batch) => {
+    for (let i = 0; i < count; i++) {
+      batch.setGeometryAt(i, geometry);
+      batch.setMaterialAt(i, material);
+      batch.setMatrixAt(i, matrix);
+      batch.setPassesAt(i, RenderPassBit.OPAQUE | RenderPassBit.SHADOW);
+    }
+  }}
+/>
+```
+
+`size` is required and fixed for the batch's lifetime. Hide a slot with `setVisibleAt(i, false)` to despawn it; there is no `setItemActive` any more. For per-slot shader values such as a tint, pass `instanceData` and write it with `setInstanceDataAt`.
+
+## Single-renderer builds
+
+`@pixi/3d` exposes `@pixi/3d/webgl` and `@pixi/3d/webgpu` for apps that only need one backend. `pixi-solid-3d` imports the full `@pixi/3d` entry, which runs the package's initialisation, so keep that import when you use both.
+
 ## Public API Checklist
 
 | Area                   | Exports                                                                                                                  | Description                                                    |
@@ -117,5 +199,9 @@ function Character() {
 | **Materials**          | `<Material3D>`, `<FlatMaterial>`, `<PhongMaterial>`, `<ToonMaterial>`                                                    | Declarative materials with auto-disposal                       |
 | **Geometries**         | `<CubeGeometry>`, `<SphereGeometry>`, `<PlaneGeometry>`, `<CylinderGeometry>`, etc.                                      | Declarative shapes with auto-disposal                          |
 | **Lighting**           | `<DirectionalLight>`, `<PointLight>`, `<AmbientLight>`, `<SpotLight>`                                                    | Real-time scene lights                                         |
-| **Utils**              | `traverse3D`                                                                                                             | Depth-first 3D scene traversal                                 |
+| **Utils**              | `Container3D.traverse`                                                                                                   | Depth-first 3D scene traversal                                 |
 | **Testing**            | Import directly from `pixi-solid/testing` (`mountScene`, `getByLabel`, `cleanup`)                                        | Headless testing utilities                                     |
+
+## Related skills
+
+`@pixi/3d` 0.1.0 ships its own agent skill at `node_modules/@pixi/3d/skills/pixijs-3d/`. Read it for engine-level detail: materials, shadows, custom shaders, instancing, post-processing, and the Three.js migration guide.

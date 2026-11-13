@@ -68,4 +68,43 @@ export const CustomKnight = (props: { source: any }) => {
 };
 ```
 
-You can also import and call `traverse3D(root, callback)` imperatively on any `Container3D` node at any time.
+Every `Container3D` has `traverse(callback)`, which visits the node and every descendant depth first. Call it imperatively on a node when the `traverse` prop is not enough:
+
+```tsx
+const model = new Model3D({ source });
+
+model.traverse((node) => {
+  if (node instanceof Mesh3D) node.castShadow = true;
+});
+```
+
+### Per-model material overrides
+
+Every `<Model3D>` built from the same `Scene3DSource` draws the **same** material instances. Changing a property on one writes through to every model built from that source:
+
+```tsx
+// Affects every model made from this source
+armorMesh.material.roughness = 0.9;
+```
+
+When a model needs materials of its own, pass `materials`. `@pixi/3d` calls it once per source material, so meshes that shared a material still share its replacement:
+
+```tsx
+import { Material3D } from "@pixi/3d";
+import { Model3D } from "pixi-solid-3d";
+
+// By material label, using the names in the glTF file
+<Model3D source={source()} materials={{ Paint: new Material3D({ baseColor: 0xff2222 }) }} />;
+
+// By source material index; leave an entry out to keep the source's material
+<Model3D source={source()} materials={[undefined, glowMaterial]} />;
+
+// Build a private copy of every material
+<Model3D source={source()} materials={(material) => material.clone()} />;
+```
+
+`materials` is a setter on `Model3D`, so you can swap overrides from a signal, for example when a
+model takes damage. Assigning `undefined` gives the model the source's materials back.
+
+`<Model3D>` never destroys the materials you pass in. Destroy the ones you created when you are
+done with them, or pass `destroy({ material: true })` yourself.

@@ -2,4 +2,3 @@
 import "@pixi/3d";
 
 export * from "./components";
-export * from "./utils";

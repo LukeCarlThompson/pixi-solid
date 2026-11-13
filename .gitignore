@@ -22,5 +22,3 @@ dist-ssr
 *.sw?
 
 .pi
-
-pixi-3d/pixi-3d-beta-0.1.0-beta*

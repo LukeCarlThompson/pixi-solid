@@ -1,10 +1,15 @@
 import type * as Pixi3D from "@pixi/3d";
-import { CubeGeometry, FlatMaterial, Material3D, Mesh3D } from "@pixi/3d";
+import {
+  Container3D as PixiContainer3D,
+  CubeGeometry,
+  FlatMaterial,
+  Material3D,
+  Mesh3D,
+} from "@pixi/3d";
 import { cleanup, createTestContext, mountScene } from "pixi-solid/testing";
 import { describe, expect, it, vi } from "vitest";
 
 import { Model3D, View3D } from "../components";
-import { traverse3D } from "../utils";
 
 describe("Model3D animation ticker integration", () => {
   it("initializes Model3D without attaching to Ticker.shared and connects to context ticker", async () => {
@@ -73,7 +78,7 @@ describe("Model3D animation ticker integration", () => {
       animations: {},
       scene: {},
       _descriptor: {
-        nodes: [{ geometry: 0, material: 0, label: "Armor" }],
+        nodes: [{ geometry: 0, materials: [0], label: "Armor" }],
         scenes: [{ children: [0] }],
         defaultScene: 0,
         skins: [],
@@ -102,12 +107,59 @@ describe("Model3D animation ticker integration", () => {
     expect(armorMesh).toBeInstanceOf(Mesh3D);
     expect(armorMesh.material).toBe(customMat);
 
-    // Also test standalone traverse3D
-    let visitedNodes = 0;
-    traverse3D(modelRef, () => {
-      visitedNodes++;
-    });
-    expect(visitedNodes).toBe(2); // Model3D root + armor mesh
+    cleanup();
+  });
+
+  it("walks descendants with the built-in Container3D.traverse", () => {
+    const parent = new PixiContainer3D();
+    const child = new PixiContainer3D();
+
+    parent.addChild(child);
+
+    const visited: Pixi3D.Container3D[] = [];
+
+    parent.traverse((node) => visited.push(node));
+
+    expect(visited).toEqual([parent, child]);
+  });
+
+  it("applies per-model materials without mutating the shared source", () => {
+    const sourceMaterial = new Material3D({ baseColor: 0xff0000 });
+    const overrideMaterial = new Material3D({ baseColor: 0x0000ff });
+
+    const mockSource = {
+      textures: [],
+      materials: [sourceMaterial],
+      geometries: [[new CubeGeometry()]],
+      texture: {},
+      material: {},
+      geometry: {},
+      animations: {},
+      scene: {},
+      _descriptor: {
+        nodes: [{ geometry: 0, materials: [0], label: "Armor" }],
+        scenes: [{ children: [0] }],
+        defaultScene: 0,
+        skins: [],
+      },
+    } as unknown as Pixi3D.Scene3DSource;
+
+    let modelRef: any;
+
+    mountScene(() => (
+      <View3D width={300} height={300}>
+        <Model3D
+          ref={(m) => (modelRef = m)}
+          source={mockSource}
+          materials={() => overrideMaterial}
+        />
+      </View3D>
+    ));
+
+    const armorMesh = modelRef.children[0] as Mesh3D;
+
+    expect(armorMesh.material).toBe(overrideMaterial);
+    expect(sourceMaterial.baseColor).toBe(0xff0000);
 
     cleanup();
   });
