@@ -50,6 +50,32 @@ const { container } = mountScene<Pixi.AnimatedSprite>(() => (
 container.playing; // typed as Pixi.AnimatedSprite
 ```
 
+## Getting a nested node with a ref
+
+`container` is the root. When you need a node below it, a `ref` is the direct way to reach it — no
+label needed:
+
+```tsx
+import type * as Pixi from "pixi.js";
+
+let player: Pixi.Sprite | undefined;
+
+mountScene(() => (
+  <Container label="scene">
+    <Sprite ref={(el) => (player = el)} x={100} />
+  </Container>
+));
+
+expect(player?.x).toBe(100);
+```
+
+Label queries ([scene-queries](../scene-queries)) reach nodes as well. Both are fine; use whichever
+reads better in the test, and note that a `ref` also exercises the `ref` prop itself.
+
+A `ref` only reaches an element you wrote. Nodes a component builds for you — a split text's
+characters, for instance — are reached through that component's own API, or by querying the scene,
+which needs the node to carry a `label`.
+
 ## When to use
 
 - Testing view components that render a Pixi display object

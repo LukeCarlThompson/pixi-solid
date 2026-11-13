@@ -19,15 +19,7 @@ export type ParticleSystem3DComponentProps = Leaf3DProps<PixiParticleSystem3D> &
     playing?: boolean;
   };
 
-const PARTICLE_SYSTEM_KEYS = [
-  ...LEAF3D_RUNTIME_KEYS,
-  "autoUpdate",
-  "playing",
-  "emitRate",
-  "gravity",
-  "drag",
-  "frameRate",
-] as const;
+const PARTICLE_SYSTEM_KEYS = [...LEAF3D_RUNTIME_KEYS, "autoUpdate", "playing"] as const;
 
 /**
  * SolidJS component that renders a 3D GPU particle system (`ParticleSystem3D`).
@@ -74,7 +66,7 @@ export const ParticleSystem3D: PixiComponent3D<
     ),
   );
 
-  // Reactive setters for particle system parameters
+  // `playing` is not a plain field: it calls play()/stop(), so it cannot go through the prop binder
   createRenderEffect(
     on(
       () => (props as any).playing,
@@ -85,42 +77,6 @@ export const ParticleSystem3D: PixiComponent3D<
         } else {
           instance.stop();
         }
-      },
-    ),
-  );
-
-  createRenderEffect(
-    on(
-      () => (props as any).emitRate,
-      (emitRate) => {
-        if (emitRate !== undefined) instance.emitRate = emitRate;
-      },
-    ),
-  );
-
-  createRenderEffect(
-    on(
-      () => (props as any).gravity,
-      (gravity) => {
-        if (gravity !== undefined) instance.gravity = gravity;
-      },
-    ),
-  );
-
-  createRenderEffect(
-    on(
-      () => (props as any).drag,
-      (drag) => {
-        if (drag !== undefined) instance.drag = drag;
-      },
-    ),
-  );
-
-  createRenderEffect(
-    on(
-      () => (props as any).frameRate,
-      (frameRate) => {
-        if (frameRate !== undefined) instance.frameRate = frameRate;
       },
     ),
   );

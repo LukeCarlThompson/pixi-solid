@@ -60,6 +60,79 @@ describe("FPSCamera and ParticleSystem3D extras", () => {
 
     cleanup();
   });
+
+  it("GIVEN gravity, drag and frameRate signals WHEN they change THEN the system follows each one", () => {
+    // GIVEN
+    const ctx = createTestContext();
+    let psRef: Pixi3DExtras.ParticleSystem3D | undefined;
+    const [gravity, setGravity] = createSignal<number | { x: number; y: number; z: number }>(9.8);
+    const [drag, setDrag] = createSignal(0.5);
+    const [frameRate, setFrameRate] = createSignal(12);
+
+    mountScene(() => (
+      <ctx.Provider>
+        <View3D width={400} height={300}>
+          <ParticleSystem3D
+            ref={(ps) => (psRef = ps)}
+            capacity={64}
+            gravity={gravity()}
+            drag={drag()}
+            frameRate={frameRate()}
+          />
+        </View3D>
+      </ctx.Provider>
+    ));
+
+    // THEN the constructor took the initial values
+    expect(psRef?.drag).toBe(0.5);
+    expect(psRef?.frameRate).toBe(12);
+    expect(psRef?.gravity?.y).toBe(-9.8);
+
+    // WHEN
+    setGravity({ x: 1.5, y: -2, z: 0 });
+    setDrag(3);
+    setFrameRate(24);
+
+    // THEN the prop binder wrote each one through
+    expect(psRef?.gravity?.x).toBe(1.5);
+    expect(psRef?.gravity?.y).toBe(-2);
+    expect(psRef?.drag).toBe(3);
+    expect(psRef?.frameRate).toBe(24);
+
+    cleanup();
+  });
+
+  it("GIVEN a playing signal WHEN it flips THEN the system plays and stops", () => {
+    // GIVEN
+    const ctx = createTestContext();
+    let psRef: Pixi3DExtras.ParticleSystem3D | undefined;
+    const [playing, setPlaying] = createSignal(true);
+
+    mountScene(() => (
+      <ctx.Provider>
+        <View3D width={400} height={300}>
+          <ParticleSystem3D ref={(ps) => (psRef = ps)} capacity={64} playing={playing()} />
+        </View3D>
+      </ctx.Provider>
+    ));
+
+    // THEN
+    expect(psRef?.playing).toBe(true);
+
+    // WHEN
+    setPlaying(false);
+
+    // THEN
+    expect(psRef?.playing).toBe(false);
+
+    // WHEN
+    setPlaying(true);
+
+    // THEN
+    expect(psRef?.playing).toBe(true);
+
+    cleanup();
+  });
 });
 
 describe("ParticleSystem3D lifecycle", () => {
