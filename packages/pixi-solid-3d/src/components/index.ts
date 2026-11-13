@@ -12,3 +12,4 @@ export type { View3DProps } from "./view-3d";
 export * from "./orbit-camera";
 export * from "./fps-camera";
 export * from "./particle-system-3d";
+export * from "./container-texture";

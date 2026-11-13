@@ -1,0 +1,113 @@
+---
+title: 2D Content on a 3D Surface
+description: Rendering pixi-solid 2D scenes into 3D materials with createContainerTexture in pixi-solid-3d.
+---
+
+A 3D material can sample any texture, including one showing live 2D content. Use it for in-world
+screens, signs, labels, scoreboards, or UI panels attached to a model.
+
+`@pixi/3d` ships `ContainerTexture` for this, but using it directly has three sharp edges. Pose the
+renderer, remember that its `autoUpdate` runs on `Ticker.shared` rather than the ticker your app
+runs, and free the render target yourself. `createContainerTexture` handles all three.
+
+## Building a texture
+
+The hook takes pixi-solid JSX and returns a texture. The JSX arrives already filled with its
+children, because the parent component binds them:
+
+```tsx
+import { FlatMaterial, PlaneGeometry } from "@pixi/3d";
+import { Mesh3D, createContainerTexture } from "pixi-solid-3d";
+import { Container, Text } from "pixi-solid";
+
+const label = createContainerTexture(
+  <Container>
+    <Text text="Now serving" style={{ fontSize: 48, fill: "#ffffff" }} />
+  </Container>,
+  { width: 512, height: 128 },
+);
+
+<Mesh3D
+  geometry={new PlaneGeometry({ width: 4, height: 1 })}
+  material={new FlatMaterial({ baseColorTexture: label })}
+/>;
+```
+
+The hook must run inside a `<PixiCanvas>` or `<PixiApplicationProvider>`, because it reads the
+renderer and the ticker from context. It throws a clear error if neither is present.
+
+Two constraints come from `ContainerTexture` itself:
+
+- It draws **one** container, so wrap several roots in a `<Container>`.
+- The container is built once. Structure inside it (`<Show>`, `<For>`) stays reactive; replacing the
+  whole tree needs a new texture.
+
+## Options
+
+| Option             | Default        | Notes                                                          |
+| ------------------ | -------------- | -------------------------------------------------------------- |
+| `width` / `height` | content bounds | Pass both for text, whose bounds settle after its first layout |
+| `resolution`       | `1`            | Raise it for content shown close to the camera                 |
+| `antialias`        | `false`        | Smooths scaled content                                         |
+| `clearColor`       | transparent    | What shows where the content does not cover                    |
+| `autoUpdate`       | `true`         | Re-render every frame from the ticker in scope                 |
+
+## Reactivity
+
+**You do not call `render()`.** Content updates are drawn on the next frame, because `autoUpdate`
+defaults to `true`.
+
+The content is mounted once, like any JSX tree, so internal structure stays reactive while the
+top-level tree does not rebuild:
+
+```tsx
+const [score, setScore] = createSignal(0);
+
+const board = createContainerTexture(<Text text={`Score: ${score()}`} />, {
+  width: 256,
+  height: 64,
+});
+```
+
+`score()` changing updates the text, and the next frame draws it. Swapping the entire tree needs a
+new texture.
+
+## Rendering only when it changes
+
+Re-rendering costs one pass over the content every frame. For a texture that changes once a minute,
+such as a clock or a scoreboard nobody is looking at, turn the loop off and render on demand:
+
+```tsx
+const [label, setLabel] = createSignal("Idle");
+
+const panel = createContainerTexture(
+  <Container>
+    <Text text={label()} style={{ fontSize: 40 }} />
+  </Container>,
+  { width: 512, height: 128, autoUpdate: false },
+);
+
+// The first render already happened; redraw whenever the text changes.
+createEffect(on(label, () => panel.render(), { defer: true }));
+```
+
+`defer: true` skips the initial run, since the texture was drawn when it was built. This is an
+optimisation, not the normal path: leave `autoUpdate` on until a profile suggests otherwise.
+
+## Orientation
+
+The image is stored the other way up from an image texture. It shows upright on a default
+`PlaneGeometry` or the sides of a `CubeGeometry`, and upside down where an image would be upright: a
+`SphereGeometry`, a plane with `flipV`, a loaded model, or a 2D `Sprite`. On those, flip the object
+that shows it:
+
+```tsx
+sprite.scale.y = -1;
+sprite.anchor.y = 1;
+```
+
+## Cleanup
+
+The hook destroys the render target when its component unmounts, and leaves your content alone, since
+those components clean up after themselves. If you need the texture to outlive the component, use
+`new ContainerTexture(...)` directly and drive it yourself.

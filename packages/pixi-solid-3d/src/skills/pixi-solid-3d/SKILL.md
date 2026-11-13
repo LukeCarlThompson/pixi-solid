@@ -283,6 +283,35 @@ container.uniforms.uParticleTime = elapsed; // every frame, from `onTick`
 
 For particles you move yourself, write scalars with `setParticleAt` or `writePacked`, or straight into the typed arrays in `container.data`, then call `upload()` once per frame. Those paths allocate nothing.
 
+## 2D content on a 3D surface
+
+`createContainerTexture` renders pixi-solid JSX into a texture any 3D material can sample. It is a
+hook, not a component, because the result is a value, not a scene node.
+
+```tsx
+const label = createContainerTexture(
+  <Container>
+    <Text text="Hello" style={{ fontSize: 64 }} />
+  </Container>,
+  { width: 512, height: 128 },
+);
+
+<Mesh3D
+  geometry={new PlaneGeometry({ width: 4, height: 1 })}
+  material={new FlatMaterial({ baseColorTexture: label })}
+/>;
+```
+
+Never use `new ContainerTexture(...)` directly: `@pixi/3d`'s version needs a renderer, attaches
+`autoUpdate` to `Ticker.shared` rather than the ticker in scope, and leaves its render target for you
+to free. The hook takes the renderer and ticker from context and destroys the texture on unmount.
+
+The JSX argument arrives as a filled `Container`, since the parent component binds its own children.
+It draws one container, so wrap several roots in a `<Container>`. Content is built once, so internal
+`<Show>` / `<For>` stay reactive but the top-level tree does not rebuild. Pass `autoUpdate: false` for static content and call `texture.render()` after changes. The
+image is stored flipped relative to an image texture: upright on a `PlaneGeometry`, inverted on a
+sphere, a loaded model or a 2D sprite, where `scale.y = -1` with `anchor.y = 1` turns it over.
+
 ## Single-renderer builds
 
 `@pixi/3d` exposes `@pixi/3d/webgl` and `@pixi/3d/webgpu` for apps that only need one backend. `pixi-solid-3d` imports the full `@pixi/3d` entry, which runs the package's initialisation, so keep that import when you use both.
