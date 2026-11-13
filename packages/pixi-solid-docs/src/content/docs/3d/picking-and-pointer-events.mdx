@@ -1,0 +1,116 @@
+---
+title: Picking and Pointer Events
+description: Making 3D meshes clickable and hoverable, and reading the surface point a pointer hit, in pixi-solid-3d.
+---
+
+import { Code, Aside } from "@astrojs/starlight/components";
+import demoCode from "../../demos/picking.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
+3D nodes take the same federated pointer events as 2D ones, plus the surface point the ray hit. A
+`View3D` casts a ray from the pointer into the scene and dispatches to whatever it strikes.
+
+### Demo
+
+Move the pointer over a cube, then click it. Drag to orbit the camera.
+
+<ClientOnly fileName="picking" client:load />
+
+### Code example
+
+<Code code={demoCode} lang="tsx" title="picking.demo.tsx" />
+
+## Making a node pickable
+
+`eventMode` decides whether a node takes part. The default, `'passive'`, is inert on its own:
+
+| `eventMode`           | Behaviour                                                                                                            |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `'none'`              | Ignored entirely                                                                                                     |
+| `'passive'` (default) | Not a target, but still picked under an interactive ancestor, which receives the hit with this node's surface data   |
+| `'auto'`              | Picked even with no interactive ancestor, finds no target. Costs time; prefer `'passive'`                            |
+| `'static'`            | Picked against its `hitVolume` and fires its own listeners                                                           |
+| `'dynamic'`           | As `'static'`, and picked again while the pointer is still, so a node that moves under it still gets enter and leave |
+
+```tsx
+<Mesh3D eventMode="static" onclick={() => select()} />
+```
+
+One `'static'` ancestor makes its whole subtree pickable, and the ancestor is the target, which is
+cheaper than marking every mesh.
+
+## What the pointer hit
+
+Two fields carry the 3D information:
+
+```tsx
+<Mesh3D
+  eventMode="static"
+  hitVolume="geometry"
+  onpointertap={(event) => {
+    const hit = event.hit3D;
+    if (!hit) return;
+
+    marker.position.copyFrom(hit.point); // where the ray landed, in world space
+    console.log(hit.normal.y > 0.9 ? "floor" : "wall");
+  }}
+/>
+```
+
+`event.hit3D` holds `target`, `point`, `localPoint`, `distance`, `normal`, `uv` and `triangleIndex`,
+or `null` when the ray strikes nothing. `event.target3D` names the 3D node the event is about, and is
+`null` when it belongs to the view, such as a click on empty space.
+
+`normal`, `uv` and `triangleIndex` need a per-triangle hit volume:
+
+| `hitVolume`                   | Picked as                                                        |
+| ----------------------------- | ---------------------------------------------------------------- |
+| default                       | The geometry's bounding box. Fast, no surface data               |
+| `'geometry'`                  | Every triangle, so hits carry `normal`, `uv` and `triangleIndex` |
+| `'box'`                       | A box sized from the node's width, height and depth              |
+| `Box`, `Sphere`, `Geometry3D` | That shape                                                       |
+| `null`                        | Not pickable                                                     |
+
+A plain `<Container3D>` has no shape of its own, so it only hears events through its children.
+
+<Aside type="caution">
+  Pixi reuses event objects. Read `event.hit3D` inside the handler, and copy anything you keep —
+  `lastHit.copyFrom(event.hit3D.point)` — or the next event overwrites it.
+</Aside>
+
+## Handler names
+
+Event props are lowercase, matching `pixi-solid`: `onclick`, `ontap`, `onpointertap`, `onpointerdown`,
+`onpointerenter`, `onwheel`, `oncontextmenu`. Capture-phase variants add `capture`, as in
+`onpointerdowncapture`, and pointer moves that are delivered wherever the pointer is use the global
+names, as in `onglobalpointermove`. See [Events](/events/overview) for the 2D names; 3D supports the
+same set plus the capture forms.
+
+Each event is available two ways, and both work:
+
+```tsx
+<Mesh3D onpointerenter={() => grow()} />; // handler prop
+mesh.on("pointerenter", () => grow()); // emitter, via a ref
+```
+
+A handler prop runs before the node's `on()` listeners in every phase, so an ancestor's handler prop
+runs twice per event: once in the capture pass and again in the bubble pass. 2D behaves the same.
+
+`pointerupoutside` and `pointerout` still report where the pointer is through `hit3D`, so a pressed
+node can tell when the release landed on a drop target.
+
+## Picking without an event
+
+`view.raycast()` runs the same test and dispatches nothing, which is useful for a custom cursor or a
+tool that highlights whatever is under the pointer:
+
+```tsx
+const view = useView3D();
+const hit = view.raycast({ x: 400, y: 300 });
+```
+
+## Turning picking off
+
+The view starts with `eventMode` `'static'`, so it catches the pointer anywhere in its rectangle.
+Set the view to `'none'` or `'passive'` to switch 3D pointer events off for the whole scene. Picking
+costs time for every node that takes part, so leave `'passive'` everywhere you do not need events.

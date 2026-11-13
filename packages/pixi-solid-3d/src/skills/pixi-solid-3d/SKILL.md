@@ -160,7 +160,9 @@ To change any of these, remount with a different `key` so a new instance is buil
 
 ## Event handler props
 
-3D event props are lowercase, matching `pixi-solid`: `onclick`, `onpointerdown`, `onwheel`, `oncontextmenu`, `onpointerdowncapture`, `onglobalpointermove`, and so on. The set comes from `@pixi/3d`'s `FederatedEventEmitterTypes3D`, and the event object carries the 3D fields (`e.hit3D.point`, `e.hit3D.uv`) alongside Pixi's 2D ones.
+3D event props are lowercase, matching `pixi-solid`: `onclick`, `onpointerdown`, `onwheel`, `oncontextmenu`, `onpointerdowncapture`, `onglobalpointermove`, and so on. The set comes from `@pixi/3d`'s `FederatedEventEmitterTypes3D`, and the event object carries the 3D fields alongside Pixi's 2D ones.
+
+A node only receives events with `eventMode="static"` (or `"dynamic"` for one that moves under a still pointer); the default `"passive"` is inert unless an interactive ancestor covers it. `e.hit3D` is `{ target, point, localPoint, distance, normal, uv, triangleIndex }` or `null`, and `normal`/`uv`/`triangleIndex` need `hitVolume="geometry"` — the default picks the bounding box. Pixi reuses event objects, so copy anything kept beyond the handler. `view.raycast({ x, y })` picks without dispatching.
 
 ## Viewport options
 
