@@ -14,7 +14,10 @@ import {
   TorusKnotGeometry as PixiTorusKnotGeometry,
 } from "@pixi/3d";
 import type * as Pixi3DExtras from "@pixi/3d/extras";
-import { ToonMaterial as PixiToonMaterial } from "@pixi/3d/extras";
+import {
+  PortalMaterial as PixiPortalMaterial,
+  ToonMaterial as PixiToonMaterial,
+} from "@pixi/3d/extras";
 import { createRenderEffect, on, onCleanup, splitProps, type Component, type Ref } from "solid-js";
 
 import { useMesh3D } from "./mesh-3d-context";
@@ -192,4 +195,16 @@ export const ToonMaterial: Component<
   Partial<Pixi3DExtras.ToonMaterialOptions> & ResourceRefProps<PixiToonMaterial>
 > = createMaterial3DComponent<PixiToonMaterial, Partial<Pixi3DExtras.ToonMaterialOptions>>(
   PixiToonMaterial,
+);
+
+/**
+ * A material that shows a render texture, for portals, monitors and anything else that displays
+ * another view.
+ *
+ * `texture` is the image on the surface. The render texture is yours to create, size and destroy.
+ */
+export const PortalMaterial: Component<
+  Partial<Pixi3DExtras.PortalMaterialOptions> & ResourceRefProps<PixiPortalMaterial>
+> = createMaterial3DComponent<PixiPortalMaterial, Partial<Pixi3DExtras.PortalMaterialOptions>>(
+  PixiPortalMaterial,
 );

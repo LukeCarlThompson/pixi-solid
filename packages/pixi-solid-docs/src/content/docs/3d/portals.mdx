@@ -1,0 +1,91 @@
+---
+title: Portals and Render Textures
+description: Showing a live render texture on a 3D surface, and building a real portal through a wall, with pixi-solid-3d.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+`<PortalMaterial>` shows a render texture on a surface. That covers two jobs:
+
+- **A window onto another view** — a security monitor, a picture frame, a teleporter face. You supply a render texture from anywhere, such as a second camera.
+- **A real portal** — a doorway that leads somewhere else in the same scene. This needs the pass below as well.
+
+The render texture is always yours: you create it, size it, and destroy it.
+
+## Showing a render texture
+
+```tsx
+import { FlatMaterial, PlaneGeometry } from "@pixi/3d";
+import { PortalMaterial } from "pixi-solid-3d";
+
+const feed = RenderTexture.create({ width: 512, height: 512 });
+
+<Mesh3D geometry={geometry}>
+  <PortalMaterial texture={feed} baseColor={0xbfdcff} />
+</Mesh3D>;
+```
+
+`texture` is a shortcut for the material's `portal` slot, and `baseColor` tints it. Leave `texture` out and the surface shows plain `baseColor` until you assign `material.textures.portal`.
+
+`<PortalMaterial>` is written as a child of `<Mesh3D>`, so it is created, updated and destroyed with the mesh. See [Meshes and Materials](/3d/meshes-and-materials) for the ownership rules the other materials follow.
+
+## A real portal
+
+A portal is two quads facing their local `+Z`:
+
+- **entry** — the surface the viewer looks through, drawn with `<PortalMaterial>`.
+- **exit** — the quad on the far side. The room the portal shows sits in front of it.
+
+Each frame, `PortalPass` puts a camera behind the exit where the viewer is in front of the entry, renders the scene through it into the feed, and the entry shows the result. Because the entry shows that image at the viewer's own screen position, it reads as an opening rather than a picture.
+
+```tsx
+import { FlatMaterial, Mesh3D as Mesh3DClass, PlaneGeometry } from "@pixi/3d";
+import { PortalPass, PortalMaterial as PortalMaterialClass } from "@pixi/3d/extras";
+import { Mesh3D, PortalMaterial, View3D } from "pixi-solid-3d";
+import { RenderTexture } from "pixi.js";
+
+const WIDTH = 800;
+const HEIGHT = 600;
+
+// 1. The feed, sized to the view.
+const feed = RenderTexture.create({ width: WIDTH, height: HEIGHT, format: "rgba16float" });
+
+// 2. Both quads. They must share a scale.
+const geometry = new PlaneGeometry({ width: 3, height: 4 });
+const entry = new Mesh3DClass({ geometry, material: new PortalMaterialClass({ texture: feed }) });
+const exit = new Mesh3DClass({ geometry, material: new FlatMaterial() });
+exit.position.set(60, 1, 0);
+
+// 3. The pass, which needs both quads and the feed.
+const portal = new PortalPass({ entry, exit, texture: feed });
+
+<View3D width={WIDTH} height={HEIGHT} passes={[portal]}>
+  <Mesh3D as={entry} />
+  <Mesh3D as={exit} />
+</View3D>;
+```
+
+The meshes are built as instances because the pass needs them at construction. `as` adopts them, so the components add them to the view and leave destroying them to you. Note the two imports: `Mesh3DClass` is `@pixi/3d`'s class, while `<Mesh3D>` is the component.
+
+Three rules decide whether it looks right:
+
+- **Size the feed to the view, and resize it with the view.** Another aspect ratio stretches the far side, and too few pixels blur it.
+- **Give both quads the same `scale`.** A scale only one of them has carries into the portal camera and distorts the far side.
+- **Use a perspective camera and an unrotated view.** With an orthographic camera the far side does not show, and in a rotated view the image does not line up with the opening.
+
+`PortalPass` runs at the `'beforeOpaque'` stage, so its position in `passes` does not matter; it always finishes before the scene draws the entry.
+
+<Aside type="note">
+  The far side draws only opaque and transparent meshes, with no sky. Enclose the far room, or add a
+  background pass to `portal.camera`. The pass also skips frames where the entry is hidden, off
+  screen or seen from behind, and a portal that can see itself updates one frame late per level.
+  `PortalFeedPass` is internal — `PortalPass` builds it for you.
+</Aside>
+
+## Disposing
+
+`PortalPass` frees its own resources when the view is destroyed. The feed render texture is yours, so destroy it when the scene unloads:
+
+```tsx
+onCleanup(() => feed.destroy(true));
+```

@@ -5,7 +5,9 @@ import {
   Material3D as PixiMaterial3D,
   PlaneGeometry as PixiPlaneGeometry,
 } from "@pixi/3d";
+import { PortalMaterial as PixiPortalMaterial } from "@pixi/3d/extras";
 import { cleanup, mountScene } from "pixi-solid/testing";
+import { RenderTexture } from "pixi.js";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
@@ -15,6 +17,7 @@ import {
   CubeGeometry,
   Material3D,
   PhongMaterial,
+  PortalMaterial,
   ToonMaterial,
 } from "../components";
 
@@ -306,5 +309,29 @@ describe("Mesh3D and Lights", () => {
     expect(container.intensity).toBe(4);
 
     cleanup();
+  });
+
+  it("GIVEN a nested PortalMaterial WHEN it mounts THEN it shows the render texture and disposes on unmount", () => {
+    // GIVEN
+    let capturedMat: any;
+    const feed = RenderTexture.create({ width: 64, height: 64 });
+
+    mountScene<Pixi3D.Mesh3D>(() => (
+      <Mesh3D>
+        <CubeGeometry />
+        <PortalMaterial ref={(m) => (capturedMat = m)} texture={feed} baseColor={0xbfdcff} />
+      </Mesh3D>
+    ));
+
+    // THEN
+    expect(capturedMat).toBeInstanceOf(PixiPortalMaterial);
+    expect(capturedMat.textures.portal).toBe(feed);
+
+    // WHEN
+    cleanup();
+
+    // THEN
+    expect(capturedMat.destroyed).toBe(true);
+    feed.destroy(true);
   });
 });

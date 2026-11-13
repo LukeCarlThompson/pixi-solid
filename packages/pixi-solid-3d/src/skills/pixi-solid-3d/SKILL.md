@@ -314,6 +314,24 @@ It draws one container, so wrap several roots in a `<Container>`. Content is bui
 image is stored flipped relative to an image texture: upright on a `PlaneGeometry`, inverted on a
 sphere, a loaded model or a 2D sprite, where `scale.y = -1` with `anchor.y = 1` turns it over.
 
+## Portals and render textures
+
+`<PortalMaterial>` shows a render texture on a surface — a monitor, a teleporter face, or a portal.
+The texture is yours to create, size and destroy.
+
+```tsx
+<Mesh3D geometry={geometry}>
+  <PortalMaterial texture={feed} baseColor={0xbfdcff} />
+</Mesh3D>
+```
+
+A real portal adds two quads and a pass: `entry` (the opening, drawn with `PortalMaterial`), `exit`
+(the far side) and `PortalPass({ entry, exit, texture: feed })` in `passes`. The pass needs the mesh
+instances at construction, so build them with `@pixi/3d`'s `Mesh3D` class and mount them with
+`<Mesh3D as={entry} />`. Size the feed to the view and resize it with the view, give both quads the
+same `scale`, and keep the view camera perspective and unrotated. `PortalPass` runs at
+`'beforeOpaque'`, so its order in `passes` does not matter. `PortalFeedPass` is internal.
+
 ## Single-renderer builds
 
 `@pixi/3d` exposes `@pixi/3d/webgl` and `@pixi/3d/webgpu` for apps that only need one backend. `pixi-solid-3d` imports the full `@pixi/3d` entry, which runs the package's initialisation, so keep that import when you use both.
