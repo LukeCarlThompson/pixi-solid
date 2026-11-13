@@ -4,10 +4,19 @@ description: Adding bloom, SSAO, outlines and other post effects to a View3D in 
 ---
 
 import { Aside } from "@astrojs/starlight/components";
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/post-processing.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
 
 A pass runs after the 3D scene draws. It can tint the whole image, add bloom, or copy an output such
 as normals into a texture you keep. Passes belong to the **view**, not to a node, because they change
 everything the view draws.
+
+Bloom and an outline pass on emissive materials. Drag to orbit:
+
+<ClientOnly fileName="post-processing" client:load />
+
+<Code code={demoCode} lang="tsx" title="post-processing.demo.tsx" />
 
 ## Adding passes
 

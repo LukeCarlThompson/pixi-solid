@@ -5,12 +5,22 @@ sidebar:
   order: 6
 ---
 
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/instancing.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
 `<BatchedMesh3D>` draws many copies of a geometry from one GPU batch, with no scene node per copy.
 Reach for it when a scene has thousands of identical objects: grass, trees, bullets, crowd members,
 voxel tiles.
 
 Past a few thousand meshes, a node each costs more to update and draw than the batch saves. Below
 that, plain `<Mesh3D>` is simpler and fast enough.
+
+1,600 cubes in one draw batch. Drag to orbit; the whole grid turns as a single node:
+
+<ClientOnly fileName="instancing" client:load />
+
+<Code code={demoCode} lang="tsx" title="instancing.demo.tsx" />
 
 ### Declaring a batch
 

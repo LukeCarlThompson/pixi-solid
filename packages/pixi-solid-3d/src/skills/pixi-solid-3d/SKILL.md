@@ -83,14 +83,20 @@ export function App() {
 
 ## Reactive 3D Vector Props
 
-All 3D components (`<Container3D>`, `<Mesh3D>`, `<Model3D>`, `<Camera3D>`, lights) support individual axis props for fine-grained reactivity without re-creating vector objects:
+Every 3D component (`<Container3D>`, `<Mesh3D>`, `<Model3D>`, `<Camera3D>`, lights) takes a single
+axis at a time. **Prefer the axis props.** They update one component through one effect, and they
+allocate nothing:
 
-- **Position**: `x`, `y`, `z`, or `positionX`, `positionY`, `positionZ`, or `position={{ x, y, z }}`
-- **Scale**: `scaleX`, `scaleY`, `scaleZ`, or uniform `scale={2}`
-- **Rotation**: `rotationX`, `rotationY`, `rotationZ` (Euler radians), or `angleX`, `angleY`, `angleZ` (Euler degrees)
-- **Origin / Pivot**: `originX`, `originY`, `originZ`, or `origin={0}`
-- **Quaternion**: `quaternion={{ x, y, z, w }}`
-- **LookAt**: `lookAtX`, `lookAtY`, `lookAtZ`, or `lookAt={{ x, y, z }}`
+- **Position**: `x`, `y`, `z`, or `positionX`, `positionY`, `positionZ`
+- **Scale**: `scaleX`, `scaleY`, `scaleZ`, or the uniform shorthand `scale={2}`
+- **Rotation**: `rotationX`, `rotationY`, `rotationZ` (Euler radians), or `angleX`, `angleY`, `angleZ` (degrees)
+- **Origin / Pivot**: `originX`, `originY`, `originZ`, or the uniform shorthand `origin={0}`
+- **LookAt**: `lookAtX`, `lookAtY`, `lookAtZ`
+
+The whole-object forms are for setting several axes at once: `position={{ x, y, z }}`,
+`lookAt={{ x, y, z }}`, `quaternion={{ x, y, z, w }}`. Pass **all** the axes: the types require them,
+and the object is allocated on every change, so it is the wrong tool inside a frame loop. Partial
+objects are not part of the API even though the runtime would merge them.
 
 ## Loading 3D Models
 
@@ -348,6 +354,17 @@ same `scale`, and keep the view camera perspective and unrotated. `PortalPass` r
 | **Lighting**           | `<DirectionalLight>`, `<PointLight>`, `<AmbientLight>`, `<SpotLight>`                                                    | Real-time scene lights                                         |
 | **Utils**              | `Container3D.traverse`                                                                                                   | Depth-first 3D scene traversal                                 |
 | **Testing**            | Import directly from `pixi-solid/testing` (`mountScene`, `getByLabel`, `cleanup`)                                        | Headless testing utilities                                     |
+
+### Prop names
+
+Component props are `@pixi/3d`'s own option types, so the compiler rejects a name that does not
+exist. A handful are elided rather than obvious, and worth knowing when reading the package:
+
+- Geometry segment counts: `widthSegments` / `heightSegments` on spheres, planes, capsules.
+- Texture slots read `baseColorTexture`, `normalTexture`, not `texture` / `normalMap`.
+- Point and spot lights bound their reach with `range` and `radius`; a spot adds `coneAngle`,
+  `penumbra`.
+- `PlaneGeometry` lies in XY with a +Z normal, so a quarter turn on X makes it a floor.
 
 ## Related skills
 

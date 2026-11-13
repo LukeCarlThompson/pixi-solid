@@ -3,12 +3,22 @@ title: 2D Content on a 3D Surface
 description: Rendering pixi-solid 2D scenes into 3D materials with createContainerTexture in pixi-solid-3d.
 ---
 
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/container-texture.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
 A 3D material can sample any texture, including one showing live 2D content. Use it for in-world
 screens, signs, labels, scoreboards, or UI panels attached to a model.
 
 `@pixi/3d` ships `ContainerTexture` for this, but using it directly has three sharp edges. Pose the
 renderer, remember that its `autoUpdate` runs on `Ticker.shared` rather than the ticker your app
 runs, and free the render target yourself. `createContainerTexture` handles all three.
+
+A live 2D panel on a 3D surface. The uptime and draw-call lines update every frame:
+
+<ClientOnly fileName="container-texture" client:load />
+
+<Code code={demoCode} lang="tsx" title="container-texture.demo.tsx" />
 
 ## Building a texture
 

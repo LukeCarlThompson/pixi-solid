@@ -3,7 +3,17 @@ title: Meshes and Materials
 description: Creating 3D geometries and PBR materials in pixi-solid-3d with automated GPU resource lifecycle management.
 ---
 
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/meshes-and-materials.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
 `pixi-solid-3d` provides `<Mesh3D>` to render 3D geometry combined with materials.
+
+Four geometries and all four material types, on a turntable:
+
+<ClientOnly fileName="meshes-and-materials" client:load />
+
+<Code code={demoCode} lang="tsx" title="meshes-and-materials.demo.tsx" />
 
 In 3D rendering engines like PixiJS 3D, GPU resources (buffers, textures, and shader pipeline descriptors) are expensive to allocate. `pixi-solid-3d` gives you two ways to work with geometries and materials:
 
@@ -99,18 +109,18 @@ export const EnemySwarm = (props: {
 ### Available Declarative Geometries
 
 - `<CubeGeometry width={...} height={...} depth={...} />`
-- `<SphereGeometry radius={...} segments={...} />`
-- `<PlaneGeometry width={...} depth={...} />`
+- `<SphereGeometry radius={...} widthSegments={...} heightSegments={...} />`
+- `<PlaneGeometry width={...} height={...} />` — lies in XY with a +Z normal, so a quarter turn on X makes it a floor
 - `<CylinderGeometry radiusTop={...} radiusBottom={...} height={...} />`
 - `<ConeGeometry radius={...} height={...} />`
-- `<CapsuleGeometry radius={...} length={...} />`
+- `<CapsuleGeometry radius={...} height={...} />`
 - `<TorusGeometry radius={...} tube={...} />`
 - `<TorusKnotGeometry radius={...} tube={...} />`
 - `<IcosahedronGeometry radius={...} />`
 
 ### Available Declarative Materials
 
-- `<Material3D baseColor={...} roughness={...} metallic={...} normalMap={...} />` — PBR metallic-roughness material.
-- `<FlatMaterial baseColor={...} texture={...} />` — Unlit flat color or texture.
-- `<PhongMaterial baseColor={...} specular={...} shininess={...} />` — Classic Blinn-Phong material.
+- `<Material3D baseColor={...} roughness={...} metallic={...} normalTexture={...} />` — PBR metallic-roughness material.
+- `<FlatMaterial baseColor={...} baseColorTexture={...} />` — Unlit flat color or texture.
+- `<PhongMaterial baseColor={...} specularColor={...} shininess={...} />` — Classic Blinn-Phong material.
 - `<ToonMaterial baseColor={...} bands={...} outline={...} />` — Cel-shaded stylized toon material.

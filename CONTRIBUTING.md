@@ -73,6 +73,30 @@ packages/
 
 ---
 
+## Docs
+
+`packages/pixi-solid-docs/src/content/docs/` holds the public docs. Two kinds of code appear there:
+
+- **Demos** in `src/content/demos/`, imported by `?raw` and rendered client-side. These are real
+  modules, so `tsc` checks them and the build bundles them.
+- **Code fences** in `.mdx`. These are text. Nothing compiles them, so a prop renamed upstream is
+  silently wrong on the page.
+
+Prefer a demo when the point is visual, and compile a fenced sample against the installed package
+before trusting it:
+
+```bash
+cd packages/pixi-solid-docs
+npx tsc --noEmit -p tsconfig.json
+```
+
+That command checks the demos and any page components, not the fences. For a fence, paste it into a
+scratch `.tsx` under `src/`, run the check, then delete it. An option name that does not exist costs a
+reader real time: props we do not recognise are dropped, so the scene renders without the effect and
+nothing warns.
+
+---
+
 ## TypeScript Conventions
 
 ### Strict Mode
