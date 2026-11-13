@@ -116,6 +116,42 @@ describe("3D projection hooks", () => {
     cleanup();
   });
 
+  it("GIVEN a distance instead of a plane WHEN useScreenToWorld runs THEN it returns a point along the ray", async () => {
+    // GIVEN
+    const ctx = createTestContext();
+    const distance = 10;
+    const [cursor, setCursor] = createSignal({ x: 400, y: 300 });
+    let unprojectedResult: () => ScreenToWorldPoint | null = () => null;
+
+    const TestComponent = () => {
+      unprojectedResult = useScreenToWorld(cursor, distance);
+      return null;
+    };
+
+    mountScene(() => (
+      <ctx.Provider>
+        <View3D width={800} height={600}>
+          <Camera3D x={0} y={0} z={10} lookAt={{ x: 0, y: 0, z: 0 }} />
+          <TestComponent />
+        </View3D>
+      </ctx.Provider>
+    ));
+
+    // THEN the centre of the view is straight down the camera's ray
+    expect(unprojectedResult()).not.toBeNull();
+    expect(unprojectedResult()?.x).toBeCloseTo(0, 0);
+    expect(unprojectedResult()?.y).toBeCloseTo(0, 0);
+
+    // WHEN
+    setCursor({ x: 600, y: 300 });
+    await ctx.ticker.fastForwardFrames(1);
+
+    // THEN moving right moves the point right
+    expect(unprojectedResult()?.x).toBeGreaterThan(0);
+
+    cleanup();
+  });
+
   it("GIVEN a 2D sibling inside View3DProvider WHEN the node moves THEN the hook resolves the shared view", async () => {
     // GIVEN
     const ctx = createTestContext();

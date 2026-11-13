@@ -160,11 +160,13 @@ export const useScreenToWorld = (
     if (!point) return null;
 
     const resolvedTarget = resolveTarget();
-    // `screenToWorld` is overloaded on `Plane` vs `number`, so the union must be narrowed first.
+    // `screenToWorld` is overloaded: a number is a distance along the pick ray and always hits, a
+    // `Plane` is intersected and may miss. The two calls read the same on purpose — each arm binds
+    // a different overload, and only the narrowing above picks which.
     const hit =
       typeof resolvedTarget === "number"
-        ? view.screenToWorld(point, resolvedTarget)
-        : view.screenToWorld(point, resolvedTarget);
+        ? view.screenToWorld(point, resolvedTarget) // distance
+        : view.screenToWorld(point, resolvedTarget); // plane
     if (!hit) return null;
     return { x: hit.x, y: hit.y, z: hit.z };
   };
