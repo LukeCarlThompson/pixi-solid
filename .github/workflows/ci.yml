@@ -30,11 +30,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # pixi-solid-3d resolves pixi-solid's built types, so it must be built first.
       - name: Build pixi-solid
         run: pnpm --filter pixi-solid build
 
       - name: Lint
         run: pnpm lint
 
+      - name: Check formatting
+        run: pnpm fmt:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
       - name: Test
         run: pnpm test
+
+      # Builds the artifact users install; tests import src, so this is separate.
+      - name: Build pixi-solid-3d
+        run: pnpm --filter pixi-solid-3d build

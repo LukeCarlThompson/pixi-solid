@@ -3,12 +3,28 @@
   "version": "0.1.0-alpha.0",
   "private": false,
   "description": "3D components and utilities for writing PixiJS 3D applications with SolidJS",
+  "keywords": [
+    "3d",
+    "declarative",
+    "gltf",
+    "graphics",
+    "particles",
+    "pixi",
+    "pixi.js",
+    "pixijs",
+    "solid",
+    "solid-js",
+    "solidjs",
+    "webgl",
+    "webgpu"
+  ],
   "homepage": "https://lukecarlthompson.github.io/pixi-solid/",
   "license": "MIT",
   "author": "Luke Thompson",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LukeCarlThompson/pixi-solid"
+    "url": "https://github.com/LukeCarlThompson/pixi-solid",
+    "directory": "packages/pixi-solid-3d"
   },
   "files": [
     "dist",
@@ -33,12 +49,6 @@
     "prepack": "node -e \"require('fs').existsSync('dist/index.js') || (console.error('ERROR: dist/index.js not found') && process.exit(1))\"",
     "test": "vitest --run",
     "typecheck": "tsc --project tsconfig.test.json --noEmit"
-  },
-  "dependencies": {
-    "pixi-solid": "workspace:^"
-  },
-  "devDependencies": {
-    "@pixi/3d": "^0.1.0"
   },
   "peerDependencies": {
     "@pixi/3d": ">=0.1.0 <0.2",
