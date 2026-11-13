@@ -144,6 +144,20 @@ Use `traverse` on `<Model3D>`, or call `Container3D.traverse` on any node:
 />
 ```
 
+## Props and instances
+
+Pass `as={instance}` to adopt a `Container3D` you built yourself. The component then never destroys it, and you do not restate the constructor options: `<BatchedMesh3D as={batch} />` needs no `size`, and `<Model3D as={model} />` needs no `source`.
+
+Some options belong to construction only, because the instance preallocates buffers around them. Updating one logs a warning in development and the new value is ignored:
+
+| Component               | Option      | Why                                           |
+| ----------------------- | ----------- | --------------------------------------------- |
+| `<BatchedMesh3D>`       | `size`      | Slots are allocated once                      |
+| `<ParticleContainer3D>` | `capacity`  | Particle buffers are allocated once           |
+| `<ParticleContainer3D>` | `billboard` | Read back as `billboardMode`, always `'none'` |
+
+To change any of these, remount with a different `key` so a new instance is built.
+
 ## Event handler props
 
 3D event props are lowercase, matching `pixi-solid`: `onclick`, `onpointerdown`, `onwheel`, `oncontextmenu`, `onpointerdowncapture`, `onglobalpointermove`, and so on. The set comes from `@pixi/3d`'s `FederatedEventEmitterTypes3D`, and the event object carries the 3D fields (`e.hit3D.point`, `e.hit3D.uv`) alongside Pixi's 2D ones.

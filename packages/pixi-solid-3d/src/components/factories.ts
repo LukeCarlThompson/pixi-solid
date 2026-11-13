@@ -25,6 +25,16 @@ export type RefAsProps3D<Component> = {
 export type PixiComponent3D<Props, Instance> = (props: Props) => Instance & JSX.Element;
 
 /**
+ * Constructor options, or none when the instance is adopted through `as`.
+ *
+ * Required options belong to construction: `<BatchedMesh3D as={batch} />` must not demand `size`,
+ * and `<Model3D as={model} />` must not demand `source`.
+ */
+export type AdoptableProps<OptionsType extends object, InstanceType> =
+  | (Omit<OptionsType, "children"> & { as?: undefined })
+  | (Partial<Omit<OptionsType, "children">> & { as: InstanceType });
+
+/**
  * Prop definition for Container3D-based components
  */
 export type Container3DProps<Component extends Pixi3D.Container3D = Pixi3D.Container3D> =
@@ -87,10 +97,10 @@ export const createContainer3DComponent = <
 >(
   Pixi3DClass: new (...args: any[]) => InstanceType,
 ): PixiComponent3D<
-  Omit<OptionsType, "children"> & Container3DProps<InstanceType>,
+  Container3DProps<InstanceType> & AdoptableProps<OptionsType, InstanceType>,
   InstanceType
 > => {
-  return (props): InstanceType & JSX.Element => {
+  const Component = (props: any): InstanceType & JSX.Element => {
     const [runtimeProps, initialisationProps] = splitProps(props, CONTAINER3D_RUNTIME_KEYS);
 
     const isUserOwnedInstance = runtimeProps.as !== undefined;
@@ -106,6 +116,8 @@ export const createContainer3DComponent = <
 
     return instance as InstanceType & JSX.Element;
   };
+
+  return Component;
 };
 
 /**
@@ -116,8 +128,11 @@ export const createLeaf3DComponent = <
   OptionsType extends object = Pixi3D.Container3DOptions,
 >(
   Pixi3DClass: new (...args: any[]) => InstanceType,
-): PixiComponent3D<Omit<OptionsType, "children"> & Leaf3DProps<InstanceType>, InstanceType> => {
-  return (props): InstanceType & JSX.Element => {
+): PixiComponent3D<
+  Leaf3DProps<InstanceType> & AdoptableProps<OptionsType, InstanceType>,
+  InstanceType
+> => {
+  const Component = (props: any): InstanceType & JSX.Element => {
     const [runtimeProps, initialisationProps] = splitProps(props, LEAF3D_RUNTIME_KEYS);
 
     const isUserOwnedInstance = runtimeProps.as !== undefined;
@@ -133,4 +148,6 @@ export const createLeaf3DComponent = <
 
     return instance as InstanceType & JSX.Element;
   };
+
+  return Component;
 };

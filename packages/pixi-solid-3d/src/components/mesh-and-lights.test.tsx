@@ -9,13 +9,22 @@ import { cleanup, mountScene } from "pixi-solid/testing";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
-import { Mesh3D, DirectionalLight, CubeGeometry, Material3D, ToonMaterial } from "../components";
+import {
+  Mesh3D,
+  DirectionalLight,
+  CubeGeometry,
+  Material3D,
+  PhongMaterial,
+  ToonMaterial,
+} from "../components";
 
 describe("Mesh3D and Lights", () => {
-  it("mounts Mesh3D with geometry and material", () => {
+  it("GIVEN geometry, material and shadow props WHEN a Mesh3D mounts THEN it carries them", () => {
+    // GIVEN
     const geometry = new PixiCubeGeometry();
     const material = new PixiMaterial3D();
 
+    // WHEN
     const { container } = mountScene<Pixi3D.Mesh3D>(() => (
       <Mesh3D
         label="cube"
@@ -29,6 +38,7 @@ describe("Mesh3D and Lights", () => {
       />
     ));
 
+    // THEN
     expect(container.label).toBe("cube");
     expect(container.castShadow).toBe(true);
     expect(container.receiveShadow).toBe(true);
@@ -39,7 +49,8 @@ describe("Mesh3D and Lights", () => {
     cleanup();
   });
 
-  it("mounts and updates light components reactively", () => {
+  it("GIVEN signals bound to light props WHEN they change THEN the light follows", () => {
+    // GIVEN
     const [intensity, setIntensity] = createSignal(1);
     const [color, setColor] = createSignal(0xffffff);
 
@@ -51,16 +62,23 @@ describe("Mesh3D and Lights", () => {
     expect(container.color.toNumber()).toBe(0xffffff);
     expect(container.castShadow).toBe(true);
 
+    // WHEN
     setIntensity(5);
+
+    // THEN
     expect(container.intensity).toBe(5);
 
+    // WHEN
     setColor(0xff0000);
+
+    // THEN
     expect(container.color.toNumber()).toBe(0xff0000);
 
     cleanup();
   });
 
-  it("supports reactive lookAt prop on 3D containers and lights", () => {
+  it("GIVEN a lookAt signal WHEN the target moves THEN the light turns to face it", () => {
+    // GIVEN
     const [target, setTarget] = createSignal({ x: 0, y: 0, z: 0 });
 
     const { container } = mountScene<Pixi3D.DirectionalLight>(() => (
@@ -69,14 +87,17 @@ describe("Mesh3D and Lights", () => {
 
     const initialQuatX = container.quaternion.x;
 
-    // Moving target forward should tilt quaternion orientation
+    // WHEN
     setTarget({ x: 0, y: 0, z: 10 });
+
+    // THEN
     expect(container.quaternion.x).not.toBe(initialQuatX);
 
     cleanup();
   });
 
-  it("supports granular lookAtX, lookAtY, lookAtZ without object recreation", () => {
+  it("GIVEN single-axis lookAt props WHEN one axis changes THEN the light turns without a new object", () => {
+    // GIVEN
     const [targetZ, setTargetZ] = createSignal(0);
 
     const { container } = mountScene<Pixi3D.DirectionalLight>(() => (
@@ -93,13 +114,17 @@ describe("Mesh3D and Lights", () => {
 
     const initialQuatX = container.quaternion.x;
 
+    // WHEN
     setTargetZ(15);
+
+    // THEN
     expect(container.quaternion.x).not.toBe(initialQuatX);
 
     cleanup();
   });
 
-  it("supports declarative nested CubeGeometry and Material3D with automated disposal", () => {
+  it("GIVEN a nested CubeGeometry and Material3D WHEN the mesh unmounts THEN both are disposed", () => {
+    // GIVEN
     let capturedMesh: Pixi3D.Mesh3D | undefined;
     let capturedGeom: any;
     let capturedMat: any;
@@ -117,18 +142,23 @@ describe("Mesh3D and Lights", () => {
     expect(capturedMesh?.material).toBe(capturedMat);
     expect(capturedMat?.roughness).toBeCloseTo(0.2, 2);
 
-    // Fine-grained update to material property without re-allocating
+    // WHEN
     setRoughness(0.85);
+
+    // THEN
     expect(capturedMat?.roughness).toBeCloseTo(0.85, 2);
     expect(capturedMesh?.material).toBe(capturedMat);
 
-    // Unmount and verify automatic disposal
+    // WHEN
     cleanup();
+
+    // THEN
     expect(capturedGeom._destroyed).toBe(true);
     expect(capturedMat.destroyed).toBe(true);
   });
 
-  it("supports declarative ToonMaterial", () => {
+  it("GIVEN a nested ToonMaterial WHEN its bands change THEN it re-shades and disposes on unmount", () => {
+    // GIVEN
     let capturedMat: any;
     const [bands, setBands] = createSignal(3);
 
@@ -142,40 +172,87 @@ describe("Mesh3D and Lights", () => {
     expect(capturedMat).toBeDefined();
     expect(capturedMat.data.bands).toBe(3);
 
+    // WHEN
     setBands(5);
+
+    // THEN
     expect(capturedMat.data.bands).toBe(5);
 
+    // WHEN
     cleanup();
+
+    // THEN
     expect(capturedMat.destroyed).toBe(true);
   });
 
-  it("binds the oncontextmenu event handler", () => {
+  it("GIVEN a nested PhongMaterial WHEN its shininess changes THEN it updates and disposes on unmount", () => {
+    // GIVEN
+    let capturedMat: any;
+    const [shininess, setShininess] = createSignal(20);
+
+    mountScene<Pixi3D.Mesh3D>(() => (
+      <Mesh3D>
+        <CubeGeometry />
+        <PhongMaterial
+          ref={(m) => (capturedMat = m)}
+          specularColor={0xffffff}
+          shininess={shininess()}
+        />
+      </Mesh3D>
+    ));
+
+    expect(capturedMat).toBeDefined();
+    expect(capturedMat.data.shininess).toBe(20);
+
+    // WHEN
+    setShininess(80);
+
+    // THEN
+    expect(capturedMat.data.shininess).toBe(80);
+
+    // WHEN
+    cleanup();
+
+    // THEN
+    expect(capturedMat.destroyed).toBe(true);
+  });
+
+  it("GIVEN an oncontextmenu handler WHEN the event fires THEN the handler runs", () => {
+    // GIVEN
     const onContextMenu = vi.fn();
 
     const { container } = mountScene<Pixi3D.Mesh3D>(() => (
       <Mesh3D label="panel" oncontextmenu={onContextMenu} />
     ));
 
+    // WHEN
     container.emit("contextmenu", {} as Pixi3D.Pointer3DEvent);
+
+    // THEN
     expect(onContextMenu).toHaveBeenCalledTimes(1);
 
     cleanup();
   });
 
-  it("binds a capture-phase event handler", () => {
+  it("GIVEN an onpointerdowncapture handler WHEN the capture event fires THEN the handler runs", () => {
+    // GIVEN
     const onPointerDownCapture = vi.fn();
 
     const { container } = mountScene<Pixi3D.Mesh3D>(() => (
       <Mesh3D label="panel" onpointerdowncapture={onPointerDownCapture} />
     ));
 
+    // WHEN
     container.emit("pointerdowncapture", {} as Pixi3D.Pointer3DEvent);
+
+    // THEN
     expect(onPointerDownCapture).toHaveBeenCalledTimes(1);
 
     cleanup();
   });
 
-  it("frees the fallback geometry and material of a bare Mesh3D on unmount", () => {
+  it("GIVEN a bare Mesh3D WHEN it unmounts THEN its fallback geometry and material are freed", () => {
+    // GIVEN
     const { container } = mountScene<Pixi3D.Mesh3D>(() => <Mesh3D label="bare" />);
 
     const geometry = container.geometry as unknown as { _destroyed: boolean };
@@ -184,13 +261,16 @@ describe("Mesh3D and Lights", () => {
     expect(container.geometry).toBeInstanceOf(PixiPlaneGeometry);
     expect(material).toBeInstanceOf(PixiFlatMaterial);
 
+    // WHEN
     cleanup();
 
+    // THEN
     expect(geometry._destroyed).toBe(true);
     expect(material.destroyed).toBe(true);
   });
 
-  it("leaves fallback resources alone when geometry and material are supplied", () => {
+  it("GIVEN supplied geometry and material WHEN the mesh unmounts THEN both stay alive", () => {
+    // GIVEN
     const geometry = new PixiCubeGeometry();
     const material = new PixiMaterial3D();
 
@@ -201,8 +281,10 @@ describe("Mesh3D and Lights", () => {
     expect(container.geometry).toBe(geometry);
     expect(container.material).toBe(material);
 
+    // WHEN
     cleanup();
 
+    // THEN
     expect((geometry as unknown as { _destroyed: boolean })._destroyed).toBeFalsy();
     expect(material.destroyed).toBe(false);
   });

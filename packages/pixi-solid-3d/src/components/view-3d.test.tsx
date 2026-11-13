@@ -13,9 +13,11 @@ import {
 } from "../components";
 
 describe("View3D component", () => {
-  it("mounts View3D and mounts 3D children into view.root", () => {
+  it("GIVEN children and viewport props WHEN it mounts THEN children land in view.root", () => {
+    // GIVEN
     let viewRef: PixiView3D | undefined;
 
+    // WHEN
     const { container } = mountScene<PixiView3D>(() => (
       <View3D ref={(el) => (viewRef = el)} width={400} height={300} toneMapping="aces">
         <Container3DComp label="group" x={10}>
@@ -24,13 +26,13 @@ describe("View3D component", () => {
       </View3D>
     ));
 
+    // THEN
     expect(container).toBeInstanceOf(PixiView3D);
     expect(viewRef).toBe(container);
     expect(container.width).toBe(400);
     expect(container.height).toBe(300);
     expect(container.toneMapping).toBe("aces");
 
-    // Children should be attached to view.root (Container3D) alongside default camera
     const userNodes = container.root.children.filter((c) => c !== container.camera);
     expect(userNodes.length).toBe(1);
     const group = userNodes[0];
@@ -39,7 +41,7 @@ describe("View3D component", () => {
     expect(group.children.length).toBe(1);
     expect(group.children[0].label).toBe("sun");
 
-    // Seamlessly query 3D children directly from View3D using pixi-solid getByLabel
+    // 3D nodes are reachable with the same label query as 2D ones.
     const foundGroup = getByLabel<Pixi3D.Container3D>(container, "group");
     expect(foundGroup).toBe(group);
     const foundSun = getByLabel<Pixi3D.PointLight>(container, "sun");
@@ -48,7 +50,8 @@ describe("View3D component", () => {
     cleanup();
   });
 
-  it("updates View3D toneMapping and dimensions reactively", () => {
+  it("GIVEN a toneMapping signal WHEN it changes THEN the view follows", () => {
+    // GIVEN
     const [tone, setTone] = createSignal<"aces" | "reinhard">("aces");
 
     const { container } = mountScene<PixiView3D>(() => (
@@ -59,13 +62,17 @@ describe("View3D component", () => {
 
     expect(container.toneMapping).toBe("aces");
 
+    // WHEN
     setTone("reinhard");
+
+    // THEN
     expect(container.toneMapping).toBe("reinhard");
 
     cleanup();
   });
 
-  it("destroys its own View3D instance on unmount", () => {
+  it("GIVEN a view it created WHEN it unmounts THEN it destroys that view", () => {
+    // GIVEN
     const [visible, setVisible] = createSignal(true);
     let viewRef: PixiView3D | undefined;
 
@@ -78,8 +85,10 @@ describe("View3D component", () => {
     const view = viewRef;
     expect(view).toBeInstanceOf(PixiView3D);
 
+    // WHEN
     setVisible(false);
 
+    // THEN
     expect(view?.destroyed).toBe(true);
 
     cleanup();
@@ -87,7 +96,8 @@ describe("View3D component", () => {
 });
 
 describe("View3DProvider component", () => {
-  it("creates the View3D and shares it with sibling 2D components", () => {
+  it("GIVEN a provider with a sibling 2D component WHEN it mounts THEN both resolve one view", () => {
+    // GIVEN
     let siblingCapturedView: PixiView3D | undefined;
     let mountedView: PixiView3D | undefined;
 
@@ -96,6 +106,7 @@ describe("View3DProvider component", () => {
       return null;
     };
 
+    // WHEN
     const { container } = mountScene<PixiView3D>(() => (
       <View3DProvider width={400} height={300} toneMapping="aces">
         <View3D ref={(el) => (mountedView = el)} />
@@ -103,6 +114,7 @@ describe("View3DProvider component", () => {
       </View3DProvider>
     ));
 
+    // THEN
     expect(siblingCapturedView).toBeInstanceOf(PixiView3D);
     expect(mountedView).toBe(siblingCapturedView);
     expect(siblingCapturedView?.width).toBe(400);
@@ -113,7 +125,8 @@ describe("View3DProvider component", () => {
     cleanup();
   });
 
-  it("keeps the provider-owned View3D alive when the mounted View3D unmounts", () => {
+  it("GIVEN a provider-owned view WHEN the mounted View3D unmounts THEN the view survives", () => {
+    // GIVEN
     const [visible, setVisible] = createSignal(true);
     let viewRef: PixiView3D | undefined;
 
@@ -128,14 +141,17 @@ describe("View3DProvider component", () => {
     const view = viewRef;
     expect(view).toBeInstanceOf(PixiView3D);
 
+    // WHEN
     setVisible(false);
 
+    // THEN
     expect(view?.destroyed).toBe(false);
 
     cleanup();
   });
 
-  it("adopts a View3D passed through as without destroying it", () => {
+  it("GIVEN an adopted view WHEN the provider unmounts THEN the view is not destroyed", () => {
+    // GIVEN
     const externalView = new PixiView3D({ width: 320, height: 240 });
     let viewRef: PixiView3D | undefined;
 
@@ -147,14 +163,17 @@ describe("View3DProvider component", () => {
 
     expect(viewRef).toBe(externalView);
 
+    // WHEN
     cleanup();
 
+    // THEN
     expect(externalView.destroyed).toBe(false);
 
     externalView.destroy({ children: true });
   });
 
-  it("throws when two View3D components mount the same provider-owned view", () => {
+  it("GIVEN one provider WHEN two View3D components mount THEN it throws", () => {
+    // GIVEN / WHEN / THEN
     expect(() => {
       mountScene(() => (
         <View3DProvider width={400} height={300}>
@@ -169,9 +188,11 @@ describe("View3DProvider component", () => {
     cleanup();
   });
 
-  it("throws when View3D combines as with an enclosing View3DProvider", () => {
+  it("GIVEN a provider WHEN a View3D also passes as THEN it throws", () => {
+    // GIVEN
     const externalView = new PixiView3D({ width: 320, height: 240 });
 
+    // WHEN / THEN
     expect(() => {
       mountScene(() => (
         <View3DProvider width={400} height={300}>

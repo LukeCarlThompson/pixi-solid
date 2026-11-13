@@ -6,13 +6,15 @@ import { describe, expect, it } from "vitest";
 import { Container3D, PointLight } from "../components";
 
 describe("Container3D component", () => {
-  it("mounts a basic Container3D and binds initial position/scale", () => {
+  it("GIVEN position and scale props WHEN it mounts THEN the container and its child carry them", () => {
+    // GIVEN / WHEN
     const { container } = mountScene<Pixi3D.Container3D>(() => (
       <Container3D label="root" x={10} y={20} z={30} scale={2}>
         <Container3D label="child" x={5} />
       </Container3D>
     ));
 
+    // THEN
     expect(container.label).toBe("root");
     expect(container.x).toBe(10);
     expect(container.y).toBe(20);
@@ -28,7 +30,8 @@ describe("Container3D component", () => {
     cleanup();
   });
 
-  it("updates 3D coordinates reactively with signals", () => {
+  it("GIVEN signals bound to coordinates WHEN they change THEN the container follows", () => {
+    // GIVEN
     const [x, setX] = createSignal(0);
     const [scaleZ, setScaleZ] = createSignal(1);
 
@@ -39,16 +42,23 @@ describe("Container3D component", () => {
     expect(container.x).toBe(0);
     expect(container.scale.z).toBe(1);
 
+    // WHEN
     setX(42);
+
+    // THEN
     expect(container.x).toBe(42);
 
+    // WHEN
     setScaleZ(3.5);
+
+    // THEN
     expect(container.scale.z).toBe(3.5);
 
     cleanup();
   });
 
-  it("adds and removes child 3D nodes reactively", () => {
+  it("GIVEN a conditionally rendered light WHEN it toggles THEN the child is added and removed", () => {
+    // GIVEN
     const [showLight, setShowLight] = createSignal(false);
 
     const { container } = mountScene<Pixi3D.Container3D>(() => (
@@ -59,13 +69,19 @@ describe("Container3D component", () => {
 
     expect(container.children.length).toBe(0);
 
+    // WHEN
     setShowLight(true);
+
+    // THEN
     expect(container.children.length).toBe(1);
     expect(container.children[0].label).toBe("sun");
     const sun = getByLabel<Pixi3D.PointLight>(container, "sun");
     expect(sun.intensity).toBe(10);
 
+    // WHEN
     setShowLight(false);
+
+    // THEN
     expect(container.children.length).toBe(0);
 
     cleanup();

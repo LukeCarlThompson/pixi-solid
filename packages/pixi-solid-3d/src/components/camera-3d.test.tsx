@@ -6,15 +6,18 @@ import { describe, expect, it } from "vitest";
 import { Camera3D, View3D } from "../components";
 
 describe("Camera3D component", () => {
-  it("mounts Camera3D inside View3D and becomes the active camera declaratively", () => {
+  it("GIVEN a Camera3D inside a View3D WHEN it mounts THEN it becomes the active camera", () => {
+    // GIVEN
     let cameraRef: Pixi3D.Camera3D | undefined;
 
+    // WHEN
     const { container: view } = mountScene<Pixi3D.View3D>(() => (
       <View3D width={300} height={300}>
         <Camera3D ref={(c) => (cameraRef = c)} x={0} y={2.5} z={5} fov={45} />
       </View3D>
     ));
 
+    // THEN
     expect(cameraRef).toBeDefined();
     expect(view.camera).toBe(cameraRef);
     expect(cameraRef?.x).toBe(0);
@@ -25,7 +28,8 @@ describe("Camera3D component", () => {
     cleanup();
   });
 
-  it("can switch active cameras reactively", () => {
+  it("GIVEN two cameras with active driven by a signal WHEN it switches THEN the view swaps camera", () => {
+    // GIVEN
     const [activeCam, setActiveCam] = createSignal<1 | 2>(1);
     let cam1: Pixi3D.Camera3D | undefined;
     let cam2: Pixi3D.Camera3D | undefined;
@@ -39,13 +43,17 @@ describe("Camera3D component", () => {
 
     expect(view.camera).toBe(cam1);
 
+    // WHEN
     setActiveCam(2);
+
+    // THEN
     expect(view.camera).toBe(cam2);
 
     cleanup();
   });
 
-  it("throws an error if Camera3D is rendered outside a View3D", () => {
+  it("GIVEN no View3D context WHEN a Camera3D mounts THEN it throws", () => {
+    // GIVEN / WHEN / THEN
     expect(() => {
       mountScene(() => <Camera3D x={10} />);
     }).toThrow(

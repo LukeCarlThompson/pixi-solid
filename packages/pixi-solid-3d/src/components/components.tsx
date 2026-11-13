@@ -31,6 +31,7 @@ import {
   createContainer3DComponent,
   createLeaf3DComponent,
   LEAF3D_RUNTIME_KEYS,
+  type AdoptableProps,
   type Container3DProps,
   type Leaf3DProps,
   type PixiComponent3D,
@@ -39,13 +40,13 @@ import {
 export type { Container3DProps, Leaf3DProps, PixiComponent3D };
 
 export type Container3DComponentProps = Container3DProps<PixiContainer3D> &
-  Omit<Pixi3D.Container3DOptions, "children">;
+  AdoptableProps<Pixi3D.Container3DOptions, PixiContainer3D>;
 export type Mesh3DComponentProps = Leaf3DProps<PixiMesh3D> &
-  Omit<Partial<Pixi3D.Mesh3DOptions>, "children"> & {
+  AdoptableProps<Pixi3D.Mesh3DOptions, PixiMesh3D> & {
     children?: JSX.Element;
   };
 export type Model3DComponentProps = Container3DProps<PixiModel3D> &
-  Omit<Pixi3D.Model3DOptions, "children"> & {
+  AdoptableProps<Pixi3D.Model3DOptions, PixiModel3D> & {
     /**
      * Materials the model draws instead of its source's, so one loaded model can be tinted or
      * re-shaded without touching the shared `Scene3DSource`.
@@ -58,27 +59,27 @@ export type Model3DComponentProps = Container3DProps<PixiModel3D> &
     traverse?: (node: Pixi3D.Container3D) => void;
   };
 export type Sprite3DComponentProps = Leaf3DProps<PixiSprite3D> &
-  Omit<Pixi3D.Sprite3DOptions, "children">;
+  AdoptableProps<Pixi3D.Sprite3DOptions, PixiSprite3D>;
 
 import { Mesh3DContext } from "./mesh-3d-context";
 import { useView3D } from "./view-3d-context";
 
 export type Camera3DComponentProps = Leaf3DProps<PixiCamera3D> &
-  Omit<Pixi3D.Camera3DOptions, "children"> & {
+  AdoptableProps<Pixi3D.Camera3DOptions, PixiCamera3D> & {
     active?: boolean;
   };
 export type AmbientLightComponentProps = Leaf3DProps<PixiAmbientLight> &
-  Omit<Pixi3D.AmbientLightOptions, "children">;
+  AdoptableProps<Pixi3D.AmbientLightOptions, PixiAmbientLight>;
 export type DirectionalLightComponentProps = Leaf3DProps<PixiDirectionalLight> &
-  Omit<Pixi3D.DirectionalLightOptions, "children">;
+  AdoptableProps<Pixi3D.DirectionalLightOptions, PixiDirectionalLight>;
 export type PointLightComponentProps = Leaf3DProps<PixiPointLight> &
-  Omit<Pixi3D.PointLightOptions, "children">;
+  AdoptableProps<Pixi3D.PointLightOptions, PixiPointLight>;
 export type SpotLightComponentProps = Leaf3DProps<PixiSpotLight> &
-  Omit<Pixi3D.SpotLightOptions, "children">;
+  AdoptableProps<Pixi3D.SpotLightOptions, PixiSpotLight>;
 export type BatchedMesh3DComponentProps = Leaf3DProps<PixiBatchedMesh3D> &
-  Omit<Pixi3D.BatchedMesh3DOptions, "children">;
+  AdoptableProps<Pixi3D.BatchedMesh3DOptions, PixiBatchedMesh3D>;
 export type ParticleContainer3DComponentProps = Leaf3DProps<PixiParticleContainer3D> &
-  Omit<Pixi3D.ParticleContainer3DOptions, "children">;
+  AdoptableProps<Pixi3D.ParticleContainer3DOptions, PixiParticleContainer3D>;
 
 /**
  * A SolidJS component that renders a `Container3D`.

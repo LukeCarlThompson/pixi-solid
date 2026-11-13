@@ -1,5 +1,5 @@
 import type * as Pixi3D from "@pixi/3d";
-import { createRenderEffect, on, onCleanup } from "solid-js";
+import { createRenderEffect, DEV, on, onCleanup } from "solid-js";
 
 import { bindChildrenToContainer3D } from "./bind-children";
 import { is3DEventProperty } from "./event-properties";
@@ -10,6 +10,62 @@ import {
   setAxis3DProperty,
   setVector3DProperty,
 } from "./vector-properties";
+
+/**
+ * Whether a prop may be written to `key` on `target`.
+ *
+ * Options classes expose getter-only properties: `BatchedMesh3D.size` is fixed for the batch's
+ * lifetime. Assigning to one throws, so the binder skips it.
+ */
+export const isWritableProp = (target: object, key: string): boolean => {
+  for (let node: object | null = target; node; node = Object.getPrototypeOf(node)) {
+    const descriptor = Object.getOwnPropertyDescriptor(node, key);
+    if (descriptor) {
+      return "value" in descriptor
+        ? descriptor.writable === true
+        : typeof descriptor.set === "function";
+    }
+  }
+  return false;
+};
+
+/** Instances whose read-only props have already warned, so a reactive update warns once. */
+const warnedInstances = new WeakMap<object, Set<string>>();
+
+/**
+ * Tells the developer that a prop they are updating cannot be written, instead of dropping the
+ * update silently and leaving them to wonder why nothing changed.
+ */
+const warnReadOnlyProp = (instance: object, key: string): void => {
+  if (!DEV) return;
+
+  let warned = warnedInstances.get(instance);
+  if (!warned) {
+    warned = new Set();
+    warnedInstances.set(instance, warned);
+  }
+  if (warned.has(key)) return;
+  warned.add(key);
+
+  const name = instance.constructor?.name ?? "instance";
+  console.warn(
+    `[pixi-solid-3d] ${name} "${key}" is read-only, so the new value is ignored. Build a new instance, for example by changing the \`key\` you mount it with.`,
+  );
+};
+
+/** Writes a prop, or warns when the property has no setter. */
+const assignProp = (instance: any, key: string, value: unknown): void => {
+  if (!(key in instance)) return;
+  if (!isWritableProp(instance, key)) {
+    warnReadOnlyProp(instance, key);
+    return;
+  }
+  if (key === "color" && instance.color?.setValue) {
+    instance.color.setValue(value);
+    return;
+  }
+  instance[key] = value;
+};
 
 /**
  * Binds runtime props to a Container3D instance with subscriptions to maintain reactivity.
@@ -68,13 +124,7 @@ export const bindRuntimeProps3D = <
       }
 
       if (key in instance) {
-        createRenderEffect(() => {
-          if (key === "color" && (instance as any).color?.setValue) {
-            (instance as any).color.setValue(props[key]);
-            return;
-          }
-          (instance as any)[key] = props[key];
-        });
+        createRenderEffect(() => assignProp(instance, key, props[key]));
         continue;
       }
     }
@@ -116,14 +166,7 @@ export const bindInitialisationProps3D = <
             return;
           }
 
-          if (key === "color" && (instance as any).color?.setValue) {
-            (instance as any).color.setValue(nextValue);
-            return;
-          }
-
-          if (key in instance) {
-            (instance as any)[key] = nextValue;
-          }
+          assignProp(instance, key, nextValue);
         },
         { defer: true },
       ),
