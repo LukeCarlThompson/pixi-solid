@@ -179,6 +179,31 @@ Every `View3DOptions` key is accepted on `<View3D>` or `<View3DProvider>` and ap
 | `resolution`                     | Texels per logical pixel, or `'inherit'`                     |
 | `passes`                         | Post effects and passes; the array is copied                 |
 
+## Post effects and passes
+
+A pass runs on the whole view, so it is declared on the view and never from a nested component. Build
+it with `@pixi/3d` and pass it in; the array order is the run order.
+
+```tsx
+const bloom = new BloomEffect({ intensity: 1.2, threshold: 0.8 });
+
+<View3D width={800} height={600} passes={[bloom]}>
+  …
+</View3D>;
+```
+
+There is deliberately no `<Bloom>` component:
+
+- a pass is view-wide, so a component that registered itself from anywhere would change content it
+  does not own;
+- `enabled` toggles a pass without rebuilding the graph, while reassigning `passes` does rebuild it;
+- a wrapper per effect would duplicate upstream class names and option types and drift with them.
+
+Tune effects through their setters in a `createEffect`, and toggle with `bloom.enabled = false`.
+`levels` / `resolution` on `BloomEffect` are constructor-only. Only `ExtractPass` and `PortalPass` own
+resources and need `destroy()`; the other effects' `destroy()` is a no-op because the view's graph owns
+their targets.
+
 ## Instancing with `<BatchedMesh3D>`
 
 For thousands of copies of one geometry, `<BatchedMesh3D>` draws them without a node each:

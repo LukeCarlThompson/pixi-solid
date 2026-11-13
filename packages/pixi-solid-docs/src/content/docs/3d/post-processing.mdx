@@ -1,0 +1,140 @@
+---
+title: Post Effects and Passes
+description: Adding bloom, SSAO, outlines and other post effects to a View3D in pixi-solid-3d.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+A pass runs after the 3D scene draws. It can tint the whole image, add bloom, or copy an output such
+as normals into a texture you keep. Passes belong to the **view**, not to a node, because they change
+everything the view draws.
+
+## Adding passes
+
+Build the pass with `@pixi/3d` and hand it to the view through `passes`. The order of the array is the
+order they run in.
+
+```tsx
+import { BloomEffect, OutlinePass, SsaoEffect } from "@pixi/3d/extras";
+import { View3D } from "pixi-solid-3d";
+
+const bloom = new BloomEffect({ intensity: 1.2, threshold: 0.8 });
+const ssao = new SsaoEffect({ radius: 0.5 });
+const outline = new OutlinePass({ width: 0.05, color: 0xffffff });
+
+export const Scene = () => (
+  <View3D width={800} height={600} passes={[bloom, ssao, outline]}>
+    <Mesh3D geometry={geometry} material={material} />
+  </View3D>
+);
+```
+
+With `<View3DProvider>` the view owns the passes, so they go on the provider with the other viewport
+options:
+
+```tsx
+<View3DProvider width={800} height={600} passes={[bloom]}>
+  <View3D>{/* 3D scene */}</View3D>
+  <HealthBar />
+</View3DProvider>
+```
+
+Construct passes once, outside the component if nothing reactive feeds them. The array is copied when
+you assign it, so a new array literal each render re-initialises the graph.
+
+## Toggling and tuning
+
+Turn a pass on and off with `enabled`. This leaves the render graph alone, so it is cheap enough for a
+settings toggle:
+
+```tsx
+const [glow, setGlow] = createSignal(true);
+
+createEffect(() => {
+  bloom.enabled = glow();
+});
+```
+
+Options that have setters can be driven the same way, from a signal:
+
+```tsx
+const [strength, setStrength] = createSignal(1);
+
+createEffect(() => {
+  bloom.intensity = strength();
+});
+```
+
+Do **not** toggle by rebuilding the `passes` array. Reassigning it invalidates the graph, while
+`enabled` costs nothing.
+
+`levels` and `resolution` on `BloomEffect`, and anything else the class exposes as read-only, are
+constructor options. Change those by rebuilding the pass.
+
+## Available passes
+
+| Pass               | Import            | What it does                              |
+| ------------------ | ----------------- | ----------------------------------------- |
+| `BloomEffect`      | `@pixi/3d/extras` | Glow around bright areas                  |
+| `SsaoEffect`       | `@pixi/3d/extras` | Contact shadowing in creases              |
+| `MotionBlurEffect` | `@pixi/3d/extras` | Directional blur from camera movement     |
+| `TiltShiftEffect`  | `@pixi/3d/extras` | Defocus away from a band                  |
+| `TintEffect`       | `@pixi/3d/extras` | Colour grade the whole image              |
+| `FxaaEffect`       | `@pixi/3d/extras` | Cheap anti-aliasing                       |
+| `OutlinePass`      | `@pixi/3d/extras` | Draw outlines around meshes               |
+| `WireframePass`    | `@pixi/3d/extras` | Draw meshes as wireframes                 |
+| `ExtractPass`      | `@pixi/3d/extras` | Copy a scene output into a texture        |
+| `PortalPass`       | `@pixi/3d/extras` | Render a portal through a mirrored camera |
+
+For an effect of your own, extend `PostEffect` (or `Pass3D`) from `@pixi/3d` and add the instance to
+`passes`.
+
+## Render to texture
+
+`ExtractPass` copies a scene output — colour, normals or velocity — into a texture your app keeps.
+Use it when the result has to leave the view, for example to show it on a 2D sprite, or to feed a
+compositor of your own.
+
+```tsx
+import { ExtractPass, normalOutput } from "@pixi/3d/extras";
+import { onCleanup } from "solid-js";
+
+const normals = new ExtractPass({ output: normalOutput });
+
+// This pass owns its texture. Unlike the effects above, it has to be destroyed.
+onCleanup(() => normals.destroy());
+
+<View3D width={800} height={600} passes={[normals]}>
+  <Mesh3D geometry={geometry} material={material} />
+</View3D>;
+
+// `normals.texture` is a regular pixi texture, usable on any 2D sprite.
+```
+
+An effect that reads an output within the same frame, such as an upscaler, should read it in its own
+pass rather than through `ExtractPass`, so it is not copied out first.
+
+<Aside type="note">
+  `Pass3D.destroy()` does nothing on the effects listed above: they build their render targets into
+  the view's graph, and the view frees them. Only `ExtractPass` and `PortalPass` own resources and
+  need `destroy()` when you unmount.
+</Aside>
+
+## Why there is no `<Bloom>` component
+
+Every other 3D node has a component, so the absence here is deliberate.
+
+- **A pass is view-wide.** A component that registered itself from wherever it was mounted could
+  change the rendering of content it knows nothing about. Passes are therefore declared only where
+  the view is declared: the `passes` prop.
+- **`passes` is already declarative.** Order is the array order, and the set of passes is a plain
+  list you can read.
+- **A component per effect would add nothing.** It would shadow upstream class names, repeat their
+  option types, and drift every time `@pixi/3d` adds a pass. Effects are constructed once and
+  tuned through setters, which JSX props do not improve on.
+- **Reactivity has a better answer.** `enabled` toggles a pass without touching the graph, whereas a
+  JSX `<Show>` would reassign `passes` and rebuild it.
+
+If JSX ordering is ever worth having, it can be added as one thin component — `<View3DPass pass={bloom} />`
+— that registers into the enclosing view and does nothing else. That would sit beside `passes`, not
+replace it.
