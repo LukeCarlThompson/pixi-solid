@@ -1,5 +1,6 @@
 import type * as Pixi3D from "@pixi/3d";
 import { Container3D as PixiContainer3D, View3D as PixiView3D } from "@pixi/3d";
+import { Container } from "pixi-solid";
 import { cleanup, mountScene } from "pixi-solid/testing";
 import { createSignal, Show } from "solid-js";
 import { describe, expect, it } from "vitest";
@@ -11,7 +12,7 @@ import {
   View3D,
   View3DProvider,
 } from "../components";
-import { getByLabel3D } from "../testing";
+import { getByLabel3D, queryByLabel3D } from "../testing";
 
 describe("View3D component", () => {
   it("GIVEN children and viewport props WHEN it mounts THEN children land in view.root", () => {
@@ -213,6 +214,42 @@ describe("View3DProvider component", () => {
     expect(externalView.destroyed).toBe(false);
 
     externalView.destroy({ children: true });
+  });
+
+  it("GIVEN two providers WHEN each mounts its View3D THEN both viewports keep their own scene", () => {
+    // GIVEN two viewports beside each other, each with its own provider
+    let first: PixiView3D | undefined;
+    let second: PixiView3D | undefined;
+
+    mountScene(() => (
+      <Container label="screens">
+        <View3DProvider width={400} height={300}>
+          <View3D ref={(view) => (first = view)}>
+            <Container3DComp label="left-node" />
+          </View3D>
+        </View3DProvider>
+        <View3DProvider width={200} height={200}>
+          <View3D ref={(view) => (second = view)}>
+            <Container3DComp label="right-node" />
+          </View3D>
+        </View3DProvider>
+      </Container>
+    ));
+
+    // THEN they are two views, not one mounted twice
+    expect(first).toBeInstanceOf(PixiView3D);
+    expect(second).toBeInstanceOf(PixiView3D);
+    expect(first).not.toBe(second);
+    expect(first?.width).toBe(400);
+    expect(second?.width).toBe(200);
+
+    // THEN each owns the scene bound to it
+    expect(getByLabel3D(first!, "left-node")).toBeDefined();
+    expect(queryByLabel3D(first!, "right-node")).toBeUndefined();
+    expect(getByLabel3D(second!, "right-node")).toBeDefined();
+    expect(queryByLabel3D(second!, "left-node")).toBeUndefined();
+
+    cleanup();
   });
 
   it("GIVEN one provider WHEN two View3D components mount THEN it throws", () => {

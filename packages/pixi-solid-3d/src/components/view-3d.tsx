@@ -27,27 +27,22 @@ export type View3DProps<TRoot extends Pixi3D.Container3D = Pixi3D.Container3D> =
   children?: JSX.Element;
   ref?: Ref<Pixi3D.View3D<TRoot>>;
   as?: Pixi3D.View3D<TRoot>;
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  autoResize?: boolean;
 };
 
 const VIEW_3D_RUNTIME_KEYS = ["ref", "as", "children"] as const;
 
-const viewsWithMount = new WeakSet<Pixi3D.View3D>();
+const mountedViews = new WeakSet<Pixi3D.View3D>();
 
 const claimView3DMount = (view: Pixi3D.View3D): (() => void) => {
-  if (viewsWithMount.has(view)) {
+  if (mountedViews.has(view)) {
     throw new Error(
       "Only one <View3D> may be mounted at a time per View3D instance. Unmount it before mounting another.",
     );
   }
 
-  viewsWithMount.add(view);
+  mountedViews.add(view);
   return () => {
-    viewsWithMount.delete(view);
+    mountedViews.delete(view);
   };
 };
 
