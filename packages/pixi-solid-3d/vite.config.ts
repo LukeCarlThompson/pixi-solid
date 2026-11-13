@@ -28,7 +28,10 @@ export default defineConfig({
     minify: false,
     emptyOutDir: true,
     lib: {
-      entry: [path.resolve(import.meta.dirname, "src/index.ts")],
+      entry: [
+        path.resolve(import.meta.dirname, "src/index.ts"),
+        path.resolve(import.meta.dirname, "src/testing/index.ts"),
+      ],
       formats: ["es"],
     },
     rollupOptions: {

@@ -344,16 +344,16 @@ same `scale`, and keep the view camera perspective and unrotated. `PortalPass` r
 
 ## Public API Checklist
 
-| Area                   | Exports                                                                                                                  | Description                                                    |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
-| **Viewport & Context** | `<View3D>`, `View3DProvider`, `useView3D`, `useWorldToScreen`, `useScreenToWorld`                                        | 2D/3D bridge container, context accessor, and projection hooks |
-| **Scene Nodes**        | `<Container3D>`, `<Mesh3D>`, `<Model3D>`, `<Sprite3D>`, `<BatchedMesh3D>`, `<ParticleContainer3D>`, `<ParticleSystem3D>` | 3D transform nodes & GPU particles                             |
-| **Cameras & Controls** | `<Camera3D>`, `<OrbitCamera>`, `<FPSCamera>`                                                                             | Perspective/orthographic cameras, orbit and FPS controls       |
-| **Materials**          | `<Material3D>`, `<FlatMaterial>`, `<PhongMaterial>`, `<ToonMaterial>`                                                    | Declarative materials with auto-disposal                       |
-| **Geometries**         | `<CubeGeometry>`, `<SphereGeometry>`, `<PlaneGeometry>`, `<CylinderGeometry>`, etc.                                      | Declarative shapes with auto-disposal                          |
-| **Lighting**           | `<DirectionalLight>`, `<PointLight>`, `<AmbientLight>`, `<SpotLight>`                                                    | Real-time scene lights                                         |
-| **Utils**              | `Container3D.traverse`                                                                                                   | Depth-first 3D scene traversal                                 |
-| **Testing**            | Import directly from `pixi-solid/testing` (`mountScene`, `getByLabel`, `cleanup`)                                        | Headless testing utilities                                     |
+| Area                   | Exports                                                                                                                             | Description                                                    |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| **Viewport & Context** | `<View3D>`, `View3DProvider`, `useView3D`, `useWorldToScreen`, `useScreenToWorld`                                                   | 2D/3D bridge container, context accessor, and projection hooks |
+| **Scene Nodes**        | `<Container3D>`, `<Mesh3D>`, `<Model3D>`, `<Sprite3D>`, `<BatchedMesh3D>`, `<ParticleContainer3D>`, `<ParticleSystem3D>`            | 3D transform nodes & GPU particles                             |
+| **Cameras & Controls** | `<Camera3D>`, `<OrbitCamera>`, `<FPSCamera>`                                                                                        | Perspective/orthographic cameras, orbit and FPS controls       |
+| **Materials**          | `<Material3D>`, `<FlatMaterial>`, `<PhongMaterial>`, `<ToonMaterial>`                                                               | Declarative materials with auto-disposal                       |
+| **Geometries**         | `<CubeGeometry>`, `<SphereGeometry>`, `<PlaneGeometry>`, `<CylinderGeometry>`, etc.                                                 | Declarative shapes with auto-disposal                          |
+| **Lighting**           | `<DirectionalLight>`, `<PointLight>`, `<AmbientLight>`, `<SpotLight>`                                                               | Real-time scene lights                                         |
+| **Utils**              | `Container3D.traverse`                                                                                                              | Depth-first 3D scene traversal                                 |
+| **Testing**            | `mountScene`, `cleanup` from `pixi-solid/testing`; `getByLabel3D`, `queryByLabel3D`, `getAllByLabel3D` from `pixi-solid-3d/testing` | Headless testing; one query spans 2D and 3D                    |
 
 ### Prop names
 

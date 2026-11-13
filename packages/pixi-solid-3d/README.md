@@ -90,18 +90,35 @@ export const App = () => (
 
 ## Testing
 
-Scene tests run without a browser or canvas, using the utilities from `pixi-solid/testing`:
+Scene tests run without a browser or canvas, using `mountScene` and `cleanup` from
+`pixi-solid/testing`, and the 3D label queries from `pixi-solid-3d/testing`:
 
 ```tsx
-import { cleanup, getByLabel, mountScene } from "pixi-solid/testing";
-import { Mesh3D } from "pixi-solid-3d";
+import { cleanup, mountScene } from "pixi-solid/testing";
+import { getByLabel3D } from "pixi-solid-3d/testing";
+import { Container, Sprite } from "pixi-solid";
+import { Mesh3D, View3D } from "pixi-solid-3d";
 
-const { container } = mountScene(() => <Mesh3D label="crate" />);
+const { container } = mountScene(() => (
+  <Container label="hud">
+    <Sprite label="score" />
+    <View3D>
+      <Mesh3D label="crate" />
+    </View3D>
+  </Container>
+));
 
-expect(getByLabel(container, "crate")).toBeDefined();
+// One query covers the whole scene: 2D nodes, and 3D nodes inside any View3D
+expect(getByLabel3D(container, "score")).toBeDefined();
+expect(getByLabel3D(container, "crate")).toBeDefined();
 
 cleanup();
 ```
+
+`getByLabel3D` is the throwing variant, `queryByLabel3D` returns `undefined`, and
+`getAllByLabel3D` returns every match in depth-first order. Any of them accepts a 2D container, a
+`<View3D>`, or a `<Container3D>` as the root, and each `<View3D>` it reaches continues into that
+view's 3D scene (`view.root`).
 
 ## Agent skill
 

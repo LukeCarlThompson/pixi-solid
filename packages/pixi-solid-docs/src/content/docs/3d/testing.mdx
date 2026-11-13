@@ -1,0 +1,82 @@
+---
+title: Testing 3D Scenes
+description: Headless tests for pixi-solid-3d scenes, using mountScene from pixi-solid/testing and the 3D label queries.
+---
+
+A 3D scene tests like a 2D one: `<View3D>` needs no canvas, renderer or WebGL context. Mount with
+`mountScene` from `pixi-solid/testing`, query with the 3D helpers from `pixi-solid-3d/testing`, and
+assert on the nodes themselves.
+
+```tsx
+import { Container } from "pixi-solid";
+import { cleanup, mountScene } from "pixi-solid/testing";
+import { Container3D, Mesh3D, View3D } from "pixi-solid-3d";
+import { getByLabel3D } from "pixi-solid-3d/testing";
+
+const { container } = mountScene(() => (
+  <Container label="hud">
+    <Container label="score" />
+    <View3D>
+      <Container3D label="group">
+        <Mesh3D label="crate" />
+      </Container3D>
+    </View3D>
+  </Container>
+));
+
+expect(getByLabel3D(container, "score")).toBeDefined(); // 2D, beside the view
+expect(getByLabel3D(container, "crate")).toBeDefined(); // 3D, inside the view
+
+cleanup();
+```
+
+## Scene queries
+
+`pixi-solid-3d/testing` exports three queries. They walk the whole scene in one pass: 2D containers,
+into every `<View3D>` (whose 3D nodes hang off `view.root`), and on through its 3D nodes.
+
+| Helper                     | Returns                                    |
+| -------------------------- | ------------------------------------------ |
+| `getByLabel3D(root, …)`    | The first match; throws when there is none |
+| `queryByLabel3D(root, …)`  | The first match, or `undefined`            |
+| `getAllByLabel3D(root, …)` | Every match, in depth-first order          |
+
+Any of them accepts a 2D container, a `<View3D>`, or a `<Container3D>` as the root, and the root
+itself is a candidate, so `getByLabel3D(view, "main-view")` finds a labelled `<View3D>`.
+
+The returned node type is what you say it is — the walk cannot know which class a label belongs to:
+
+```tsx
+import type * as Pixi3D from "@pixi/3d";
+
+const crate = getByLabel3D<Pixi3D.Mesh3D>(container, "crate");
+expect(crate?.geometry).toBeInstanceOf(Pixi3D.CubeGeometry);
+```
+
+## Ticker-driven components
+
+`<Model3D>`, `<ParticleSystem3D>`, `<OrbitCamera>` and `<FPSCamera>` advance on the ticker from
+context rather than `Ticker.shared`. Wrap the scene in `ctx.Provider` from `createTestContext()` and
+step frames on `ctx.ticker`:
+
+```tsx
+const ctx = createTestContext();
+
+mountScene(() => (
+  <ctx.Provider>
+    <View3D>
+      <ParticleSystem3D capacity={64} emitRate={20} />
+    </View3D>
+  </ctx.Provider>
+));
+
+await ctx.ticker.fastForwardFrames(2);
+```
+
+## What to assert
+
+Nodes expose the same properties the components write, so assert those directly: `mesh.position.x`,
+`node.children`, `view.camera` for the active camera, and `instance.destroyed` after unmount.
+
+`cleanup()` disposes every mounted scene, including the `<View3D>` that owns its view. A view passed
+in through `as` is adopted, never destroyed.

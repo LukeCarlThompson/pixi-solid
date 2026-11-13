@@ -1,9 +1,10 @@
 import type * as Pixi3D from "@pixi/3d";
-import { cleanup, getByLabel, mountScene } from "pixi-solid/testing";
+import { cleanup, mountScene } from "pixi-solid/testing";
 import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import { Container3D, PointLight } from "../components";
+import { getByLabel3D } from "../testing";
 
 describe("Container3D component", () => {
   it("GIVEN position and scale props WHEN it mounts THEN the container and its child carry them", () => {
@@ -23,7 +24,7 @@ describe("Container3D component", () => {
     expect(container.scale.y).toBe(2);
     expect(container.scale.z).toBe(2);
 
-    const child = getByLabel<Pixi3D.Container3D>(container, "child");
+    const child = getByLabel3D(container, "child");
     expect(child).toBeDefined();
     expect(child.x).toBe(5);
 
@@ -75,7 +76,7 @@ describe("Container3D component", () => {
     // THEN
     expect(container.children.length).toBe(1);
     expect(container.children[0].label).toBe("sun");
-    const sun = getByLabel<Pixi3D.PointLight>(container, "sun");
+    const sun = getByLabel3D<Pixi3D.PointLight>(container, "sun");
     expect(sun.intensity).toBe(10);
 
     // WHEN

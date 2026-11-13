@@ -1,13 +1,48 @@
 import type * as Pixi from "pixi.js";
 
-export type LabelQueryTarget =
-  | {
-      label?: string | null;
-      children?: readonly any[] | any[];
-      root?: any;
-    }
-  | undefined
-  | null;
+/**
+ * The parts of a scene node a label query needs: a label, and the children to walk.
+ * `Pixi.Container` satisfies it, so the walk works on any 2D PixiJS graph.
+ */
+type LabelNode = {
+  label?: string | null;
+  children?: readonly LabelNode[];
+};
+
+/**
+ * Reads a node's children.
+ *
+ * `LabelNode.children` is `LabelNode[]` because a walk can change node types along the way. A walk
+ * over one tree of one type knows its children are that type, so it says so here once, instead of
+ * every caller casting.
+ */
+const childrenOnNode = <Node extends LabelNode>(node: Node): readonly Node[] =>
+  (node.children ?? []) as readonly Node[];
+
+/** Depth-first search that stops at the first node carrying `label`. */
+const findFirst = <Node extends LabelNode>(node: Node, label: string): Node | undefined => {
+  if (node.label === label) return node;
+
+  const children = childrenOnNode(node);
+  for (let i = 0; i < children.length; i += 1) {
+    const found = findFirst(children[i], label);
+    if (found !== undefined) return found;
+  }
+
+  return undefined;
+};
+
+/** Depth-first visit that collects every node carrying `label`. */
+const findAll = <Node extends LabelNode>(node: Node, label: string, found: Node[] = []): Node[] => {
+  if (node.label === label) found.push(node);
+
+  const children = childrenOnNode(node);
+  for (let i = 0; i < children.length; i += 1) {
+    findAll(children[i], label, found);
+  }
+
+  return found;
+};
 
 /**
  * Recursively search `root` for a display object with the given label.
@@ -15,49 +50,27 @@ export type LabelQueryTarget =
  *
  * Accepts `undefined` or `null` for convenience with refs — returns
  * `undefined` immediately instead of throwing.
- * Supports standard 2D `Pixi.Container`s, 3D `Container3D`s, and `View3D` (automatically
- * traverses into 3D view roots e.g. `View3D.root`).
  *
  * @example
  * ```ts
- * let scene: Pixi.Container | undefined;
  * const { container } = mountScene(() => <Container label="scene" />);
  * const score = queryByLabel(container, "score");
  * ```
  */
-export const queryByLabel = <T = Pixi.Container>(
-  root: LabelQueryTarget,
+export const queryByLabel = <Node extends LabelNode = Pixi.Container>(
+  root: Node | undefined | null,
   label: string,
-): T | undefined => {
-  if (!root) return undefined;
-  if (root.label === label) return root as T;
-
-  if ("root" in root && root.root && typeof root.root === "object" && "children" in root.root) {
-    const foundIn3DRoot = queryByLabel<T>(root.root, label);
-    if (foundIn3DRoot) return foundIn3DRoot;
-  }
-
-  if (root.children && Array.isArray(root.children)) {
-    for (let i = 0; i < root.children.length; i++) {
-      const child = root.children[i];
-      if (!child || typeof child !== "object") continue;
-
-      if ("children" in child || ("root" in child && (child as any).root)) {
-        const found = queryByLabel<T>(child, label);
-        if (found) return found;
-      }
-    }
-  }
-
-  return undefined;
-};
+): Node | undefined => (root ? findFirst(root, label) : undefined);
 
 /**
  * Like {@link queryByLabel} but throws if the label is not found.
  * Accepts `undefined` or `null` for convenience with refs — throws a
  * clear error if the root is missing.
  */
-export const getByLabel = <T = Pixi.Container>(root: LabelQueryTarget, label: string): T => {
+export const getByLabel = <Node extends LabelNode = Pixi.Container>(
+  root: Node | undefined | null,
+  label: string,
+): Node => {
   if (!root) {
     throw new Error(
       "getByLabel: root is " +
@@ -66,7 +79,7 @@ export const getByLabel = <T = Pixi.Container>(root: LabelQueryTarget, label: st
     );
   }
 
-  const found = queryByLabel<T>(root, label);
+  const found = queryByLabel(root, label);
   if (!found) {
     throw new Error('getByLabel: no node with label "' + label + '" found in the scene graph.');
   }
@@ -78,9 +91,11 @@ export const getByLabel = <T = Pixi.Container>(root: LabelQueryTarget, label: st
  * Useful for components that render lists of items with the same label.
  * Accepts `undefined` or `null` for convenience with refs — throws a
  * clear error if the root is missing.
- * Automatically traverses into 3D view roots (e.g. `View3D.root`) if present.
  */
-export const getAllByLabel = <T = Pixi.Container>(root: LabelQueryTarget, label: string): T[] => {
+export const getAllByLabel = <Node extends LabelNode = Pixi.Container>(
+  root: Node | undefined | null,
+  label: string,
+): Node[] => {
   if (!root) {
     throw new Error(
       "getAllByLabel: root is " +
@@ -89,31 +104,5 @@ export const getAllByLabel = <T = Pixi.Container>(root: LabelQueryTarget, label:
     );
   }
 
-  const results: T[] = [];
-
-  const walk = (node: {
-    label?: string | null;
-    children?: readonly any[] | any[];
-    root?: any;
-  }): void => {
-    if (node.label === label) results.push(node as unknown as T);
-
-    if ("root" in node && node.root && typeof node.root === "object" && "children" in node.root) {
-      walk(node.root);
-    }
-
-    if (node.children && Array.isArray(node.children)) {
-      for (let i = 0; i < node.children.length; i++) {
-        const child = node.children[i];
-        if (!child || typeof child !== "object") continue;
-
-        if ("children" in child || ("root" in child && (child as any).root)) {
-          walk(child);
-        }
-      }
-    }
-  };
-
-  walk(root);
-  return results;
+  return findAll(root, label);
 };

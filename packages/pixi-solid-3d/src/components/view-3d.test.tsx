@@ -1,6 +1,6 @@
 import type * as Pixi3D from "@pixi/3d";
 import { View3D as PixiView3D } from "@pixi/3d";
-import { cleanup, getByLabel, mountScene } from "pixi-solid/testing";
+import { cleanup, mountScene } from "pixi-solid/testing";
 import { createSignal, Show } from "solid-js";
 import { describe, expect, it } from "vitest";
 
@@ -11,6 +11,7 @@ import {
   View3D,
   View3DProvider,
 } from "../components";
+import { getByLabel3D } from "../testing";
 
 describe("View3D component", () => {
   it("GIVEN children and viewport props WHEN it mounts THEN children land in view.root", () => {
@@ -42,9 +43,9 @@ describe("View3D component", () => {
     expect(group.children[0].label).toBe("sun");
 
     // 3D nodes are reachable with the same label query as 2D ones.
-    const foundGroup = getByLabel<Pixi3D.Container3D>(container, "group");
+    const foundGroup = getByLabel3D(container, "group");
     expect(foundGroup).toBe(group);
-    const foundSun = getByLabel<Pixi3D.PointLight>(container, "sun");
+    const foundSun = getByLabel3D<Pixi3D.PointLight>(container, "sun");
     expect(foundSun).toBe(group.children[0]);
 
     cleanup();
