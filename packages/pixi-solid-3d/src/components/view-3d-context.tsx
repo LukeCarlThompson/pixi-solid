@@ -193,13 +193,29 @@ export const useScreenToWorld = (
 
 const VIEW_3D_PROVIDER_RUNTIME_KEYS = ["children", "ref", "as"] as const;
 
-export type View3DProviderProps<TRoot extends Pixi3D.Container3D = Pixi3D.Container3D> =
-  Pixi3D.View3DOptions<TRoot> & {
-    children?: JSX.Element;
-    ref?: Ref<Pixi3D.View3D<TRoot>>;
-    /** An existing `View3D` to adopt. The provider will not destroy it. */
-    as?: Pixi3D.View3D<TRoot>;
-  };
+/**
+ * Options the view reads once, when it is built.
+ *
+ * `root` is not part of the component props, but an untyped caller can still pass it, and assigning
+ * a new root after construction leaves the old graph rendering. Both option syncs skip these, so the
+ * value given at mount — which reached the constructor — stays the one in use.
+ */
+export const VIEW_3D_CONSTRUCTION_ONLY_KEYS: ReadonlySet<string> = new Set(["root"]);
+
+/**
+ * `root` is left out for the same reason as on `View3DProps`: a custom root parents the camera and
+ * lights under it, and cannot be replaced after construction. Pass a view built with your own root
+ * through `as` instead.
+ */
+export type View3DProviderProps<TRoot extends Pixi3D.Container3D = Pixi3D.Container3D> = Omit<
+  Pixi3D.View3DOptions<TRoot>,
+  "root"
+> & {
+  children?: JSX.Element;
+  ref?: Ref<Pixi3D.View3D<TRoot>>;
+  /** An existing `View3D` to adopt. The provider will not destroy it. */
+  as?: Pixi3D.View3D<TRoot>;
+};
 
 /**
  * Creates and owns a `View3D`, and shares it with every descendant through `View3DContext`.
@@ -243,6 +259,8 @@ export const View3DProvider = <TRoot extends Pixi3D.Container3D = Pixi3D.Contain
   createRenderEffect(() => {
     const source = props as unknown as Record<string, unknown>;
     for (const key in options) {
+      if (VIEW_3D_CONSTRUCTION_ONLY_KEYS.has(key)) continue;
+
       const value = source[key];
       if (value !== undefined && key in view) {
         (view as unknown as Record<string, unknown>)[key] = value;

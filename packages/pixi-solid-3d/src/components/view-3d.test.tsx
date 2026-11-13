@@ -1,5 +1,5 @@
 import type * as Pixi3D from "@pixi/3d";
-import { View3D as PixiView3D } from "@pixi/3d";
+import { Container3D as PixiContainer3D, View3D as PixiView3D } from "@pixi/3d";
 import { cleanup, mountScene } from "pixi-solid/testing";
 import { createSignal, Show } from "solid-js";
 import { describe, expect, it } from "vitest";
@@ -68,6 +68,48 @@ describe("View3D component", () => {
 
     // THEN
     expect(container.toneMapping).toBe("reinhard");
+
+    cleanup();
+  });
+
+  it("GIVEN an untyped root prop WHEN it changes THEN the view keeps the root it was built with", () => {
+    // GIVEN `root` is not part of View3DProps, but an untyped caller can still pass it
+    const first = new PixiContainer3D({ label: "first" });
+    const [root, setRoot] = createSignal(first);
+
+    const { container } = mountScene<PixiView3D>(() => (
+      <View3D {...({ root: root() } as Pixi3D.View3DOptions)} />
+    ));
+
+    expect(container.root).toBe(first);
+
+    // WHEN the same prop is given a different root after mount
+    setRoot(new PixiContainer3D({ label: "second" }));
+
+    // THEN the view still tracks the root from construction, which is the only one it can render
+    expect(container.root).toBe(first);
+
+    cleanup();
+  });
+
+  it("GIVEN an untyped root prop WHEN it changes THEN the provider keeps the root it was built with", () => {
+    // GIVEN `root` is not part of View3DProviderProps, but an untyped caller can still pass it
+    const first = new PixiContainer3D({ label: "first" });
+    const [root, setRoot] = createSignal(first);
+
+    const { container } = mountScene<PixiView3D>(() => (
+      <View3DProvider {...({ root: root() } as Pixi3D.View3DOptions)}>
+        <View3D />
+      </View3DProvider>
+    ));
+
+    expect(container.root).toBe(first);
+
+    // WHEN
+    setRoot(new PixiContainer3D({ label: "second" }));
+
+    // THEN
+    expect(container.root).toBe(first);
 
     cleanup();
   });

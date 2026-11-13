@@ -12,19 +12,27 @@ import {
 } from "solid-js";
 
 import { bindChildrenToContainer3D } from "./bind-children";
-import { View3DContext } from "./view-3d-context";
+import { VIEW_3D_CONSTRUCTION_ONLY_KEYS, View3DContext } from "./view-3d-context";
 
-export type View3DProps<TRoot extends Pixi3D.Container3D = Pixi3D.Container3D> =
-  Pixi3D.View3DOptions<TRoot> & {
-    children?: JSX.Element;
-    ref?: Ref<Pixi3D.View3D<TRoot>>;
-    as?: Pixi3D.View3D<TRoot>;
-    x?: number;
-    y?: number;
-    width?: number;
-    height?: number;
-    autoResize?: boolean;
-  };
+/**
+ * `root` is deliberately absent. A view mounts the camera and any unparented lights under its root,
+ * so passing a model as the root also parents the camera under that model and inherits its
+ * transform; `@pixi/3d` also only tracks the root a view was built with, so it cannot be replaced
+ * later. Build the view yourself and hand it over with `as` if you need a custom root.
+ */
+export type View3DProps<TRoot extends Pixi3D.Container3D = Pixi3D.Container3D> = Omit<
+  Pixi3D.View3DOptions<TRoot>,
+  "root"
+> & {
+  children?: JSX.Element;
+  ref?: Ref<Pixi3D.View3D<TRoot>>;
+  as?: Pixi3D.View3D<TRoot>;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  autoResize?: boolean;
+};
 
 const VIEW_3D_RUNTIME_KEYS = ["ref", "as", "children"] as const;
 
@@ -89,6 +97,8 @@ export const View3D: Component<View3DProps> = (props) => {
   } else {
     createRenderEffect(() => {
       for (const key in initialisationProps) {
+        if (VIEW_3D_CONSTRUCTION_ONLY_KEYS.has(key)) continue;
+
         const value = (props as unknown as Record<string, unknown>)[key];
         if (value !== undefined && key in view) {
           (view as unknown as Record<string, unknown>)[key] = value;
