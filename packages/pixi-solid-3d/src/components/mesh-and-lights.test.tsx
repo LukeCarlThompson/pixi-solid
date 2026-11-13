@@ -288,4 +288,23 @@ describe("Mesh3D and Lights", () => {
     expect((geometry as unknown as { _destroyed: boolean })._destroyed).toBeFalsy();
     expect(material.destroyed).toBe(false);
   });
+
+  it("GIVEN a spread props object WHEN it gains an option key THEN that option is applied", () => {
+    // GIVEN
+    const [spread, setSpread] = createSignal<Record<string, unknown>>({ label: "sun" });
+
+    const { container } = mountScene<Pixi3D.DirectionalLight>(() => (
+      <DirectionalLight {...spread()} />
+    ));
+
+    expect(container.intensity).toBe(1);
+
+    // WHEN — `intensity` is an option, not a runtime prop, and was absent at mount
+    setSpread({ label: "sun", intensity: 4 });
+
+    // THEN
+    expect(container.intensity).toBe(4);
+
+    cleanup();
+  });
 });

@@ -35,25 +35,7 @@ export type AdoptableProps<OptionsType extends object, InstanceType> =
   | (Partial<Omit<OptionsType, "children">> & { as: InstanceType });
 
 /**
- * Prop definition for Container3D-based components
- */
-export type Container3DProps<Component extends Pixi3D.Container3D = Pixi3D.Container3D> =
-  PixiSolid3DEventHandlerMap &
-    Container3DAxisProps &
-    TopLevelAxisProps &
-    RefAsProps3D<Component> & {
-      children?: JSX.Element;
-      position?: Pixi3D.PointData3D;
-      scale?: Pixi3D.PointData3D | number;
-      rotation?: Pixi3D.PointData3D;
-      angle?: Pixi3D.PointData3D;
-      quaternion?: Pixi3D.QuaternionData;
-      origin?: Pixi3D.PointData3D | number;
-      lookAt?: Pixi3D.PointData3D;
-    };
-
-/**
- * Prop definition for 3D leaf components that do not take children
+ * Props every 3D node takes: pointer events, the point and axis shortcuts, and `ref` / `as`.
  */
 export type Leaf3DProps<Component extends Pixi3D.Container3D = Pixi3D.Container3D> =
   PixiSolid3DEventHandlerMap &
@@ -68,6 +50,12 @@ export type Leaf3DProps<Component extends Pixi3D.Container3D = Pixi3D.Container3
       origin?: Pixi3D.PointData3D | number;
       lookAt?: Pixi3D.PointData3D;
     };
+
+/**
+ * `Leaf3DProps` plus `children`, for components that mount 3D nodes beneath them.
+ */
+export type Container3DProps<Component extends Pixi3D.Container3D = Pixi3D.Container3D> =
+  Leaf3DProps<Component> & { children?: JSX.Element };
 
 export const SOLID_3D_PROP_KEYS = ["ref", "as", "children"] as const;
 

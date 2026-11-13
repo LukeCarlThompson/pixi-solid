@@ -7,6 +7,13 @@ import { createRenderEffect, on, onCleanup, splitProps, type JSX } from "solid-j
 import { bindInitialisationProps3D, bindRuntimeProps3D } from "./bind-props";
 import { LEAF3D_RUNTIME_KEYS, type Leaf3DProps, type PixiComponent3D } from "./factories";
 
+/**
+ * Props for `<ParticleSystem3D>`.
+ *
+ * Not generic over the extra shader bits: a system derives every built-in bit from its options, and
+ * `setParticle` accepts the built-in attributes whatever bits it has. `extraBits` only types the
+ * attributes of bits you wrote yourself.
+ */
 export type ParticleSystem3DComponentProps = Leaf3DProps<PixiParticleSystem3D> &
   Omit<Partial<Pixi3DExtras.ParticleSystem3DOptions>, "children"> & {
     playing?: boolean;
@@ -37,7 +44,7 @@ export const ParticleSystem3D: PixiComponent3D<
 
   const isUserOwnedInstance = runtimeProps.as !== undefined;
   const instance =
-    props.as ||
+    props.as ??
     new PixiParticleSystem3D({
       autoUpdate: false,
       ...initialisationProps,

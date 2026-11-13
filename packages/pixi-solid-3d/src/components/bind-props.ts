@@ -67,8 +67,33 @@ const assignProp = (instance: any, key: string, value: unknown): void => {
   instance[key] = value;
 };
 
+/** Applies one prop value to whichever shape a `Container3D` stores it in. */
+const applyPropValue = (instance: any, key: string, value: unknown): void => {
+  if (isVector3DProperty(key)) {
+    setVector3DProperty(instance, key, value);
+    return;
+  }
+
+  if (isAxis3DProperty(key)) {
+    setAxis3DProperty(instance, key, value);
+    return;
+  }
+
+  if (isTopLevelAxisProperty(key)) {
+    instance[key] = value;
+    return;
+  }
+
+  assignProp(instance, key, value);
+};
+
 /**
  * Binds runtime props to a Container3D instance with subscriptions to maintain reactivity.
+ *
+ * The outer effect re-runs when the props object itself changes, which is what a spread props
+ * signal does: `<Container3D {...spread()} />` builds a new props object, so keys that were absent
+ * at mount have to be enumerated again before they can be bound. Re-running disposes the inner
+ * effects with it and rebuilds them, which is why each one tracks a single prop.
  */
 export const bindRuntimeProps3D = <
   InstanceType extends Pixi3D.Container3D,
@@ -91,23 +116,6 @@ export const bindRuntimeProps3D = <
         continue;
       }
 
-      if (isVector3DProperty(key)) {
-        createRenderEffect(() => setVector3DProperty(instance, key, props[key]));
-        continue;
-      }
-
-      if (isAxis3DProperty(key)) {
-        createRenderEffect(() => setAxis3DProperty(instance, key, props[key]));
-        continue;
-      }
-
-      if (isTopLevelAxisProperty(key)) {
-        createRenderEffect(() => {
-          instance[key] = props[key];
-        });
-        continue;
-      }
-
       if (is3DEventProperty(key)) {
         createRenderEffect(() => {
           const eventName = key.slice(2);
@@ -123,17 +131,17 @@ export const bindRuntimeProps3D = <
         continue;
       }
 
-      if (key in instance) {
-        createRenderEffect(() => assignProp(instance, key, props[key]));
-        continue;
-      }
+      createRenderEffect(() => applyPropValue(instance, key, props[key]));
     }
   });
 };
 
 /**
  * Binds initialisation props to a Container3D instance.
- * Updates properties only when they change after initial creation.
+ *
+ * The constructor already applied the values present at mount, so those are only re-applied when
+ * they change. A later run of the outer effect means the props object was replaced, as a spread
+ * props signal does, so keys that were absent at mount are applied straight away.
  */
 export const bindInitialisationProps3D = <
   InstanceType extends Pixi3D.Container3D,
@@ -142,34 +150,25 @@ export const bindInitialisationProps3D = <
   instance: InstanceType,
   props: OptionsType,
 ): void => {
-  for (const key in props) {
-    if (key === "children") continue;
+  let isFirstRun = true;
 
-    createRenderEffect(
-      on(
-        () => props[key],
-        (nextValue, prevValue) => {
-          if (nextValue === prevValue) return;
+  createRenderEffect(() => {
+    for (const key in props) {
+      if (key === "children") continue;
 
-          if (isVector3DProperty(key)) {
-            setVector3DProperty(instance, key, nextValue);
-            return;
-          }
+      createRenderEffect(
+        on(
+          () => props[key],
+          (nextValue, prevValue) => {
+            if (nextValue === prevValue) return;
 
-          if (isAxis3DProperty(key)) {
-            setAxis3DProperty(instance, key, nextValue);
-            return;
-          }
+            applyPropValue(instance, key, nextValue);
+          },
+          { defer: isFirstRun },
+        ),
+      );
+    }
 
-          if (isTopLevelAxisProperty(key)) {
-            instance[key] = nextValue;
-            return;
-          }
-
-          assignProp(instance, key, nextValue);
-        },
-        { defer: true },
-      ),
-    );
-  }
+    isFirstRun = false;
+  });
 };

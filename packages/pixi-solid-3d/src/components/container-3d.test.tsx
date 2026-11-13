@@ -1,7 +1,7 @@
 import type * as Pixi3D from "@pixi/3d";
 import { cleanup, getByLabel, mountScene } from "pixi-solid/testing";
 import { createSignal } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { Container3D, PointLight } from "../components";
 
@@ -83,6 +83,65 @@ describe("Container3D component", () => {
 
     // THEN
     expect(container.children.length).toBe(0);
+
+    cleanup();
+  });
+
+  it("GIVEN an event handler WHEN the children change THEN the handler still fires exactly once", () => {
+    // GIVEN
+    const onClick = vi.fn();
+    const [showChild, setShowChild] = createSignal(true);
+
+    const { container } = mountScene<Pixi3D.Container3D>(() => (
+      <Container3D label="root" onclick={onClick}>
+        {showChild() && <Container3D label="child" />}
+      </Container3D>
+    ));
+
+    container.emit("click", {} as Pixi3D.Pointer3DEvent);
+    expect(onClick).toHaveBeenCalledTimes(1);
+
+    // WHEN
+    setShowChild(false);
+    container.emit("click", {} as Pixi3D.Pointer3DEvent);
+
+    // THEN
+    expect(onClick).toHaveBeenCalledTimes(2);
+
+    cleanup();
+  });
+
+  it("GIVEN a spread props object WHEN it gains a key THEN the new prop is applied", () => {
+    // GIVEN
+    const [spread, setSpread] = createSignal<Record<string, unknown>>({ label: "root" });
+
+    const { container } = mountScene<Pixi3D.Container3D>(() => <Container3D {...spread()} />);
+
+    expect(container.label).toBe("root");
+    expect(container.x).toBe(0);
+
+    // WHEN — the spread object is replaced, so the key set grows
+    setSpread({ label: "root", x: 42 });
+
+    // THEN
+    expect(container.x).toBe(42);
+
+    cleanup();
+  });
+
+  it("GIVEN a spread props object WHEN an existing key changes THEN the prop is updated", () => {
+    // GIVEN
+    const [spread, setSpread] = createSignal<Record<string, unknown>>({ label: "root", x: 1 });
+
+    const { container } = mountScene<Pixi3D.Container3D>(() => <Container3D {...spread()} />);
+
+    expect(container.x).toBe(1);
+
+    // WHEN
+    setSpread({ label: "root", x: 7 });
+
+    // THEN
+    expect(container.x).toBe(7);
 
     cleanup();
   });

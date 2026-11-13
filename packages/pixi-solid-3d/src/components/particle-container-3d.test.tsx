@@ -83,3 +83,20 @@ describe("ParticleContainer3D component", () => {
     owned.destroy();
   });
 });
+
+describe("ParticleContainer3D lifecycle", () => {
+  it("GIVEN a mounted container WHEN it unmounts THEN the component destroys the instance it built", () => {
+    // GIVEN
+    let mounted: PixiParticleContainer3D | undefined;
+
+    mountScene(() => <ParticleContainer3D capacity={4} ref={(c) => (mounted = c)} />);
+
+    expect(mounted).toBeDefined();
+
+    // WHEN
+    cleanup();
+
+    // THEN
+    expect(mounted?.destroyed).toBe(true);
+  });
+});

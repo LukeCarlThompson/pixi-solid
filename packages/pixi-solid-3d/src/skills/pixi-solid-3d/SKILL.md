@@ -199,6 +199,65 @@ For thousands of copies of one geometry, `<BatchedMesh3D>` draws them without a 
 
 `size` is required and fixed for the batch's lifetime. Hide a slot with `setVisibleAt(i, false)` to despawn it; there is no `setItemActive` any more. For per-slot shader values such as a tint, pass `instanceData` and write it with `setInstanceDataAt`.
 
+## Particles
+
+- `<ParticleSystem3D>` simulates particles for you. Lifetime, ballistic motion, size, alpha and colour over life, spin and flipbooks all come from its options.
+- `<ParticleContainer3D>` is a pool of quads with no simulation. You write each slot, then call `upload()` once per frame.
+
+```tsx
+<ParticleSystem3D
+  capacity={500}
+  emitRate={80}
+  life={[1, 2]}
+  size={[0.3, 0.6]}
+  speed={[3, 6]}
+  blendMode="add"
+/>
+```
+
+Both are built from _particle bits_: shader fragments that declare per-particle attributes and uniforms, so age, motion and fade run in the vertex shader instead of on the CPU. `<ParticleSystem3D>` derives the bits it needs from your options, so you never name one.
+
+### `extraBits`
+
+`extraBits` adds a bit beyond the built-in ones. On `<ParticleSystem3D>` that means a bit you wrote yourself, so it is an `@advanced` path you can ignore.
+
+On `<ParticleContainer3D>` it is how you opt into GPU animation at all, since nothing is derived for you. Pass the bits and write their attributes with `setParticle`:
+
+```tsx
+const BITS = [particleLifetimeBit, particleMotionBit, particleSizeOverLifeBit] as const;
+
+<ParticleContainer3D
+  capacity={2000}
+  texture={Texture.WHITE}
+  blendMode="add"
+  extraBits={BITS}
+  ref={(particles) => {
+    // Written once, at spawn: `aBirth`, `aLife`, `aVel` and `aSizeEnd` come from BITS.
+    particles.setParticle(0, {
+      aPosition: { x: 0, y: 0, z: 0 },
+      aBirth: 0,
+      aLife: 1.5,
+      aVel: { x: 0, y: 2, z: 0 },
+      aSizeEnd: 0,
+    });
+    particles.upload();
+  }}
+/>;
+```
+
+An unknown attribute throws at runtime and lists the attributes the bits declare.
+
+### Running a system
+
+`setParticle` takes an object, so use it to spawn, not to run. The bits animate each particle on the GPU from the attributes you wrote, so a frame only advances the clock:
+
+```tsx
+container.upload(); // once, after spawning
+container.uniforms.uParticleTime = elapsed; // every frame, from `onTick`
+```
+
+For particles you move yourself, write scalars with `setParticleAt` or `writePacked`, or straight into the typed arrays in `container.data`, then call `upload()` once per frame. Those paths allocate nothing.
+
 ## Single-renderer builds
 
 `@pixi/3d` exposes `@pixi/3d/webgl` and `@pixi/3d/webgpu` for apps that only need one backend. `pixi-solid-3d` imports the full `@pixi/3d` entry, which runs the package's initialisation, so keep that import when you use both.

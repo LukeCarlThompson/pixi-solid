@@ -61,3 +61,27 @@ describe("FPSCamera and ParticleSystem3D extras", () => {
     cleanup();
   });
 });
+
+describe("ParticleSystem3D lifecycle", () => {
+  it("GIVEN a mounted system WHEN it unmounts THEN the component destroys it", () => {
+    // GIVEN
+    const ctx = createTestContext();
+    let system: Pixi3DExtras.ParticleSystem3D | undefined;
+
+    mountScene(() => (
+      <ctx.Provider>
+        <View3D width={400} height={300}>
+          <ParticleSystem3D capacity={64} ref={(c) => (system = c)} />
+        </View3D>
+      </ctx.Provider>
+    ));
+
+    expect(system).toBeDefined();
+
+    // WHEN
+    cleanup();
+
+    // THEN
+    expect(system?.destroyed).toBe(true);
+  });
+});
