@@ -1,12 +1,15 @@
-# Publish pixi-solid to npm (pnpm). Skips publish if the package version is already published.
-# The npm dist-tag is derived from the version in packages/pixi-solid/package.json:
-#   - prerelease version (2.0.0-rc.1) -> next
-#   - stable version on main           -> latest
-#   - stable version on any other branch -> v<major>-latest (for example v1-latest)
+# Publish the workspace libraries to npm (pnpm). Each package is published only when its version is
+# not already on the registry, so bumping one package does not republish the other.
+#
+# The npm dist-tag is derived from each package's own version:
+#   - prerelease version (0.2.0-beta.1) -> next
+#   - stable version on main            -> latest
+#   - stable version on any other branch -> v<major>-latest (for example v0-latest)
+#
 # Triggers:
 #  - push to main or a release line (real publish)
 #  - manual run (workflow_dispatch) — does a dry-run by default
-name: Publish pixi-solid to NPM
+name: Publish to NPM
 
 on:
   push:
@@ -27,6 +30,13 @@ jobs:
     # A branch deletion also fires a push event, and there is nothing to publish.
     if: github.event_name != 'push' || github.event.deleted == false
     runs-on: ubuntu-latest
+    strategy:
+      # One package failing should not hide the other's result.
+      fail-fast: false
+      matrix:
+        package:
+          - pixi-solid
+          - pixi-solid-3d
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
@@ -46,21 +56,36 @@ jobs:
           cache: "pnpm" # Caches pnpm dependencies
 
       - name: Install dependencies
-        run: pnpm --filter "pixi-solid" install --frozen-lockfile
-
-      - name: Test
-        run: pnpm --filter "pixi-solid" test
+        run: pnpm install --frozen-lockfile
 
       - name: Check if version is already published
         id: check_published
-        run: node .github/scripts/check-published-version.mjs
+        run: node .github/scripts/check-published-version.mjs packages/${{ matrix.package }}
+
+      # pixi-solid must be built before anything that resolves its types or runtime.
+      - name: Build pixi-solid
+        if: steps.check_published.outputs.published == 'false'
+        run: pnpm --filter pixi-solid build
+
+      - name: Typecheck
+        if: steps.check_published.outputs.published == 'false'
+        run: pnpm --filter "${{ matrix.package }}" typecheck
+
+      - name: Test
+        if: steps.check_published.outputs.published == 'false'
+        run: pnpm --filter "${{ matrix.package }}" test
+
+      # Builds the artifact that gets published, and runs again via prepublishOnly.
+      - name: Build
+        if: steps.check_published.outputs.published == 'false'
+        run: pnpm --filter "${{ matrix.package }}" build
 
       - name: Resolve npm dist-tag
         id: dist_tag
         if: steps.check_published.outputs.published == 'false'
         run: |
           set -euo pipefail
-          version=$(node -p "require('./packages/pixi-solid/package.json').version")
+          version=$(node -p "require('./packages/${{ matrix.package }}/package.json').version")
 
           if [[ "$version" == *-* ]]; then
             dist_tag=next
@@ -70,7 +95,7 @@ jobs:
             dist_tag=latest
           fi
 
-          echo "$version from ${GITHUB_REF_NAME} publishes to $dist_tag"
+          echo "${{ matrix.package }} $version from ${GITHUB_REF_NAME} publishes to $dist_tag"
           echo "dist_tag=$dist_tag" >> "$GITHUB_OUTPUT"
 
       - name: Verify npm auth (safe)
@@ -79,8 +104,8 @@ jobs:
 
       - name: Publish (dry-run for manual runs)
         if: github.event_name == 'workflow_dispatch' && steps.check_published.outputs.published == 'false'
-        run: pnpm --filter "pixi-solid" publish --access public --no-git-checks --dry-run --tag "${{ steps.dist_tag.outputs.dist_tag }}"
+        run: pnpm --filter "${{ matrix.package }}" publish --access public --no-git-checks --dry-run --tag "${{ steps.dist_tag.outputs.dist_tag }}"
 
       - name: Publish
         if: github.event_name == 'push' && steps.check_published.outputs.published == 'false'
-        run: pnpm --filter "pixi-solid" publish --access public --no-git-checks --tag "${{ steps.dist_tag.outputs.dist_tag }}"
+        run: pnpm --filter "${{ matrix.package }}" publish --access public --no-git-checks --tag "${{ steps.dist_tag.outputs.dist_tag }}"

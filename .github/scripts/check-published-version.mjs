@@ -2,10 +2,22 @@ import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 
-// Determine the package.json path based on the working directory
-const packageJsonPath = path.join(process.cwd(), "packages", "pixi-solid", "package.json");
-const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+/**
+ * Reports whether a workspace package's current version is already on npm.
+ *
+ * Usage: node .github/scripts/check-published-version.mjs packages/pixi-solid-3d
+ *
+ * Writes `name`, `version` and `published` to GITHUB_OUTPUT for the publishing workflow.
+ */
+const packageDir = process.argv[2] ?? "packages/pixi-solid";
+const packageJsonPath = path.join(process.cwd(), packageDir, "package.json");
 
+if (!fs.existsSync(packageJsonPath)) {
+  console.error(`No package.json at ${packageJsonPath}`);
+  process.exit(1);
+}
+
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
 const pkg_name = packageJson.name;
 const pkg_version = packageJson.version;
 
@@ -39,7 +51,6 @@ if (githubOutput) {
   console.log(`published=${published}`);
 }
 
-// Add the warning logic here
 if (published) {
   console.log(
     `::warning::Package ${pkg_name}@${pkg_version} is already published to npm. Publish will be skipped.`,

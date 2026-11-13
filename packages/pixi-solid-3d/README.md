@@ -6,6 +6,10 @@ A `View3D` is an ordinary 2D display object that renders a 3D scene into its rec
 mix in one Solid component tree. Every 3D node is a component: props are reactive, and geometry,
 materials and passes are created and disposed with the scene.
 
+> **Pre-1.0.** The API may change between minor releases. Breaking changes ship as `0.x` bumps, which
+> is what semver allows below 1.0, so pin `^0.1.0` and read the release notes before taking a `0.x`
+> minor.
+
 ## What it covers
 
 - **Scene graph**: `<View3D>`, `<View3DProvider>`, `<Container3D>`, `<Mesh3D>`, `<Sprite3D>`, `<BatchedMesh3D>`, `<ParticleContainer3D>`
