@@ -12,6 +12,7 @@ import {
   type Ref,
 } from "solid-js";
 
+import { assignDefinedProp } from "./bind-props";
 import { useView3D } from "./view-3d-context";
 
 export type FPSCameraProps = Omit<Partial<Pixi3DExtras.FPSCameraOptions>, "autoUpdate"> & {
@@ -28,6 +29,18 @@ const FPS_CAMERA_KEYS = [
   "onchange",
   "onlock",
   "onunlock",
+  "enabled",
+  "moveSpeed",
+  "lookSpeed",
+  "maxPitch",
+  "pointerLock",
+  "keyboard",
+  "yaw",
+  "pitch",
+] as const;
+
+/** Props copied onto the controller as-is. */
+const FPS_CAMERA_ASSIGNED_KEYS = [
   "enabled",
   "moveSpeed",
   "lookSpeed",
@@ -110,29 +123,10 @@ export const FPSCamera: Component<FPSCameraProps> = (props) => {
     }
   });
 
-  createEffect(() => {
-    if (local.enabled !== undefined) controller.enabled = local.enabled;
-  });
-
-  createEffect(() => {
-    if (local.moveSpeed !== undefined) controller.moveSpeed = local.moveSpeed;
-  });
-
-  createEffect(() => {
-    if (local.lookSpeed !== undefined) controller.lookSpeed = local.lookSpeed;
-  });
-
-  createEffect(() => {
-    if (local.maxPitch !== undefined) controller.maxPitch = local.maxPitch;
-  });
-
-  createEffect(() => {
-    if (local.yaw !== undefined) controller.yaw = local.yaw;
-  });
-
-  createEffect(() => {
-    if (local.pitch !== undefined) controller.pitch = local.pitch;
-  });
+  // One effect per prop, so a change writes only that prop.
+  for (const key of FPS_CAMERA_ASSIGNED_KEYS) {
+    createEffect(() => assignDefinedProp(controller, key, local[key]));
+  }
 
   onCleanup(() => {
     controller.destroy();

@@ -12,6 +12,21 @@ import {
 } from "./vector-properties";
 
 /**
+ * Writes `value` to `target[key]`, and leaves the target alone when the value is `undefined`.
+ *
+ * Passing the key and its value through one generic ties them together, so the compiler checks the
+ * value against the property it lands on. Iterating a union of keys cannot do that: a write through
+ * a union of keys takes the intersection of their value types, which is `never`.
+ */
+export const assignDefinedProp = <Target extends object, Key extends keyof Target>(
+  target: Target,
+  key: Key,
+  value: Target[Key] | undefined,
+): void => {
+  if (value !== undefined) target[key] = value;
+};
+
+/**
  * Whether a prop may be written to `key` on `target`.
  *
  * Options classes expose getter-only properties: `BatchedMesh3D.size` is fixed for the batch's

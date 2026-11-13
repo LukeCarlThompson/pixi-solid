@@ -15,7 +15,13 @@ describe("FPSCamera and ParticleSystem3D extras", () => {
     mountScene(() => (
       <ctx.Provider>
         <View3D width={400} height={300}>
-          <FPSCamera ref={(c) => (camRef = c)} moveSpeed={12} lookSpeed={0.005} />
+          <FPSCamera
+            ref={(c) => (camRef = c)}
+            moveSpeed={12}
+            lookSpeed={0.005}
+            pointerLock={false}
+            keyboard={false}
+          />
         </View3D>
       </ctx.Provider>
     ));
@@ -24,6 +30,37 @@ describe("FPSCamera and ParticleSystem3D extras", () => {
     expect(camRef).toBeDefined();
     expect(camRef?.moveSpeed).toBe(12);
     expect(camRef?.lookSpeed).toBe(0.005);
+    expect(camRef?.pointerLock).toBe(false);
+    expect(camRef?.keyboard).toBe(false);
+
+    cleanup();
+  });
+
+  it("GIVEN pointerLock and keyboard signals WHEN they change THEN the camera follows", () => {
+    // GIVEN
+    const ctx = createTestContext();
+    let camRef: Pixi3DExtras.FPSCamera | undefined;
+    const [pointerLock, setPointerLock] = createSignal(true);
+    const [keyboard, setKeyboard] = createSignal(true);
+
+    mountScene(() => (
+      <ctx.Provider>
+        <View3D width={400} height={300}>
+          <FPSCamera ref={(c) => (camRef = c)} pointerLock={pointerLock()} keyboard={keyboard()} />
+        </View3D>
+      </ctx.Provider>
+    ));
+
+    expect(camRef?.pointerLock).toBe(true);
+    expect(camRef?.keyboard).toBe(true);
+
+    // WHEN
+    setPointerLock(false);
+    setKeyboard(false);
+
+    // THEN
+    expect(camRef?.pointerLock).toBe(false);
+    expect(camRef?.keyboard).toBe(false);
 
     cleanup();
   });

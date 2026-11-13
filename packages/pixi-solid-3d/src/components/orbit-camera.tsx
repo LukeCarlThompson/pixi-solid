@@ -12,6 +12,7 @@ import {
   type Ref,
 } from "solid-js";
 
+import { assignDefinedProp } from "./bind-props";
 import { useView3D } from "./view-3d-context";
 
 export type OrbitCameraProps = Omit<Partial<Pixi3DExtras.OrbitCameraOptions>, "autoUpdate"> & {
@@ -33,6 +34,9 @@ const ORBIT_CAMERA_KEYS = [
   "minDistance",
   "maxDistance",
 ] as const;
+
+/** Props copied onto the controller as-is. `target` is a vector, so it has its own effect. */
+const ORBIT_CAMERA_ASSIGNED_KEYS = ["enabled", "minDistance", "maxDistance"] as const;
 
 /**
  * SolidJS component to attach an OrbitCamera controller to the current `<View3D>` context.
@@ -112,17 +116,10 @@ export const OrbitCamera: Component<OrbitCameraProps> = (props) => {
     }
   });
 
-  createEffect(() => {
-    if (local.enabled !== undefined) controller.enabled = local.enabled;
-  });
-
-  createEffect(() => {
-    if (local.minDistance !== undefined) controller.minDistance = local.minDistance;
-  });
-
-  createEffect(() => {
-    if (local.maxDistance !== undefined) controller.maxDistance = local.maxDistance;
-  });
+  // One effect per prop, so a change writes only that prop.
+  for (const key of ORBIT_CAMERA_ASSIGNED_KEYS) {
+    createEffect(() => assignDefinedProp(controller, key, local[key]));
+  }
 
   onCleanup(() => {
     controller.destroy();
