@@ -1,0 +1,1 @@
+import{T as o}from"./components.CA7rodh-.js";import{P as e}from"./pixi-canvas.DUqT5F9V.js";import{a as t}from"./solid.cm6h0zV4.js";const r=()=>t(o,{text:"Hello World",style:{fill:"white",fontSize:68,fontFamily:"Arial"}}),m=()=>t(e,{style:{"aspect-ratio":"2/1.5"},background:"#1099bb",get children(){return t(r,{})}});export{m as Demo};
