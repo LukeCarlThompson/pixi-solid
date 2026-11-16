@@ -9,7 +9,13 @@ import path from "path";
  *
  * Writes `name`, `version` and `published` to GITHUB_OUTPUT for the publishing workflow.
  */
-const packageDir = process.argv[2] ?? "packages/pixi-solid";
+const packageDir = process.argv[2];
+
+if (!packageDir) {
+  console.error("Usage: node .github/scripts/check-published-version.mjs <package-dir>");
+  process.exit(1);
+}
+
 const packageJsonPath = path.join(process.cwd(), packageDir, "package.json");
 
 if (!fs.existsSync(packageJsonPath)) {
