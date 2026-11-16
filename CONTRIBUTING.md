@@ -305,10 +305,10 @@ Use `afterEach(() => vi.restoreAllMocks())` to clean up mocks between tests.
 
 ## Pull Requests
 
-Every PR must include:
+Every PR must include, for each package it changes:
 
-1. **A version bump** in `packages/pixi-solid/package.json`.
-2. **A changelog entry** in `packages/pixi-solid/CHANGELOG.md`.
+1. **A version bump** in that package's `package.json`.
+2. **A changelog entry** in that package's `CHANGELOG.md`.
 
 Target `main` for the stable line. Target a release line, such as `release/v2`, for a prerelease.
 
