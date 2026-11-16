@@ -312,6 +312,27 @@ describe("Mesh3D and Lights", () => {
     cleanup();
   });
 
+  it("GIVEN a geometry signal WHEN it changes THEN the mesh swaps to the new geometry", () => {
+    // GIVEN geometry is a mesh prop, unlike the options inside a geometry component
+    const first = new PixiCubeGeometry();
+    const second = new PixiPlaneGeometry();
+    const [geometry, setGeometry] = createSignal<Pixi3D.Geometry3D>(first);
+
+    const { container: mesh } = mountScene<Pixi3D.Mesh3D>(() => (
+      <Mesh3D label="host" geometry={geometry()} material={new PixiFlatMaterial()} />
+    ));
+
+    expect(mesh.geometry).toBe(first);
+
+    // WHEN
+    setGeometry(second);
+
+    // THEN
+    expect(mesh.geometry).toBe(second);
+
+    cleanup();
+  });
+
   it("GIVEN a nested PortalMaterial WHEN it mounts THEN it shows the render texture and disposes on unmount", () => {
     // GIVEN
     let capturedMat: any;

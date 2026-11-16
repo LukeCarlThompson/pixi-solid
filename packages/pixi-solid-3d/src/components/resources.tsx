@@ -30,6 +30,10 @@ export type ResourceRefProps<T> = {
 /**
  * Factory helper for creating declarative, lifecycle-managed Geometry3D components.
  * Automatically attaches to the enclosing <Mesh3D> and destroys the geometry on unmount.
+ *
+ * Options apply when the geometry is built: `@pixi/3d` turns them into vertex buffers and keeps no
+ * settable copy, so a prop that changes later has no effect on the shape. Mount a new geometry — for
+ * example inside `<Show keyed>` — to change it.
  */
 export const createGeometry3DComponent = <
   TInstance extends Pixi3D.Geometry3D,
@@ -87,7 +91,7 @@ export const createMaterial3DComponent = <
       }
     });
 
-    // Reactive setters for fine-grained runtime updates
+    // The constructor applied these once, so each effect only writes later changes.
     for (const key in initialisationProps) {
       createRenderEffect(
         on(
@@ -120,54 +124,108 @@ export const createMaterial3DComponent = <
 };
 
 // Declarative Geometry Components
+/**
+ * A box.
+ *
+ * Options apply when the geometry is built — `scale` the mesh to resize it, and mount a new
+ * geometry to change its shape.
+ */
 export const CubeGeometry: Component<
   Partial<Pixi3D.CubeGeometryOptions> & ResourceRefProps<PixiCubeGeometry>
 > = createGeometry3DComponent<PixiCubeGeometry, Partial<Pixi3D.CubeGeometryOptions>>(
   PixiCubeGeometry,
 );
 
+/**
+ * A sphere.
+ *
+ * Options apply when the geometry is built — `scale` the mesh to resize it, and mount a new
+ * geometry to change its shape.
+ */
 export const SphereGeometry: Component<
   Partial<Pixi3D.SphereGeometryOptions> & ResourceRefProps<PixiSphereGeometry>
 > = createGeometry3DComponent<PixiSphereGeometry, Partial<Pixi3D.SphereGeometryOptions>>(
   PixiSphereGeometry,
 );
 
+/**
+ * A flat rectangle.
+ *
+ * Options apply when the geometry is built — `scale` the mesh to resize it, and mount a new
+ * geometry to change its shape.
+ */
 export const PlaneGeometry: Component<
   Partial<Pixi3D.PlaneGeometryOptions> & ResourceRefProps<PixiPlaneGeometry>
 > = createGeometry3DComponent<PixiPlaneGeometry, Partial<Pixi3D.PlaneGeometryOptions>>(
   PixiPlaneGeometry,
 );
 
+/**
+ * A cylinder.
+ *
+ * Options apply when the geometry is built — `scale` the mesh to resize it, and mount a new
+ * geometry to change its shape.
+ */
 export const CylinderGeometry: Component<
   Partial<Pixi3D.CylinderGeometryOptions> & ResourceRefProps<PixiCylinderGeometry>
 > = createGeometry3DComponent<PixiCylinderGeometry, Partial<Pixi3D.CylinderGeometryOptions>>(
   PixiCylinderGeometry,
 );
 
+/**
+ * A cone.
+ *
+ * Options apply when the geometry is built — `scale` the mesh to resize it, and mount a new
+ * geometry to change its shape.
+ */
 export const ConeGeometry: Component<
   Partial<Pixi3D.ConeGeometryOptions> & ResourceRefProps<PixiConeGeometry>
 > = createGeometry3DComponent<PixiConeGeometry, Partial<Pixi3D.ConeGeometryOptions>>(
   PixiConeGeometry,
 );
 
+/**
+ * A capsule.
+ *
+ * Options apply when the geometry is built — `scale` the mesh to resize it, and mount a new
+ * geometry to change its shape.
+ */
 export const CapsuleGeometry: Component<
   Partial<Pixi3D.CapsuleGeometryOptions> & ResourceRefProps<PixiCapsuleGeometry>
 > = createGeometry3DComponent<PixiCapsuleGeometry, Partial<Pixi3D.CapsuleGeometryOptions>>(
   PixiCapsuleGeometry,
 );
 
+/**
+ * A torus (ring).
+ *
+ * Options apply when the geometry is built — `scale` the mesh to resize it, and mount a new
+ * geometry to change its shape.
+ */
 export const TorusGeometry: Component<
   Partial<Pixi3D.TorusGeometryOptions> & ResourceRefProps<PixiTorusGeometry>
 > = createGeometry3DComponent<PixiTorusGeometry, Partial<Pixi3D.TorusGeometryOptions>>(
   PixiTorusGeometry,
 );
 
+/**
+ * A torus knot.
+ *
+ * Options apply when the geometry is built — `scale` the mesh to resize it, and mount a new
+ * geometry to change its shape.
+ */
 export const TorusKnotGeometry: Component<
   Partial<Pixi3D.TorusKnotGeometryOptions> & ResourceRefProps<PixiTorusKnotGeometry>
 > = createGeometry3DComponent<PixiTorusKnotGeometry, Partial<Pixi3D.TorusKnotGeometryOptions>>(
   PixiTorusKnotGeometry,
 );
 
+/**
+ * An icosahedron, at the detail level its options ask for.
+ *
+ * Options apply when the geometry is built — `scale` the mesh to resize it, and mount a new
+ * geometry to change its shape.
+ */
 export const IcosahedronGeometry: Component<
   Partial<Pixi3D.IcosahedronGeometryOptions> & ResourceRefProps<PixiIcosahedronGeometry>
 > = createGeometry3DComponent<PixiIcosahedronGeometry, Partial<Pixi3D.IcosahedronGeometryOptions>>(
