@@ -237,17 +237,19 @@ describe("View3DProvider component", () => {
     ));
 
     // THEN they are two views, not one mounted twice
+    if (!first || !second) throw new Error("a viewport did not receive its ref");
+
     expect(first).toBeInstanceOf(PixiView3D);
     expect(second).toBeInstanceOf(PixiView3D);
     expect(first).not.toBe(second);
-    expect(first?.width).toBe(400);
-    expect(second?.width).toBe(200);
+    expect(first.width).toBe(400);
+    expect(second.width).toBe(200);
 
     // THEN each owns the scene bound to it
-    expect(getByLabel3D(first!, "left-node")).toBeDefined();
-    expect(queryByLabel3D(first!, "right-node")).toBeUndefined();
-    expect(getByLabel3D(second!, "right-node")).toBeDefined();
-    expect(queryByLabel3D(second!, "left-node")).toBeUndefined();
+    expect(getByLabel3D(first, "left-node")).toBeDefined();
+    expect(queryByLabel3D(first, "right-node")).toBeUndefined();
+    expect(getByLabel3D(second, "right-node")).toBeDefined();
+    expect(queryByLabel3D(second, "left-node")).toBeUndefined();
 
     cleanup();
   });
