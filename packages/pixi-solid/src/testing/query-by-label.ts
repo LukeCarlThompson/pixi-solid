@@ -1,6 +1,48 @@
 import type * as Pixi from "pixi.js";
 
-type MaybeContainer = Pixi.Container | undefined | null;
+/**
+ * The parts of a scene node a label query needs: a label, and the children to walk.
+ * `Pixi.Container` satisfies it, so the walk works on any 2D PixiJS graph.
+ */
+type LabelNode = {
+  label?: string | null;
+  children?: readonly LabelNode[];
+};
+
+/**
+ * Reads a node's children.
+ *
+ * `LabelNode.children` is `LabelNode[]` because a walk can change node types along the way. A walk
+ * over one tree of one type knows its children are that type, so it says so here once, instead of
+ * every caller casting.
+ */
+const childrenOnNode = <Node extends LabelNode>(node: Node): readonly Node[] =>
+  (node.children ?? []) as readonly Node[];
+
+/** Depth-first search that stops at the first node carrying `label`. */
+const findFirst = <Node extends LabelNode>(node: Node, label: string): Node | undefined => {
+  if (node.label === label) return node;
+
+  const children = childrenOnNode(node);
+  for (let i = 0; i < children.length; i += 1) {
+    const found = findFirst(children[i], label);
+    if (found !== undefined) return found;
+  }
+
+  return undefined;
+};
+
+/** Depth-first visit that collects every node carrying `label`. */
+const findAll = <Node extends LabelNode>(node: Node, label: string, found: Node[] = []): Node[] => {
+  if (node.label === label) found.push(node);
+
+  const children = childrenOnNode(node);
+  for (let i = 0; i < children.length; i += 1) {
+    findAll(children[i], label, found);
+  }
+
+  return found;
+};
 
 /**
  * Recursively search `root` for a display object with the given label.
@@ -11,32 +53,24 @@ type MaybeContainer = Pixi.Container | undefined | null;
  *
  * @example
  * ```ts
- * let scene: Pixi.Container | undefined;
  * const { container } = mountScene(() => <Container label="scene" />);
  * const score = queryByLabel(container, "score");
  * ```
  */
-export const queryByLabel = (root: MaybeContainer, label: string): Pixi.Container | undefined => {
-  if (!root) return undefined;
-  if (root.label === label) return root;
-
-  for (let i = 0; i < root.children.length; i++) {
-    const child = root.children[i];
-    if (!("children" in child)) continue;
-
-    const found = queryByLabel(child as Pixi.Container, label);
-    if (found) return found;
-  }
-
-  return undefined;
-};
+export const queryByLabel = <Node extends LabelNode = Pixi.Container>(
+  root: Node | undefined | null,
+  label: string,
+): Node | undefined => (root ? findFirst(root, label) : undefined);
 
 /**
  * Like {@link queryByLabel} but throws if the label is not found.
  * Accepts `undefined` or `null` for convenience with refs — throws a
  * clear error if the root is missing.
  */
-export const getByLabel = (root: MaybeContainer, label: string): Pixi.Container => {
+export const getByLabel = <Node extends LabelNode = Pixi.Container>(
+  root: Node | undefined | null,
+  label: string,
+): Node => {
   if (!root) {
     throw new Error(
       "getByLabel: root is " +
@@ -58,7 +92,10 @@ export const getByLabel = (root: MaybeContainer, label: string): Pixi.Container 
  * Accepts `undefined` or `null` for convenience with refs — throws a
  * clear error if the root is missing.
  */
-export const getAllByLabel = (root: MaybeContainer, label: string): Pixi.Container[] => {
+export const getAllByLabel = <Node extends LabelNode = Pixi.Container>(
+  root: Node | undefined | null,
+  label: string,
+): Node[] => {
   if (!root) {
     throw new Error(
       "getAllByLabel: root is " +
@@ -67,19 +104,5 @@ export const getAllByLabel = (root: MaybeContainer, label: string): Pixi.Contain
     );
   }
 
-  const results: Pixi.Container[] = [];
-
-  const walk = (node: Pixi.Container): void => {
-    if (node.label === label) results.push(node);
-
-    for (let i = 0; i < node.children.length; i++) {
-      const child = node.children[i];
-      if ("children" in child) {
-        walk(child as Pixi.Container);
-      }
-    }
-  };
-
-  walk(root);
-  return results;
+  return findAll(root, label);
 };

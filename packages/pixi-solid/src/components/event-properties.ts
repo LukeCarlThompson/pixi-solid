@@ -76,7 +76,7 @@ export const PIXI_SOLID_EVENT_HANDLER_NAMES = PIXI_EVENT_NAMES.map(
 export type PixiSolidEventHandlerName = (typeof PIXI_SOLID_EVENT_HANDLER_NAMES)[number];
 
 export const isEventProperty = (name: string): name is PixiSolidEventHandlerName =>
-  PIXI_SOLID_EVENT_HANDLER_NAME_SET.has(name);
+  PIXI_SOLID_EVENT_HANDLER_NAMES_SET.has(name);
 
 /** Maps each PixiJS event to an optional SolidJS event handler prop, typed to Pixi's event payloads. */
 export type PixiSolidEventHandlerMap = {
@@ -85,7 +85,7 @@ export type PixiSolidEventHandlerMap = {
     | ((...args: FederatedEventEmitterTypes[K]) => void);
 };
 
-export const PIXI_SOLID_EVENT_HANDLER_NAME_SET: Set<string> = new Set(
+export const PIXI_SOLID_EVENT_HANDLER_NAMES_SET: Set<string> = new Set(
   PIXI_SOLID_EVENT_HANDLER_NAMES,
 );
 

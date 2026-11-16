@@ -1,0 +1,176 @@
+---
+title: Particles
+description: GPU particle effects with ParticleSystem3D and hand-driven particles with ParticleContainer3D in pixi-solid-3d.
+---
+
+import { Code } from "@astrojs/starlight/components";
+import demoCode from "../../demos/particle-system-3d.demo.tsx?raw";
+import containerCode from "../../demos/particle-container-3d.demo.tsx?raw";
+import { ClientOnly } from "../../demos/client-only";
+
+`pixi-solid-3d` exposes both particle classes from `@pixi/3d`, and they do different jobs.
+
+|            | `<ParticleSystem3D>`            | `<ParticleContainer3D>`                     |
+| ---------- | ------------------------------- | ------------------------------------------- |
+| Simulation | built in                        | none                                        |
+| You write  | nothing per frame               | every slot, every frame                     |
+| Good for   | fire, smoke, sparks, rain, dust | particles a physics or gameplay system owns |
+| Import     | `@pixi/3d/extras`               | `@pixi/3d`                                  |
+
+`ParticleSystem3D` **extends** `ParticleContainer3D`, so it is the container plus an emitter. If you
+are not computing particle positions yourself, use `<ParticleSystem3D>` and skip the rest of the
+container section.
+
+## Simulated particles
+
+`<ParticleSystem3D>` emits particles from a shape, moves them under gravity and drag, and animates
+their size, colour and opacity over their life. Everything is driven by props.
+
+### Why a component?
+
+In `@pixi/3d`, `ParticleSystem3D` steps itself from Pixi's global `Ticker.shared`. A default
+`Application` runs that separately from `app.ticker`, so a new particle can show a frame late.
+
+`<ParticleSystem3D>`:
+
+1. **Follows your ticker**: steps from the nearest contextual ticker (from `<PixiCanvas>`,
+   `<PixiApplicationProvider>` or `<TickerProvider>`) instead of a global timer.
+2. **Updates live**: `emitRate`, `gravity`, `drag`, `playing` and `frameRate` are reactive, so a
+   signal changes the running emitter without rebuilding its GPU buffers.
+3. **Cleans up**: on unmount it frees the buffers and the ticker callback.
+
+### Interactive demo
+
+Rotate and zoom the camera with your mouse or touch to inspect the 3D ember fountain:
+
+<ClientOnly fileName="particle-system-3d" client:load />
+
+### Code example
+
+<Code code={demoCode} lang="tsx" title="particle-system-3d.demo.tsx" />
+
+### Emitter shapes
+
+Shapes come from `@pixi/3d/extras`:
+
+- `ConeShape({ angle, radius })` spawns on an XZ disc and shoots upward in a cone. Fire plumes,
+  exhaust, fountains, torches.
+- `SphereShape({ radius, surfaceOnly })` spawns inside or on a sphere, radiating outward. Magic orbs,
+  explosions, bursts.
+- `BoxShape({ width, height, depth })` spawns across a volume. Ambient dust, snow, rain.
+- `PointShape()` spawns everything from one origin.
+
+### Spreads: ranges versus fixed numbers
+
+`speed`, `life`, `size`, `sizeEnd`, `alpha`, `alphaEnd` and `startRotation` accept **spreads**:
+
+- **Fixed scalar**: `speed={4}` gives every particle speed 4.
+- **Range**: `speed={[2, 5]}` randomises between 2 and 5 per particle.
+
+```tsx
+<ParticleSystem3D
+  capacity={2000}
+  emitRate={80}
+  shape={new ConeShape({ angle: 25, radius: 0.2 })}
+  speed={[3, 6]}
+  life={[1.0, 2.0]}
+  size={[0.3, 0.6]}
+  sizeEnd={0.05}
+  color={0xff6600}
+  colorEnd={0x220000}
+  alphaEnd={0}
+  blendMode="add"
+/>
+```
+
+### Additive versus normal blending
+
+- `blendMode="add"` brightens what is behind: fire, glowing sparks, laser exhaust, magic.
+- `blendMode="normal"` composites normally: smoke, dust, leaves, debris.
+
+## Hand-driven particles
+
+`<ParticleContainer3D>` is a pool of quads and nothing more. It never moves a particle, so your frame
+loop writes every slot and then calls `upload()` once.
+
+<ClientOnly fileName="particle-container-3d" client:load />
+
+<Code code={containerCode} lang="tsx" title="particle-container-3d.demo.tsx" />
+
+### Writing slots
+
+Three ways, all of which allocate nothing per particle:
+
+```tsx
+// Packs the colour on every call.
+container.setParticleAt(i, x, y, z, size, rotation, 0x66ccff, 0.9);
+
+// A fixed tint, packed once — cheapest per slot.
+const tint = packParticleColor(0x66ccff, 0.9);
+container.writePacked(i, x, y, z, size, rotation, tint);
+
+// Straight into the shared buffer, for code that already has typed arrays.
+const { f32, floatStride, offsets } = container.data;
+const position = offsets.aPosition / 4;
+
+for (let i = 0; i < count; i++) {
+  const vertex = i * 4 * floatStride; // four vertices per particle
+  f32[vertex + position] = x[i];
+  f32[vertex + position + 1] = y[i];
+  f32[vertex + position + 2] = z[i];
+}
+
+container.markDirty(0, count - 1);
+container.upload();
+```
+
+Call `upload()` once, after all writes for the frame. Nothing appears until you do. A slot with size
+`0` draws nothing, and `clear()` empties the pool.
+
+`setParticle(index, values)` also exists but takes an object literal, so reserve it for spawning.
+
+### Letting the GPU animate
+
+Writing every particle every frame is only necessary when _you_ own the simulation. When the motion
+is predictable, `extraBits` moves the work into the vertex shader: a bit declares per-particle
+attributes and uniforms, so you write each particle once and a frame only advances a uniform.
+
+```tsx
+const BITS = [particleLifetimeBit, particleMotionBit, particleSizeOverLifeBit] as const;
+
+<ParticleContainer3D
+  capacity={2000}
+  texture={Texture.WHITE}
+  extraBits={BITS}
+  ref={(particles) => {
+    for (let i = 0; i < 2000; i++) {
+      particles.setParticle(i, {
+        aPosition: { x: 0, y: 0, z: 0 },
+        aBirth: 0,
+        aLife: 1.5,
+        aVel: { x: 0, y: 2, z: 0 },
+        aSizeEnd: 0,
+      });
+    }
+
+    particles.upload();
+  }}
+/>;
+```
+
+Then the frame loop is one line:
+
+```tsx
+onTick((ticker) => {
+  elapsed += ticker.deltaMS / 1000;
+  particles.uniforms.uParticleTime = elapsed;
+});
+```
+
+An unknown attribute throws at spawn time and lists the attributes the bits declare.
+
+`<ParticleSystem3D>` derives the bits it needs from its own props, so you never name one there.
+`extraBits` on a system only adds a bit you wrote yourself, which is an advanced case.
+
+See the [`@pixi/3d` particle bits guide](https://pixijs.download/3d/release/docs/llms.txt) for writing
+your own.

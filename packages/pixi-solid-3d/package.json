@@ -1,0 +1,68 @@
+{
+  "name": "pixi-solid-3d",
+  "version": "0.1.0",
+  "private": false,
+  "description": "3D components and utilities for writing PixiJS 3D applications with SolidJS",
+  "keywords": [
+    "3d",
+    "declarative",
+    "gltf",
+    "graphics",
+    "particles",
+    "pixi",
+    "pixi.js",
+    "pixijs",
+    "solid",
+    "solid-js",
+    "solidjs",
+    "webgl",
+    "webgpu"
+  ],
+  "homepage": "https://lukecarlthompson.github.io/pixi-solid/",
+  "license": "MIT",
+  "author": "Luke Thompson",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LukeCarlThompson/pixi-solid",
+    "directory": "packages/pixi-solid-3d"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "./dist/index.js"
+  ],
+  "exports": {
+    ".": {
+      "browser": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./testing": {
+      "browser": "./dist/testing/index.js",
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js"
+    }
+  },
+  "scripts": {
+    "build": "vite build && tsc --project tsconfig.build.json --emitDeclarationOnly",
+    "build:tarball": "pnpm run build && pnpm pack",
+    "prepublishOnly": "pnpm run build",
+    "prepack": "node -e \"require('fs').existsSync('dist/index.js') || (console.error('ERROR: dist/index.js not found') && process.exit(1))\"",
+    "test": "vitest --run",
+    "typecheck": "tsc --project tsconfig.test.json --noEmit"
+  },
+  "devDependencies": {
+    "pixi-solid": "workspace:*"
+  },
+  "peerDependencies": {
+    "@pixi/3d": ">=0.1.0 <0.2",
+    "pixi-solid": ">=1.0.1 <2",
+    "pixi.js": ">=8.23.0 <9",
+    "solid-js": ">=1.9.10 <2"
+  }
+}

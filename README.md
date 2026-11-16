@@ -1,44 +1,27 @@
-<!-- AUTO-GENERATED FILE. DO NOT EDIT DIRECTLY. -->
-<!-- Source: packages/pixi-solid/README.md -->
-
 <div align="center">
   <img src="https://raw.githubusercontent.com/LukeCarlThompson/pixi-solid/main/packages/pixi-solid/pixi-solid-logo.png" alt="Pixi-Solid Logo" width="200" />
 
-[![NPM Version](https://img.shields.io/npm/v/pixi-solid.svg)](https://www.npmjs.com/package/pixi-solid)
-[![License](https://img.shields.io/npm/l/pixi-solid.svg)](https://github.com/LukeCarlThompson/pixi-solid/blob/main/packages/pixi-solid/LICENSE)
 [![CI](https://github.com/LukeCarlThompson/pixi-solid/actions/workflows/ci.yml/badge.svg)](https://github.com/LukeCarlThompson/pixi-solid/actions)
-[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue)](https://www.typescriptlang.org/)
+[![Docs](https://img.shields.io/badge/docs-lukecarlthompson.github.io%2Fpixi--solid-blue)](https://lukecarlthompson.github.io/pixi-solid/)
+[![License](https://img.shields.io/badge/license-MIT-blue)](./packages/pixi-solid/LICENSE)
 
 </div>
 
-# Pixi-Solid
+# Pixi Solid
 
-A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your scene with [SolidJS](https://www.solidjs.com/) JSX components and its fine-grained signal-based reactivity.
+PixiJS renderers for [SolidJS](https://www.solidjs.com/): **`pixi-solid`** for 2D, **`pixi-solid-3d`** for
+3D. Both build the scene graph out of JSX, so plain Solid signals drive PixiJS objects, and a 2D UI and
+a 3D scene can live in the same component tree.
 
-- 📦 **Full component coverage** — Every major PixiJS display object has a corresponding component.
-- ⚡ **Signals-driven reactivity** — State changes automatically update your scene.
-- 🧹 **Automatic cleanup** — Components destroy Pixi instances they own and remove subscriptions on unmount. Instances passed through `as` and shared textures/assets remain caller-owned.
-- 🧪 **Testable without a browser** — Context, hooks, and ticker are built for simulation. `pixi-solid/testing` provides mountScene, scene graph queries, and manual ticker helpers.
-- ✨ **All PixiJS events supported** — Every federated event from PixiJS works as a component prop.
-- 🛠️ **Utilities included** — Animation helpers (spring, smooth damp), layout (object-fit), and async timing. Available via `pixi-solid/utils`.
-- 🤩 **Full TypeScript support** — Strict type safety and auto completion throughout the API.
+| Package                                     | Install                                                    | What it covers                                                                                                                                                                |
+| ------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`pixi-solid`](./packages/pixi-solid)       | `npm i pixi-solid pixi.js solid-js`                        | Every major PixiJS display object as a component, all federated events as props, `pixi-solid/utils` animation and layout helpers, and `pixi-solid/testing` for headless tests |
+| [`pixi-solid-3d`](./packages/pixi-solid-3d) | `npm i pixi-solid-3d @pixi/3d pixi-solid pixi.js solid-js` | Viewport, meshes, glTF models, lights, cameras, materials, geometries, particles and post effects, on top of [`@pixi/3d`](https://github.com/pixijs/3d)                       |
 
-## Install
+Guides, live demos and the full API reference are at
+**[lukecarlthompson.github.io/pixi-solid](https://lukecarlthompson.github.io/pixi-solid/)**.
 
-```bash
-npm i pixi-solid
-```
-
-Peer dependencies of
-
-```json
-{
-  "pixi.js": ">=8.14.3 <9",
-  "solid-js": ">=1.9.10 <2"
-}
-```
-
-## Basic usage
+## 2D
 
 ```tsx
 import { PixiCanvas, Sprite } from "pixi-solid";
@@ -48,58 +31,77 @@ import { Texture } from "pixi.js";
 export const DemoApp = () => {
   const [scale, setScale] = createSignal(10);
 
-  const handleSpriteTap = () => {
-    setScale((currentScale) => currentScale + 1);
-  };
-
   return (
     <PixiCanvas style={{ width: "100%", height: "100vh" }} background="#1099bb">
       <Sprite
         texture={Texture.WHITE}
         scale={scale()}
-        onpointertap={handleSpriteTap}
         tint="#ff0000"
+        onpointertap={() => setScale((current) => current + 1)}
       />
     </PixiCanvas>
   );
 };
 ```
 
-## More information
+## 3D
 
-- 📖 **[Documentation](https://lukecarlthompson.github.io/pixi-solid/)** — Getting started, components, hooks, utilities, and live examples.
-- 🎮 **[Live Demo](https://lukecarlthompson.github.io/pixi-solid/)** — Interactive example on the docs homepage.
-- 🐛 **[GitHub Issues](https://github.com/LukeCarlThompson/pixi-solid/issues)** — Report bugs or request features.
+```tsx
+import { PixiCanvas } from "pixi-solid";
+import { Camera3D, CubeGeometry, Material3D, Mesh3D, View3D } from "pixi-solid-3d";
 
-## Why combine SolidJS with PixiJS?
+export const DemoApp = () => (
+  <PixiCanvas style={{ width: "100%", height: "100vh" }}>
+    <View3D width={800} height={600} toneMapping="aces">
+      <Camera3D z={6} />
+      <Mesh3D>
+        <CubeGeometry />
+        <Material3D baseColor={0x38bdf8} />
+      </Mesh3D>
+    </View3D>
+  </PixiCanvas>
+);
+```
 
-**Declarative scene graphs.** Compose PixiJS objects with JSX instead of imperative `addChild`/`removeChild` calls. The tree is your scene.
+A `View3D` is an ordinary 2D display object that renders a 3D scene into its rectangle, which is why
+`useWorldToScreen`, `useScreenToWorld` and `createContainerTexture` can pin 2D UI to 3D objects.
 
-**Automatic lifecycle.** Components clean up after themselves on unmount — display objects, event listeners, ticker subscriptions, textures. No manual disposal tracking.
+## Repository layout
 
-**Shared reactivity.** Signals and stores drive both canvas content and HTML UI from the same state. No bridging layer or two-way sync required.
+```
+packages/
+  pixi-solid/      2D renderer, utils and testing entry
+  pixi-solid-3d/   3D renderer on @pixi/3d, plus its testing entry
+  pixi-solid-docs/ Astro + Starlight documentation site
+scripts/           repo tooling
+.github/           CI, npm publish and docs deploy workflows
+```
 
-**Unified timing.** Animations, frame callbacks, and sprite updates all synchronise to the same ticker context. No timing drift between `onTick`, `useSpring`, or `AnimatedSprite`.
+Each package has its own README with the full API tour. The docs site holds the guides and the demos.
 
-**HTML + canvas side by side.** Use HTML elements alongside or on top of your PixiJS canvas to create rich user interfaces that combine the strengths of both technologies.
+## Development
 
-**Full PixiJS coverage.** Every PixiJS property, event, and ref is accessible. Break out of the abstraction any time and interact directly with PixiJS objects.
+Node 22.21.1 and pnpm 12.4.1 (`corepack enable`).
 
-**Testable by design.** Context providers, hooks, and the ticker are structured for simulation in tests. No browser or canvas required for unit tests.
+```bash
+pnpm install
+pnpm build        # every package
+pnpm test         # vitest, per package
+pnpm typecheck
+pnpm lint         # oxlint
+pnpm fmt          # oxfmt
+pnpm dev          # package dev servers
+```
 
-## AI-Assisted Development
+To work on the docs:
 
-This project provides skill-based documentation for AI code assistants, containing the library's API and patterns. When using an LLM to generate pixi-solid code, you can reference:
+```bash
+pnpm --filter pixi-solid-docs dev
+```
 
-- [`SKILL.md`](https://github.com/LukeCarlThompson/pixi-solid/blob/main/packages/pixi-solid/src/skills/pixi-solid/SKILL.md) — main entry point for the skill docs
-- [Skill API references](https://github.com/LukeCarlThompson/pixi-solid/tree/main/packages/pixi-solid/src/skills/pixi-solid) — detailed docs on components, hooks, asset loading, lifecycle, testing, and utils
-- [`AGENTS.md`](https://github.com/LukeCarlThompson/pixi-solid/blob/main/AGENTS.md) — contribution and architecture guide
-- [📖 Docs site](https://lukecarlthompson.github.io/pixi-solid/) — live examples and interactive documentation
-
-## Contributing
-
-Contributions are welcome! Feel free to open an issue to report a bug, suggest a feature, or submit a pull request.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for conventions, component architecture and the release
+process, and [PHILOSOPHY.md](./PHILOSOPHY.md) for the design principles behind the library.
 
 ## License
 
-This project is licensed under the MIT License.
+MIT. See `LICENSE` in each package.
