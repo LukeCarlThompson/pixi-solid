@@ -70,6 +70,9 @@ const warnReadOnlyProp = (instance: object, key: string): void => {
 
 /** Writes a prop, or warns when the property has no setter. */
 const assignProp = (instance: any, key: string, value: unknown): void => {
+  // Options the constructor consumed may have no property on the instance (14 of
+  // `ParticleSystem3DOptions`, such as `speed`). The value did its job at construction, so there is
+  // nothing to write — and nothing to warn about, since a real option and a typo look the same here.
   if (!(key in instance)) return;
   if (!isWritableProp(instance, key)) {
     warnReadOnlyProp(instance, key);
