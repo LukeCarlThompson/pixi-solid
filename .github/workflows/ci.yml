@@ -49,3 +49,7 @@ jobs:
       # Builds the artifact users install; tests import src, so this is separate.
       - name: Build pixi-solid-3d
         run: pnpm --filter pixi-solid-3d build
+
+      # The docs import both packages through their built entries, so this needs the two builds above.
+      - name: Build docs
+        run: pnpm --filter pixi-solid-docs build

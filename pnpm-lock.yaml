@@ -215,15 +215,16 @@ importers:
       '@pixi/3d':
         specifier: '>=0.1.0 <0.2'
         version: 0.1.0(pixi.js@8.23.0)
-      pixi-solid:
-        specifier: workspace:^
-        version: link:../pixi-solid
       pixi.js:
         specifier: 8.23.0
         version: 8.23.0
       solid-js:
         specifier: 1.9.15
         version: 1.9.15
+    devDependencies:
+      pixi-solid:
+        specifier: workspace:*
+        version: link:../pixi-solid
 
   packages/pixi-solid-docs:
     dependencies:

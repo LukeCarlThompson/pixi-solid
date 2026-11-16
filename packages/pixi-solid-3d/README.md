@@ -30,8 +30,16 @@ materials and passes are created and disposed with the scene.
 pnpm add pixi-solid-3d @pixi/3d pixi-solid pixi.js solid-js
 ```
 
-`@pixi/3d` needs `pixi.js` 8.23.0 or later. Your bundler must read the `exports` field, so use a
-`moduleResolution` of `bundler` or `node16`.
+Peer dependencies of
+
+```json
+{
+  "@pixi/3d": ">=0.1.0 <0.2",
+  "pixi-solid": ">=1.0.1 <2",
+  "pixi.js": ">=8.23.0 <9",
+  "solid-js": ">=1.9.10 <2"
+}
+```
 
 ## Quick start
 
