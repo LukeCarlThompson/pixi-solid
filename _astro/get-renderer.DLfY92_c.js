@@ -1,1 +1,0 @@
-import{l as e}from"./pixi-canvas.DUqT5F9V.js";import{l as t}from"./solid.cm6h0zV4.js";var n=()=>{const r=t(e);if(!r)throw new Error("getRenderer must be used within a PixiApplicationProvider or a PixiCanvas");return r.renderer};export{n as g};

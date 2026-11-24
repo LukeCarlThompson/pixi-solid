@@ -1,0 +1,1 @@
+import{x as e}from"./pixi-canvas.VdzezSWX.js";import{D as t,k as n}from"./DemoMount.astro_astro_type_script_index_0_lang.C4qNGa0-.js";import{l as r}from"./Filter.DlSeaCjA.js";var i=(i,a=r.NORMAL)=>{let o=t(e);if(!o)throw Error(`onTick must be used within a PixiApplicationProvider, PixiCanvas or a TickerProvider`);o.add(i,o,a),n(()=>{o.remove(i,o)})};export{i as t};
