@@ -42,8 +42,9 @@ jobs:
       - name: Install workspace dependencies (root)
         run: pnpm install --frozen-lockfile
 
-      - name: Build all packages
-        run: pnpm build
+      # The site and every workspace package it depends on, in dependency order.
+      - name: Build docs and its dependencies
+        run: pnpm --filter pixi-solid-docs... build
 
       - name: Verify pixi-solid build output exists
         run: |

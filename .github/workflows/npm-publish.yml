@@ -65,10 +65,10 @@ jobs:
         id: check_published
         run: node .github/scripts/check-published-version.mjs packages/${{ matrix.package }}
 
-      # pixi-solid must be built before anything that resolves its types or runtime.
-      - name: Build pixi-solid
+      # Every package builds before anything publishes, because the packages depend on each other.
+      - name: Build all packages
         if: steps.check_published.outputs.published == 'false'
-        run: pnpm --filter pixi-solid build
+        run: pnpm build
 
       - name: Typecheck
         if: steps.check_published.outputs.published == 'false'
@@ -77,11 +77,6 @@ jobs:
       - name: Test
         if: steps.check_published.outputs.published == 'false'
         run: pnpm --filter "${{ matrix.package }}" test
-
-      # Builds the artifact that gets published, and runs again via prepublishOnly.
-      - name: Build
-        if: steps.check_published.outputs.published == 'false'
-        run: pnpm --filter "${{ matrix.package }}" build
 
       - name: Resolve npm dist-tag
         id: dist_tag
