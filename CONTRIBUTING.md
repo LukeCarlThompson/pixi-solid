@@ -359,11 +359,15 @@ The branch that receives the push publishes the package. The version in
 `packages/pixi-solid/package.json` selects the npm dist-tag. Do not publish from a local machine, and
 do not pass a dist-tag by hand.
 
-| Line           | Branch       | Version      | dist-tag    |
-| -------------- | ------------ | ------------ | ----------- |
-| Prerelease     | `release/v2` | `2.0.0-rc.1` | `next`      |
-| Stable         | `main`       | `2.0.0`      | `latest`    |
-| v1 maintenance | `release/v1` | `1.0.2`      | `v1-latest` |
+| Line           | Branch                    | Version      | dist-tag    |
+| -------------- | ------------------------- | ------------ | ----------- |
+| Stable         | `main`                    | `2.0.0`      | `latest`    |
+| Prerelease     | a line branched from main | `2.1.0-rc.1` | `next`      |
+| v1 maintenance | `release/v1`              | `1.0.2`      | `v1-latest` |
+
+There is no standing prerelease branch. Cut one from `main` when a prerelease needs one, and delete
+it once the stable version lands. `release/v1` is the only permanent release line, because version 1
+supports Solid 1 and cannot ship from `main`.
 
 Two rules produce the table:
 
@@ -393,7 +397,8 @@ use them as working copies.
 
 This is not ceremony. A working push to `release/v2` that carried `version: 2.0.0` published the
 version to `v2-latest` before `main` merged. The run on `main` then skipped it as already published,
-and `latest` stayed on 1.x until the tag was moved by hand.
+and `latest` stayed on 1.x until the tag was moved by hand. `release/v2` was deleted once `main`
+owned the version 2 line.
 
 ### Line policy
 
@@ -404,14 +409,14 @@ new features.
 
 ### Cutover
 
-When version 2 becomes stable, merge the prerelease branch into `main`, then branch `release/v1`
-from the last version 1 commit. Version 1 patches ship from `release/v1` to `v1-latest` without
-touching `main`.
+Version 2 is stable on `main`. `release/v1` is branched from the last version 1 commit, and version 1
+patches ship from it to `v1-latest` without touching `main`. Solid 1 users install with
+`npm i pixi-solid@1`, which resolves across every published version whatever the dist-tags say.
 
 ### Workflow changes
 
 `.github/workflows/npm-publish.yml` runs from the branch that receives the push, so every line needs
-the same file. Land a change on `main` first, then merge `main` into `release/v2` and
-`release/v1`. Do not edit the file separately on two branches, or the copies drift.
+the same file. Land a change on `main` first, then copy it to `release/v1`. That line is on Solid 1,
+so `main` cannot be merged into it. Do not leave the two copies to drift.
 
 The documentation site deploys from `main` only, so the published pages match the stable line.

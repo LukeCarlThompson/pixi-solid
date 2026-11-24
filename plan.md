@@ -1,7 +1,7 @@
 # Pixi-Solid v2: Solid 2 Migration
 
-Branch `release/v2`, baseline `26d03e1` (tag `v1.0.0`). SolidJS 2 is stable, `2.0.0-rc.1` is on npm,
-and `main` has moved on. The work below carries v2 to a stable release and keeps the v1 line alive.
+`main` carries `2.0.0`. SolidJS 2 is stable and `latest` points at 2.0.0. `release/v1` holds the last
+Solid 1 tree. `release/v2` is retired. The work below is the 3D port.
 
 ## Goal and policy
 
@@ -12,13 +12,13 @@ and `main` has moved on. The work below carries v2 to a stable release and keeps
 
 ## Stack
 
-| Area            | Target                                                                      | Current |
-| --------------- | --------------------------------------------------------------------------- | ------- |
-| Solid           | `solid-js@2.0.3`, `@solidjs/web@2.0.3`                                      | same    |
-| Compiler / Vite | `@solidjs/vite-plugin@3.0.1`, Vite 8.3.0, `jsxImportSource: "@solidjs/web"` | same    |
-| Docs site       | Astro 7.3.5, Starlight 0.42.4                                               | same    |
-| Package         | `2.0.0`; peers `>=2.0.0 <3`                                                 | same    |
-| `main`          | `2df8b6d`                                                                   | merged  |
+| Area            | Target                                                                      | Current  |
+| --------------- | --------------------------------------------------------------------------- | -------- |
+| Solid           | `solid-js@2.0.3`, `@solidjs/web@2.0.3`                                      | same     |
+| Compiler / Vite | `@solidjs/vite-plugin@3.0.1`, Vite 8.3.0, `jsxImportSource: "@solidjs/web"` | same     |
+| Docs site       | Astro 7.3.5, Starlight 0.42.4                                               | same     |
+| Package         | `2.0.0`; peers `>=2.0.0 <3`                                                 | same     |
+| `main`          | `58d5247`                                                                   | released |
 
 ## Progress
 
@@ -104,6 +104,9 @@ What happened, including the mistake:
 - PR #104 records the branch rule in CONTRIBUTING and removes the ruleset's admin bypass, so
   `release/**` and the default branch can no longer be pushed directly at all.
 - `release/v2` is brought to the released content through a pull request, not a push.
+- `release/v2` deleted, and its ruleset deletion rule restored afterwards.
+- `v1-latest` created by retagging the published `1.0.1`, so no version 1 release was needed. Solid 1
+  users also install with `npm i pixi-solid@1`, which resolves without any dist-tag.
 
 Still open:
 
