@@ -1,1 +1,0 @@
-import{b as e}from"./pixi-canvas.DW7IbBT1.js";import{D as t}from"./DemoMount.astro_astro_type_script_index_0_lang.GK8QDboE.js";var n=()=>{try{return t(e)}catch{throw Error(`usePixiScreen must be used within a PixiApplicationProvider or PixiCanvas`)}};export{n as t};

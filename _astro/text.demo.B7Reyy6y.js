@@ -1,1 +1,0 @@
-import{_ as e,t}from"./pixi-canvas.DW7IbBT1.js";import{b as n}from"./DemoMount.astro_astro_type_script_index_0_lang.GK8QDboE.js";var r=()=>n(e,{text:`Hello World`,style:{fill:`white`,fontSize:68,fontFamily:`Arial`}}),i=()=>n(t,{style:{"aspect-ratio":`2/1.5`},background:`#1099bb`,get children(){return n(r,{})}});export{i as Demo};
