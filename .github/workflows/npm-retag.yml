@@ -1,0 +1,65 @@
+# Move an npm dist-tag onto a version that is already published.
+#
+# The publish workflow derives the dist-tag from the version and the branch, so it
+# never corrects a tag that landed on the wrong channel. That happens when a stable
+# version publishes from a release line before `main` does, which maps it to
+# `v<major>-latest`. This workflow moves the tag by hand, on purpose, with the repo's
+# own npm token.
+#
+# Refuses prerelease versions, so an -rc can never reach `latest` this way.
+name: Retag pixi-solid on NPM
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Workspace directory name, for example pixi-solid"
+        required: true
+        default: pixi-solid
+      version:
+        description: "Exact published version, for example 2.0.0"
+        required: true
+      tag:
+        description: "Dist-tag to move: latest, next, or v<major>-latest"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  retag:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.21.1
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Retag
+        run: |
+          set -euo pipefail
+          name=$(node -p "require('./packages/${{ inputs.package }}/package.json').name")
+          version='${{ inputs.version }}'
+          tag='${{ inputs.tag }}'
+
+          if [[ "$version" == *-* ]]; then
+            echo "Refusing to move a dist-tag onto prerelease $version"
+            exit 1
+          fi
+          case "$tag" in
+            latest | next | v*-latest) ;;
+            *)
+              echo "Refusing unknown dist-tag $tag"
+              exit 1
+              ;;
+          esac
+
+          echo "$name@$version becomes $tag"
+          npm dist-tag add "$name@$version" "$tag" --registry=https://registry.npmjs.org/
+          npm view "$name" dist-tags --json
