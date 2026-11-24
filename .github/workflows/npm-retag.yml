@@ -1,26 +1,36 @@
-# Move an npm dist-tag onto a version that is already published.
+# Move or remove an npm dist-tag.
 #
 # The publish workflow derives the dist-tag from the version and the branch, so it
 # never corrects a tag that landed on the wrong channel. That happens when a stable
 # version publishes from a release line before `main` does, which maps it to
-# `v<major>-latest`. This workflow moves the tag by hand, on purpose, with the repo's
-# own npm token.
+# `v<major>-latest`. This workflow moves or removes the tag by hand, on purpose, with
+# the repo's own npm token.
 #
-# Refuses prerelease versions, so an -rc can never reach `latest` this way.
+# It refuses prerelease versions on `add`, so an -rc can never reach `latest` this way.
+# Removing a tag never touches a published version; the version stays installable by
+# its exact number.
 name: Retag pixi-solid on NPM
 
 on:
   workflow_dispatch:
     inputs:
+      action:
+        description: "add moves a tag onto a version; remove deletes the tag"
+        required: true
+        default: add
+        type: choice
+        options:
+          - add
+          - remove
       package:
         description: "Workspace directory name, for example pixi-solid"
         required: true
         default: pixi-solid
       version:
-        description: "Exact published version, for example 2.0.0"
-        required: true
+        description: "Exact published version. Required for add, ignored for remove"
+        required: false
       tag:
-        description: "Dist-tag to move: latest, next, or v<major>-latest"
+        description: "Dist-tag to move or remove: latest, next, rc, or v<major>-latest"
         required: true
 
 permissions:
@@ -44,22 +54,40 @@ jobs:
       - name: Retag
         run: |
           set -euo pipefail
+          action='${{ inputs.action }}'
           name=$(node -p "require('./packages/${{ inputs.package }}/package.json').name")
           version='${{ inputs.version }}'
           tag='${{ inputs.tag }}'
 
-          if [[ "$version" == *-* ]]; then
-            echo "Refusing to move a dist-tag onto prerelease $version"
-            exit 1
-          fi
           case "$tag" in
-            latest | next | v*-latest) ;;
+            latest | next | rc | v*-latest) ;;
             *)
               echo "Refusing unknown dist-tag $tag"
               exit 1
               ;;
           esac
 
-          echo "$name@$version becomes $tag"
-          npm dist-tag add "$name@$version" "$tag" --registry=https://registry.npmjs.org/
+          case "$action" in
+            remove)
+              echo "$name loses the $tag tag"
+              npm dist-tag rm "$name" "$tag" --registry=https://registry.npmjs.org/
+              ;;
+            add)
+              if [[ -z "$version" ]]; then
+                echo "A version is required to add a tag"
+                exit 1
+              fi
+              if [[ "$version" == *-* ]]; then
+                echo "Refusing to move a dist-tag onto prerelease $version"
+                exit 1
+              fi
+              echo "$name@$version becomes $tag"
+              npm dist-tag add "$name@$version" "$tag" --registry=https://registry.npmjs.org/
+              ;;
+            *)
+              echo "Unknown action $action"
+              exit 1
+              ;;
+          esac
+
           npm view "$name" dist-tags --json
