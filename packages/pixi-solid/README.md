@@ -23,19 +23,18 @@ A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your sce
 ## Install
 
 ```bash
-npm i pixi-solid@next
+npm i pixi-solid
 ```
 
-`next` holds the 2.0 release candidates. `latest` stays on 1.x until 2.0.0 ships. The 2.0 line
-requires SolidJS 2, as the peer dependencies below show.
+The 2.0 line requires SolidJS 2, as the peer dependencies below show.
 
 Peer dependencies:
 
 ```json
 {
   "pixi.js": ">=8.14.3 <9",
-  "@solidjs/web": ">=2.0.0-rc.13 <3",
-  "solid-js": ">=2.0.0-rc.13 <3"
+  "@solidjs/web": ">=2.0.0 <3",
+  "solid-js": ">=2.0.0 <3"
 }
 ```
 

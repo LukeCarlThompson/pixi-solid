@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
-## 2.0.0-rc.1
+## 2.0.0
 
 `pixi-solid` 2 requires SolidJS 2. Component, hook, and utility names stay the same, but SolidJS 2 removed or replaced several of the framework APIs around them, so this is a major release. The [migration guide](https://lukecarlthompson.github.io/pixi-solid/migration/solid-2/) lists every change.
 
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- ⚙️ `solid-js` and `@solidjs/web` are peer dependencies at `>=2.0.0-rc.9 <3`. SolidJS 1 is no longer supported.
+- ⚙️ `solid-js` and `@solidjs/web` are peer dependencies at `>=2.0.0 <3`. SolidJS 1 is no longer supported.
 - ⚙️ `PixiCanvas` accepts a Solid `Ref<HTMLDivElement>` for `ref`, so a callback, an array of callbacks, or a variable all work.
 - ⚙️ Ref callbacks no longer run inside the component's owner. `onCleanup` and `useContext` no longer work inside a ref callback, and an effect created inside one never disposes. Move that work to `onSettled` or to an effect beside the ref.
 - ⚙️ A ref callback runs once. It no longer re-runs when a prop it reads changes. Use the new `draw` prop on `Graphics`, and a `createEffect` compute function on other components, to follow a signal.

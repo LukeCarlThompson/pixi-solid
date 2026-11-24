@@ -12,27 +12,96 @@ and `main` has moved on. The work below carries v2 to a stable release and keeps
 
 ## Stack
 
-| Area            | Target                                                                   | Current on this branch |
-| --------------- | ------------------------------------------------------------------------ | ---------------------- |
-| Solid           | `solid-js@2.0.3`, `@solidjs/web@2.0.3`                                   | `2.0.0-rc.13`          |
-| Compiler / Vite | `@solidjs/vite-plugin@3.0.1`, Vite 8.3.0, `jsxImportSource: "@solidjs/web"` | `3.0.0-next.35`        |
-| Docs site       | Astro 7.3.5, Starlight 0.42.4                                            | same                   |
-| Package         | `2.0.0`; peers `>=2.0.0 <3`                                              | `2.0.0-rc.1`, peers `>=2.0.0-rc.13 <3` |
+| Area            | Target                                                                      | Current        |
+| --------------- | --------------------------------------------------------------------------- | -------------- |
+| Solid           | `solid-js@2.0.3`, `@solidjs/web@2.0.3`                                      | same           |
+| Compiler / Vite | `@solidjs/vite-plugin@3.0.1`, Vite 8.3.0, `jsxImportSource: "@solidjs/web"` | same           |
+| Docs site       | Astro 7.3.5, Starlight 0.42.4                                               | same           |
+| Package         | `2.0.0`; peers `>=2.0.0 <3`                                                 | same           |
+| `main`          | `2df8b6d`, 5 commits this branch lacks, 21 conflicting files                | not yet merged |
 
-## Done
+## Progress
 
-- Every component, binder, provider, and utility runs on Solid 2. 20 test files and 182 tests pass.
-- Breaking changes for v1 users: `ref` callbacks are unowned and run once, `as` applies
-  initialisation props, `Graphics` takes a `draw` prop, and `class` replaces `classList` on
-  `PixiCanvas`. The [migration guide](packages/pixi-solid-docs/src/content/docs/migration/solid-2.mdx)
-  covers each one.
-- Test utilities are `mountScene(setup, { wrapper })`, `renderHook(cb, { wrapper })`, `cleanup()`, and
-  `createTestContext().mount`.
-- Docs site runs on Solid 2 through `@solidjs/vite-plugin` and the `DemoMount.astro` renderer.
-- `2.0.0-rc.1` is published. `dist-tags` read `latest: 1.0.1`, `next: 2.0.0-rc.1`, so the gate held.
-- `.github/workflows/npm-publish.yml` derives the dist-tag from the version, so an `-rc` cannot reach
-  `latest`.
-- `CONTRIBUTING.md` records the line policy and the cutover.
+### Stage 1: Preserve the v1 line — done
+
+`main@2df8b6d` is the last Solid 1 tree. Root overrides pin `solid-js: 1.9.15`, the package is
+`1.0.1` with peer `solid-js >=1.9.10 <2`, and `pixi-solid-3d@0.1.0` peers against it.
+
+- Tag `v1.0.1` pushed, pointing at `2df8b6d`.
+- Branch `release/v1` pushed from `2df8b6d`.
+- The push ran the publish matrix on both packages. Both skipped because npm already had `1.0.1` and
+  `0.1.0`, so it was a green smoke test. `dist-tags` still read `latest: 1.0.1`, `next: 2.0.0-rc.1`.
+
+### Stage 2: Stabilize this branch — done
+
+- Removed the readme sync: deleted `scripts/sync-readme.mjs` and the `readme:sync` / `readme:verify`
+  scripts, and restored `"test": "pnpm -r run test"`. `main` removed these in #101, and git would
+  have kept the script call while accepting the file deletion.
+- Bumped root and docs dependencies to `solid-js@2.0.3`, `@solidjs/web@2.0.3`, and
+  `@solidjs/vite-plugin@3.0.1`. Regenerated `pnpm-lock.yaml`; `pnpm peers check` is clean.
+- Package version `2.0.0`, peers `>=2.0.0 <3`, changelog heading `## 2.0.0`, and the peer line that
+  still claimed `rc.9` now reads `>=2.0.0 <3`.
+- Package README installs with `npm i pixi-solid` and lists the stable peer range.
+- Set `test.environment: "jsdom"` in `packages/pixi-solid/vite.config.ts`. `@solidjs/vite-plugin`
+  3.0.1 no longer supplies the environment implicitly, so 40 context tests failed on a missing
+  `document` until it was explicit.
+- Green: `pnpm fmt:check`, `pnpm lint` (5 pre-existing warnings), `pnpm --filter pixi-solid
+typecheck`, 182 tests, library build, docs build (55 pages).
+
+## Remaining work
+
+### Stage 3: Merge `main` into `release/v2`
+
+Merge now, while `main` is still unpublished. If the merge lands on `main` first, the publish fires
+before the tree is verified.
+
+- [ ] Merge and resolve 21 conflicts. Regenerate `pnpm-lock.yaml`; do not hand-merge it.
+
+      | File                                                                                             | Take                                                                            |
+          | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+          | `.github/workflows/npm-publish.yml`, `.github/scripts/check-published-version.mjs`                 | `main` — matrix over both packages, skips published versions                     |
+          | `.github/workflows/ci.yml`                                                                        | `main`, then drop the two 3D steps                                               |
+          | `.github/workflows/docs-build-and-publish.yml`                                                    | `main`, then drop the 3D build step                                              |
+          | `pnpm-workspace.yaml`                                                                             | Drop `solid-js: 1.9.15`; keep `pixi.js: 8.23.0` and the `@pixi/3d` exclude      |
+          | `README.md` (root)                                                                                | `main`'s monorepo version, install line adjusted for stable                      |
+          | `packages/pixi-solid-docs/{package.json,astro.config.mjs}`                                        | This branch's, keep the Migration nav, drop the 3D deps                          |
+          | `docs/3d/**`, `demos/*-3d.demo.tsx`                                                               | Delete, until the 3D port                                                        |
+          | `packages/pixi-solid/{package.json,CHANGELOG.md}`, benchmark JSONs, `components.tsx`               | This branch's                                                                    |
+
+          `main`'s publish matrix makes the 3D question disappear at release time: it publishes
+          `pixi-solid@2.0.0` and skips `pixi-solid-3d@0.1.0`, which npm already has.
+
+- [ ] Scope the recursive scripts in `ci.yml`. Test and typecheck run `--filter pixi-solid`. The docs
+      build stays, because the site deploys from `main`.
+- [ ] Delete the 3D docs. #101 added 13 pages under `docs/3d/` and 4 demos, plus a "3D (Beta)"
+      sidebar section. The docs workflow builds `--filter pixi-solid-docs` on every push to `main`,
+      and those pages import a package that cannot compile under Solid 2. Remove the pages, the
+      demos, the sidebar entry, and the deps. They come back with the port.
+
+### Stage 4: Verify
+
+- [ ] Verify from a clean install. Remove `node_modules`, install with `--frozen-lockfile`, then run
+      `pnpm lint`, `pnpm fmt:check`, `pnpm --filter pixi-solid typecheck`, `pnpm --filter pixi-solid
+    test`, `pnpm --filter pixi-solid build`, and `pnpm --filter pixi-solid-docs build`. The merged
+      tree has never been built cold, and CI gates on all of it.
+
+### Stage 5: Publish stable
+
+- [ ] Merge `release/v2` into `main`. The push publishes `2.0.0` to `latest` and skips 3D.
+- [ ] Confirm the registry. `npm view pixi-solid dist-tags` must read `latest: 2.0.0`,
+      `next: 2.0.0-rc.1`, and no `v1-latest` yet.
+- [ ] Check the site. gh-pages rebuilds from `main` on the same push. Confirm the v1 pages are gone
+      and the migration guide is live.
+- [ ] Delete this file.
+
+### Stage 6: Port 3D
+
+- [ ] Port `pixi-solid-3d` on `main`. Swap `vite-plugin-solid` for `@solidjs/vite-plugin`, widen
+      peers to `solid-js >=2.0.0 <3` and `pixi-solid >=2.0.0 <3`, fix the Solid 1 idioms, bump to
+      `0.2.0`. Restore the docs pages, the demos, the sidebar section, and the CI and docs build
+      steps.
+- [ ] Deprecate `pixi-solid-3d@0.1.0` with a note pointing at the Solid 2 release. Its peer range
+      caps at `pixi-solid <2`, so it can never run beside v2.
 
 ## Decisions
 
@@ -45,89 +114,6 @@ and `main` has moved on. The work below carries v2 to a stable release and keeps
   stays on npm and gets deprecated once the Solid 2 release lands.
 - **Adopt `main`'s workflows.** They are newer than this branch's: a publish matrix over both
   packages that skips versions already on npm, plus a fuller `ci.yml`.
-
-## Remaining work
-
-In order. Each stage ends with a green tree.
-
-### Stage 1: Preserve the v1 line
-
-`main@2df8b6d` is the last Solid 1 tree. Root overrides pin `solid-js: 1.9.15`, the package is
-`1.0.1` with peer `solid-js >=1.9.10 <2`, and `pixi-solid-3d@0.1.0` peers against it. Once v2 lands
-on `main`, that tree is gone.
-
-1. **Tag `v1.0.1`** at `2df8b6d`. Only `v1.0.0` exists; 1.0.1 shipped untagged.
-2. **Branch `release/v1`** from `2df8b6d` and push it. The push runs the publish workflow, which
-   skips `1.0.1` because npm already has it. That is a free smoke test, not a release.
-3. **Confirm `dist-tags` did not move.** `v1-latest` does not exist yet; the first v1 patch creates
-   it.
-
-### Stage 2: Stabilize this branch
-
-4. **Remove the readme sync.** `main` deleted `scripts/sync-readme.mjs` and the `readme:sync` /
-   `readme:verify` scripts in #101. This branch still has both. Git merges that badly: it keeps this
-   branch's `"test": "pnpm readme:verify && pnpm -r run test"` and accepts the file deletion, so the
-   script fails on a missing module. Delete `scripts/sync-readme.mjs`, drop both scripts, and set
-   `"test": "pnpm -r run test"`.
-5. **Bump to stable.** Root and docs dependencies to `solid-js@2.0.3`, `@solidjs/web@2.0.3`,
-   `@solidjs/vite-plugin@3.0.1`. Package version `2.0.0`, peer `>=2.0.0 <3`.
-6. **Update the changelog.** Rename the heading to `## 2.0.0`, and fix the peer line that still reads
-   `>=2.0.0-rc.9 <3`; the published rc.1 used `rc.13`.
-7. **Update the package README.** Install line becomes `npm i pixi-solid`, peer block becomes stable.
-8. **Run `pnpm fmt`.** `pnpm fmt:check` fails today on `packages/pixi-solid/vite.config.ts`, and
-   `main`'s CI runs it.
-
-### Stage 3: Merge `main` into `release/v2`
-
-`main` is 5 ahead, this branch is 20 ahead, and 21 files conflict. Resolve now, while `main` is still
-unpublished. If the merge goes into `main` first, the publish fires before the tree is verified.
-
-9. **Merge and resolve.** Regenerate `pnpm-lock.yaml`; do not hand-merge it.
-
-    | File                                                                   | Take                                                                 |
-    | ---------------------------------------------------------------------- | -------------------------------------------------------------------- |
-    | `.github/workflows/npm-publish.yml`, `.github/scripts/check-published-version.mjs` | `main` — matrix over both packages, skips published versions |
-    | `.github/workflows/ci.yml`                                              | `main`, then drop the two 3D steps                                    |
-    | `.github/workflows/docs-build-and-publish.yml`                          | `main`, then drop the 3D build step                                    |
-    | `pnpm-workspace.yaml`                                                   | Drop `solid-js: 1.9.15`; keep `pixi.js: 8.23.0` and the `@pixi/3d` exclude |
-    | `README.md` (root)                                                      | `main`'s monorepo version, install line adjusted for stable           |
-    | `packages/pixi-solid-docs/{package.json,astro.config.mjs}`              | This branch's, keep the Migration nav, drop the 3D deps               |
-    | `docs/3d/**`, `demos/*-3d.demo.tsx`                                     | Delete, until the 3D port                                             |
-    | `packages/pixi-solid/{package.json,CHANGELOG.md}`, benchmark JSONs, `components.tsx` | This branch's                                     |
-
-    `main`'s publish matrix makes the 3D question disappear at release time: it publishes
-    `pixi-solid@2.0.0` and skips `pixi-solid-3d@0.1.0`, which npm already has.
-
-10. **Scope the recursive scripts.** In `ci.yml`, test and typecheck run `--filter pixi-solid`. The
-    docs build stays, because the site deploys from `main`.
-11. **Delete the 3D docs.** #101 added 13 pages under `docs/3d/` and 4 demos, plus a "3D (Beta)"
-    sidebar section. The docs workflow builds `--filter pixi-solid-docs` on every push to `main`, and
-    those pages import a package that cannot compile under Solid 2. Remove the pages, the demos, the
-    sidebar entry, and the deps. They come back with the port.
-
-### Stage 4: Verify
-
-12. **Verify from a clean install.** Remove `node_modules`, install with `--frozen-lockfile`, then run
-    `pnpm lint`, `pnpm fmt:check`, `pnpm --filter pixi-solid typecheck`, `pnpm --filter pixi-solid
-    test`, `pnpm --filter pixi-solid build`, and `pnpm --filter pixi-solid-docs build`. The tree has
-    never been built cold, and CI gates on all of it.
-
-### Stage 5: Publish stable
-
-13. **Merge `release/v2` into `main`.** The push publishes `2.0.0` to `latest` and skips 3D.
-14. **Confirm the registry.** `npm view pixi-solid dist-tags` must read `latest: 2.0.0`,
-    `next: 2.0.0-rc.1`, and no `v1-latest` yet.
-15. **Check the site.** gh-pages rebuilds from `main` on the same push. Confirm the v1 pages are gone
-    and the migration guide is live.
-16. **Delete this file.**
-
-### Stage 6: Port 3D
-
-17. **Port `pixi-solid-3d` on `main`.** Swap `vite-plugin-solid` for `@solidjs/vite-plugin`, widen
-    peers to `solid-js >=2.0.0 <3` and `pixi-solid >=2.0.0 <3`, fix the Solid 1 idioms, bump to
-    `0.2.0`. Restore the docs pages, the demos, the sidebar section, and the CI and docs build steps.
-18. **Deprecate `pixi-solid-3d@0.1.0`** with a note pointing at the Solid 2 release. Its peer range
-    caps at `pixi-solid <2`, so it can never run beside v2.
 
 ## Not blocking
 

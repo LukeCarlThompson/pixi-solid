@@ -12,16 +12,16 @@
   },
   "dependencies": {
     "@astrojs/starlight": "0.42.4",
-    "@solidjs/web": "2.0.0-rc.13",
+    "@solidjs/web": "2.0.3",
     "astro": "7.3.5",
     "pixi-filters": "6.1.5",
     "pixi-solid": "workspace:*",
     "pixi.js": "*",
     "sharp": "0.34.5",
-    "solid-js": "2.0.0-rc.13"
+    "solid-js": "2.0.3"
   },
   "devDependencies": {
     "@astrojs/markdown-remark": "^7.3.0",
-    "@solidjs/vite-plugin": "3.0.0-next.35"
+    "@solidjs/vite-plugin": "3.0.1"
   }
 }
