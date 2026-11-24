@@ -42,8 +42,9 @@ jobs:
       - name: Install workspace dependencies (root)
         run: pnpm install --frozen-lockfile
 
-      - name: Build pixi-solid package
-        run: pnpm --filter pixi-solid build
+      # The site and every workspace package it depends on, in dependency order.
+      - name: Build docs and its dependencies
+        run: pnpm --filter pixi-solid-docs... build
 
       - name: Verify pixi-solid build output exists
         run: |
@@ -55,9 +56,6 @@ jobs:
           fi
           echo "pixi-solid build output found:"
           ls -la ${{ env.LIB_PACKAGE }}/dist || true
-
-      - name: Build pixi-solid-docs package
-        run: pnpm --filter pixi-solid-docs build
 
       - name: Verify docs build output exists
         run: |
