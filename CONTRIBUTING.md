@@ -362,7 +362,7 @@ do not pass a dist-tag by hand.
 | Line           | Branch                    | Version      | dist-tag    |
 | -------------- | ------------------------- | ------------ | ----------- |
 | Stable         | `main`                    | `2.0.0`      | `latest`    |
-| Prerelease     | a line branched from main | `2.1.0-rc.1` | `rc`        |
+| Prerelease     | a line branched from main | `2.1.0-rc.1` | `next`      |
 | v1 maintenance | `release/v1`              | `1.0.2`      | `v1-latest` |
 
 There is no standing prerelease branch. Cut one from `main` when a prerelease needs one, and delete
@@ -371,8 +371,14 @@ supports Solid 1 and cannot ship from `main`.
 
 Two rules produce the table:
 
-- A version with a prerelease suffix publishes to `rc`, so an `-rc` version can reach neither
-  `latest` nor anyone who did not ask for a candidate.
+- A version with a prerelease suffix publishes to `next`, so an `-rc` version cannot reach
+  `latest`.
+- After a stable version publishes to `latest`, the workflow moves `next` onto that same version.
+  `next` therefore never points at a candidate older than the release.
+
+`next` and `latest` are equal most of the time. That is expected: a candidate exists only while one
+is being tested.
+
 - A stable version publishes to `latest` from `main` only. From any other branch it publishes to
   `v<major>-latest`.
 
@@ -384,9 +390,9 @@ If a version lands on the wrong channel, dispatch `npm-retag.yml` with the packa
 It moves the tag with the repository token and refuses a prerelease version, so an `-rc` can never
 reach `latest` that way.
 
-`next` is not used. It sits on the current stable version. The repository token can add a dist-tag
-but not remove one, so a stray tag gets parked on the stable version instead of deleted. Regenerate
-the token with permission to delete a dist-tag if removal is ever needed.
+`next` is not a separate line. It points at the newest candidate while one is being tested, and at
+the current release otherwise. The repository token can add a dist-tag but not remove one, so a tag
+that must disappear needs a token with permission to delete a dist-tag.
 
 ### Branch discipline
 

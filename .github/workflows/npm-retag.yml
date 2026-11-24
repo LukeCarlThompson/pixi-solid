@@ -30,7 +30,7 @@ on:
         description: "Exact published version. Required for add, ignored for remove"
         required: false
       tag:
-        description: "Dist-tag to move or remove: latest, next, rc, or v<major>-latest"
+        description: "Dist-tag to move or remove: latest, next, or v<major>-latest"
         required: true
 
 permissions:
@@ -60,7 +60,7 @@ jobs:
           tag='${{ inputs.tag }}'
 
           case "$tag" in
-            latest | next | rc | v*-latest) ;;
+            latest | next | v*-latest) ;;
             *)
               echo "Refusing unknown dist-tag $tag"
               exit 1

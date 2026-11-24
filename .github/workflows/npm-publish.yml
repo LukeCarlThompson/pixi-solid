@@ -6,6 +6,9 @@
 #   - stable version on main            -> latest
 #   - stable version on any other branch -> v<major>-latest (for example v0-latest)
 #
+# `next` means the upcoming version. When a stable version publishes to latest there is
+# no upcoming version, so `next` follows latest rather than pointing at an older candidate.
+#
 # Triggers:
 #  - push to main or a release line (real publish)
 #  - manual run (workflow_dispatch) — does a dry-run by default
@@ -88,7 +91,7 @@ jobs:
           version=$(node -p "require('./packages/${{ matrix.package }}/package.json').version")
 
           if [[ "$version" == *-* ]]; then
-            dist_tag=rc
+            dist_tag=next
           elif [[ "${GITHUB_REF_NAME}" != "main" ]]; then
             dist_tag="v${version%%.*}-latest"
           else
@@ -109,3 +112,14 @@ jobs:
       - name: Publish
         if: github.event_name == 'push' && steps.check_published.outputs.published == 'false'
         run: pnpm --filter "${{ matrix.package }}" publish --access public --no-git-checks --tag "${{ steps.dist_tag.outputs.dist_tag }}"
+
+      # `next` must never sit on an older candidate once a stable version is out. The token
+      # can add a dist-tag but not delete one, so move it rather than remove it.
+      - name: Park next on the stable version
+        if: github.event_name == 'push' && steps.check_published.outputs.published == 'false' && steps.dist_tag.outputs.dist_tag == 'latest'
+        run: |
+          set -euo pipefail
+          name=$(node -p "require('./packages/${{ matrix.package }}/package.json').name")
+          version=$(node -p "require('./packages/${{ matrix.package }}/package.json').version")
+          npm dist-tag add "$name@$version" next --registry=https://registry.npmjs.org/
+          npm view "$name" dist-tags --json
