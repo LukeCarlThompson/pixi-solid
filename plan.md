@@ -1,136 +1,146 @@
 # Pixi-Solid v2: Solid 2 Migration
 
-Branch `release/v2`, baseline `26d03e1` (tag `v1.0.0`). The library, tests, docs, and release
-metadata are migrated and committed. [Remaining work](#remaining-work) follows.
+Branch `release/v2`, baseline `26d03e1` (tag `v1.0.0`). SolidJS 2 is stable, `2.0.0-rc.1` is on npm,
+and `main` has moved on. The work below carries v2 to a stable release and keeps the v1 line alive.
 
 ## Goal and policy
 
 - `pixi-solid` v2 supports Solid 2 only. This branch carries no Solid 1 compatibility code.
-- The published 1.x line stays available for Solid 1 maintenance, on `release/next`.
+- The published 1.x line stays available for Solid 1 users, on `release/v1`.
 - Pin exact versions, and keep Solid external as a peer dependency.
+- `pixi-solid-3d` is not released at 1.0. It stays on Solid 1 and moves to Solid 2 after v2 ships.
 
 ## Stack
 
-| Area            | Version                                                                                  |
-| --------------- | ---------------------------------------------------------------------------------------- |
-| Solid           | `solid-js@2.0.0-rc.9`, `@solidjs/web@2.0.0-rc.9`                                         |
-| Compiler / Vite | `@solidjs/vite-plugin@3.0.0-next.35`, Vite 8.3.0, `jsxImportSource: "@solidjs/web"`      |
-| Docs site       | Astro 7.3.5, Starlight 0.42.4                                                            |
-| Package         | `2.0.0-rc.0`; peers `solid-js`/`@solidjs/web` `>=2.0.0-rc.9 <3`, `pixi.js` `>=8.14.3 <9` |
+| Area            | Target                                                                   | Current on this branch |
+| --------------- | ------------------------------------------------------------------------ | ---------------------- |
+| Solid           | `solid-js@2.0.3`, `@solidjs/web@2.0.3`                                   | `2.0.0-rc.13`          |
+| Compiler / Vite | `@solidjs/vite-plugin@3.0.1`, Vite 8.3.0, `jsxImportSource: "@solidjs/web"` | `3.0.0-next.35`        |
+| Docs site       | Astro 7.3.5, Starlight 0.42.4                                            | same                   |
+| Package         | `2.0.0`; peers `>=2.0.0 <3`                                              | `2.0.0-rc.1`, peers `>=2.0.0-rc.13 <3` |
 
 ## Done
 
-- Every component, binder, provider, and utility runs on Solid 2. `splitProps`, `on`, `batch`,
-  `createMutable`, `createResource`, `Index`, `ErrorBoundary`, and the `solid-js/store` and
-  `solid-js/web` subpaths are gone.
-- Breaking changes for users of v1: `ref` callbacks are unowned and run once, `as` now applies
+- Every component, binder, provider, and utility runs on Solid 2. 20 test files and 182 tests pass.
+- Breaking changes for v1 users: `ref` callbacks are unowned and run once, `as` applies
   initialisation props, `Graphics` takes a `draw` prop, and `class` replaces `classList` on
-  `PixiCanvas`. The
-  [migration guide](packages/pixi-solid-docs/src/content/docs/migration/solid-2.mdx) covers each one.
-- Testing utilities are `mountScene(setup, { wrapper })`, `renderHook(cb, { wrapper })`, `cleanup()`,
-  and `createTestContext().mount`. `waitFor` was removed, because Solid 2 makes `flush()`
-  deterministic. 20 files and 182 tests pass.
-- The docs site runs on Solid 2 through `@solidjs/vite-plugin` and the `DemoMount.astro` client-side
-  renderer. The README, the consumer skills, the migration guide, and the STE writing rules are
-  current.
-- The `preinstall` script is gone, and `files` and the exports were verified from a packed tarball.
+  `PixiCanvas`. The [migration guide](packages/pixi-solid-docs/src/content/docs/migration/solid-2.mdx)
+  covers each one.
+- Test utilities are `mountScene(setup, { wrapper })`, `renderHook(cb, { wrapper })`, `cleanup()`, and
+  `createTestContext().mount`.
+- Docs site runs on Solid 2 through `@solidjs/vite-plugin` and the `DemoMount.astro` renderer.
+- `2.0.0-rc.1` is published. `dist-tags` read `latest: 1.0.1`, `next: 2.0.0-rc.1`, so the gate held.
+- `.github/workflows/npm-publish.yml` derives the dist-tag from the version, so an `-rc` cannot reach
+  `latest`.
+- `CONTRIBUTING.md` records the line policy and the cutover.
+
+## Decisions
+
+- **Leave `packages/pixi-solid-3d` in the workspace.** It is not buildable against Solid 2, so the
+  root scripts must stop reaching it until it ports. Do not move the folder and do not edit the
+  workspace globs.
+- **Scope CI to `pixi-solid`.** Root `pnpm test` and `pnpm typecheck` are recursive. Both must be
+  filtered while 3D is stale.
+- **Port 3D after the v2 release, not before.** No 1.x-compatible 3D line is maintained. `0.1.0`
+  stays on npm and gets deprecated once the Solid 2 release lands.
+- **Adopt `main`'s workflows.** They are newer than this branch's: a publish matrix over both
+  packages that skips versions already on npm, plus a fuller `ci.yml`.
 
 ## Remaining work
 
-In order. Nothing is deferred.
+In order. Each stage ends with a green tree.
 
-### Stage 1: Verify the branch
+### Stage 1: Preserve the v1 line
 
-1. **Verify from a clean install.** Remove `node_modules`, install with `--frozen-lockfile`, then run
-   `pnpm lint`, the library typecheck, tests, and build, the docs typecheck, and the docs build.
-   Everything passes incrementally, but never from a cold `node_modules`. Decide what to do about the
-   five pre-existing `oxlint` warnings, because CI gates on `pnpm lint`.
-2. **Get CI onto this branch.** `ci.yml` triggers on a pull request to `main`, and the `branches`
-   filter matches the base. So a pull request from this branch into `main` runs CI, and it needs no
-   workflow change. Keep it open until Stage 3, because merging to `main` publishes `latest` today.
-   The alternative is a `push: branches: ["release/**"]` trigger.
-3. **Push the pending v1 commit.** `release/next` is one commit ahead of origin:
-   `525d3c2 fix: migrate v1 benchmarks to the Vitest 5 fixture API`.
+`main@2df8b6d` is the last Solid 1 tree. Root overrides pin `solid-js: 1.9.15`, the package is
+`1.0.1` with peer `solid-js >=1.9.10 <2`, and `pixi-solid-3d@0.1.0` peers against it. Once v2 lands
+on `main`, that tree is gone.
 
-### Stage 2: Harden the package
+1. **Tag `v1.0.1`** at `2df8b6d`. Only `v1.0.0` exists; 1.0.1 shipped untagged.
+2. **Branch `release/v1`** from `2df8b6d` and push it. The push runs the publish workflow, which
+   skips `1.0.1` because npm already has it. That is a free smoke test, not a release.
+3. **Confirm `dist-tags` did not move.** `v1-latest` does not exist yet; the first v1 patch creates
+   it.
 
-These checks guard the published artifact, so they complete before the RC is published.
+### Stage 2: Stabilize this branch
 
-4. **Add `publint` and `@arethetypeswrong/cli`** (`attw`) against the packed tarball, in CI. Together
-   they cover most packaged-package problems, with far less maintenance than a committed fixture.
-5. **Add a pack and install smoke job.** Pack the library, install it into a temporary directory, then
-   typecheck and run a small scene. This replaces the removed `fixtures/solid2-consumer` harness and
-   commits no nested workspace.
-6. **Fix the same problems on the v1 branch.** The `preinstall` script, the missing declarations, and
-   the invalid committed benchmark baseline were never specific to this migration. The committed
-   `results/baseline.json` was generated under vitest's `node` environment, where Solid 1 resolves to
-   the non-reactive server build, so it does not measure reactive updates.
-7. **Audit the remaining components.** `AnimatedSprite` has settable instance properties that the
-   Pixi options type omits, such as `currentFrame`. Check the other components for the same shape, and
-   record the result so that the README coverage claim can be stated accurately.
-8. **Mirror the benchmark suite onto the v1 branch.** Most of it is already there.
-   `point-property-lookup`, `set-event-property`, and `set-prop-assignment` are identical to this
-   branch, and `container-prop-updates` differs only by the `flush()` calls that Solid 1 does not
-   export, so the workloads stay comparable. Two things remain. Port `bind-props-strategies`,
-   pointing its per-key entry at the v1 binder: v1 already creates one inner render effect per key
-   inside `bindRuntimeProps`, so export that helper the way this branch exports `bindPropsByKey`.
-   Then regenerate the v1 baselines, which item 6 covers. Mirror every later benchmark change across
-   both lines, and record the v1-to-v2 comparison from the same command on both branches.
+4. **Remove the readme sync.** `main` deleted `scripts/sync-readme.mjs` and the `readme:sync` /
+   `readme:verify` scripts in #101. This branch still has both. Git merges that badly: it keeps this
+   branch's `"test": "pnpm readme:verify && pnpm -r run test"` and accepts the file deletion, so the
+   script fails on a missing module. Delete `scripts/sync-readme.mjs`, drop both scripts, and set
+   `"test": "pnpm -r run test"`.
+5. **Bump to stable.** Root and docs dependencies to `solid-js@2.0.3`, `@solidjs/web@2.0.3`,
+   `@solidjs/vite-plugin@3.0.1`. Package version `2.0.0`, peer `>=2.0.0 <3`.
+6. **Update the changelog.** Rename the heading to `## 2.0.0`, and fix the peer line that still reads
+   `>=2.0.0-rc.9 <3`; the published rc.1 used `rc.13`.
+7. **Update the package README.** Install line becomes `npm i pixi-solid`, peer block becomes stable.
+8. **Run `pnpm fmt`.** `pnpm fmt:check` fails today on `packages/pixi-solid/vite.config.ts`, and
+   `main`'s CI runs it.
 
-### Stage 3: Prepare the release lines
+### Stage 3: Merge `main` into `release/v2`
 
-Before this stage, publishing is coupled to `main`, and npm tags every publish as `latest` by default
-(`defaultTag: 'latest'`, with no case for a prerelease version). The package sets no
-`publishConfig.tag`, and the workflow passes no `--tag`. The registry shows `{ latest: '1.0.0' }`. So
-the current path would move `latest` to `2.0.0-rc.0`, and serve it to every `npm install pixi-solid`.
+`main` is 5 ahead, this branch is 20 ahead, and 21 files conflict. Resolve now, while `main` is still
+unpublished. If the merge goes into `main` first, the publish fires before the tree is verified.
 
-9. **Publish from branches, and derive the dist-tag from the version.** `npm publish` always
-   assigns a dist-tag and defaults to `latest`, so the workflow passes `--tag` on every publish. The
-   workflow runs on pushes to `main` and `release/**`, and it reads the version from
-   `packages/pixi-solid/package.json`:
+9. **Merge and resolve.** Regenerate `pnpm-lock.yaml`; do not hand-merge it.
 
-   | Line          | Branch       | Version      | dist-tag    | Result                         |
-   | ------------- | ------------ | ------------ | ----------- | ------------------------------ |
-   | v2 prerelease | `release/v2` | `2.0.0-rc.1` | `next`      | `latest` stays on `1.0.x`      |
-   | v2 stable     | `main`       | `2.0.0`      | `latest`    | `npm i pixi-solid` installs v2 |
-   | v1 patch      | `release/v1` | `1.0.2`      | `v1-latest` | `npm i pixi-solid@v1-latest`   |
+    | File                                                                   | Take                                                                 |
+    | ---------------------------------------------------------------------- | -------------------------------------------------------------------- |
+    | `.github/workflows/npm-publish.yml`, `.github/scripts/check-published-version.mjs` | `main` — matrix over both packages, skips published versions |
+    | `.github/workflows/ci.yml`                                              | `main`, then drop the two 3D steps                                    |
+    | `.github/workflows/docs-build-and-publish.yml`                          | `main`, then drop the 3D build step                                    |
+    | `pnpm-workspace.yaml`                                                   | Drop `solid-js: 1.9.15`; keep `pixi.js: 8.23.0` and the `@pixi/3d` exclude |
+    | `README.md` (root)                                                      | `main`'s monorepo version, install line adjusted for stable           |
+    | `packages/pixi-solid-docs/{package.json,astro.config.mjs}`              | This branch's, keep the Migration nav, drop the 3D deps               |
+    | `docs/3d/**`, `demos/*-3d.demo.tsx`                                     | Delete, until the 3D port                                             |
+    | `packages/pixi-solid/{package.json,CHANGELOG.md}`, benchmark JSONs, `components.tsx` | This branch's                                     |
 
-   Two rules produce the table. A version with a prerelease suffix maps to `next`. A stable version
-   maps to `latest` only from `main`, and to `v<major>-latest` from every other branch. No one types a
-   dist-tag at release time, and an `-rc` version cannot reach `latest`.
+    `main`'s publish matrix makes the 3D question disappear at release time: it publishes
+    `pixi-solid@2.0.0` and skips `pixi-solid-3d@0.1.0`, which npm already has.
 
-   There are no git tags in the release flow. The branch that receives the push selects the line, and
-   the version string selects the channel.
+10. **Scope the recursive scripts.** In `ci.yml`, test and typecheck run `--filter pixi-solid`. The
+    docs build stays, because the site deploys from `main`.
+11. **Delete the 3D docs.** #101 added 13 pages under `docs/3d/` and 4 demos, plus a "3D (Beta)"
+    sidebar section. The docs workflow builds `--filter pixi-solid-docs` on every push to `main`, and
+    those pages import a package that cannot compile under Solid 2. Remove the pages, the demos, the
+    sidebar entry, and the deps. They come back with the port.
 
-   `v<major>-latest` follows existing practice: Vue publishes `v2-latest` for its 2.x line, and
-   `pixi.js` publishes `latest-8.x` and `latest-7.x`. Do not use `v1`, `1`, or `1.x` as dist-tags; npm
-   rejects a dist-tag that parses as a semver range. Users can always install `pixi-solid@1`, because
-   npm resolves that range across all published versions.
+### Stage 4: Verify
 
-10. **Rename `release/next` to `release/v1`.** `main` holds the released `1.0.1`, and
-    `release/next` will describe the wrong line once v2 is next. The publish workflow already accepts
-    pushes to `release/**`.
-11. **Record the change policy in CONTRIBUTING.** A fix cannot be cherry-picked between the lines,
-    because v2 is a port rather than a superset. A security or critical correctness fix gets one
-    hand-written implementation per line. Everything else is v2 only, and a v1 patch takes no features.
+12. **Verify from a clean install.** Remove `node_modules`, install with `--frozen-lockfile`, then run
+    `pnpm lint`, `pnpm fmt:check`, `pnpm --filter pixi-solid typecheck`, `pnpm --filter pixi-solid
+    test`, `pnpm --filter pixi-solid build`, and `pnpm --filter pixi-solid-docs build`. The tree has
+    never been built cold, and CI gates on all of it.
 
-Documentation stays single-version. The site publishes to gh-pages from `main`, so the v1 pages leave
-when v2 lands. npm serves the README of the installed version, which covers v1 users.
+### Stage 5: Publish stable
 
-### Stage 4: Publish
+13. **Merge `release/v2` into `main`.** The push publishes `2.0.0` to `latest` and skips 3D.
+14. **Confirm the registry.** `npm view pixi-solid dist-tags` must read `latest: 2.0.0`,
+    `next: 2.0.0-rc.1`, and no `v1-latest` yet.
+15. **Check the site.** gh-pages rebuilds from `main` on the same push. Confirm the v1 pages are gone
+    and the migration guide is live.
+16. **Delete this file.**
 
-12. **Finalize the changelog heading.** The v2 entry starts with `## Unreleased`. Rename it to
-    `## 2.0.0-rc.N` for each RC, because the file ships to npm.
-13. **Publish `2.0.0-rc.1`** by merging a release PR into `release/v2`, then confirm with
-    `npm view pixi-solid dist-tags` that `next` moved and `latest` still points at 1.x. The registry
-    can lag by a minute, so check `curl -s https://registry.npmjs.org/pixi-solid` if they disagree.
-14. **Stay on `-rc.N` until SolidJS 2.0 ships stable.** The peer range targets `2.0.0-rc.x`, so a
-    stable `2.0.0` would claim support the package does not have. Cut stable only after Solid 2.0 is
-    released and the peer range is updated. Until then, every RC publishes to `next` and nobody
-    installs v2 by accident.
-15. **Address RC feedback.** Publish further RCs by bumping the version and merging a release PR.
-16. **Cut `2.0.0`.** Update the peer range to the released Solid 2 versions, bump
-    `packages/pixi-solid/package.json` to `2.0.0`, and merge `release/v2` into `main`. The merge
-    publishes stable as `latest`. Then branch `release/v1` from the last v1 commit, so v1 patches keep
-    shipping from there.
-17. **Point the migration guide at Solid's released docs**, then delete this file.
+### Stage 6: Port 3D
+
+17. **Port `pixi-solid-3d` on `main`.** Swap `vite-plugin-solid` for `@solidjs/vite-plugin`, widen
+    peers to `solid-js >=2.0.0 <3` and `pixi-solid >=2.0.0 <3`, fix the Solid 1 idioms, bump to
+    `0.2.0`. Restore the docs pages, the demos, the sidebar section, and the CI and docs build steps.
+18. **Deprecate `pixi-solid-3d@0.1.0`** with a note pointing at the Solid 2 release. Its peer range
+    caps at `pixi-solid <2`, so it can never run beside v2.
+
+## Not blocking
+
+- `publint` and `@arethetypeswrong/cli` against the packed tarball, in CI.
+- A pack-and-install smoke job, replacing the removed consumer fixture.
+- An audit of components with settable instance properties that their Pixi options type omits, such
+  as `AnimatedSprite.currentFrame`.
+- Mirroring the benchmark suite onto `release/v1` and recording a v1-to-v2 comparison.
+
+## Notes
+
+- Documentation stays single-version. The site publishes to gh-pages from `main`, so the v1 pages
+  leave when v2 lands. npm serves the README of the installed version, which covers v1 users.
+- `CONTRIBUTING.md` says to land a workflow change on `main` first, then merge it into each release
+  line. That rule breaks at cutover: `main` becomes Solid 2, so `release/v1` needs hand-carried
+  copies of any later workflow fix. Record the exception when the cutover happens.
