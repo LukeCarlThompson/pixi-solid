@@ -1,11 +1,17 @@
 import type * as Pixi3DExtras from "@pixi/3d/extras";
 import { ParticleSystem3D as PixiParticleSystem3D } from "@pixi/3d/extras";
+import type { JSX } from "@solidjs/web";
 import { getTicker } from "pixi-solid";
 import type * as Pixi from "pixi.js";
-import { createRenderEffect, on, onCleanup, splitProps, type JSX } from "solid-js";
+import { createRenderEffect, omit, onCleanup, untrack } from "solid-js";
 
 import { bindInitialisationProps3D, bindRuntimeProps3D } from "./bind-props";
-import { LEAF3D_RUNTIME_KEYS, type Leaf3DProps, type PixiComponent3D } from "./factories";
+import {
+  LEAF3D_RUNTIME_KEYS,
+  LEAF3D_RUNTIME_KEY_SET,
+  type Leaf3DProps,
+  type PixiComponent3D,
+} from "./factories";
 
 /**
  * Props for `<ParticleSystem3D>`.
@@ -22,6 +28,14 @@ export type ParticleSystem3DComponentProps = Leaf3DProps<PixiParticleSystem3D> &
 const PARTICLE_SYSTEM_KEYS = [...LEAF3D_RUNTIME_KEYS, "autoUpdate", "playing"] as const;
 
 /**
+ * `autoUpdate` and `playing` have their own effects below. Binding them would write a getter, which
+ * does nothing and trips the read-only warning.
+ */
+const PARTICLE_SYSTEM_INITIALISATION_RUNTIME_KEY_SET: ReadonlySet<string> = new Set(
+  PARTICLE_SYSTEM_KEYS,
+);
+
+/**
  * SolidJS component that renders a 3D GPU particle system (`ParticleSystem3D`).
  *
  * Automatically manages lifecycle and synchronizes updates with the scoped Pixi.Ticker
@@ -31,66 +45,62 @@ const PARTICLE_SYSTEM_KEYS = [...LEAF3D_RUNTIME_KEYS, "autoUpdate", "playing"] a
 export const ParticleSystem3D: PixiComponent3D<
   ParticleSystem3DComponentProps,
   PixiParticleSystem3D
-> = (props) => {
-  const [runtimeProps, initialisationProps] = splitProps(props as any, PARTICLE_SYSTEM_KEYS as any);
+> = (props) =>
+  // The body is one-time setup: build the system, then let the effects below track props.
+  untrack(() => {
+    const as = props.as;
+    const isUserOwnedInstance = as !== undefined;
+    const instance =
+      as ??
+      new PixiParticleSystem3D({
+        autoUpdate: false,
+        ...omit(props, ...PARTICLE_SYSTEM_KEYS),
+      });
 
-  const isUserOwnedInstance = runtimeProps.as !== undefined;
-  const instance =
-    props.as ??
-    new PixiParticleSystem3D({
-      autoUpdate: false,
-      ...initialisationProps,
-    });
-
-  // Re-wire to the scoped context ticker if autoUpdate is not explicitly false
-  createRenderEffect(
-    on(
+    // Re-wire to the scoped context ticker if autoUpdate is not explicitly false
+    createRenderEffect(
       () => (props as any).autoUpdate,
       (autoUpdate) => {
         if (autoUpdate === false) return;
 
-        const onTick = (ticker: Pixi.Ticker) => {
-          instance.update(ticker);
-        };
-
         try {
           const ticker = getTicker();
+          const onTick = (currentTicker: Pixi.Ticker) => {
+            instance.update(currentTicker);
+          };
+
           ticker.add(onTick);
-          onCleanup(() => {
-            ticker.remove(onTick);
-          });
+          return () => ticker.remove(onTick);
         } catch {
-          // Fallback gracefully if mounted without context ticker
+          // Rendered without a context ticker, so updates stay manual.
+          return;
         }
       },
-    ),
-  );
+    );
 
-  // `playing` is not a plain field: it calls play()/stop(), so it cannot go through the prop binder
-  createRenderEffect(
-    on(
+    // `playing` is not a plain field: it calls play()/stop(), so it cannot go through the prop binder
+    createRenderEffect(
       () => (props as any).playing,
       (playing) => {
         if (playing === undefined) return;
+
         if (playing) {
           instance.play();
         } else {
           instance.stop();
         }
       },
-    ),
-  );
+    );
 
-  bindInitialisationProps3D(instance, initialisationProps);
-  // `playing` is a getter with no setter: writing it does nothing and trips the read-only warning,
-  // so the effect above is the only thing that drives it.
-  const [, runtimeWithoutPlaying] = splitProps(runtimeProps, ["playing"]);
-  bindRuntimeProps3D(instance, runtimeWithoutPlaying as any);
+    onCleanup(() => {
+      if (isUserOwnedInstance) return;
+      instance.destroy({ children: true });
+    });
 
-  onCleanup(() => {
-    if (isUserOwnedInstance) return;
-    instance.destroy({ children: true });
+    bindInitialisationProps3D(instance, props, PARTICLE_SYSTEM_INITIALISATION_RUNTIME_KEY_SET, {
+      deferInitialRun: !isUserOwnedInstance,
+    });
+    bindRuntimeProps3D(instance, props, LEAF3D_RUNTIME_KEY_SET);
+
+    return instance as PixiParticleSystem3D & JSX.Element;
   });
-
-  return instance as PixiParticleSystem3D & JSX.Element;
-};

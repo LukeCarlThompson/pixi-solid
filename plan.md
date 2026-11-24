@@ -1,7 +1,7 @@
 # Pixi-Solid v2: Solid 2 Migration
 
-`main` carries `2.0.0`. SolidJS 2 is stable and `latest` points at 2.0.0. `release/v1` holds the last
-Solid 1 tree. `release/v2` is retired. The work below is the 3D port.
+`main` carries `pixi-solid@2.0.0` and, unreleased, `pixi-solid-3d@0.2.0` on Solid 2. SolidJS 2 is
+stable. `release/v1` holds the last Solid 1 tree. `release/v2` is retired.
 
 ## Goal and policy
 
@@ -112,12 +112,33 @@ Still open:
 
 - [ ] Delete this file. It is the last item, after the 3D port records its own state.
 
-### Stage 6: Port 3D
+### Stage 6: Port 3D — done, unreleased
 
-- [ ] Port `pixi-solid-3d` on `main`. Swap `vite-plugin-solid` for `@solidjs/vite-plugin`, widen
-      peers to `solid-js >=2.0.0 <3` and `pixi-solid >=2.0.0 <3`, fix the Solid 1 idioms, bump to
-      `0.2.0`. Restore `auto-install-peers` if the package still needs it, the docs pages, the demos,
-      the sidebar section, and the CI and docs build steps.
+`pixi-solid-3d@0.2.0` runs on Solid 2 and `pixi-solid` 2. Component names, props and hooks are
+unchanged; the release notes list only what the framework move changed.
+
+- Toolchain: `@solidjs/vite-plugin`, `test.environment: "jsdom"`, `@solidjs/web` externals.
+- Peers: `solid-js`, `@solidjs/web` and `pixi-solid` at `>=2.0.0 <3`. Version `0.2.0`.
+- Source: `splitProps`, `on`, `createResource` and `<Ctx.Provider>` are gone. The binder is now the
+  same `bindPropsByKey` shape as `pixi-solid` 2: one render effect per key, `$PROXY` reconcile for
+  spread props, `applyRef`, and key sets built per factory. `omit` replaces `splitProps`, `untrack`
+  wraps each component body, and effect callbacks return their cleanups.
+- Contexts are `createContext<T | null>(null)`. Solid 2 throws on a context read with no provider and
+  no default, and `View3D` probes the context to find out whether a provider owns the view. A
+  `null` read must not count as a provider.
+- `<Camera3D>` activates during render and its effect handles later changes only, so a sibling
+  component that reads the view in the same pass sees the camera.
+- `useWorldToScreen` and `useScreenToWorld` compute on read until the first tick.
+- Restored `auto-install-peers`, the 13 3D docs pages, the 11 demos, the sidebar section, and the
+  CI and docs build steps. The demos moved from `ClientOnly` to `DemoMount`, and one dropped
+  `solid-js/store` and `createResource`.
+- Green: `pnpm lint`, `pnpm fmt:check`, `pnpm typecheck` across 3 packages, 193 + 110 tests,
+  every package build, docs build at 68 pages.
+
+Still open:
+
+- [ ] Publish `0.2.0`. Merge to `main`; the publish matrix sends it to `latest` because a `0.x`
+      version is the current line, then parks `next` on it.
 - [ ] Deprecate `pixi-solid-3d@0.1.0` with a note pointing at the Solid 2 release. Its peer range
       caps at `pixi-solid <2`, so it can never run beside v2.
 

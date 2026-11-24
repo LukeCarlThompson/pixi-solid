@@ -56,6 +56,10 @@ export default defineConfig({
           label: "Migration",
           items: [{ autogenerate: { directory: "migration" } }],
         },
+        {
+          label: "3D (Beta)",
+          items: [{ autogenerate: { directory: "3d" } }],
+        },
       ],
     }),
   ],

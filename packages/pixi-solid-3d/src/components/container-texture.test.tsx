@@ -2,7 +2,7 @@ import { Container } from "pixi-solid";
 import { cleanup, createTestContext, mountScene } from "pixi-solid/testing";
 import type * as Pixi from "pixi.js";
 import { Container as PixiContainer, Ticker } from "pixi.js";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import { createContainerTexture } from "../components";
@@ -157,6 +157,7 @@ describe("createContainerTexture", () => {
 
     // WHEN
     setLabel("second");
+    flush();
     await ctx.ticker.fastForwardFrames(1);
 
     // THEN

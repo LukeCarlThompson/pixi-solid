@@ -1,8 +1,9 @@
 import { ContainerTexture } from "@pixi/3d";
+import type { JSX } from "@solidjs/web";
 import { getRenderer, getTicker } from "pixi-solid";
 import type { ColorSource } from "pixi.js";
 import { Container } from "pixi.js";
-import { onCleanup, type JSX } from "solid-js";
+import { onCleanup } from "solid-js";
 
 export type ContainerTextureOptions = {
   /** Width of the rendered texture in pixels. Defaults to the content's bounds. */

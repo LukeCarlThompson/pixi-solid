@@ -106,10 +106,15 @@ Load `.glb` / `.gltf` assets using `Assets.load<Scene3DSource>` and render with 
 import { Assets } from "pixi.js";
 import type { Scene3DSource } from "@pixi/3d";
 import { Model3D } from "pixi-solid-3d";
-import { createResource, Show } from "solid-js";
+import { createSignal, onSettled, Show } from "solid-js";
 
 function Character() {
-  const [source] = createResource(() => Assets.load<Scene3DSource>("/assets/character.glb"));
+  // Solid 2 has no createResource; start the load once the render settles.
+  const [source, setSource] = createSignal<Scene3DSource>();
+
+  onSettled(() => {
+    void Assets.load<Scene3DSource>("/assets/character.glb").then(setSource);
+  });
 
   return (
     <Show when={source()}>{(src) => <Model3D source={src()} castShadow receiveShadow />}</Show>

@@ -2,7 +2,7 @@ import type * as Pixi3D from "@pixi/3d";
 import { FlatMaterial, Material3D, PlaneGeometry, Sprite3D as PixiSprite3D } from "@pixi/3d";
 import { cleanup, mountScene } from "pixi-solid/testing";
 import { Texture } from "pixi.js";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import { Container3D, Sprite3D } from "../components";
@@ -73,12 +73,14 @@ describe("Sprite3D component", () => {
 
     // WHEN
     setTint(0x00ff00);
+    flush();
 
     // THEN
     expect(container.tint).toBe(0x00ff00);
 
     // WHEN
     setAlpha(0.25);
+    flush();
 
     // THEN
     expect(container.alpha).toBe(0.25);

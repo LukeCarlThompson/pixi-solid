@@ -1,6 +1,6 @@
 import { BatchedMesh3D as PixiBatchedMesh3D, CubeGeometry, Material3D, Matrix4 } from "@pixi/3d";
 import { cleanup, mountScene } from "pixi-solid/testing";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import { BatchedMesh3D } from "../components";
@@ -103,6 +103,7 @@ describe("BatchedMesh3D component", () => {
 
     // WHEN
     setSize(6);
+    flush();
 
     // THEN
     expect(container.size).toBe(2);

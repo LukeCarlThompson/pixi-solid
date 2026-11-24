@@ -1,6 +1,7 @@
 import type * as Pixi3D from "@pixi/3d";
+import type { JSX } from "@solidjs/web";
+import type { Accessor } from "solid-js";
 import { children as resolveChildren, createRenderEffect, onCleanup } from "solid-js";
-import type { JSX } from "solid-js";
 
 export class Invalid3DChildTypeError extends Error {
   constructor(cause: Error) {
@@ -12,15 +13,18 @@ export class Invalid3DChildTypeError extends Error {
   }
 }
 
+const getContainer3DChildren = (resolvedChildren: ReturnType<typeof resolveChildren>) =>
+  resolvedChildren.toArray().filter(Boolean) as unknown as Pixi3D.Container3D[];
+
 /**
  * Binds JSX children to a Container3D parent.
  * Reactively adds and removes children in Container3D draw order.
  */
 export const bindChildrenToContainer3D = (
   parent: Pixi3D.Container3D,
-  children?: JSX.Element,
+  children: Accessor<JSX.Element> = () => undefined,
 ): void => {
-  const resolvedChildren = resolveChildren(() => children);
+  const resolvedChildren = resolveChildren(children);
 
   const canAddChild = typeof parent.addChildAt === "function";
   if (!canAddChild) {
@@ -28,50 +32,35 @@ export const bindChildrenToContainer3D = (
   }
 
   onCleanup(() => {
-    const boundChildren = resolvedChildren
-      .toArray()
-      .filter(Boolean) as unknown as Pixi3D.Container3D[];
-    for (let i = 0; i < boundChildren.length; i += 1) {
-      if (parent.children.includes(boundChildren[i])) {
-        parent.removeChild?.(boundChildren[i]);
-      }
+    for (const child of getContainer3DChildren(resolvedChildren)) {
+      parent.removeChild?.(child);
     }
   });
 
-  createRenderEffect((prevChildren: Pixi3D.Container3D[] | undefined) => {
-    const nextChildren = resolvedChildren
-      .toArray()
-      .filter(Boolean) as unknown as Pixi3D.Container3D[];
-
-    try {
-      if (prevChildren) {
-        for (let i = 0; i < prevChildren.length; i += 1) {
-          const child = prevChildren[i];
-          if (nextChildren.includes(child)) continue;
-          parent.removeChild?.(child);
+  createRenderEffect(
+    () => getContainer3DChildren(resolvedChildren),
+    (nextChildren, previousChildren = []) => {
+      try {
+        for (const child of previousChildren) {
+          if (!nextChildren.includes(child)) parent.removeChild?.(child);
         }
-      }
 
-      for (let i = 0; i < nextChildren.length; i += 1) {
-        const nextChild = nextChildren[i];
-        if (nextChild.parent === parent) {
-          // If already child, we can swap or re-index if needed
-          const currentIndex = parent.children.indexOf(nextChild);
-          if (currentIndex !== i) {
-            parent.addChildAt(nextChild, i);
+        for (let index = 0; index < nextChildren.length; index += 1) {
+          const nextChild = nextChildren[index];
+
+          // An existing child only needs re-indexing when its draw order moved.
+          if (nextChild.parent === parent) {
+            if (parent.children.indexOf(nextChild) !== index) {
+              parent.addChildAt(nextChild, index);
+            }
+          } else {
+            parent.addChild(nextChild);
           }
-        } else {
-          parent.addChild(nextChild);
         }
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Invalid3DChildTypeError(error);
-      } else {
+      } catch (error) {
+        if (error instanceof Error) throw new Invalid3DChildTypeError(error);
         throw error;
       }
-    }
-
-    return nextChildren;
-  });
+    },
+  );
 };

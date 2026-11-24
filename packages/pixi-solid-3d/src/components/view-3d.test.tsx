@@ -2,7 +2,7 @@ import type * as Pixi3D from "@pixi/3d";
 import { Container3D as PixiContainer3D, View3D as PixiView3D } from "@pixi/3d";
 import { Container } from "pixi-solid";
 import { cleanup, mountScene } from "pixi-solid/testing";
-import { createSignal, Show } from "solid-js";
+import { Show, createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -66,6 +66,7 @@ describe("View3D component", () => {
 
     // WHEN
     setTone("reinhard");
+    flush();
 
     // THEN
     expect(container.toneMapping).toBe("reinhard");
@@ -86,6 +87,7 @@ describe("View3D component", () => {
 
     // WHEN the same prop is given a different root after mount
     setRoot(new PixiContainer3D({ label: "second" }));
+    flush();
 
     // THEN the view still tracks the root from construction, which is the only one it can render
     expect(container.root).toBe(first);
@@ -108,6 +110,7 @@ describe("View3D component", () => {
 
     // WHEN
     setRoot(new PixiContainer3D({ label: "second" }));
+    flush();
 
     // THEN
     expect(container.root).toBe(first);
@@ -131,6 +134,7 @@ describe("View3D component", () => {
 
     // WHEN
     setVisible(false);
+    flush();
 
     // THEN
     expect(view?.destroyed).toBe(true);
@@ -187,6 +191,7 @@ describe("View3DProvider component", () => {
 
     // WHEN
     setVisible(false);
+    flush();
 
     // THEN
     expect(view?.destroyed).toBe(false);

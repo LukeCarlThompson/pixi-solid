@@ -1,6 +1,6 @@
 import { Container3D, Plane, Vector3 } from "@pixi/3d";
 import { cleanup, createTestContext, mountScene } from "pixi-solid/testing";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -40,6 +40,7 @@ describe("3D projection hooks", () => {
 
     // WHEN
     setPos({ x: 2, y: 0, z: 0 });
+    flush();
     await ctx.ticker.fastForwardFrames(1);
 
     // THEN
@@ -108,6 +109,7 @@ describe("3D projection hooks", () => {
 
     // WHEN
     setCursor({ x: 600, y: 300 });
+    flush();
     await ctx.ticker.fastForwardFrames(1);
 
     // THEN
@@ -144,6 +146,7 @@ describe("3D projection hooks", () => {
 
     // WHEN
     setCursor({ x: 600, y: 300 });
+    flush();
     await ctx.ticker.fastForwardFrames(1);
 
     // THEN moving right moves the point right

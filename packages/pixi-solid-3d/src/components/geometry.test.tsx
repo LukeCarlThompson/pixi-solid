@@ -10,8 +10,9 @@ import {
   TorusGeometry as PixiTorusGeometry,
   TorusKnotGeometry as PixiTorusKnotGeometry,
 } from "@pixi/3d";
+import type { JSX } from "@solidjs/web";
 import { cleanup, mountScene } from "pixi-solid/testing";
-import { createSignal, type JSX } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -106,6 +107,7 @@ describe("declarative geometries", () => {
 
     // WHEN
     setShowSphere(false);
+    flush();
 
     // THEN
     expect(mesh.geometry).not.toBe(sphere);
