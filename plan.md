@@ -88,21 +88,26 @@ one passed.
 
 Merge committed as `9dcc420`.
 
-### Stage 5: Publish stable
+### Stage 5: Publish stable — done
 
-Do not push `release/v2` first. A stable version on a `release/*` branch publishes to `v2-latest`.
-Land on `main` first, then push the branch, so the version check skips it.
+What happened, including the mistake:
 
-- [ ] Push the branch as `v2-stable`, which does not match the publish triggers, and open a pull
-      request into `main`. CI runs on pull requests into `main`.
-- [ ] Merge the pull request. The push to `main` publishes `2.0.0` to `latest` and skips 3D, and
-      gh-pages rebuilds.
-- [ ] Push `release/v2`. The version check then finds `2.0.0` on npm and skips, so no `v2-latest` tag
-      appears. Delete `v2-stable`.
-- [ ] Confirm the registry reads `latest: 2.0.0`, `next: 2.0.0-rc.1`, and no `v1-latest` yet.
-- [ ] Check the site. Confirm the v1 pages are gone, the 3D pages are gone, and the migration guide
-      is live.
-- [ ] Delete this file.
+- PR #102, `v2-stable` into `main`, passed CI and squash-merged as `e88b778`.
+- `2.0.0` had already reached npm at 11:12:43 from a push to `release/v2` that carried it. That run
+  used the branch's pre-merge workflow, which maps a stable version on a non-`main` branch to
+  `v<major>-latest`, so the version landed on `v2-latest`. The run on `main` then skipped it as
+  already published, and `latest` stayed on `1.0.1`.
+- PR #103 added `npm-retag.yml`, a dispatch-only workflow that moves a dist-tag with the repo token
+  and refuses prerelease versions. Dispatched for `pixi-solid@2.0.0` to `latest`.
+- Registry now reads `latest: 2.0.0`, `next: 2.0.0-rc.1`, `v2-latest: 2.0.0`.
+- The docs site redeployed. The migration guide answers 200 and the 3D pages return 404.
+- PR #104 records the branch rule in CONTRIBUTING and removes the ruleset's admin bypass, so
+  `release/**` and the default branch can no longer be pushed directly at all.
+- `release/v2` is brought to the released content through a pull request, not a push.
+
+Still open:
+
+- [ ] Delete this file. It is the last item, after the 3D port records its own state.
 
 ### Stage 6: Port 3D
 
