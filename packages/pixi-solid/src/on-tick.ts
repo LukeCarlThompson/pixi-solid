@@ -18,9 +18,13 @@ export const onTick = (
   tickerCallback: Pixi.TickerCallback<Pixi.Ticker>,
   priority: Pixi.UPDATE_PRIORITY = UPDATE_PRIORITY.NORMAL,
 ): void => {
-  const ticker = useContext(TickerContext);
+  let ticker: Pixi.Ticker;
 
-  if (!ticker) {
+  try {
+    // Solid 2 throws its own context error when no provider is above the read, so the library
+    // message has to come from a catch rather than from a null check on the result.
+    ticker = useContext(TickerContext);
+  } catch {
     throw new Error(
       "onTick must be used within a PixiApplicationProvider, PixiCanvas or a TickerProvider",
     );
