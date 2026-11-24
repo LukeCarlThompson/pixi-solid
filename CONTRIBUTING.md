@@ -375,6 +375,26 @@ Two rules produce the table:
 `.github/workflows/npm-publish.yml` always passes `--tag`. The workflow skips a version that npm
 already has, so a repeated push is safe.
 
+If a version lands on the wrong channel, dispatch `npm-retag.yml` with the package, version and tag.
+It moves the tag with the repository token and refuses a prerelease version, so an `-rc` can never
+reach `latest` that way.
+
+### Branch discipline
+
+`main` and every `release/*` branch publish. A push to one of them is a release, not a save. Never
+use them as working copies.
+
+- Feature and fix work goes on a short-lived branch and lands through a pull request.
+- The pull request passes the `test` check and is squash-merged.
+- A release branch receives only release pull requests: a version bump and a changelog entry.
+- The ruleset `Protect published branches` covers the default branch and `release/**`. It requires a
+  pull request and the `test` check, allows squash merges only, and blocks deletion and force pushes.
+  It grants no bypass, so the rule holds for maintainers too.
+
+This is not ceremony. A working push to `release/v2` that carried `version: 2.0.0` published the
+version to `v2-latest` before `main` merged. The run on `main` then skipped it as already published,
+and `latest` stayed on 1.x until the tag was moved by hand.
+
 ### Line policy
 
 Version 1 supports Solid 1 and version 2 supports Solid 2, so version 2 is a port rather than a
