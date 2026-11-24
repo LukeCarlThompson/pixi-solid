@@ -1,7 +1,7 @@
 import { AnimatedSprite, PixiCanvas, usePixiScreen } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { createResource, Show } from "solid-js";
+import { createMemo, Loading } from "solid-js";
 
 import assetUrl_01 from "@/assets/run_01.png";
 import assetUrl_02 from "@/assets/run_02.png";
@@ -13,8 +13,9 @@ import assetUrl_06 from "@/assets/run_06.png";
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
 
-  // Create a resource to load the required assets
-  const [textureResource] = createResource(async () => {
+  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
+  // suspends, so the enclosing `<Loading>` holds the scene until the textures arrive.
+  const textures = createMemo(async () => {
     // Setting scale mode to nearest for crisp pixel art
     TextureStyle.defaultOptions.scaleMode = "nearest";
 
@@ -31,20 +32,17 @@ const DemoComponent = () => {
   });
 
   return (
-    <Show when={textureResource()}>
-      {/* Show our AnimatedSprite only when the textures are loaded */}
-      {(textures) => (
-        <AnimatedSprite
-          autoPlay={true}
-          textures={textures()}
-          scale={3}
-          animationSpeed={0.25}
-          anchor={0.5}
-          x={pixiScreen.width * 0.5}
-          y={pixiScreen.height * 0.5}
-        />
-      )}
-    </Show>
+    <Loading>
+      <AnimatedSprite
+        autoPlay={true}
+        textures={textures()}
+        scale={3}
+        animationSpeed={0.25}
+        anchor={0.5}
+        x={pixiScreen.width * 0.5}
+        y={pixiScreen.height * 0.5}
+      />
+    </Loading>
   );
 };
 

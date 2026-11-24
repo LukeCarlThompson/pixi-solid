@@ -1,9 +1,7 @@
 import { Container as PixiContainer } from "pixi.js";
 import type * as Pixi from "pixi.js";
-import { createSignal } from "solid-js";
-import { describe, expect, it, vi } from "vitest";
-
-import { mountScene } from "../testing";
+import { createRoot, createSignal, flush, resetErrorHalt } from "solid-js";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   bindChildrenToContainer,
@@ -12,6 +10,8 @@ import {
 } from "./bind-children";
 
 // oxlint-disable typescript/unbound-method
+
+afterEach(() => resetErrorHalt());
 
 const createMockContainer = () => ({
   addChild: vi.fn(),
@@ -24,6 +24,23 @@ const createMockRenderLayer = () => ({
   attach: vi.fn(),
   detach: vi.fn(),
 });
+
+const mountScene = <T>(setup: () => T) => {
+  let disposeRoot: (() => void) | undefined;
+
+  try {
+    const container = createRoot((dispose) => {
+      disposeRoot = dispose;
+      return setup();
+    });
+    flush();
+
+    return { container, dispose: () => disposeRoot?.() };
+  } catch (error) {
+    disposeRoot?.();
+    throw error;
+  }
+};
 
 describe("bindChildrenToContainer()", () => {
   it("GIVEN initial children WHEN bindChildrenToContainer runs THEN it adds children in order", () => {
@@ -59,6 +76,7 @@ describe("bindChildrenToContainer()", () => {
     });
 
     setChildren([childA, childB, childC, childD]);
+    flush();
 
     expect(parent.addChildAt).toHaveBeenCalledTimes(7);
     expect(parent.addChildAt).toHaveBeenNthCalledWith(1, childA, 0);
@@ -84,6 +102,7 @@ describe("bindChildrenToContainer()", () => {
     });
 
     setChildren([childC, childB, childA]);
+    flush();
 
     expect(parent.removeChild).not.toHaveBeenCalled();
     expect(parent.addChildAt).toHaveBeenCalledTimes(6);
@@ -205,6 +224,7 @@ describe("bindChildrenToContainer()", () => {
     expect(parent.children).toEqual([childA, childB, childC]);
 
     setChildren([childA, childB]);
+    flush();
 
     expect(parent.children).toEqual([childA, childB]);
     dispose();
@@ -223,6 +243,7 @@ describe("bindChildrenToContainer()", () => {
     });
 
     setChildren([]);
+    flush();
 
     expect(parent.children).toEqual([]);
     dispose();
@@ -281,6 +302,7 @@ describe("bindChildrenToRenderLayer()", () => {
     });
 
     setChildren([childA, childB]);
+    flush();
 
     expect(parent.detach).toHaveBeenCalledTimes(1);
     expect(parent.detach).toHaveBeenCalledWith(childC);
@@ -300,6 +322,7 @@ describe("bindChildrenToRenderLayer()", () => {
     });
 
     setChildren([childC, childB, childA]);
+    flush();
 
     expect(parent.detach).not.toHaveBeenCalled();
     expect(parent.attach).toHaveBeenCalledTimes(6);
@@ -400,6 +423,7 @@ describe("bindChildrenToRenderLayer()", () => {
 
     // Remove all children from the signal (render layer stays mounted)
     setChildren([]);
+    flush();
 
     // All children should be detached from the render layer
     expect(parent.detach).toHaveBeenCalledTimes(3);

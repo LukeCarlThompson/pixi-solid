@@ -31,7 +31,8 @@ import type {
   TilingSpriteProps,
 } from "pixi-solid";
 import type * as Pixi from "pixi.js";
-import type { JSX, Ref } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import type { Ref } from "solid-js";
 ```
 
 ## Component prop types
@@ -40,9 +41,9 @@ import type { JSX, Ref } from "solid-js";
 
 Generic base type for a Pixi-backed component. It combines Pixi options with typed event props and common point-axis props. It also adds `anchorX`/`anchorY` when the options include `anchor`, and `tilePositionX`/`tilePositionY` plus `tileScaleX`/`tileScaleY` when options include `tilePosition`.
 
-Use this when building your own Pixi-backed component and you want consumers to pass through Pixi-style props to the underlying instance. If you don't require all props, narrow with `Pick` or `Omit`.
+Use this type when you build your own Pixi-backed component and want consumers to pass Pixi-style props to the underlying instance. If you do not need all props, narrow the type with `Pick` or `Omit`.
 
-**Examples:** `PixiComponentProps<Pixi.SpriteOptions>` or `PixiComponentProps<Pixi.ContainerOptions>`. The first includes anchor axes; the second does not.
+**Examples:** `PixiComponentProps<Pixi.SpriteOptions>` or `PixiComponentProps<Pixi.ContainerOptions>`. The first includes anchor axes. The second does not.
 
 Each component has a concrete prop type. These types match component signatures and include Pixi options, Solid props, event props, and axis props.
 
@@ -81,11 +82,11 @@ Available concrete prop types:
 - `TextProps`
 - `TilingSpriteProps`
 
-`AnimatedSpriteProps` includes `autoUpdate`. `Container`, `RenderContainer`, and `RenderLayer` accept `children`; other component prop types do not.
+`AnimatedSpriteProps` includes `autoUpdate`. `Container`, `RenderContainer`, and `RenderLayer` accept `children`. Other component prop types do not.
 
 ## Prop updates
 
-Pixi options are passed to the Pixi constructor when the component mounts. pixi-solid tracks changed props and updates the corresponding instance property when that property exists and is writable. Constructor-only options cannot be updated after mount. Prefer axis props when updating one coordinate or scale axis.
+pixi-solid passes the Pixi options to the Pixi constructor when the component mounts. It tracks changed props and updates the matching instance property when that property exists and is writable. Constructor-only options cannot be updated after mount. Prefer axis props when you update one coordinate or scale axis.
 
 `AnimatedSprite` is an exception: pixi-solid disables Pixi's automatic ticker update and registers updates with the current ticker unless `autoUpdate={false}`. It therefore needs ticker context by default.
 
@@ -111,7 +112,7 @@ All concrete component prop types include typed PixiJS event props. Use lowercas
 
 Supported events include pointer, mouse, touch, wheel, tap, global movement, and capture variants such as `onpointerdowncapture`.
 
-Interactive events require `eventMode="static"` or `eventMode="dynamic"` on the component to be received.
+To receive an interactive event, set `eventMode="static"` or `eventMode="dynamic"` on the component.
 
 ### Common events by category
 
@@ -122,7 +123,7 @@ Interactive events require `eventMode="static"` or `eventMode="dynamic"` on the 
 | Touch    | `ontouchstart`, `ontouchend`, `ontouchmove`, `ontouchcancel`                                        |
 | Wheel    | `onwheel`                                                                                           |
 
-Most non-global events also have **capture variants** with a `capture` suffix — e.g. `onpointerdowncapture`. They fire during capture before the target phase. Global movement events have no capture variants. Event names are typed from PixiJS's `FederatedEventEmitterTypes`.
+Most non-global events also have **capture variants** with a `capture` suffix, for example `onpointerdowncapture`. They fire during the capture phase, before the target phase. Global movement events have no capture variants. Event names are typed from PixiJS's `FederatedEventEmitterTypes`.
 
 ## Using these types
 
@@ -130,7 +131,7 @@ When building a custom component:
 
 1. Import `PixiComponentProps<Pixi.YourOptionsType>` as the base.
 2. Narrow with `Pick` for specific props, or `Omit` to exclude props you handle yourself.
-3. Combine with `splitProps` and `{...rest}` spreading to separate custom props from Pixi props.
+3. Combine with `omit` and `{...rest}` spreading to separate custom props from Pixi props.
 
 ```tsx
 import type { PixiComponentProps } from "pixi-solid";
@@ -141,19 +142,19 @@ type MyComponentProps = PixiComponentProps<Pixi.SpriteOptions> & {
 };
 ```
 
-Example — forwarding Pixi props while handling custom props with `splitProps`:
+Example — forwarding Pixi props while handling custom props with `omit`, which returns a reactive view of the remaining props:
 
 ```tsx
-import { splitProps } from "solid-js";
+import { omit } from "solid-js";
 import { Container, Sprite } from "pixi-solid";
 import type { PixiComponentProps } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 
 function MySprite(props: PixiComponentProps<Pixi.SpriteOptions> & { label: string }) {
-  const [local, pixiProps] = splitProps(props, ["label"]);
+  const pixiProps = omit(props, "label");
 
   return (
-    <Container label={local.label}>
+    <Container label={props.label}>
       <Sprite {...pixiProps} />
     </Container>
   );
@@ -164,24 +165,94 @@ function MySprite(props: PixiComponentProps<Pixi.SpriteOptions> & { label: strin
 
 ### `ref` usage
 
-All pixi-solid components support a `ref` callback that receives the underlying PixiJS object when mounted:
+All pixi-solid components accept a `ref` that receives the underlying PixiJS object when mounted. The value may be a callback, an array of callbacks, or a variable:
+
+```tsx
+let container: Pixi.Container | undefined;
+
+<Container ref={container} />;
+```
+
+A ref callback **captures, and nothing else**. It runs once, without an owner. `onCleanup` inside one never runs, an effect created inside one never disposes, and `useContext` inside one throws. Reading a signal inside one does not re-run it.
 
 ```tsx
 <Container
   ref={(container) => {
-    // do something with the container instance
+    // capture or touch the instance only
   }}
 />
 ```
 
-`Graphics` is typically used imperatively through `ref` for drawing commands:
+#### Drawing with `Graphics`
+
+`Graphics` draws through the `draw` prop. The callback receives the instance, and the instance is cleared before every run, so the callback describes the whole content. It runs once on mount, then again whenever a reactive value it reads changes:
 
 ```tsx
 <Graphics
-  ref={(graphics) => {
+  draw={(graphics) => {
     graphics.rect(50, 50, 100, 200).fill(0xff0000).circle(200, 200, 50).stroke(0x00ff00);
   }}
 />
+```
+
+Read a prop or a signal inside `draw` to redraw when it changes:
+
+```tsx
+const Circle = (props: { radius: number }) => (
+  <Graphics draw={(graphics) => graphics.circle(0, 0, props.radius).fill("#ffd500ff")} />
+);
+```
+
+Do not call `clear()` yourself. A value that changes every frame redraws every frame, so animate per-frame work from `onTick` with the instance from `ref` instead.
+
+#### Calling instance methods
+
+Most PixiJS state has a matching prop, and pixi-solid binds those props reactively. Some state does not. `Pixi.AnimatedSprite#playing` is a getter with no setter, so passing it as a prop throws, and starting or stopping playback needs a method call. Capture the instance in a variable and drive it from a split effect: the compute function tracks the read, and the apply function calls the method:
+
+```tsx
+let animation: Pixi.AnimatedSprite | undefined;
+
+createEffect(
+  () => isPlaying(),
+  (playing) => {
+    if (playing) animation?.play();
+    else animation?.stop();
+  },
+);
+
+<AnimatedSprite ref={animation} textures={textures} />;
+```
+
+`currentFrame` behaves the same way. It is an instance property and not an `AnimatedSpriteOptions` member, so a prop does not typecheck, and passing it anyway crashes inside the PixiJS constructor because the value is assigned before the textures are set up. Seek with `gotoAndStop(frame)` or `gotoAndPlay(frame)` instead:
+
+```tsx
+const [frame, setFrame] = createSignal(0);
+let animation: Pixi.AnimatedSprite | undefined;
+
+createEffect(
+  () => frame(),
+  (value) => animation?.gotoAndStop(value),
+);
+
+<AnimatedSprite ref={animation} textures={textures} />;
+```
+
+`gotoAndStop` also pauses playback, so the frame holds. Use `autoPlay` with `gotoAndPlay(frame)` to start from a chosen frame instead. Seeking is an action rather than a value: playback keeps changing the frame, so a value would go stale, and a request for the frame it already holds would be dropped. `playing` and `totalFrames` are read-only for the same reason — playback owns them.
+
+#### Setup and teardown for an instance
+
+Use `onSettled`, which is owned and runs after the ref has been assigned. Return a cleanup function, because `onCleanup` is not allowed inside `onSettled`:
+
+```tsx
+let sprite: Pixi.Sprite | undefined;
+
+onSettled(() => {
+  sprite?.on("pointerdown", handleDown);
+
+  return () => sprite?.off("pointerdown", handleDown);
+});
+
+<Sprite ref={sprite} texture={texture} />;
 ```
 
 ### `as` prop (advanced)
@@ -200,7 +271,14 @@ existingContainer.label = "my-container";
 </Container>;
 ```
 
-**Lifecycle note:** When `as` is provided, pixi-solid assumes you own the instance's lifecycle and will **not** destroy it on unmount. You must destroy it manually when no longer needed. Child components still follow their own lifecycle.
+Props on the component are still applied to the given instance, including initialisation props such as `texture` or `label`:
+
+```tsx
+// The texture is applied to `existingSprite` on mount.
+<Sprite as={existingSprite} texture={texture} x={40} />
+```
+
+**Lifecycle note:** When you provide `as`, pixi-solid assumes that you own the instance's lifecycle and will **not** destroy it on unmount. Destroy it manually when you no longer need it. Child components still follow their own lifecycle.
 
 ## Deliberate omissions
 
@@ -221,4 +299,4 @@ import {
 
 `Particle` is omitted because `ParticleContainer` is designed for high-volume, imperative updates rather than per-particle Solid reactivity. Use `ParticleContainer` from `pixi-solid`, then manage `Particle` instances from `pixi.js` imperatively.
 
-`MeshGeometry`, `NineSliceGeometry`, `PerspectivePlaneGeometry`, `PlaneGeometry`, and `RopeGeometry` are low-level geometry types for custom meshes. `Rectangle` and `Culler` are PixiJS utilities. Import these directly from `pixi.js` when needed; `pixi-solid` does not re-export PixiJS classes.
+`MeshGeometry`, `NineSliceGeometry`, `PerspectivePlaneGeometry`, `PlaneGeometry`, and `RopeGeometry` are low-level geometry types for custom meshes. `Rectangle` and `Culler` are PixiJS utilities. Import these directly from `pixi.js` when needed. `pixi-solid` does not re-export PixiJS classes.

@@ -1,4 +1,4 @@
-import { createStore } from "solid-js/store";
+import { createStore } from "solid-js";
 
 import { onTick } from "../../on-tick";
 
@@ -12,7 +12,9 @@ export const createClockStore = (): ClockStore => {
   });
 
   onTick((ticker) => {
-    setStore("time", (t) => t + ticker.deltaMS);
+    setStore((state) => {
+      state.time += ticker.deltaMS;
+    });
   });
 
   return store;

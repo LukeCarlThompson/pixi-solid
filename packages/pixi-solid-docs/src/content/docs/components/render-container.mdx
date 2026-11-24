@@ -6,7 +6,7 @@ description: A SolidJS component that renders a PixiJS RenderContainer.
 import { Code } from "@astrojs/starlight/components";
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 import demoCode from "../../demos/render-container.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 A SolidJS component that renders a PixiJS `RenderContainer`.
 
@@ -14,7 +14,7 @@ Please see the [PixiJS docs](https://pixijs.download/release/docs/scene.RenderCo
 
 ### Demo
 
-<ClientOnly fileName="render-container" client:load />
+<DemoMount name="render-container" />
 
 ### Code example
 

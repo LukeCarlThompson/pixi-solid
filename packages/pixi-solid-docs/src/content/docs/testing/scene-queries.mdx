@@ -7,34 +7,47 @@ sidebar:
 
 Find display objects by their `label` property, decoupling tests from scene graph hierarchy.
 
-## getByLabel(root, label)
+`mountScene` returns these helpers bound to the current root. The standalone form takes a root as its first argument, so it also works on any Pixi container you already hold.
 
-Throws if the label is not found.
+## getByLabel(label)
+
+Throws when the label is not found.
 
 ```tsx
-const { container } = mountScene(() => (
+const { getByLabel } = mountScene(() => (
   <Container label="scene">
-    <Sprite label="player" />
+    <Sprite label="player" x={100} />
   </Container>
 ));
 
+expect(getByLabel("player").x).toBe(100);
+```
+
+The standalone form takes the root explicitly:
+
+```tsx
 const player = getByLabel(container, "player");
-expect(player.x).toBe(100);
 ```
 
-## queryByLabel(root, label)
+## queryByLabel(label)
 
-Same as `getByLabel` but returns `undefined` instead of throwing.
+Same as `getByLabel`, but returns `undefined` instead of throwing.
 
 ```tsx
-const maybe = queryByLabel(container, "missing-label"); // undefined
+const maybe = queryByLabel("missing-label"); // undefined
 ```
 
-## getAllByLabel(root, label)
+## getAllByLabel(label)
 
-Find all display objects with the given label.
+Find every display object with the given label, which is useful when a scene repeats one:
 
 ```tsx
-const enemies = getAllByLabel(container, "enemy");
-expect(enemies).toHaveLength(3);
+const { getAllByLabel } = mountScene(() => (
+  <Container label="scene">
+    <Sprite label="enemy" />
+    <Sprite label="enemy" />
+  </Container>
+));
+
+expect(getAllByLabel("enemy")).toHaveLength(2);
 ```

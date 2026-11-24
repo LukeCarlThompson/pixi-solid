@@ -1,6 +1,5 @@
 import type { Accessor } from "solid-js";
 import { createSignal } from "solid-js";
-import { createMutable } from "solid-js/store";
 
 import { onTick } from "../on-tick";
 
@@ -53,18 +52,6 @@ export const smoothDamp = (
   return result;
 };
 
-/**
- * A SolidJS hook that provides a smoothly damped signal towards a target value.
- * Internally manages velocity with continuous updates synced to the Pixi ticker.
- *
- * @example
- * ```tsx
- * const pos = useSmoothDamp({ to: () => targetX() });
- *
- * return <Sprite x={pos.value()} />;
- * ```
- */
-
 export type UseSmoothDampProps = {
   to: () => number;
   smoothTimeMs?: () => number;
@@ -76,7 +63,7 @@ export type SmoothDamp = {
   velocity: Accessor<number>;
   /**
    * Sets the current value of the smooth damp directly. This can be used to "teleport" the value to a specific point.
-   * The next frame will still calculate the smooth damp physics as normal based on the current to value so you may want to set the to value at the same time to control the behaviour.
+   * The next frame will still calculate the smooth damp physics as normal based on the current to value so you may want to set the to value at the same time to control the behavior.
    */
   setValue: (value: number) => void;
 };
@@ -94,26 +81,31 @@ export type SmoothDamp = {
  */
 export const useSmoothDamp = (props: UseSmoothDampProps): SmoothDamp => {
   const [current, setCurrent] = createSignal(props.to());
-  const velocity = createMutable({ value: 0 });
+  const [velocity, setVelocity] = createSignal(0);
+  // `smoothDamp` mutates a `{ value }` ref, so reuse one object per hook rather
+  // than allocating (or proxying a signal) on every tick.
+  const velocityRef = { value: 0 };
 
   const update = (deltaTimeMS: number) => {
     const currentValue = current();
     const currentTarget = props.to();
 
     if (currentValue === currentTarget) {
-      velocity.value = 0;
+      setVelocity(0);
       return;
     }
 
     const deltaTime = deltaTimeMS / 1000; // Convert milliseconds to seconds
+    velocityRef.value = velocity();
     const newCurrent = smoothDamp(
       currentValue,
       currentTarget,
-      velocity,
+      velocityRef,
       props.smoothTimeMs?.(),
       props.maxSpeed?.(),
       deltaTime,
     );
+    setVelocity(velocityRef.value);
     setCurrent(newCurrent);
   };
 
@@ -123,7 +115,7 @@ export const useSmoothDamp = (props: UseSmoothDampProps): SmoothDamp => {
 
   return {
     value: current,
-    velocity: () => velocity.value,
+    velocity,
     setValue: setCurrent,
   };
 };

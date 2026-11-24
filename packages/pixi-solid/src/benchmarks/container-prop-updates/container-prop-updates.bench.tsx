@@ -1,4 +1,4 @@
-import { createRoot, createSignal } from "solid-js";
+import { createRoot, createSignal, flush } from "solid-js";
 import { test } from "vitest";
 
 import { Container } from "../../components";
@@ -74,6 +74,8 @@ test("Container prop updates", async ({ bench }) => {
         jsxIteration += 1;
 
         state.setX(jsxIteration);
+
+        flush();
       },
     },
     {
@@ -85,6 +87,8 @@ test("Container prop updates", async ({ bench }) => {
         state.setX(i);
         state.setAlpha((i % 100) / 100);
         state.setOnclick(i % 2 === 0 ? handlers.a : handlers.b);
+
+        flush();
       },
     },
     {
@@ -105,6 +109,10 @@ test("Container prop updates", async ({ bench }) => {
         state.setSkewX(i * 0.0001);
         state.setPivotY(i * 0.0002);
         state.setOnclick(toggle ? handlers.a : handlers.b);
+
+        // Solid 2 batches writes; flush so the benchmark measures the full
+        // reactive update path (prop binding), not just the staged writes.
+        flush();
       },
     },
   ]);

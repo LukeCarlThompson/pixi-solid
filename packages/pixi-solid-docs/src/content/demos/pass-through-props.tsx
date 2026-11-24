@@ -2,7 +2,7 @@ import type { PixiComponentProps } from "pixi-solid";
 import { AnimatedSprite, onTick, Container } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { splitProps } from "solid-js";
+import { omit } from "solid-js";
 
 // Using the utility PixiComponentProps type to allow passing through any ContainerOptions props by default or accepts a generic for the specific Pixi component options we want to support.
 export type BirdProps = Pick<PixiComponentProps, "position" | "x" | "y" | "angle" | "scale"> & {
@@ -19,8 +19,8 @@ export const Bird = (props: BirdProps) => {
     "bird_06",
   ]);
 
-  // Splitting out flyingSpeed so we pass only the valid Container props to our AnimatedSprite
-  const [, containerProps] = splitProps(props, ["flyingSpeed"]);
+  // Omitting flyingSpeed so we pass only the valid Container props to our AnimatedSprite
+  const containerProps = omit(props, "flyingSpeed");
 
   return (
     // Spread the containerProps to pass through all valid Container options and the ref

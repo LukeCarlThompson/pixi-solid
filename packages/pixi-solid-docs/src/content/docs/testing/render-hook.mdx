@@ -1,12 +1,12 @@
 ---
 title: renderHook
-description: Run a hook or store in a temporary Solid root — optionally inside a provider — for testing logic that needs context but doesn't render a scene.
+description: Run a hook or store in a temporary Solid root — optionally inside a provider — for testing logic that needs context but does not render a scene.
 sidebar:
   order: 3
 ---
 
 `renderHook()` is for testing **stores, hooks, or any logic** that has signals inside or requires context but does **not** render a scene.
-It runs the callback in a temporary Solid root, optionally inside a `wrapper` component (e.g. `ctx.Provider`), and exposes the return value as a reactive accessor.
+It runs the callback **once** in a temporary Solid root, optionally inside a `wrapper` component (e.g. `ctx.Provider`), and exposes the return value as an accessor.
 
 ```tsx
 type RenderHookResult<T> = {
@@ -15,7 +15,7 @@ type RenderHookResult<T> = {
 };
 ```
 
-The callback runs exactly once inside the wrapper, so hooks that register side effects (`onTick`, `onResize`) are cleaned up on dispose. If the callback reads reactive values, `result` re-evaluates when they change.
+The callback runs once inside the wrapper, and it does **not** re-run when reactive values change. Hooks that register side effects (`onTick`, `onResize`) are cleaned up on `dispose`. To observe updates, return a reactive value from the callback (an accessor or a store) and read it through `result()`.
 
 ## Testing hooks with context
 
@@ -56,25 +56,30 @@ const { result } = ctx.renderHook(() => createClockStore()); // uses onTick inte
 
 expect(result().time).toBe(0);
 
-ctx.ticker.fastForwardFrames(3);
+// The driver methods are async, so always await them
+await ctx.ticker.fastForwardFrames(3);
 expect(result().time).toBe(48);
 ```
 
 ## Reactivity
 
-If the callback reads reactive values, `result` re-evaluates when they change:
+The callback runs once, so `result` does not re-evaluate on its own. Return a reactive value from the callback and read it through `result()` to observe updates. Solid batches reactive writes and flushes them on a microtask, so call `flush()` before asserting:
 
 ```tsx
+import { flush } from "solid-js";
+
 const ctx = createTestContext();
 
-const { result } = ctx.renderHook(() => usePixiScreen().width);
-expect(result()).toBe(800);
+const { result } = ctx.renderHook(() => usePixiScreen());
+expect(result().width).toBe(800);
 
 ctx.renderer.emitResize({ width: 1024 });
-expect(result()).toBe(1024);
+flush();
+
+expect(result().width).toBe(1024);
 ```
 
-> **Tip:** return stable reactive objects (stores, screen dimensions) rather than deriving primitives inside the callback. Derived primitives re-run the callback when they change, which re-creates any state created inside it.
+> **Tip:** return stable reactive objects (stores, screen dimensions) rather than deriving primitives inside the callback. A derived primitive is read only once, so later changes would not be visible through `result()`.
 
 ## Error testing
 
@@ -87,7 +92,7 @@ expect(() => renderHook(() => usePixiScreen())).toThrow();
 ## When to use
 
 - Testing stores or hooks that have signals inside
-- Testing logic that requires context (`usePixiScreen`, `getPixiApp`, etc.) but doesn't render a scene
+- Testing logic that requires context (`usePixiScreen`, `getPixiApp`, etc.) but does not render a scene
 - Error testing for missing context
 
 For testing view components that render a Pixi display object, use [`mountScene`](../mount-scene) instead.

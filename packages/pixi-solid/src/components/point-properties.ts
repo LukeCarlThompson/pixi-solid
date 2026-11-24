@@ -41,13 +41,11 @@ export const COMMON_POINT_PROP_AXIS_NAMES = [
   "skewY",
 ] as const;
 
-/** A single axis-specific point property name available on all Container-based components. */
 export type CommonPointAxisPropName = (typeof COMMON_POINT_PROP_AXIS_NAMES)[number];
 
 /** Axis-specific anchor property names available on Sprite-like components: `anchorX`, `anchorY`. */
 export const ANCHOR_POINT_PROP_AXIS_NAMES = ["anchorX", "anchorY"] as const;
 
-/** A single axis-specific anchor property name available on Sprite-like components. */
 export type AnchorPointAxisPropName = (typeof ANCHOR_POINT_PROP_AXIS_NAMES)[number];
 
 /**
@@ -61,7 +59,6 @@ export const TILING_POINT_PROP_AXIS_NAMES = [
   "tileScaleY",
 ] as const;
 
-/** A single axis-specific tiling property name available on TilingSprite. */
 export type TilingPointAxisPropName = (typeof TILING_POINT_PROP_AXIS_NAMES)[number];
 
 // All axis properties (for runtime checking)
@@ -71,15 +68,9 @@ export const POINT_PROP_AXIS_NAMES = [
   ...TILING_POINT_PROP_AXIS_NAMES,
 ] as const;
 
-/** Any axis-specific point property name across all component types. */
 export type PointAxisPropName = (typeof POINT_PROP_AXIS_NAMES)[number];
 
 export const POINT_PROP_AXIS_NAMES_SET: Set<string> = new Set(POINT_PROP_AXIS_NAMES);
-
-export const ALL_VALID_PROP_NAMES_SET: Set<string> = new Set([
-  ...POINT_PROP_NAMES_SET,
-  ...POINT_PROP_AXIS_NAMES_SET,
-]);
 
 export const POINT_PROP_AXIS_MAP = POINT_PROP_AXIS_NAMES.reduce((map, name) => {
   const axisName = name[name.length - 1].toLowerCase() as "x" | "y";
@@ -91,22 +82,29 @@ export const POINT_PROP_AXIS_MAP = POINT_PROP_AXIS_NAMES.reduce((map, name) => {
 export const isPointProperty = (propName: string): propName is PointPropName =>
   POINT_PROP_NAMES_SET.has(propName);
 
-export const setPointProperty = <T>(node: Pixi.Container, name: PointPropName, value: T): void => {
+export const setPointProperty = (
+  node: Pixi.Container,
+  name: PointPropName,
+  value: unknown,
+): void => {
+  const point = (node as any)[name] as Pixi.ObservablePoint;
+
   if (typeof value === "number") {
-    (node as any)[name].set(value);
+    point.set(value);
     return;
   }
 
-  (node as any)[name].set((value as any).x, (value as any).y);
+  const { x, y } = value as { x: number; y: number };
+  point.set(x, y);
 };
 
 export const isPointAxisProperty = (propName: string): propName is PointAxisPropName =>
   POINT_PROP_AXIS_NAMES_SET.has(propName);
 
-export const setPointAxisProperty = <T>(
+export const setPointAxisProperty = (
   node: Pixi.Container,
   name: PointAxisPropName,
-  value: T,
+  value: unknown,
 ): void => {
   const axisInfo = POINT_PROP_AXIS_MAP.get(name);
   if (axisInfo) {

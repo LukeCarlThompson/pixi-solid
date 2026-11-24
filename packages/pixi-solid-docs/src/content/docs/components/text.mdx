@@ -5,7 +5,7 @@ description: A SolidJS component that renders a PixiJS Text.
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/text.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 A SolidJS component that renders a PixiJS `Text`.
 
@@ -13,7 +13,7 @@ Please see the [PixiJS docs](https://pixijs.download/release/docs/scene.Text.htm
 
 ### Demo
 
-<ClientOnly fileName="text" client:load />
+<DemoMount name="text" />
 
 ### Code example
 

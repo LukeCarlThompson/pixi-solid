@@ -7,22 +7,21 @@ sidebar:
 
 import { Aside } from "@astrojs/starlight/components";
 
-The `onResize` hook provides a convenient way to react to changes in the Pixi.js renderer's dimensions. It executes a specified callback function whenever the renderer's screen size is updated, which occurs when the browser window is resized or when the HTML element containing the PixiCanvas changes dimensions.
+`onResize` runs a callback whenever the PixiJS renderer's screen size changes, which happens when the browser window resizes or when the element containing `PixiCanvas` changes size.
 
-This hook must be called from a component that is a descendant of either `<PixiApplicationProvider />` or `<PixiCanvas />`. If used outside of this context, it will throw an error.
+Call this hook from a descendant of `<PixiApplicationProvider />` or `<PixiCanvas />`. Outside that context it throws.
 
 ### Usage
 
-The `onResize` hook takes a single argument: a `resizeCallback` function. This callback receives a
-`Pixi.Rectangle` object, which contains the current `width`, `height`, `x`, and `y` of the
-renderer's screen. The callback is invoked immediately upon the hook's initialisation and then
-again every time the renderer detects a resize event.
+`onResize` takes one argument: a `resizeCallback` function. It receives a `Pixi.Rectangle` with the
+current `width`, `height`, `x`, and `y` of the renderer's screen. The callback runs immediately on
+hook initialization, then on every resize event.
 
 <Aside type="tip" title="Compatibility with usePixiScreen">
   The callback is scheduled via <code>queueMicrotask</code>, which means it fires shortly after the
-  renderer's resize event — not synchronously during it. This ensures that
-  <code>usePixiScreen</code> store listeners have already synchronised their reactive values before
-  your callback runs, avoiding stale reads when both hooks are used together.
+  renderer's resize event — not synchronously during it. This makes sure that
+  <code>usePixiScreen</code> store listeners have synchronized their reactive values before your
+  callback runs, which avoids stale reads when you use both hooks together.
 </Aside>
 
 ```tsx
@@ -41,7 +40,7 @@ const MyResponsiveComponent = () => {
   });
 
   return (
-    // You can use the signals to dynamically adjust your Pixi.js components
+    // You can use the signals to dynamically adjust your PixiJS components
     <Text
       text={`Renderer Dimensions: ${rendererWidth()}x${rendererHeight()}`}
       position={{ x: rendererWidth() * 0.5, y: rendererHeight() * 0.5 }}
@@ -64,7 +63,7 @@ export const DemoApp = () => {
 
 ## When to use it
 
-- To dynamically adjust the layout or scale of your Pixi.js scene in response to screen size changes.
-- When implementing responsive design principles for your Pixi.js application.
+- To dynamically adjust the layout or scale of your PixiJS scene in response to screen size changes.
+- When implementing responsive design principles for your PixiJS application.
 - To recenter elements or reposition UI components when the available rendering area changes.
 - To re-render or update certain graphics based on the new dimensions.

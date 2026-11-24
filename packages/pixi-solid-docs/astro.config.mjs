@@ -2,8 +2,8 @@
 
 import path from "path";
 
-import solidJs from "@astrojs/solid-js";
 import starlight from "@astrojs/starlight";
+import solidPlugin from "@solidjs/vite-plugin";
 import { defineConfig } from "astro/config";
 
 // Get the current working directory to resolve paths correctly
@@ -13,9 +13,6 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 export default defineConfig({
   site: "https://lukecarlthompson.github.io",
   base: "/pixi-solid",
-  markdown: {
-    gfm: true,
-  },
   integrations: [
     starlight({
       title: "Pixi Solid",
@@ -56,14 +53,14 @@ export default defineConfig({
           items: [{ autogenerate: { directory: "testing" } }],
         },
         {
-          label: "3D (Beta)",
-          items: [{ autogenerate: { directory: "3d" } }],
+          label: "Migration",
+          items: [{ autogenerate: { directory: "migration" } }],
         },
       ],
     }),
-    solidJs(),
   ],
   vite: {
+    plugins: [solidPlugin()],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

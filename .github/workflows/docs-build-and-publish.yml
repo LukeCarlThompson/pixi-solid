@@ -45,10 +45,6 @@ jobs:
       - name: Build pixi-solid package
         run: pnpm --filter pixi-solid build
 
-      # The docs import pixi-solid-3d through its package entry, which points at dist.
-      - name: Build pixi-solid-3d package
-        run: pnpm --filter pixi-solid-3d build
-
       - name: Verify pixi-solid build output exists
         run: |
           if [ ! -d "${{ env.LIB_PACKAGE }}/dist" ]; then

@@ -2,7 +2,7 @@ import { PixiCanvas, Text, usePixiScreen, Sprite } from "pixi-solid";
 import { ObjectFitContainer } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets, TextureStyle } from "pixi.js";
-import { createResource, createSignal, Show } from "solid-js";
+import { createMemo, createSignal, Loading, Show } from "solid-js";
 
 import birdAssetUrl_01 from "@/assets/bird_01.png";
 import birdAssetUrl_02 from "@/assets/bird_02.png";
@@ -18,11 +18,13 @@ const DemoComponent = () => {
   const [flyingSpeed, setFlyingSpeed] = createSignal(1);
   const pixiScreen = usePixiScreen();
 
-  const [texturesResource] = createResource(async () => {
+  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
+  // suspends, so the enclosing `<Loading>` holds the scene until the textures arrive.
+  const assetsReady = createMemo(async () => {
     await Assets.init();
     // Setting scale mode to nearest for crisp pixel art
     TextureStyle.defaultOptions.scaleMode = "nearest";
-    const assets = await Assets.load<Pixi.Texture>([
+    await Assets.load<Pixi.Texture>([
       { alias: "sky", src: skyAssetUrl },
       { alias: "bird_01", src: birdAssetUrl_01 },
       { alias: "bird_02", src: birdAssetUrl_02 },
@@ -31,8 +33,7 @@ const DemoComponent = () => {
       { alias: "bird_05", src: birdAssetUrl_05 },
       { alias: "bird_06", src: birdAssetUrl_06 },
     ]);
-
-    return assets;
+    return true;
   });
 
   const handlePointerMove = (e: Pixi.FederatedPointerEvent) => {
@@ -47,35 +48,37 @@ const DemoComponent = () => {
     setFlyingSpeed(speed);
   };
   return (
-    <Show when={texturesResource()}>
-      <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode={"cover"}>
-        <Sprite
-          texture={Assets.get<Pixi.Texture>("sky")}
-          onglobalpointermove={handlePointerMove}
-          eventMode="static"
+    <Loading>
+      <Show when={assetsReady()}>
+        <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode={"cover"}>
+          <Sprite
+            texture={Assets.get<Pixi.Texture>("sky")}
+            onglobalpointermove={handlePointerMove}
+            eventMode="static"
+          />
+        </ObjectFitContainer>
+        {/* Here on our `Bird` custom component we can also set any of the ContainerOptions we picked and they will be passed through to the underlying Container */}
+        <Bird
+          flyingSpeed={flyingSpeed()}
+          x={pixiScreen.width / 2}
+          y={pixiScreen.height / 2}
+          scale={2}
         />
-      </ObjectFitContainer>
-      {/* Here on our `Bird` custom component we can also set any of the ContainerOptions we picked and they will be passed through to the underlying Container */}
-      <Bird
-        flyingSpeed={flyingSpeed()}
-        x={pixiScreen.width / 2}
-        y={pixiScreen.height / 2}
-        scale={2}
-      />
-      <Text
-        text={`Flying Speed: ${flyingSpeed().toFixed(2)}`}
-        x={10}
-        y={10}
-        style={{
-          fill: "#ffffff",
-          fontSize: 16,
-        }}
-      />
-    </Show>
+        <Text
+          text={`Flying Speed: ${flyingSpeed().toFixed(2)}`}
+          x={10}
+          y={10}
+          style={{
+            fill: "#ffffff",
+            fontSize: 16,
+          }}
+        />
+      </Show>
+    </Loading>
   );
 };
 
-export const DemoApp = () => (
+export const Demo = () => (
   <PixiCanvas style={{ "aspect-ratio": "2/1.5" }}>
     <DemoComponent />
   </PixiCanvas>

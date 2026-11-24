@@ -1,15 +1,14 @@
 ---
 title: Loading an Asset Manifest
-description: Learn how to load multiple assets efficiently using an asset manifest with Solid.js's createResource in pixi-solid.
+description: How to load multiple assets efficiently with an asset manifest in pixi-solid.
 ---
 
 For applications with many assets, managing individual asset loading can become cumbersome.
-Pixi.js provides a robust **Asset Manifest** system that allows you to define all your assets, their paths, and groups in a single JSON file.
-This approach simplifies asset management, improves organization, and enables more efficient loading strategies.
+PixiJS provides an **Asset Manifest** system that lets you define all your assets, their paths, and groups in a single JSON file.
 
-It's recommended to use PixiJs [AssetPack](https://pixijs.io/assetpack/) to generate the asset manifest automatically for you.
+Use PixiJS [AssetPack](https://pixijs.io/assetpack/) to generate the manifest for you.
 
-This guide demonstrates how to use Solid.js's `createResource` to load an entire asset manifest and then access the loaded assets within your `pixi-solid` application.
+This guide demonstrates how to load an entire asset manifest and then access the loaded assets within your `pixi-solid` application.
 
 ## What is an Asset Manifest?
 
@@ -59,7 +58,7 @@ Let's assume you have an `assets-manifest.json` file in your `public` folder lik
 }
 ```
 
-With `createResource`, you can easily load your manifest and then use Pixi.js's `Assets` manager to load the bundles defined within it.
+Loading a manifest resolves to `void`, so the memo reports when the bundles are ready rather than returning the assets. Components then read each asset by its alias as they need it.
 
 ### Example: Loading Assets from a Manifest
 
@@ -67,35 +66,31 @@ With `createResource`, you can easily load your manifest and then use Pixi.js's 
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
 import { PixiCanvas, Sprite, Text } from "pixi-solid";
-import { createResource, Show, Suspense } from "solid-js";
+import { createMemo, Loading, Show } from "solid-js";
 
 export const AssetManifestLoadingDemo = () => {
-  // Use createResource to initialize Assets and load the manifest
-  const [assetsLoaded] = createResource(async () => {
-    // 1. Initialize Pixi.js Assets manager
+  const assetsReady = createMemo(async () => {
+    // 1. Register the manifest
     await Assets.init({
-      manifest: "/assets-manifest.json", // Specify your manifest file here
+      manifest: "/assets-manifest.json",
     });
 
-    // 2. Load a specific bundle (or all bundles if you don't specify)
-    // Here, we load the "game-assets" bundle.
+    // 2. Load the bundles this scene needs
     await Assets.loadBundle("game-assets");
-
-    // We can also load other bundles as needed, or all of them.
     await Assets.loadBundle("ui-assets");
 
-    // Assets.init and loadBundle return void promises.
-    // <Show when={}> gates on truthiness, so return true to open the gate.
+    // `Assets.init` and `loadBundle` resolve to void, so return true to open the gate.
     return true;
   });
 
   return (
-    <Suspense fallback={<p>Loading...</p>}>
-      {/* Suspense will show the fallback while any resources inside it are pending */}
-      <PixiCanvas>
-        {/* Use <Show> to render components only after assets are loaded */}
-        <Show when={assetsLoaded()}>
-          {/* Access assets using their alias defined in the manifest */}
+    // The fallback is a DOM element, so the boundary sits outside the canvas. A `<Loading>`
+    // inside `PixiCanvas` would add its fallback as a Pixi child.
+    <Loading fallback={<p>Loading...</p>}>
+      {/* `Show` supplies the read the boundary waits on, then renders once the assets are ready */}
+      <Show when={assetsReady()}>
+        <PixiCanvas>
+          {/* Read assets by the alias the manifest defines */}
           <Sprite
             texture={Assets.get<Pixi.Texture>("background")}
             anchor={0.5}
@@ -118,19 +113,17 @@ export const AssetManifestLoadingDemo = () => {
             style={{ fontFamily: "font_pixel", fontSize: 32, fill: 0xffffff }}
             position={[200, 50]}
           />
-        </Show>
-      </PixiCanvas>
-    </Suspense>
+        </PixiCanvas>
+      </Show>
+    </Loading>
   );
 };
 ```
 
-If we have a HTML based SolidJS app we can go further and put the Suspense boundary around a `lazy` dynamic import of our whole pixi-solid app.
-That way we could show a HTML loading indicator before we even start loading PixiJS itself.
+The boundary renders its `fallback` while the bundles load, so the page can show a DOM loading indicator before any Pixi object exists.
 
-Using an asset manifest is a powerful way to streamline asset loading in larger `pixi-solid` applications and we can combine with the SolidJS built in `createResource` and `<Suspense>` to manage loading states.
+When a scene needs only a few known assets, return them from the memo and read them directly instead. See [loading individual assets](../individual-assets).
 
 ## Further reading
 
-- Read more about [Pixi.js Assets Management and Manifests](https://pixijs.com/8.x/guides/components/assets) in the official PixiJS documentation.
-- Learn about [Solid.js `createResource`](https://www.solidjs.com/docs/latest/api#createresource) for asynchronous data handling.
+- Read more about [PixiJS Assets Management and Manifests](https://pixijs.com/8.x/guides/components/assets) in the official PixiJS documentation.

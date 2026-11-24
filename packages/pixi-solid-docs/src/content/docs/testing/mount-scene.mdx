@@ -6,35 +6,37 @@ sidebar:
 ---
 
 `mountScene()` is for testing **view components** that render a Pixi display object (Sprite, Container, Text, etc.).
-It mounts JSX in a temporary Solid root, resolves it to a real Pixi node, and returns the root Container.
+It mounts JSX in a temporary Solid root, resolves it to a real Pixi node, and returns the root Container with query helpers bound to it.
 
 ```tsx
 type MountSceneResult<TRoot = Pixi.Container> = {
   container: TRoot;
+  getByLabel: (label: string) => Pixi.Container;
+  queryByLabel: (label: string) => Pixi.Container | undefined;
+  getAllByLabel: (label: string) => Pixi.Container[];
   dispose: () => void;
 };
 ```
 
-The returned `container` is the root PixiJS node — no ref callback is needed to access it.
+The returned `container` is the root PixiJS node, so no ref callback is needed to access it. It is a snapshot of the root taken right after mounting. If the scene's root node can be replaced (a `<Loading>` boundary or a `<Show>` at the top level), prefer the bound query helpers, which always read the current root.
 
 ## Basic usage
 
 ```tsx
 import { Container, Sprite } from "pixi-solid";
-import { mountScene, getByLabel } from "pixi-solid/testing";
+import { mountScene } from "pixi-solid/testing";
 
-const { container, dispose } = mountScene(() => (
+const { container, getByLabel, dispose } = mountScene(() => (
   <Container label="scene">
     <Sprite label="player" x={100} />
   </Container>
 ));
 
 // Container is Pixi.Container — directly accessible
-container.x;
+expect(container.label).toBe("scene");
 
-// Query children by label
-const player = getByLabel(container, "player");
-expect(player.x).toBe(100);
+// The bound query helper searches from the current root
+expect(getByLabel("player").x).toBe(100);
 
 dispose();
 ```
@@ -50,31 +52,34 @@ const { container } = mountScene<Pixi.AnimatedSprite>(() => (
 container.playing; // typed as Pixi.AnimatedSprite
 ```
 
-## Getting a nested node with a ref
+## Providing context
 
-`container` is the root. When you need a node below it, a `ref` is the direct way to reach it — no
-label needed:
+Pass the provider as `options.wrapper`, or use `ctx.mount`, which applies `ctx.Provider` for you. The provider supplies a mock ticker (stopped, manually controlled), renderer, and app:
 
 ```tsx
-import type * as Pixi from "pixi.js";
+import { createTestContext } from "pixi-solid/testing";
+import { Container, onTick, Sprite } from "pixi-solid";
 
-let player: Pixi.Sprite | undefined;
+const ctx = createTestContext();
+let calls = 0;
 
-mountScene(() => (
-  <Container label="scene">
-    <Sprite ref={(el) => (player = el)} x={100} />
+const TickerCounter = () => {
+  onTick(() => {
+    calls++;
+  });
+  return <Sprite x={100} />;
+};
+
+ctx.mount(() => (
+  <Container>
+    <TickerCounter />
   </Container>
 ));
 
-expect(player?.x).toBe(100);
+// The driver methods are async, so always await them
+await ctx.ticker.fastForwardFrames(5);
+expect(calls).toBe(5);
 ```
-
-Label queries ([scene-queries](../scene-queries)) reach nodes as well. Both are fine; use whichever
-reads better in the test, and note that a `ref` also exercises the `ref` prop itself.
-
-A `ref` only reaches an element you wrote. Nodes a component builds for you — a split text's
-characters, for instance — are reached through that component's own API, or by querying the scene,
-which needs the node to carry a `label`.
 
 ## When to use
 
@@ -82,32 +87,4 @@ which needs the node to carry a `label`.
 - You need to inspect the rendered scene graph
 - You want to query children by label with `getByLabel` / `queryByLabel`
 
-For testing stores or hooks that don't render a scene, use [`renderHook`](../render-hook) instead.
-
-## With context (onTick, onResize, etc.)
-
-Wrap your component in `createTestContext().Provider` to provide a mock ticker (stopped, manually
-controlled), renderer, and app context:
-
-```tsx
-import { mountScene, createTestContext } from "pixi-solid/testing";
-import { Container, Sprite, onTick } from "pixi-solid";
-
-const ctx = createTestContext();
-let calls = 0;
-
-mountScene(() => (
-  <ctx.Provider>
-    <Container>
-      {onTick(() => {
-        calls++;
-      })}
-      <Sprite x={100} />
-    </Container>
-  </ctx.Provider>
-));
-
-// Advance frames with the manual ticker
-ctx.ticker.fastForwardFrames(5);
-expect(calls).toBe(5);
-```
+For testing stores or hooks that do not render a scene, use [`renderHook`](../render-hook) instead.

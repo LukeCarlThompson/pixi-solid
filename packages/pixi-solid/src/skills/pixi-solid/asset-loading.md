@@ -1,35 +1,72 @@
 ---
 name: asset-loading
-description: Patterns for loading PixiJS assets for pixi-solid components. Covers createResource, manifests, bundles, and scene-gated rendering.
+description: Patterns for loading PixiJS assets for pixi-solid components. Covers async memos, manifests, bundles, and scene-gated rendering.
 ---
 
 # Loading assets for pixi-solid
 
-PixiJS `Assets` and SolidJS `createResource` are not exported by `pixi-solid`. Use PixiJS to load resources, then pass them to pixi-solid components. Neither component cleanup nor disposing a Solid resource unloads assets from PixiJS's shared cache.
+PixiJS `Assets` is not exported by `pixi-solid`. Use PixiJS to load resources, then pass them to pixi-solid components. Neither component cleanup nor discarding a loading computation unloads assets from PixiJS's shared cache.
 
 ## Load one asset
 
-Use a Solid resource to gate mounting until texture is ready. Mount this component under `PixiCanvas` or another application provider:
+Async is "any computation that returns a Promise": return one from `createMemo` and read it inside a `<Loading>` boundary, which renders its `fallback` until the read settles. Mount this component under `PixiCanvas` or another application provider:
 
 ```tsx
-import { createResource, Show } from "solid-js";
+import { createMemo, Loading } from "solid-js";
 import { Assets, Texture } from "pixi.js";
-import { Sprite } from "pixi-solid";
+import { Sprite, Text } from "pixi-solid";
 
 function HeroScene() {
-  const [texture] = createResource(() => Assets.load<Texture>("/images/hero.png"));
+  const texture = createMemo(() => Assets.load<Texture>("/images/hero.png"));
 
   return (
-    <Show when={texture()}>{(loadedTexture) => <HeroSprite texture={loadedTexture()} />}</Show>
+    <Loading fallback={<Text text="Loading…" />}>
+      <Sprite label="hero" texture={texture()} />
+    </Loading>
   );
-}
-
-function HeroSprite(props: { texture: Texture }) {
-  return <Sprite texture={props.texture} />;
 }
 ```
 
-`Assets.load()` does not require `Assets.init()` for a direct URL. Keep the loading boundary at the route or scene level: load its resources together, then render display components with loaded values. Avoid adding separate resources and loading gates to every `Sprite`. A failed load is available through the resource's `error` accessor; add an error or loading state if your UI needs one.
+`Assets.load()` does not require `Assets.init()` for a direct URL. Keep the loading boundary at the route or scene level: load its resources together, then render display components with loaded values. Avoid adding a separate boundary to every `Sprite`. Async errors flow to an `<Errored>` boundary instead of an inline `resource.error`.
+
+### How `<Loading>` behaves
+
+`<Loading>` renders its `fallback` while a read inside its subtree is pending. While it waits, the children are **not** constructed: the pending read throws, the boundary discards that attempt, and the children are built once when the read settles. No half-built Pixi objects survive.
+
+`fallback` is optional. Without one, the boundary renders nothing while pending, which makes `<Loading>` a direct replacement for the old `Show when={undefined}` pattern.
+
+Inside a Pixi tree the `fallback` must be a Pixi element, or nothing at all. A DOM element such as `<div>` is not a Pixi object, so pixi-solid rejects it as a child and the error halts reactivity. Keep a DOM fallback outside `PixiCanvas`, where it is a sibling of the canvas rather than a child of the scene:
+
+```tsx
+// DOM fallback: the boundary wraps the canvas.
+<Loading fallback={<div>Loading…</div>}>
+  <Show when={assetsReady()}>
+    <PixiCanvas>
+      <Scene />
+    </PixiCanvas>
+  </Show>
+</Loading>
+
+// Pixi fallback: the boundary lives inside the scene.
+<Loading fallback={<Text text="Loading…" />}>
+  <Sprite texture={texture()} />
+</Loading>
+```
+
+The boundary covers its **whole subtree** and catches a pending read from any descendant. Place it around the smallest subtree that should wait, and never wrap a subtree that belongs to your caller. A provider or wrapper whose children are the caller's should gate its own computation narrowly instead:
+
+```tsx
+import { createMemo, Show } from "solid-js";
+
+// `loadingValue` supplies the value to read while the computation is pending, so the read
+// returns that value instead of suspending. `Show` then gates only this computation.
+const app = createMemo<Pixi.Application | undefined>(
+  async (): Promise<Pixi.Application> => createApp(),
+  { loadingValue: undefined },
+);
+
+return <Show when={app()}>{(resolvedApp) => <Contents app={resolvedApp} />}</Show>;
+```
 
 ## Load scene bundles
 
@@ -42,9 +79,9 @@ Avoid mixing asset loading logic inside render-heavy Pixi components. Prefer to:
 - Keep scene components focused on display and interaction logic.
 
 ```tsx
-import { createResource, Show } from "solid-js";
+import { createMemo, Loading, Show } from "solid-js";
 import { Assets, Texture } from "pixi.js";
-import { PixiCanvas, Sprite } from "pixi-solid";
+import { PixiCanvas, Sprite, Text } from "pixi-solid";
 
 const manifest = {
   bundles: [
@@ -56,30 +93,34 @@ const manifest = {
 };
 
 function App() {
-  const [initialized] = createResource(async () => {
+  const initialized = createMemo(async () => {
     await Assets.init({ manifest });
     return true;
   });
 
   return (
-    <Show when={initialized()}>
-      <PixiCanvas style={{ width: "100%", height: "100vh" }}>
-        <MenuRoute />
-      </PixiCanvas>
-    </Show>
+    <Loading fallback={<Text text="Loading…" />}>
+      <Show when={initialized()}>
+        <PixiCanvas style={{ width: "100%", height: "100vh" }}>
+          <MenuRoute />
+        </PixiCanvas>
+      </Show>
+    </Loading>
   );
 }
 
 function MenuRoute() {
-  const [ready] = createResource(async () => {
+  const ready = createMemo(async () => {
     await Assets.loadBundle("menu");
     return true;
   });
 
   return (
-    <Show when={ready()}>
-      <MenuScene />
-    </Show>
+    <Loading fallback={<Text text="Loading…" />}>
+      <Show when={ready()}>
+        <MenuScene />
+      </Show>
+    </Loading>
   );
 }
 
@@ -88,7 +129,9 @@ function MenuScene() {
 }
 ```
 
-`Assets.init()` resolves to `void`; `Assets.loadBundle()` resolves to loaded resources. Returning `true` makes each resource truthy for `<Show>` after loading.
+`Assets.init()` resolves to `void` and `Assets.loadBundle()` resolves to the loaded resources. Returning `true` gives `<Show>` a truthy value to render on. The pending read inside `<Loading>` shows the fallback until the memo settles.
+
+A manifest is a gate: the load resolves to `void`, the scene does not enumerate its contents, and each component reads the alias it needs. When a scene needs only a few known assets, return them from the memo and read them directly instead. The read then both waits for the load and supplies the value, so no `<Show>` is needed.
 
 ## Cache keys and ownership
 

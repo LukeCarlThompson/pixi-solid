@@ -1,8 +1,8 @@
+import type { JSX } from "@solidjs/web";
 import { Container, Graphics, PixiCanvas, usePixiScreen } from "pixi-solid";
 import type { ObjectFitMode, ObjectPosition } from "pixi-solid/utils";
 import { ObjectFitContainer } from "pixi-solid/utils";
 import { Rectangle } from "pixi.js";
-import type { JSX } from "solid-js";
 import { createSignal } from "solid-js";
 
 const fitModes: ObjectFitMode[] = ["contain", "cover", "fill", "scale-down", "none"];
@@ -65,7 +65,7 @@ const DemoComponent = (props: {
   );
 };
 
-export const DemoApp = (): JSX.Element => {
+export const Demo = (): JSX.Element => {
   const [fitMode, setFitMode] = createSignal<ObjectFitMode>(fitModes[0]);
   const [objectPosition, setObjectPosition] = createSignal<ObjectPositionPreset>(positions[0]);
   const [angle, setAngle] = createSignal(10);

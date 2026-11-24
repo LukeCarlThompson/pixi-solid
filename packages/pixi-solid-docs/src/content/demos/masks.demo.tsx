@@ -2,15 +2,15 @@ import { Container, Graphics, PixiCanvas, Sprite, usePixiScreen } from "pixi-sol
 import { ObjectFitContainer } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { createResource, onCleanup, Show } from "solid-js";
+import { createMemo, Loading, onCleanup } from "solid-js";
 
 import skyAssetUrl from "@/assets/sky.png";
 
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
-  const [textureResource] = createResource(() =>
-    Assets.load<Pixi.Texture>([{ alias: "sky", src: skyAssetUrl }]),
-  );
+  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
+  // suspends, so the enclosing `<Loading>` holds the scene until the texture arrives.
+  const skyTexture = createMemo(() => Assets.load<Pixi.Texture>(skyAssetUrl));
 
   let graphicsRef: Pixi.Graphics | undefined;
 
@@ -25,7 +25,7 @@ const DemoComponent = () => {
   });
 
   return (
-    <Show when={textureResource()}>
+    <Loading>
       <Container onglobalpointermove={handlePointerMove} eventMode="static">
         <Graphics
           ref={(instance) => {
@@ -34,10 +34,10 @@ const DemoComponent = () => {
           }}
         />
         <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode="cover">
-          <Sprite label="sky" texture={Assets.get<Pixi.Texture>("sky")} mask={graphicsRef} />
+          <Sprite label="sky" texture={skyTexture()} mask={graphicsRef} />
         </ObjectFitContainer>
       </Container>
-    </Show>
+    </Loading>
   );
 };
 

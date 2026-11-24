@@ -1,6 +1,6 @@
 import { Sprite as PixiSprite, Texture } from "pixi.js";
 import type * as Pixi from "pixi.js";
-import { ErrorBoundary, Show, createSignal } from "solid-js";
+import { Errored, Show, createSignal, flush } from "solid-js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Sprite } from "./components";
@@ -52,8 +52,8 @@ describe("PixiCanvas stage binding cleanup", () => {
     });
 
     // WHEN: the canvas subtree unmounts while the provider survives.
-    // The Show disposal is synchronous — no wait needed.
     setShow(false);
+    flush();
 
     // THEN: the scene must be detached from the shared stage…
     expect(ctx.app.stage.children).toEqual([]);
@@ -63,6 +63,7 @@ describe("PixiCanvas stage binding cleanup", () => {
     // AND: remounting must not stack a second copy. The remount goes through
     // the async provider resource again, so wait for the scene to re-mount.
     setShow(true);
+    flush();
     await vi.waitFor(() => {
       expect(ctx.app.stage.children).toEqual([rawSprite]);
     });
@@ -103,8 +104,8 @@ describe("PixiCanvas stage binding cleanup", () => {
     });
 
     // WHEN: the canvas subtree unmounts while the provider survives.
-    // The Show disposal is synchronous — no wait needed.
     setShow(false);
+    flush();
 
     // THEN: owned children are destroyed by their own component cleanups
     // and the stage no longer holds them
@@ -146,8 +147,8 @@ describe("PixiCanvas stage binding cleanup", () => {
     });
 
     // WHEN: the canvas subtree unmounts while the provider survives.
-    // The Show disposal is synchronous — no wait needed.
     setShow(false);
+    flush();
 
     // THEN: the raw sprite must be detached from the shared stage…
     expect(ctx.app.stage.children).toEqual([]);
@@ -157,6 +158,7 @@ describe("PixiCanvas stage binding cleanup", () => {
 
     // AND: remounting must not stack a second copy on top of the first
     setShow(true);
+    flush();
     await vi.waitFor(() => {
       expect(ctx.app.stage.children.length).toBe(1);
     });
@@ -173,9 +175,9 @@ describe("PixiCanvas application ownership", () => {
 
     const { dispose } = mountScene(() => (
       <PixiApplicationProvider existingApp={ctx.app}>
-        <ErrorBoundary
+        <Errored
           fallback={(error) => {
-            duplicateCanvasError = error;
+            duplicateCanvasError = error();
             return <Sprite texture={Texture.WHITE} />;
           }}
         >
@@ -185,7 +187,7 @@ describe("PixiCanvas application ownership", () => {
           <PixiCanvas>
             <Sprite texture={Texture.WHITE} />
           </PixiCanvas>
-        </ErrorBoundary>
+        </Errored>
       </PixiApplicationProvider>
     ));
 
@@ -265,8 +267,7 @@ describe("PixiCanvas wrapper props", () => {
           ref={(element) => {
             wrapper = element;
           }}
-          class={className()}
-          classList={{ active: active() }}
+          class={[className(), { active: active() }]}
           style={{ width: `${width()}px` }}
         >
           <Sprite texture={Texture.WHITE} />
@@ -277,8 +278,11 @@ describe("PixiCanvas wrapper props", () => {
     await vi.waitFor(() => expect(wrapper?.className).toBe("initial"));
 
     setClassName("updated");
+    flush();
     setActive(true);
+    flush();
     setWidth(240);
+    flush();
 
     expect(wrapper?.classList.contains("updated")).toBe(true);
     expect(wrapper?.classList.contains("active")).toBe(true);

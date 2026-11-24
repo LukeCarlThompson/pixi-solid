@@ -1,21 +1,20 @@
 import { NineSliceSprite, onTick, PixiCanvas, usePixiScreen } from "pixi-solid";
 import type * as Pixi from "pixi.js";
 import { Assets } from "pixi.js";
-import { createResource, Show } from "solid-js";
+import { createMemo, Loading } from "solid-js";
 
 import assetUrl from "@/assets/nine-slice.png";
 
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
-  // Create a resource to load the nine slice texture
-  const [textureResource] = createResource(() =>
-    Assets.load<Pixi.Texture>({ alias: "nine-slice", src: assetUrl }),
-  );
+  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
+  // suspends, so the enclosing `<Loading>` holds the scene until the texture arrives.
+  const texture = createMemo(() => Assets.load<Pixi.Texture>(assetUrl));
 
   return (
-    <Show when={textureResource()}>
+    <Loading>
       <NineSliceSprite
-        texture={Assets.get("nine-slice")}
+        texture={texture()}
         // Add in the boundaries for scaling
         leftWidth={90}
         rightWidth={90}
@@ -38,7 +37,7 @@ const DemoComponent = () => {
           });
         }}
       />
-    </Show>
+    </Loading>
   );
 };
 

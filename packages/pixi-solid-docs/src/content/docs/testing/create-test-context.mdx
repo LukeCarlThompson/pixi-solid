@@ -5,22 +5,28 @@ sidebar:
   order: 4
 ---
 
-Creates mock PixiJS instances and a context provider. Returns `{ Provider, ticker, renderer, app, renderHook }`.
+Creates mock PixiJS instances and a context provider. Returns `{ Provider, ticker, renderer, app, mount, renderHook }`.
 
-| Property     | Type                             | Purpose                                                                             |
-| ------------ | -------------------------------- | ----------------------------------------------------------------------------------- |
-| `Provider`   | Component                        | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext`      |
-| `ticker`     | `ManualTicker`                   | Advance frames with `await fastForwardFrames()` or `await fastForwardTime()`        |
-| `renderer`   | `TestRenderer`                   | Simulate resize events with `emitResize()`                                          |
-| `app`        | `Pixi.Application`               | Minimal stub for hooks that call `getPixiApp()`                                     |
-| `renderHook` | `(callback) => RenderHookResult` | `renderHook(callback, { wrapper: Provider })` — runs hooks inside the mock contexts |
+| Property     | Type                             | Purpose                                                                              |
+| ------------ | -------------------------------- | ------------------------------------------------------------------------------------ |
+| `Provider`   | Component                        | Wraps children in mock `PixiAppContext`, `TickerContext`, `ScreenStoreContext`       |
+| `ticker`     | `ManualTicker`                   | Advance frames with `await fastForwardFrames()` or `await fastForwardTime()`         |
+| `renderer`   | `TestRenderer`                   | Simulate resize events with `emitResize()`                                           |
+| `app`        | `Pixi.Application`               | Minimal stub for hooks that call `getPixiApp()`                                      |
+| `mount`      | `(setup) => MountSceneResult`    | `mountScene(setup, { wrapper: Provider })` — mounts a scene inside the mock contexts |
+| `renderHook` | `(callback) => RenderHookResult` | `renderHook(callback, { wrapper: Provider })` — runs hooks inside the mock contexts  |
 
 ## Simulating resize
 
+`emitResize()` updates the mock screen and fires the renderer's listeners. Solid batches the resulting reactive writes, so call `flush()` before asserting:
+
 ```tsx
+import { flush } from "solid-js";
+
 ctx.renderer.emitResize({ width: 1024 });
+flush();
+
 ctx.renderer.emitResize();
-ctx.renderer.emitResize({ width: 1024, height: 768, x: 0, y: 0 });
 ```
 
 ## Spying on mocks

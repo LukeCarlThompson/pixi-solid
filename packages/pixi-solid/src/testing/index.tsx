@@ -1,5 +1,10 @@
 export { mountScene, renderHook, cleanup } from "./test-root";
-export type { MountSceneResult, RenderHookResult, RenderHookOptions } from "./test-root";
+export type {
+  MountSceneOptions,
+  MountSceneResult,
+  RenderHookResult,
+  RenderHookOptions,
+} from "./test-root";
 export { queryByLabel, getByLabel, getAllByLabel } from "./query-by-label";
 export { createManualTicker } from "./manual-ticker";
 export type { ManualTicker } from "./manual-ticker";

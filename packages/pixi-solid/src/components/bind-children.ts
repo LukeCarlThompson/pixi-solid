@@ -1,6 +1,7 @@
+import type { JSX } from "@solidjs/web";
 import type * as Pixi from "pixi.js";
 import { children as resolveChildren, createRenderEffect, onCleanup } from "solid-js";
-import type { JSX } from "solid-js";
+import type { Accessor } from "solid-js";
 
 export class InvalidChildTypeError extends Error {
   constructor(cause: Error) {
@@ -12,93 +13,75 @@ export class InvalidChildTypeError extends Error {
   }
 }
 
-export const bindChildrenToContainer = (parent: Pixi.Container, children?: JSX.Element): void => {
-  const resolvedChildren = resolveChildren(() => children);
+const getPixiChildren = (resolvedChildren: ReturnType<typeof resolveChildren>) =>
+  resolvedChildren.toArray().filter(Boolean) as unknown as Pixi.Container[];
 
-  const canAddChild = "addChildAt" in parent;
+export const bindChildrenToContainer = (
+  parent: Pixi.Container,
+  children: Accessor<JSX.Element> = () => undefined,
+): void => {
+  const resolvedChildren = resolveChildren(children);
 
-  if (!canAddChild) {
+  if (!("addChildAt" in parent)) {
     throw new Error("Parent does not support children.");
   }
 
   onCleanup(() => {
-    const boundChildren = resolvedChildren.toArray().filter(Boolean) as unknown as Pixi.Container[];
+    const boundChildren = getPixiChildren(resolvedChildren);
 
-    // Detach (do not destroy) the children this binding added. The owning
-    // pixi-solid components are responsible for destroying themselves; this
-    // only un-binds them from the parent so a surviving parent (e.g. the app
-    // stage behind a removed PixiCanvas) does not keep rendering orphans.
-    for (let i = 0; i < boundChildren.length; i += 1) {
-      parent.removeChild?.(boundChildren[i]);
+    // Detach, but do not destroy, children added by this binding. The owning
+    // pixi-solid components are responsible for destroying themselves.
+    for (const child of boundChildren) {
+      parent.removeChild?.(child);
     }
   });
 
-  createRenderEffect((prevChildren: Pixi.Container[] | undefined) => {
-    const nextChildren = resolvedChildren.toArray().filter(Boolean) as unknown as Pixi.Container[];
-
-    try {
-      if (prevChildren) {
-        for (let i = 0; i < prevChildren.length; i += 1) {
-          const child = prevChildren[i];
-          if (nextChildren.includes(child)) continue;
-
-          parent.removeChild?.(child);
+  createRenderEffect(
+    () => getPixiChildren(resolvedChildren),
+    (nextChildren, previousChildren = []) => {
+      try {
+        for (const child of previousChildren) {
+          if (!nextChildren.includes(child)) parent.removeChild?.(child);
         }
-      }
 
-      for (let i = 0; i < nextChildren.length; i += 1) {
-        parent.addChildAt(nextChildren[i], i);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new InvalidChildTypeError(error);
-      } else {
+        for (let index = 0; index < nextChildren.length; index += 1) {
+          parent.addChildAt(nextChildren[index], index);
+        }
+      } catch (error) {
+        if (error instanceof Error) throw new InvalidChildTypeError(error);
         throw error;
       }
-    }
-
-    return nextChildren;
-  });
+    },
+  );
 };
 
 export const bindChildrenToRenderLayer = (
   parent: Pixi.RenderLayer,
-  children?: JSX.Element,
+  children: Accessor<JSX.Element> = () => undefined,
 ): void => {
-  const resolvedChildren = resolveChildren(() => children);
+  const resolvedChildren = resolveChildren(children);
 
   onCleanup(() => {
-    const nextChildren = resolvedChildren.toArray().filter(Boolean) as unknown as Pixi.Container[];
-
-    for (let i = 0; i < nextChildren.length; i += 1) {
-      parent.detach(nextChildren[i]);
+    for (const child of getPixiChildren(resolvedChildren)) {
+      parent.detach(child);
     }
   });
 
-  createRenderEffect((prevChildren: Pixi.Container[] | undefined) => {
-    const nextChildren = resolvedChildren.toArray().filter(Boolean) as unknown as Pixi.Container[];
-
-    try {
-      if (prevChildren) {
-        for (let i = 0; i < prevChildren.length; i += 1) {
-          const child = prevChildren[i];
-          if (nextChildren.includes(child)) continue;
-
-          parent.detach(child);
+  createRenderEffect(
+    () => getPixiChildren(resolvedChildren),
+    (nextChildren, previousChildren = []) => {
+      try {
+        for (const child of previousChildren) {
+          if (!nextChildren.includes(child)) parent.detach(child);
         }
-      }
 
-      for (let i = 0; i < nextChildren.length; i += 1) {
-        parent.attach(nextChildren[i]);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new InvalidChildTypeError(error);
-      } else {
+        for (const child of nextChildren) {
+          parent.attach(child);
+        }
+      } catch (error) {
+        if (error instanceof Error) throw new InvalidChildTypeError(error);
         throw error;
       }
-    }
-
-    return nextChildren;
-  });
+    },
+  );
 };

@@ -1,5 +1,5 @@
 import type * as Pixi from "pixi.js";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import { mountScene } from "../testing";
@@ -73,6 +73,7 @@ describe("BitmapText style prop updates", () => {
 
     // WHEN: The style signal changes to a new object
     setStyle({ fontSize: 48, fill: 0x00ff00 });
+    flush();
 
     // THEN: The instance style reflects the new values
     expect(bitmapTextRef.style.fontSize).toBe(48);
@@ -106,6 +107,7 @@ describe("BitmapText style prop updates", () => {
 
     // WHEN: The text signal changes
     setText("world");
+    flush();
 
     // THEN: The instance text updates
     expect(bitmapTextRef.text).toBe("world");
@@ -119,7 +121,6 @@ describe("BitmapText style prop updates", () => {
       text: "spread",
       style: { fontSize: 16, fill: 0x0000ff },
     });
-
     let bitmapTextRef: Pixi.BitmapText | undefined;
 
     // WHEN: Render a BitmapText with spread props from the signal
@@ -144,6 +145,7 @@ describe("BitmapText style prop updates", () => {
       text: "updated",
       style: { fontSize: 32, fill: 0xffffff },
     });
+    flush();
 
     // THEN: The instance reflects the new values
     expect(bitmapTextRef.text).toBe("updated");
@@ -178,6 +180,7 @@ describe("BitmapText style prop updates", () => {
 
     // WHEN: The fontSize signal changes
     setFontSize(48);
+    flush();
 
     // THEN: The instance style reflects the new value
     expect(bitmapTextRef.style.fontSize).toBe(48);
@@ -214,6 +217,7 @@ describe("BitmapText style prop updates", () => {
 
     // WHEN: The style signal changes to a new object
     setStyle({ fontSize: 48, fill: 0x00ff00 });
+    flush();
 
     // THEN: The instance style reflects the new values
     expect(textRef.style.fontSize).toBe(48);
@@ -326,6 +330,7 @@ describe("BitmapText user style pattern", () => {
     expect(ref.style.fontFamily).toBe("Cormorant");
 
     setCanAfford(false);
+    flush();
 
     expect(ref.text).toBe("NEED MORE COINS");
     expect(ref.style.fontSize).toBe(14);
@@ -333,6 +338,7 @@ describe("BitmapText user style pattern", () => {
     expect(ref.style.fontFamily).toBe("Cormorant");
 
     setCanAfford(true);
+    flush();
 
     expect(ref.text).toBe("BUY");
     expect(ref.style.fontSize).toBe(26);
@@ -400,7 +406,9 @@ describe("SplitText", () => {
     }
 
     setText("Updated");
+    flush();
     setStyle({ fontSize: 36, fill: 0xff0000 });
+    flush();
 
     expect(splitTextRef.text).toBe("Updated");
     expect(splitTextRef.style.fontSize).toBe(36);
@@ -481,7 +489,9 @@ describe("SplitBitmapText", () => {
     }
 
     setText("Updated");
+    flush();
     setStyle({ fontSize: 36, fill: 0xff0000 });
+    flush();
 
     expect(splitBitmapTextRef.text).toBe("Updated");
     expect(splitBitmapTextRef.style.fontSize).toBe(36);

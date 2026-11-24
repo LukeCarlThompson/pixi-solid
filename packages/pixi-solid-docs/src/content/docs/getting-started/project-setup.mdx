@@ -7,16 +7,15 @@ sidebar:
 
 ### Creating a new project
 
-To use `pixi-solid` you'll need to have a SolidJS project set up.
-If you don't have one yet, you can create a new SolidJS project using the following command:
+To use `pixi-solid` you need a SolidJS project. If you do not have one yet, create one with:
 
 ```bash
 npm init solid@latest
 ```
 
-This will create a new SolidJS project in a directory of your choice.
+This creates a new SolidJS project in a directory of your choice.
 
-Next, install `pixi-solid` along with its peer dependency `pixi.js` in the new project you just created:
+Next, install `pixi-solid` along with its peer dependency `pixi.js` in the project you created:
 
 ```bash
 npm i pixi-solid pixi.js
@@ -24,12 +23,15 @@ npm i pixi-solid pixi.js
 
 ### Existing project
 
-If you already have a project setup you'll need to make sure that you also have `pixi.js` and `solid-js` installed.
-Then you can just install `pixi-solid`.
+If you already have a project, make sure that `pixi.js` and `solid-js` are installed. Then install `pixi-solid`:
 
 ```bash
 npm i pixi-solid
 ```
+
+#### Compiler setup
+
+`pixi-solid` uses `@solidjs/web` as its JSX renderer. Point your JSX compiler at it with `"jsxImportSource": "@solidjs/web"` in `tsconfig.json`, and use `@solidjs/vite-plugin` in your Vite config.
 
 ### LLM skill
 

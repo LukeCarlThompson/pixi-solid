@@ -315,6 +315,11 @@ Target `main` for the stable line. Target a release line, such as `release/v2`, 
 On `main`, every PR bumps the version. On a prerelease line, only the release PR bumps it, because a
 merge publishes the version it finds.
 
+Target `main` for the stable line. Target a release line, such as `release/v2`, for a prerelease.
+
+On `main`, every PR bumps the version. On a prerelease line, only the release PR bumps it, because a
+merge publishes the version it finds.
+
 Follow semantic versioning: `MAJOR.MINOR.PATCH`.
 
 - Bug fix → patch bump

@@ -5,15 +5,15 @@ description: A SolidJS component that renders a PixiJS MeshPlane.
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/mesh-plane.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
-A SolidJS component that renders a PixiJS HTMLText.
+A SolidJS component that renders a PixiJS `MeshPlane`.
 
 Please see the [PixiJS docs](https://pixijs.download/release/docs/scene.MeshPlane.html) for detailed information.
 
 ### Demo
 
-<ClientOnly fileName="mesh-plane" client:load />
+<DemoMount name="mesh-plane" />
 
 ### Code example
 

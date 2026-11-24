@@ -6,7 +6,7 @@ sidebar:
 ---
 
 The `getRenderer` hook provides a way to access the root `Pixi.Renderer` instance created by the `PixiApplicationProvider` or `PixiCanvas` component.
-This is useful when you need to interact directly with the Pixi.js renderer, for example, to access renderer properties or perform low-level rendering operations.
+This is useful when you need to interact directly with the PixiJS renderer, for example, to access renderer properties or perform low-level rendering operations.
 
 ### Usage
 
@@ -19,7 +19,7 @@ import { getRenderer, Container, PixiCanvas } from "pixi-solid";
 const MyComponent = () => {
   const renderer = getRenderer();
 
-  // You can now safely use the Pixi.js Renderer instance
+  // You can now safely use the PixiJS Renderer instance
   console.log("Renderer resolution:", renderer.resolution);
   console.log("Renderer view size:", renderer.width, renderer.height);
 

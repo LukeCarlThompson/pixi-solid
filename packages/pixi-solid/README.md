@@ -15,7 +15,7 @@ A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your sce
 - 📦 **Full component coverage** — Every major PixiJS display object has a corresponding component.
 - ⚡ **Signals-driven reactivity** — State changes automatically update your scene.
 - 🧹 **Automatic cleanup** — Components destroy Pixi instances they own and remove subscriptions on unmount. Instances passed through `as` and shared textures/assets remain caller-owned.
-- 🧪 **Testable without a browser** — Context, hooks, and ticker are built for simulation. `pixi-solid/testing` provides mountScene, scene graph queries, and manual ticker helpers.
+- 🧪 **Testable without a browser** — The context, hooks, and ticker support simulation. `pixi-solid/testing` provides mountScene, scene graph queries, and manual ticker helpers.
 - ✨ **All PixiJS events supported** — Every federated event from PixiJS works as a component prop.
 - 🛠️ **Utilities included** — Animation helpers (spring, smooth damp), layout (object-fit), and async timing. Available via `pixi-solid/utils`.
 - 🤩 **Full TypeScript support** — Strict type safety and auto completion throughout the API.
@@ -26,14 +26,19 @@ A custom renderer for [PixiJS](https://pixijs.com/) that lets you build your sce
 npm i pixi-solid
 ```
 
-Peer dependencies of
+The 2.0 line requires SolidJS 2, as the peer dependencies below show.
+
+Peer dependencies:
 
 ```json
 {
   "pixi.js": ">=8.14.3 <9",
-  "solid-js": ">=1.9.10 <2"
+  "@solidjs/web": ">=2.0.0 <3",
+  "solid-js": ">=2.0.0 <3"
 }
 ```
+
+pixi-solid 2.x targets **SolidJS 2**, which splits the core (`solid-js`) from the web renderer (`@solidjs/web`). Point your JSX compiler at the renderer with `"jsxImportSource": "@solidjs/web"` in `tsconfig.json`, and use `@solidjs/vite-plugin` in your Vite config. The 1.x line remains available for SolidJS 1 projects.
 
 ## Basic usage
 
@@ -76,7 +81,7 @@ export const DemoApp = () => {
 
 **Shared reactivity.** Signals and stores drive both canvas content and HTML UI from the same state. No bridging layer or two-way sync required.
 
-**Unified timing.** Animations, frame callbacks, and sprite updates all synchronise to the same ticker context. No timing drift between `onTick`, `useSpring`, or `AnimatedSprite`.
+**Unified timing.** Animations, frame callbacks, and sprite updates all synchronize to the same ticker context. No timing drift between `onTick`, `useSpring`, or `AnimatedSprite`.
 
 **HTML + canvas side by side.** Use HTML elements alongside or on top of your PixiJS canvas to create rich user interfaces that combine the strengths of both technologies.
 

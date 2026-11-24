@@ -10,11 +10,9 @@ import { PixiAppContext } from "./context";
  * @returns The Pixi.Renderer instance.
  */
 export const getRenderer = (): Pixi.Renderer => {
-  const appContext = useContext(PixiAppContext);
-
-  if (!appContext) {
+  try {
+    return useContext(PixiAppContext).renderer;
+  } catch {
     throw new Error("getRenderer must be used within a PixiApplicationProvider or a PixiCanvas");
   }
-
-  return appContext.renderer;
 };

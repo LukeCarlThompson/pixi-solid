@@ -5,7 +5,7 @@ description: An example of mixing HTML and PixiJS together.
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/html-and-pixi.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 This example demonstrates how to combine HTML elements with pixi-solid components and share state between them.
 
@@ -13,7 +13,7 @@ HTML input controls update SolidJS signals, which then reactively update pixi-so
 
 ### Demo
 
-<ClientOnly fileName="html-and-pixi" client:load />
+<DemoMount name="html-and-pixi" />
 
 ### Code example
 

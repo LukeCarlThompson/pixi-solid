@@ -1,6 +1,6 @@
 import type * as Pixi from "pixi.js";
 import { Container as PixiContainer } from "pixi.js";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { mountScene } from "../testing";
@@ -28,12 +28,12 @@ describe("Component factory constructor options", () => {
     const TestComponent = createContainerComponent<MutatingContainer, { marker?: string }>(
       MutatingContainer,
     );
-    const [props] = createSignal<{ marker?: string }>({});
+    const [propsSignal] = createSignal<{ marker?: string }>({});
     let instance: MutatingContainer | undefined;
 
     const { dispose } = mountScene(() => (
       <TestComponent
-        {...props()}
+        {...propsSignal()}
         ref={(value) => {
           instance = value;
         }}
@@ -53,7 +53,6 @@ describe("Component factory spread props", () => {
       y: 20,
       skewY: 0.5,
     });
-
     let containerRef: Pixi.Container | undefined;
 
     const { dispose } = mountScene(() => (
@@ -80,6 +79,7 @@ describe("Component factory spread props", () => {
       skewY: 2,
       scaleX: 2,
     }));
+    flush();
 
     expect(containerRef.scale.x).toBe(2);
     expect(containerRef.skew.y).toBe(2);
@@ -96,7 +96,6 @@ describe("Component factory spread props", () => {
       alpha: 0.8,
       visible: true,
     });
-
     let containerRef: Pixi.Container | undefined;
 
     const { dispose } = mountScene(() => (
@@ -117,6 +116,7 @@ describe("Component factory spread props", () => {
     expect(containerRef.visible).toBe(true);
 
     setPropsSignal(() => ({ x: 20 }));
+    flush();
 
     expect(containerRef.x).toBe(20);
     expect(containerRef.alpha).toBe(0.8);
@@ -132,7 +132,6 @@ describe("Component factory spread props", () => {
       alpha: 1,
       rotation: 0,
     });
-
     let containerRef: Pixi.Container | undefined;
 
     const { dispose } = mountScene(() => (
@@ -155,6 +154,7 @@ describe("Component factory spread props", () => {
       x: 100,
       alpha: 0.5,
     }));
+    flush();
 
     expect(containerRef.x).toBe(100);
     expect(containerRef.alpha).toBe(0.5);
@@ -169,7 +169,6 @@ describe("Component factory spread props", () => {
       x: 10,
       y: 20,
     });
-
     let containerRef: Pixi.Container | undefined;
 
     const { dispose } = mountScene(() => (
@@ -189,11 +188,13 @@ describe("Component factory spread props", () => {
     expect(containerRef.y).toBe(20);
 
     setPropsSignal(() => ({ x: 50, y: 20 }));
+    flush();
 
     expect(containerRef.x).toBe(50);
     expect(containerRef.y).toBe(20);
 
     setPropsSignal(() => ({ x: 50, y: 100 }));
+    flush();
 
     expect(containerRef.x).toBe(50);
     expect(containerRef.y).toBe(100);
@@ -207,7 +208,6 @@ describe("Component factory spread props", () => {
     const [propsSignal, setPropsSignal] = createSignal<PixiComponentProps>({
       onclick: handler1,
     });
-
     let containerRef: Pixi.Container | undefined;
 
     const { dispose } = mountScene(() => (
@@ -228,6 +228,7 @@ describe("Component factory spread props", () => {
     expect(handler2).not.toHaveBeenCalled();
 
     setPropsSignal(() => ({ onclick: handler2 }));
+    flush();
 
     containerRef.emit("click", {} as Pixi.FederatedPointerEvent);
     expect(handler1).toHaveBeenCalledTimes(1);

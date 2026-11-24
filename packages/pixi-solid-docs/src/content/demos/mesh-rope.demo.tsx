@@ -2,16 +2,15 @@ import { MeshRope, onTick, PixiCanvas, usePixiScreen } from "pixi-solid";
 import { objectFit } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets, Point } from "pixi.js";
-import { createResource, Show } from "solid-js";
+import { createMemo, Loading } from "solid-js";
 
 import assetUrl from "@/assets/eel.png";
 
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
-  // Create a resource to load the eel texture
-  const [textureResource] = createResource(() =>
-    Assets.load<Pixi.Texture>({ alias: "eel", src: assetUrl }),
-  );
+  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
+  // suspends, so the enclosing `<Loading>` holds the scene until the texture arrives.
+  const texture = createMemo(() => Assets.load<Pixi.Texture>(assetUrl));
 
   // Create the points we will use for our mesh
   const points: Point[] = [];
@@ -20,9 +19,9 @@ const DemoComponent = () => {
   }
 
   return (
-    <Show when={textureResource()}>
+    <Loading>
       <MeshRope
-        texture={Assets.get("eel")}
+        texture={texture()}
         points={points}
         ref={(mesh) => {
           // Position the mesh contained in the center of the screen
@@ -41,7 +40,7 @@ const DemoComponent = () => {
           });
         }}
       />
-    </Show>
+    </Loading>
   );
 };
 

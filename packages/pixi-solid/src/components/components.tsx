@@ -19,6 +19,7 @@ import {
   TilingSprite as PixiTilingSprite,
 } from "pixi.js";
 import type { Component } from "solid-js";
+import { createEffect, omit } from "solid-js";
 
 import type {
   AnimatedSpriteProps,
@@ -47,63 +48,62 @@ import {
   createTilingSpriteComponent,
 } from "./factories";
 
-/**
- * A SolidJS component that renders a `PIXI.AnimatedSprite`.
- */
 export const AnimatedSprite: Component<AnimatedSpriteProps> = createAnimatedSpriteComponent<
   PixiAnimatedSprite,
   Pixi.AnimatedSpriteOptions
 >(PixiAnimatedSprite);
-/**
- * A SolidJS component that renders a `PIXI.BitmapText`.
- */
 export const BitmapText: Component<BitmapTextProps> = createSpriteComponent<
   PixiBitmapText,
   Pixi.TextOptions
 >(PixiBitmapText);
-/**
- * A SolidJS component that renders a `PIXI.Container`.
- */
 export const Container: Component<ContainerProps> = createContainerComponent<
   PixiContainer,
   Pixi.ContainerOptions
 >(PixiContainer);
 /**
  * A SolidJS component that renders a `PIXI.Graphics`.
- * Use a ref to access the underlying instance and call its imperative
- * draw methods (e.g. `rect()`, `fill()`, `stroke()`).
+ *
+ * Use the `draw` prop for drawing, which re-runs when its reactive reads change.
+ * Use a ref to reach the instance for anything else, such as reading bounds.
  */
-export const Graphics: Component<GraphicsProps> = createLeafComponent<
-  PixiGraphics,
-  Pixi.GraphicsOptions
->(PixiGraphics);
-/**
- * A SolidJS component that renders a `PIXI.HTMLText`.
- */
+export const Graphics: Component<GraphicsProps> = (props) => {
+  // `draw` is consumed here rather than by the instance, so keep it out of the
+  // constructor options and out of the prop binding.
+  const instance = createLeafComponent<PixiGraphics, Pixi.GraphicsOptions>(PixiGraphics)(
+    omit(props, "draw") as GraphicsProps,
+  );
+
+  createEffect(
+    () => {
+      const draw = props.draw;
+
+      if (!draw) return;
+
+      // Clear first: the callback describes the whole content, so a re-run must
+      // replace the previous drawing instead of adding to it.
+      instance.clear();
+      draw(instance);
+    },
+    () => {},
+  );
+
+  return instance;
+};
 export const HTMLText: Component<HTMLTextProps> = createSpriteComponent<
   PixiHTMLText,
   Pixi.HTMLTextOptions
 >(PixiHTMLText);
 
-/**
- * A SolidJS component that renders a `PIXI.MeshPlane`.
- */
 export const MeshPlane: Component<MeshPlaneProps> = createLeafComponent<
   PixiMeshPlane,
   Pixi.MeshPlaneOptions
 >(PixiMeshPlane);
 
-/**
- * A SolidJS component that renders a `PIXI.MeshRope`.
- */
 export const MeshRope: Component<MeshRopeProps> = createLeafComponent<
   PixiMeshRope,
   Pixi.MeshRopeOptions
 >(PixiMeshRope);
 
-/**
- * A SolidJS component that renders a `PIXI.NineSliceSprite`.
- */
 export const NineSliceSprite: Component<NineSliceSpriteProps> = createSpriteComponent<
   PixiNineSliceSprite,
   Pixi.NineSliceSpriteOptions
@@ -119,63 +119,39 @@ export const ParticleContainer: Component<ParticleContainerProps> = createLeafCo
   Pixi.ParticleContainerOptions
 >(PixiParticleContainer);
 
-/**
- * A SolidJS component that renders a `PIXI.PerspectiveMesh`.
- */
 export const PerspectiveMesh: Component<PerspectiveMeshProps> = createLeafComponent<
   PixiPerspectiveMesh,
   Pixi.PerspectivePlaneOptions
 >(PixiPerspectiveMesh);
 
-/**
- * A SolidJS component that renders a `PIXI.RenderContainer`.
- */
 export const RenderContainer: Component<RenderContainerProps> = createContainerComponent<
   PixiRenderContainer,
   Pixi.RenderContainerOptions
 >(PixiRenderContainer);
 
-/**
- * A SolidJS component that renders a `PIXI.RenderLayer`.
- */
 export const RenderLayer: Component<RenderLayerProps> = createContainerComponent<
   PixiRenderLayer,
   Pixi.RenderLayerOptions
 >(PixiRenderLayer);
 
-/**
- * A SolidJS component that renders a `PIXI.Sprite`.
- */
 export const Sprite: Component<SpriteProps> = createSpriteComponent<PixiSprite, Pixi.SpriteOptions>(
   PixiSprite,
 );
 
-/**
- * A SolidJS component that renders a `PIXI.Text`.
- */
 export const Text: Component<TextProps> = createSpriteComponent<PixiText, Pixi.CanvasTextOptions>(
   PixiText,
 );
 
-/**
- * A SolidJS component that renders a `PIXI.SplitText`.
- */
 export const SplitText: Component<SplitTextProps> = createLeafComponent<
   PixiSplitText,
   Pixi.SplitTextOptions
 >(PixiSplitText);
 
-/**
- * A SolidJS component that renders a `PIXI.SplitBitmapText`.
- */
 export const SplitBitmapText: Component<SplitBitmapTextProps> = createLeafComponent<
   PixiSplitBitmapText,
   Pixi.SplitBitmapTextOptions
 >(PixiSplitBitmapText);
 
-/**
- * A SolidJS component that renders a `PIXI.TilingSprite`.
- */
 export const TilingSprite: Component<TilingSpriteProps> = createTilingSpriteComponent<
   PixiTilingSprite,
   Pixi.TilingSpriteOptions

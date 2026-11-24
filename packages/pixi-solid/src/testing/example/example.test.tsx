@@ -1,3 +1,4 @@
+import { flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import { TickerProvider } from "../../pixi-application";
@@ -21,6 +22,7 @@ describe("example test", () => {
     expect(clock().time).toBe(0);
 
     await manual.fastForwardFrames(3);
+    flush();
 
     expect(clock().time).toBe(48);
 
@@ -37,6 +39,7 @@ describe("example test", () => {
     expect(clock().time).toBe(0);
 
     await ctx.ticker.fastForwardFrames(3);
+    flush();
 
     expect(clock().time).toBe(48);
 

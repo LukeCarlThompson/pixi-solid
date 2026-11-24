@@ -1,7 +1,9 @@
+import type { JSX } from "@solidjs/web";
 import type * as Pixi from "pixi.js";
-import type { JSX } from "solid-js";
-import { createMemo, onCleanup, onMount, splitProps } from "solid-js";
+import type { Ref } from "solid-js";
+import { createMemo, omit, onCleanup, onSettled } from "solid-js";
 
+import { applyRef } from "./apply-ref";
 import { bindRuntimeProps } from "./components";
 import type { ContainerProps } from "./components/factories";
 import { getPixiApp, PixiApplicationProvider } from "./pixi-application";
@@ -9,31 +11,34 @@ import { getPixiApp, PixiApplicationProvider } from "./pixi-application";
 /**
  * Props for `PixiCanvas`.
  *
- * Accepts Pixi application initialization options, plus `class`, `classList`, `style`, and `ref`
- * for its internal wrapper. Other DOM attributes belong on a caller-owned parent element.
+ * Accepts Pixi application initialization options, plus Solid's `class`, `style`, and `ref`
+ * props for its internal wrapper. `class` accepts a `JSX.ClassValue`, so an object or array
+ * can be used in place of the Solid 1 `classList` prop. Other DOM attributes belong on a
+ * caller-owned parent element.
  */
 export type PixiCanvasProps = {
   children: JSX.Element;
-  class?: string;
-  classList?: JSX.HTMLAttributes<HTMLDivElement>["classList"];
-  ref?: (el: HTMLDivElement) => void;
+  class?: JSX.ClassValue;
+  ref?: Ref<HTMLDivElement>;
   style?: JSX.HTMLAttributes<HTMLDivElement>["style"];
 } & Partial<Omit<Pixi.ApplicationOptions, "children" | "resizeTo">>;
 
-type PixiCanvasWrapperProps = Pick<PixiCanvasProps, "class" | "classList" | "ref" | "style">;
+type PixiCanvasWrapperProps = Pick<PixiCanvasProps, "class" | "ref" | "style">;
+
+const WRAPPER_KEYS = new Set(["class", "ref", "style"]);
 
 const splitPixiCanvasProps = (props: PixiCanvasProps) => {
-  const [, wrapperProps, applicationOptions] = splitProps(
+  const applicationOptions = omit(props, "children", "class", "ref", "style");
+  const wrapperProps = omit(
     props,
-    ["children"],
-    ["class", "classList", "ref", "style"],
-  );
+    (key) => typeof key !== "string" || !WRAPPER_KEYS.has(key),
+  ) as PixiCanvasWrapperProps;
 
   return {
     applicationOptions: applicationOptions as Partial<
       Omit<Pixi.ApplicationOptions, "children" | "resizeTo">
     >,
-    wrapperProps: wrapperProps as PixiCanvasWrapperProps,
+    wrapperProps,
   };
 };
 
@@ -74,8 +79,6 @@ const InnerPixiCanvas = (props: {
     children: props.children,
   } as ContainerProps<Pixi.Container>);
 
-  let previousResizeTo: HTMLElement | Window;
-  let resizeObserver: ResizeObserver | undefined;
   const wrapperStyle = createMemo<JSX.HTMLAttributes<HTMLDivElement>["style"]>(() => {
     const style = props.wrapperProps?.style;
 
@@ -92,33 +95,30 @@ const InnerPixiCanvas = (props: {
     } as JSX.CSSProperties;
   });
 
-  onMount(() => {
+  onSettled(() => {
     if (!canvasWrapElement) return;
-    previousResizeTo = pixiApp.resizeTo;
-    pixiApp.resizeTo = canvasWrapElement;
-    pixiApp.queueResize();
-    resizeObserver = new ResizeObserver(() => {
+
+    const previousResizeTo = pixiApp.resizeTo;
+    const resizeObserver = new ResizeObserver(() => {
       pixiApp.queueResize();
     });
-    resizeObserver.observe(canvasWrapElement);
-  });
 
-  onCleanup(() => {
-    if (!canvasWrapElement) return;
-    pixiApp.resizeTo = previousResizeTo;
-    resizeObserver?.disconnect();
-    resizeObserver = undefined;
+    pixiApp.resizeTo = canvasWrapElement;
+    pixiApp.queueResize();
+    resizeObserver.observe(canvasWrapElement);
+
+    return () => {
+      pixiApp.resizeTo = previousResizeTo;
+      resizeObserver.disconnect();
+    };
   });
 
   return (
     <div
-      {...props.wrapperProps}
+      class={props.wrapperProps?.class}
       ref={(el) => {
         canvasWrapElement = el;
-        const userRef = props.wrapperProps?.ref;
-        if (typeof userRef === "function") {
-          userRef(el);
-        }
+        applyRef(props.wrapperProps?.ref, el);
       }}
       style={wrapperStyle()}
     >
@@ -134,10 +134,9 @@ const InnerPixiCanvas = (props: {
  * `PixiApplicationProvider` (uses the existing context). Accepts pixi-solid
  * components as children, which are rendered into the canvas scene graph.
  *
- * Accepts `class`, `classList`, `style`, and `ref` for the wrapper, plus `Pixi.ApplicationOptions`
+ * Accepts `class`, `style`, and `ref` for the wrapper, plus `Pixi.ApplicationOptions`
  * for application initialization. Only one `PixiCanvas` can be mounted at a time per app; it may be remounted after unmount.
  */
-
 export const PixiCanvas = (props: PixiCanvasProps): JSX.Element => {
   const { applicationOptions, wrapperProps } = splitPixiCanvasProps(props);
   return (

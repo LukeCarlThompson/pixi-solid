@@ -10,11 +10,11 @@ import { TickerContext } from "./context";
  * @returns The Pixi.Ticker instance from the nearest context provider.
  */
 export const getTicker = (): Pixi.Ticker => {
-  const ticker = useContext(TickerContext);
-  if (!ticker) {
+  try {
+    return useContext(TickerContext);
+  } catch {
     throw new Error(
       "getTicker must be used within a PixiApplicationProvider, PixiCanvas, or TickerProvider",
     );
   }
-  return ticker;
 };

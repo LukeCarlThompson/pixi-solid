@@ -5,7 +5,7 @@ description: A SolidJS component that renders a PixiJS MeshRope.
 
 import { Code } from "@astrojs/starlight/components";
 import demoCode from "../../demos/mesh-rope.demo.tsx?raw";
-import { ClientOnly } from "../../demos/client-only";
+import DemoMount from "../../../components/DemoMount.astro";
 
 A SolidJS component that renders a PixiJS `MeshRope`.
 
@@ -13,7 +13,7 @@ Please see the [PixiJS docs](https://pixijs.download/release/docs/scene.MeshRope
 
 ### Demo
 
-<ClientOnly fileName="mesh-rope" client:load />
+<DemoMount name="mesh-rope" />
 
 ### Code example
 
