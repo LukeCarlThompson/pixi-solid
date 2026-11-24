@@ -74,21 +74,34 @@ Notes from the merge:
   its peer range caps at `<2`. One workspace cannot hold both Solid majors, so this stays until the
   port. It does not touch `pixi-solid`.
 
-### Stage 4: Verify — in progress
+### Stage 4: Verify — done
 
-- [ ] Verify from a clean install. Remove `node_modules`, install with `--frozen-lockfile`, then run
-      `pnpm lint`, `pnpm fmt:check`, `pnpm --filter pixi-solid typecheck`, `pnpm --filter pixi-solid
-test`, `pnpm --filter pixi-solid build`, and `pnpm --filter pixi-solid-docs build`.
-- [ ] Commit the merge on `release/v2`.
+From a cold tree: `node_modules` removed, `pnpm install --frozen-lockfile`, then all six checks. Every
+one passed.
+
+- `pnpm lint` — 5 pre-existing warnings, no errors.
+- `pnpm fmt:check` — clean.
+- `pnpm --filter pixi-solid typecheck` — clean.
+- `pnpm --filter pixi-solid test` — 21 files, 193 tests.
+- `pnpm --filter pixi-solid build` — clean.
+- `pnpm --filter pixi-solid-docs build` — 55 pages.
+
+Merge committed as `9dcc420`.
 
 ### Stage 5: Publish stable
 
-- [ ] Merge `release/v2` into `main`. The push publishes `2.0.0` to `latest` and skips 3D.
-- [ ] Push `release/v2` afterwards. The version check then finds `2.0.0` on npm and skips, so no
-      `v2-latest` tag appears.
+Do not push `release/v2` first. A stable version on a `release/*` branch publishes to `v2-latest`.
+Land on `main` first, then push the branch, so the version check skips it.
+
+- [ ] Push the branch as `v2-stable`, which does not match the publish triggers, and open a pull
+      request into `main`. CI runs on pull requests into `main`.
+- [ ] Merge the pull request. The push to `main` publishes `2.0.0` to `latest` and skips 3D, and
+      gh-pages rebuilds.
+- [ ] Push `release/v2`. The version check then finds `2.0.0` on npm and skips, so no `v2-latest` tag
+      appears. Delete `v2-stable`.
 - [ ] Confirm the registry reads `latest: 2.0.0`, `next: 2.0.0-rc.1`, and no `v1-latest` yet.
-- [ ] Check the site. gh-pages rebuilds from `main` on the same push. Confirm the v1 pages are gone,
-      the 3D pages are gone, and the migration guide is live.
+- [ ] Check the site. Confirm the v1 pages are gone, the 3D pages are gone, and the migration guide
+      is live.
 - [ ] Delete this file.
 
 ### Stage 6: Port 3D
