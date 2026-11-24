@@ -1,5 +1,5 @@
 import { cleanup, createTestContext, mountScene } from "pixi-solid/testing";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import { Container3D, OrbitCamera, View3D } from "../components";
@@ -30,12 +30,14 @@ describe("OrbitCamera component", () => {
 
     // WHEN
     setEnabled(false);
+    flush();
 
     // THEN
     expect(orbitRef?.enabled).toBe(false);
 
     // WHEN
     setMinDist(10);
+    flush();
 
     // THEN
     expect(orbitRef?.minDistance).toBe(10);

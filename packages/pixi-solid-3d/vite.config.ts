@@ -1,8 +1,8 @@
 import { cpSync } from "node:fs";
 import path from "node:path";
 
+import solidPlugin from "@solidjs/vite-plugin";
 import type { Plugin } from "vite";
-import solidPlugin from "vite-plugin-solid";
 import { defineConfig } from "vitest/config";
 
 const copySkillFilesPlugin: Plugin = {
@@ -20,6 +20,7 @@ const copySkillFilesPlugin: Plugin = {
 export default defineConfig({
   plugins: [solidPlugin(), copySkillFilesPlugin],
   test: {
+    environment: "jsdom",
     include: ["src/**/*.test.ts", "src/**/*.test.tsx", "tests/**/*.test.ts", "tests/**/*.test.tsx"],
     pool: "threads",
     isolate: false,
@@ -37,13 +38,9 @@ export default defineConfig({
     rollupOptions: {
       external: [
         "solid-js",
-        "solid-js/web",
-        "solid-js/universal",
-        "solid-js/store",
-        "solid-js/h",
-        "solid-js/html",
-        "solid-js/jsx-runtime",
-        "solid-js/jsx-dev-runtime",
+        "@solidjs/web",
+        "@solidjs/web/jsx-runtime",
+        "@solidjs/web/jsx-dev-runtime",
         "pixi.js",
         "@pixi/3d",
         "@pixi/3d/extras",

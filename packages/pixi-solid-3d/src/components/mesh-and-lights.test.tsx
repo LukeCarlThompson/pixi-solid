@@ -9,7 +9,7 @@ import {
 import { PortalMaterial as PixiPortalMaterial } from "@pixi/3d/extras";
 import { cleanup, mountScene } from "pixi-solid/testing";
 import { RenderTexture } from "pixi.js";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -68,12 +68,14 @@ describe("Mesh3D and Lights", () => {
 
     // WHEN
     setIntensity(5);
+    flush();
 
     // THEN
     expect(container.intensity).toBe(5);
 
     // WHEN
     setColor(0xff0000);
+    flush();
 
     // THEN
     expect(container.color.toNumber()).toBe(0xff0000);
@@ -93,6 +95,7 @@ describe("Mesh3D and Lights", () => {
 
     // WHEN
     setTarget({ x: 0, y: 0, z: 10 });
+    flush();
 
     // THEN
     expect(container.quaternion.x).not.toBe(initialQuatX);
@@ -120,6 +123,7 @@ describe("Mesh3D and Lights", () => {
 
     // WHEN
     setTargetZ(15);
+    flush();
 
     // THEN
     expect(container.quaternion.x).not.toBe(initialQuatX);
@@ -148,6 +152,7 @@ describe("Mesh3D and Lights", () => {
 
     // WHEN
     setRoughness(0.85);
+    flush();
 
     // THEN
     expect(capturedMat?.roughness).toBeCloseTo(0.85, 2);
@@ -178,6 +183,7 @@ describe("Mesh3D and Lights", () => {
 
     // WHEN
     setBands(5);
+    flush();
 
     // THEN
     expect(capturedMat.data.bands).toBe(5);
@@ -210,6 +216,7 @@ describe("Mesh3D and Lights", () => {
 
     // WHEN
     setShininess(80);
+    flush();
 
     // THEN
     expect(capturedMat.data.shininess).toBe(80);
@@ -305,6 +312,7 @@ describe("Mesh3D and Lights", () => {
 
     // WHEN — `intensity` is an option, not a runtime prop, and was absent at mount
     setSpread({ label: "sun", intensity: 4 });
+    flush();
 
     // THEN
     expect(container.intensity).toBe(4);
@@ -326,6 +334,7 @@ describe("Mesh3D and Lights", () => {
 
     // WHEN
     setGeometry(second);
+    flush();
 
     // THEN
     expect(mesh.geometry).toBe(second);

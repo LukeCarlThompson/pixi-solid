@@ -1,6 +1,6 @@
 import type * as Pixi3D from "@pixi/3d";
 import { cleanup, mountScene } from "pixi-solid/testing";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import { Camera3D, View3D } from "../components";
@@ -45,6 +45,7 @@ describe("Camera3D component", () => {
 
     // WHEN
     setActiveCam(2);
+    flush();
 
     // THEN
     expect(view.camera).toBe(cam2);

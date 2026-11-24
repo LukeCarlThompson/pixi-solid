@@ -1,7 +1,7 @@
 import { ParticleContainer3D as PixiParticleContainer3D } from "@pixi/3d";
 import { cleanup, mountScene } from "pixi-solid/testing";
 import { Texture } from "pixi.js";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import { ParticleContainer3D } from "../components";
@@ -61,6 +61,7 @@ describe("ParticleContainer3D component", () => {
 
     // WHEN
     setBlendMode("add");
+    flush();
 
     // THEN
     expect(container.blendMode).toBe("add");

@@ -1,19 +1,25 @@
 import type * as Pixi3D from "@pixi/3d";
 import { View3D as PixiView3D } from "@pixi/3d";
+import type { JSX } from "@solidjs/web";
 import { onTick } from "pixi-solid";
 import type { PointData } from "pixi.js";
-import type { Accessor, JSX, Ref } from "solid-js";
 import {
   createContext,
   createRenderEffect,
   createSignal,
+  omit,
   onCleanup,
-  splitProps,
+  untrack,
   useContext,
 } from "solid-js";
+import type { Accessor, Ref } from "solid-js";
+
+import { applyRef } from "../apply-ref";
 
 /** The active `View3D` for the nearest enclosing `<View3DProvider>` or `<View3D>`. */
-export const View3DContext = createContext<Pixi3D.View3D>();
+// Solid 2 throws when a context is read with no provider and no default. `View3D` and the hooks
+// probe this context to find out whether one exists, so `null` is the empty value.
+export const View3DContext = createContext<Pixi3D.View3D | null>(null);
 
 const CONTEXT_HINT =
   "must be used within a <View3D>, <View3DProvider>, or a component mounted inside one.";
@@ -95,17 +101,23 @@ export const useWorldToScreen = (
     return { x: screen.x, y: screen.y, visible: true };
   };
 
-  const [screenPos, setScreenPos] = createSignal<WorldToScreenResult>(compute());
+  // Solid 2 runs a component's prop effects after the render pass, so a sibling component that
+  // reads this on its first render would see a camera whose props have not landed yet. Compute on
+  // read until the first tick, then serve the value the ticker maintains.
+  const [screenPos, setScreenPos] = createSignal<WorldToScreenResult>();
+  let hasTicked = false;
 
   onTick(() => {
+    hasTicked = true;
+
     const next = compute();
     const prev = screenPos();
-    if (next.x !== prev.x || next.y !== prev.y || next.visible !== prev.visible) {
-      setScreenPos(next);
-    }
+    if (prev && next.x === prev.x && next.y === prev.y && next.visible === prev.visible) return;
+
+    setScreenPos(next);
   });
 
-  return screenPos;
+  return () => (hasTicked ? (screenPos() ?? compute()) : compute());
 };
 
 export type ScreenToWorldTarget = Pixi3D.Plane | number;
@@ -171,9 +183,13 @@ export const useScreenToWorld = (
     return { x: hit.x, y: hit.y, z: hit.z };
   };
 
-  const [worldPos, setWorldPos] = createSignal<ScreenToWorldPoint | null>(compute());
+  // Same reasoning as useWorldToScreen: compute on read until the ticker has produced a value.
+  const [worldPos, setWorldPos] = createSignal<ScreenToWorldPoint | null>(null);
+  let hasTicked = false;
 
   onTick(() => {
+    hasTicked = true;
+
     const next = compute();
     const prev = worldPos();
 
@@ -188,7 +204,7 @@ export const useScreenToWorld = (
     }
   });
 
-  return worldPos;
+  return () => (hasTicked ? worldPos() : compute());
 };
 
 const VIEW_3D_PROVIDER_RUNTIME_KEYS = ["children", "ref", "as"] as const;
@@ -244,36 +260,37 @@ export type View3DProviderProps<TRoot extends Pixi3D.Container3D = Pixi3D.Contai
  */
 export const View3DProvider = <TRoot extends Pixi3D.Container3D = Pixi3D.Container3D>(
   props: View3DProviderProps<TRoot>,
-): JSX.Element => {
-  const [local, options] = splitProps(props, VIEW_3D_PROVIDER_RUNTIME_KEYS);
+): JSX.Element =>
+  // The body is one-time setup: create or adopt the view, sync options. Run it under `untrack`;
+  // the effects created inside keep their own tracking.
+  untrack(() => {
+    const isUserOwnedInstance = props.as !== undefined;
+    const options = { ...omit(props, ...VIEW_3D_PROVIDER_RUNTIME_KEYS) };
+    const view = props.as || new PixiView3D<TRoot>(options as Pixi3D.View3DOptions<TRoot>);
 
-  const isUserOwnedInstance = local.as !== undefined;
-  const view = local.as || new PixiView3D<TRoot>(options as Pixi3D.View3DOptions<TRoot>);
+    createRenderEffect(
+      () => props.ref,
+      (ref) => applyRef(ref, view),
+    );
 
-  createRenderEffect(() => {
-    if (local.ref) {
-      (local.ref as unknown as (instance: Pixi3D.View3D<TRoot>) => void)(view);
-    }
-  });
-
-  createRenderEffect(() => {
-    const source = props as unknown as Record<string, unknown>;
+    // One effect per option, so a change writes only that option. Same shape as the prop binders.
     for (const key in options) {
       if (VIEW_3D_CONSTRUCTION_ONLY_KEYS.has(key)) continue;
 
-      const value = source[key];
-      if (value !== undefined && key in view) {
-        (view as unknown as Record<string, unknown>)[key] = value;
-      }
+      createRenderEffect(
+        () => (props as unknown as Record<string, unknown>)[key],
+        (value) => {
+          if (value !== undefined && key in view) {
+            (view as unknown as Record<string, unknown>)[key] = value;
+          }
+        },
+      );
     }
-  });
 
-  onCleanup(() => {
-    if (isUserOwnedInstance) return;
-    view.destroy({ children: true });
-  });
+    onCleanup(() => {
+      if (isUserOwnedInstance) return;
+      view.destroy({ children: true });
+    });
 
-  return (
-    <View3DContext.Provider value={view as Pixi3D.View3D}>{local.children}</View3DContext.Provider>
-  );
-};
+    return <View3DContext value={view as Pixi3D.View3D}>{props.children}</View3DContext>;
+  });

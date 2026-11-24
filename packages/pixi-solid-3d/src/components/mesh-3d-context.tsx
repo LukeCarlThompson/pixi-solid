@@ -9,7 +9,9 @@ export type Mesh3DContextValue = {
   unregisterMaterial: (material: Pixi3D.BaseMaterial3D) => void;
 };
 
-export const Mesh3DContext = createContext<Mesh3DContextValue>();
+// Solid 2 throws when a context is read with no provider and no default, so an optional
+// context has to name `null` as its empty value.
+export const Mesh3DContext = createContext<Mesh3DContextValue | null>(null);
 
 /**
  * Access the parent Mesh3D context, or throw if mounted outside a `<Mesh3D>`.

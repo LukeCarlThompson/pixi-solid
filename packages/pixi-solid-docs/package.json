@@ -12,10 +12,12 @@
   },
   "dependencies": {
     "@astrojs/starlight": "0.42.4",
+    "@pixi/3d": "^0.1.0",
     "@solidjs/web": "2.0.3",
     "astro": "7.3.5",
     "pixi-filters": "6.1.5",
     "pixi-solid": "workspace:*",
+    "pixi-solid-3d": "workspace:*",
     "pixi.js": "*",
     "sharp": "0.34.5",
     "solid-js": "2.0.3"

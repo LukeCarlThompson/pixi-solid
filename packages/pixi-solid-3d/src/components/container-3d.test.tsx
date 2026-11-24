@@ -1,6 +1,6 @@
 import type * as Pixi3D from "@pixi/3d";
 import { cleanup, mountScene } from "pixi-solid/testing";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import { Container3D, PointLight } from "../components";
@@ -45,12 +45,14 @@ describe("Container3D component", () => {
 
     // WHEN
     setX(42);
+    flush();
 
     // THEN
     expect(container.x).toBe(42);
 
     // WHEN
     setScaleZ(3.5);
+    flush();
 
     // THEN
     expect(container.scale.z).toBe(3.5);
@@ -72,6 +74,7 @@ describe("Container3D component", () => {
 
     // WHEN
     setShowLight(true);
+    flush();
 
     // THEN
     expect(container.children.length).toBe(1);
@@ -81,6 +84,7 @@ describe("Container3D component", () => {
 
     // WHEN
     setShowLight(false);
+    flush();
 
     // THEN
     expect(container.children.length).toBe(0);
@@ -104,6 +108,7 @@ describe("Container3D component", () => {
 
     // WHEN
     setShowChild(false);
+    flush();
     container.emit("click", {} as Pixi3D.Pointer3DEvent);
 
     // THEN
@@ -123,6 +128,7 @@ describe("Container3D component", () => {
 
     // WHEN — the spread object is replaced, so the key set grows
     setSpread({ label: "root", x: 42 });
+    flush();
 
     // THEN
     expect(container.x).toBe(42);
@@ -140,6 +146,7 @@ describe("Container3D component", () => {
 
     // WHEN
     setSpread({ label: "root", x: 7 });
+    flush();
 
     // THEN
     expect(container.x).toBe(7);

@@ -1,6 +1,6 @@
 import type * as Pixi3DExtras from "@pixi/3d/extras";
 import { cleanup, createTestContext, mountScene } from "pixi-solid/testing";
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import { FPSCamera, ParticleSystem3D, View3D } from "../components";
@@ -56,7 +56,9 @@ describe("FPSCamera and ParticleSystem3D extras", () => {
 
     // WHEN
     setPointerLock(false);
+    flush();
     setKeyboard(false);
+    flush();
 
     // THEN
     expect(camRef?.pointerLock).toBe(false);
@@ -85,6 +87,7 @@ describe("FPSCamera and ParticleSystem3D extras", () => {
 
     // WHEN
     setRate(50);
+    flush();
 
     // THEN
     expect(psRef?.emitRate).toBe(50);
@@ -127,8 +130,11 @@ describe("FPSCamera and ParticleSystem3D extras", () => {
 
     // WHEN
     setGravity({ x: 1.5, y: -2, z: 0 });
+    flush();
     setDrag(3);
+    flush();
     setFrameRate(24);
+    flush();
 
     // THEN the prop binder wrote each one through
     expect(psRef?.gravity?.x).toBe(1.5);
@@ -158,12 +164,14 @@ describe("FPSCamera and ParticleSystem3D extras", () => {
 
     // WHEN
     setPlaying(false);
+    flush();
 
     // THEN
     expect(psRef?.playing).toBe(false);
 
     // WHEN
     setPlaying(true);
+    flush();
 
     // THEN
     expect(psRef?.playing).toBe(true);

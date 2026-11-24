@@ -18,7 +18,11 @@ import {
   PortalMaterial as PixiPortalMaterial,
   ToonMaterial as PixiToonMaterial,
 } from "@pixi/3d/extras";
-import { createRenderEffect, on, onCleanup, splitProps, type Component, type Ref } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { createRenderEffect, omit, onCleanup, untrack } from "solid-js";
+import type { Component, Ref } from "solid-js";
+
+import { applyRef } from "../apply-ref";
 
 import { useMesh3D } from "./mesh-3d-context";
 
@@ -41,30 +45,29 @@ export const createGeometry3DComponent = <
 >(
   GeometryClass: new (options?: any) => TInstance,
 ): Component<TOptions & ResourceRefProps<TInstance>> => {
-  return (props) => {
-    const meshCtx = useMesh3D();
-    const [local, initialisationProps] = splitProps(props, ["ref", "as"]);
+  return (props): JSX.Element =>
+    untrack(() => {
+      const meshCtx = useMesh3D();
+      const as = props.as;
+      const isUserOwned = as !== undefined;
+      const geometry = as || new GeometryClass(omit(props, "ref", "as"));
 
-    const isUserOwned = local.as !== undefined;
-    const geometry = local.as || new GeometryClass(initialisationProps);
+      createRenderEffect(
+        () => props.ref,
+        (ref) => applyRef(ref, geometry),
+      );
 
-    createRenderEffect(() => {
-      if (local.ref) {
-        (local.ref as unknown as (g: TInstance) => void)(geometry);
-      }
+      meshCtx.registerGeometry(geometry);
+
+      onCleanup(() => {
+        meshCtx.unregisterGeometry(geometry);
+        if (!isUserOwned) {
+          geometry.destroy();
+        }
+      });
+
+      return null;
     });
-
-    meshCtx.registerGeometry(geometry);
-
-    onCleanup(() => {
-      meshCtx.unregisterGeometry(geometry);
-      if (!isUserOwned) {
-        geometry.destroy();
-      }
-    });
-
-    return null;
-  };
 };
 
 /**
@@ -78,49 +81,47 @@ export const createMaterial3DComponent = <
 >(
   MaterialClass: new (options?: any) => TInstance,
 ): Component<TOptions & ResourceRefProps<TInstance>> => {
-  return (props) => {
-    const meshCtx = useMesh3D();
-    const [local, initialisationProps] = splitProps(props, ["ref", "as"]);
+  return (props): JSX.Element =>
+    untrack(() => {
+      const meshCtx = useMesh3D();
+      const as = props.as;
+      const isUserOwned = as !== undefined;
+      const options = { ...omit(props, "ref", "as") };
+      const material = as || new MaterialClass(options);
 
-    const isUserOwned = local.as !== undefined;
-    const material = local.as || new MaterialClass(initialisationProps);
-
-    createRenderEffect(() => {
-      if (local.ref) {
-        (local.ref as unknown as (m: TInstance) => void)(material);
-      }
-    });
-
-    // The constructor applied these once, so each effect only writes later changes.
-    for (const key in initialisationProps) {
       createRenderEffect(
-        on(
+        () => props.ref,
+        (ref) => applyRef(ref, material),
+      );
+
+      // The constructor applied these once, so each effect only writes later changes.
+      for (const key in options) {
+        createRenderEffect(
           () => (props as any)[key],
-          (nextVal) => {
-            if (nextVal !== undefined) {
-              if (key in material) {
-                (material as any)[key] = nextVal;
-              } else if (material.data && key in material.data) {
-                material.data[key] = nextVal;
-              }
+          (nextValue) => {
+            if (nextValue === undefined) return;
+
+            if (key in material) {
+              (material as any)[key] = nextValue;
+            } else if (material.data && key in material.data) {
+              material.data[key] = nextValue;
             }
           },
           { defer: true },
-        ),
-      );
-    }
-
-    meshCtx.registerMaterial(material);
-
-    onCleanup(() => {
-      meshCtx.unregisterMaterial(material);
-      if (!isUserOwned) {
-        material.destroy();
+        );
       }
-    });
 
-    return null;
-  };
+      meshCtx.registerMaterial(material);
+
+      onCleanup(() => {
+        meshCtx.unregisterMaterial(material);
+        if (!isUserOwned) {
+          material.destroy();
+        }
+      });
+
+      return null;
+    });
 };
 
 // Declarative Geometry Components

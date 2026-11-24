@@ -1,6 +1,7 @@
 import type * as Pixi3D from "@pixi/3d";
-import type { JSX, Ref } from "solid-js";
-import { onCleanup, splitProps } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { onCleanup, untrack } from "solid-js";
+import type { Ref } from "solid-js";
 
 import { bindInitialisationProps3D, bindRuntimeProps3D } from "./bind-props";
 import {
@@ -76,8 +77,71 @@ export const LEAF3D_RUNTIME_KEYS = [
   "lookAt",
 ] as const;
 
+export const CONTAINER3D_RUNTIME_KEY_SET: ReadonlySet<string> = new Set(CONTAINER3D_RUNTIME_KEYS);
+export const LEAF3D_RUNTIME_KEY_SET: ReadonlySet<string> = new Set(LEAF3D_RUNTIME_KEYS);
+
 /**
- * Factory for creating 3D container components that accept children
+ * Copies the props a constructor reads once, so the binder effects never feed an instance that
+ * already exists.
+ */
+const getInstanceOptions = <Props extends object>(
+  props: Props,
+  excludedKeys: ReadonlySet<string>,
+): Record<string, unknown> => {
+  const propsRecord = props as Record<string, unknown>;
+  const options: Record<string, unknown> = {};
+
+  for (const key in propsRecord) {
+    if (excludedKeys.has(key)) continue;
+
+    options[key] = propsRecord[key];
+  }
+
+  return options;
+};
+
+/**
+ * Shares the mount, bind and destroy sequence between the container and leaf factories.
+ *
+ * `runtimeKeys` names the props the binder owns: everything else reached the constructor, so it is
+ * only re-applied when it changes. An instance passed through `as` never reached a constructor, so
+ * its props are applied immediately.
+ */
+const createNode3DComponent = <InstanceType extends Pixi3D.Container3D, OptionsType extends object>(
+  Pixi3DClass: new (...args: any[]) => InstanceType,
+  runtimeKeys: ReadonlySet<string>,
+): PixiComponent3D<
+  Leaf3DProps<InstanceType> & AdoptableProps<OptionsType, InstanceType>,
+  InstanceType
+> => {
+  return (props): InstanceType & JSX.Element =>
+    // `createComponent` runs the body with a strict-read label, which warns on any
+    // reactive read here. The body is entirely one-time setup, so run it under
+    // `untrack`; the binder effects created inside establish their own tracking.
+    untrack(() => {
+      const as = props.as;
+      const isUserOwnedInstance = as !== undefined;
+      const instance = as || new Pixi3DClass(getInstanceOptions(props, runtimeKeys) as any);
+
+      // Register cleanup before binding children. Cleanups run in unwind order,
+      // so the child-detach cleanup from bindRuntimeProps3D runs before this
+      // destroy. As a result, unowned children are detached but kept alive.
+      onCleanup(() => {
+        if (isUserOwnedInstance) return;
+        instance.destroy({ children: true });
+      });
+
+      bindInitialisationProps3D(instance, props, runtimeKeys, {
+        deferInitialRun: !isUserOwnedInstance,
+      });
+      bindRuntimeProps3D(instance, props, runtimeKeys);
+
+      return instance as InstanceType & JSX.Element;
+    });
+};
+
+/**
+ * Factory for creating 3D container components that accept children.
  */
 export const createContainer3DComponent = <
   InstanceType extends Pixi3D.Container3D,
@@ -88,28 +152,17 @@ export const createContainer3DComponent = <
   Container3DProps<InstanceType> & AdoptableProps<OptionsType, InstanceType>,
   InstanceType
 > => {
-  const Component = (props: any): InstanceType & JSX.Element => {
-    const [runtimeProps, initialisationProps] = splitProps(props, CONTAINER3D_RUNTIME_KEYS);
-
-    const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new Pixi3DClass({ ...initialisationProps } as any);
-
-    bindInitialisationProps3D(instance, initialisationProps);
-    bindRuntimeProps3D(instance, runtimeProps as any);
-
-    onCleanup(() => {
-      if (isUserOwnedInstance) return;
-      instance.destroy({ children: true });
-    });
-
-    return instance as InstanceType & JSX.Element;
-  };
+  const Component = (props: any): InstanceType & JSX.Element =>
+    createNode3DComponent<InstanceType, OptionsType>(
+      Pixi3DClass,
+      CONTAINER3D_RUNTIME_KEY_SET,
+    )(props);
 
   return Component;
 };
 
 /**
- * Factory for creating 3D leaf components that do not accept children (Mesh, Light, Camera, etc.)
+ * Factory for creating 3D leaf components that do not accept children (Mesh, Light, Camera, etc.).
  */
 export const createLeaf3DComponent = <
   InstanceType extends Pixi3D.Container3D,
@@ -120,22 +173,5 @@ export const createLeaf3DComponent = <
   Leaf3DProps<InstanceType> & AdoptableProps<OptionsType, InstanceType>,
   InstanceType
 > => {
-  const Component = (props: any): InstanceType & JSX.Element => {
-    const [runtimeProps, initialisationProps] = splitProps(props, LEAF3D_RUNTIME_KEYS);
-
-    const isUserOwnedInstance = runtimeProps.as !== undefined;
-    const instance = props.as || new Pixi3DClass({ ...initialisationProps } as any);
-
-    bindInitialisationProps3D(instance, initialisationProps);
-    bindRuntimeProps3D(instance, runtimeProps as any);
-
-    onCleanup(() => {
-      if (isUserOwnedInstance) return;
-      instance.destroy({ children: true });
-    });
-
-    return instance as InstanceType & JSX.Element;
-  };
-
-  return Component;
+  return createNode3DComponent<InstanceType, OptionsType>(Pixi3DClass, LEAF3D_RUNTIME_KEY_SET);
 };

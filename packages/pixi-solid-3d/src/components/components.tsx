@@ -14,23 +14,25 @@ import {
   SpotLight as PixiSpotLight,
   Sprite3D as PixiSprite3D,
 } from "@pixi/3d";
+import type { JSX } from "@solidjs/web";
 import { getTicker } from "pixi-solid";
 import type { Ticker } from "pixi.js";
 import {
   children as resolveChildren,
   createRenderEffect,
-  on,
+  omit,
   onCleanup,
-  splitProps,
-  type JSX,
+  untrack,
 } from "solid-js";
 
 import { bindInitialisationProps3D, bindRuntimeProps3D } from "./bind-props";
 import {
   CONTAINER3D_RUNTIME_KEYS,
+  CONTAINER3D_RUNTIME_KEY_SET,
   createContainer3DComponent,
   createLeaf3DComponent,
   LEAF3D_RUNTIME_KEYS,
+  LEAF3D_RUNTIME_KEY_SET,
   type AdoptableProps,
   type Container3DProps,
   type Leaf3DProps,
@@ -81,6 +83,20 @@ export type BatchedMesh3DComponentProps = Leaf3DProps<PixiBatchedMesh3D> &
 export type ParticleContainer3DComponentProps = Leaf3DProps<PixiParticleContainer3D> &
   Omit<Pixi3D.ParticleContainer3DOptions, "children">;
 
+/** Children are mounted by the JSX inside the context, never as 3D container children. */
+const MESH3D_INITIALISATION_RUNTIME_KEY_SET: ReadonlySet<string> = new Set([
+  ...LEAF3D_RUNTIME_KEYS,
+  "children",
+]);
+
+const MODEL_3D_RUNTIME_KEYS = [...CONTAINER3D_RUNTIME_KEYS, "traverse"] as const;
+const MODEL_3D_INITIALISATION_RUNTIME_KEY_SET: ReadonlySet<string> = new Set(MODEL_3D_RUNTIME_KEYS);
+
+const CAMERA3D_INITIALISATION_RUNTIME_KEY_SET: ReadonlySet<string> = new Set([
+  ...LEAF3D_RUNTIME_KEYS,
+  "active",
+]);
+
 /**
  * A SolidJS component that renders a `Container3D`.
  */
@@ -96,85 +112,83 @@ export const Container3D: PixiComponent3D<Container3DComponentProps, PixiContain
  * When neither is given, the mesh falls back to a `PlaneGeometry` and a `FlatMaterial` that this
  * component owns and destroys with the mesh.
  */
-export const Mesh3D: PixiComponent3D<Mesh3DComponentProps, PixiMesh3D> = (props) => {
-  const [runtimeProps, initialisationProps] = splitProps(props, [
-    ...LEAF3D_RUNTIME_KEYS,
-    "children",
-  ]);
+export const Mesh3D: PixiComponent3D<Mesh3DComponentProps, PixiMesh3D> = (props) =>
+  untrack(() => {
+    const as = props.as;
+    const isUserOwnedInstance = as !== undefined;
+    const initialisation = { ...omit(props, ...LEAF3D_RUNTIME_KEYS, "children") } as any;
 
-  const isUserOwnedInstance = runtimeProps.as !== undefined;
-  const initialisation = { ...initialisationProps } as any;
+    // Track the fallbacks so cleanup frees them; `destroy({ children: true })` leaves geometry and
+    // material alone, so a mesh that never got its own would otherwise leak one of each.
+    let fallbackGeometry: PixiPlaneGeometry | undefined;
+    let fallbackMaterial: PixiFlatMaterial | undefined;
 
-  // Track the fallbacks so cleanup frees them; `destroy({ children: true })` leaves geometry and
-  // material alone, so a mesh that never got its own would otherwise leak one of each.
-  let fallbackGeometry: PixiPlaneGeometry | undefined;
-  let fallbackMaterial: PixiFlatMaterial | undefined;
-
-  if (!isUserOwnedInstance) {
-    if (!initialisation.geometry) {
-      fallbackGeometry = new PixiPlaneGeometry();
-      initialisation.geometry = fallbackGeometry;
+    if (!isUserOwnedInstance) {
+      if (!initialisation.geometry) {
+        fallbackGeometry = new PixiPlaneGeometry();
+        initialisation.geometry = fallbackGeometry;
+      }
+      if (!initialisation.material) {
+        fallbackMaterial = new PixiFlatMaterial();
+        initialisation.material = fallbackMaterial;
+      }
     }
-    if (!initialisation.material) {
-      fallbackMaterial = new PixiFlatMaterial();
-      initialisation.material = fallbackMaterial;
-    }
-  }
 
-  const instance = props.as || new PixiMesh3D(initialisation);
+    const instance = as || new PixiMesh3D(initialisation);
 
-  const initialGeometry = instance.geometry;
-  const initialMaterial = instance.material;
+    const initialGeometry = instance.geometry;
+    const initialMaterial = instance.material;
 
-  const registerGeometry = (geometry: any) => {
-    instance.geometry = geometry;
-  };
-  const unregisterGeometry = (geometry: any) => {
-    if (instance.geometry === geometry && initialGeometry) {
-      instance.geometry = initialGeometry;
-    }
-  };
+    const registerGeometry = (geometry: any) => {
+      instance.geometry = geometry;
+    };
+    const unregisterGeometry = (geometry: any) => {
+      if (instance.geometry === geometry && initialGeometry) {
+        instance.geometry = initialGeometry;
+      }
+    };
 
-  const registerMaterial = (material: any) => {
-    instance.material = material;
-  };
-  const unregisterMaterial = (material: any) => {
-    if (instance.material === material && initialMaterial) {
-      instance.material = initialMaterial;
-    }
-  };
+    const registerMaterial = (material: any) => {
+      instance.material = material;
+    };
+    const unregisterMaterial = (material: any) => {
+      if (instance.material === material && initialMaterial) {
+        instance.material = initialMaterial;
+      }
+    };
 
-  bindInitialisationProps3D(instance, initialisationProps);
-  const [, runtimeWithoutChildren] = splitProps(runtimeProps, ["children"]);
-  bindRuntimeProps3D(instance, runtimeWithoutChildren as any);
+    // Register cleanup before binding children. Cleanups run in unwind order, so the
+    // child-detach cleanup runs before this destroy.
+    onCleanup(() => {
+      if (isUserOwnedInstance) return;
+      instance.destroy({ children: true });
+      fallbackGeometry?.destroy();
+      fallbackMaterial?.destroy();
+    });
 
-  onCleanup(() => {
-    if (isUserOwnedInstance) return;
-    instance.destroy({ children: true });
-    fallbackGeometry?.destroy();
-    fallbackMaterial?.destroy();
+    bindInitialisationProps3D(instance, props, MESH3D_INITIALISATION_RUNTIME_KEY_SET, {
+      deferInitialRun: !isUserOwnedInstance,
+    });
+    bindRuntimeProps3D(instance, props, LEAF3D_RUNTIME_KEY_SET);
+
+    return (
+      <Mesh3DContext
+        value={{
+          mesh: instance,
+          registerGeometry,
+          unregisterGeometry,
+          registerMaterial,
+          unregisterMaterial,
+        }}
+      >
+        {(() => {
+          const resolved = resolveChildren(() => props.children);
+          resolved();
+          return instance as PixiMesh3D & JSX.Element;
+        })()}
+      </Mesh3DContext>
+    ) as PixiMesh3D & JSX.Element;
   });
-
-  return (
-    <Mesh3DContext.Provider
-      value={{
-        mesh: instance,
-        registerGeometry,
-        unregisterGeometry,
-        registerMaterial,
-        unregisterMaterial,
-      }}
-    >
-      {(() => {
-        const resolved = resolveChildren(() => props.children);
-        resolved();
-        return instance as PixiMesh3D & JSX.Element;
-      })()}
-    </Mesh3DContext.Provider>
-  ) as PixiMesh3D & JSX.Element;
-};
-
-const MODEL_3D_RUNTIME_KEYS = [...CONTAINER3D_RUNTIME_KEYS, "traverse"] as const;
 
 /**
  * A SolidJS component that renders a `Model3D` from an asset source.
@@ -183,65 +197,64 @@ const MODEL_3D_RUNTIME_KEYS = [...CONTAINER3D_RUNTIME_KEYS, "traverse"] as const
  * `materials` gives this model its own materials, so mutating `mesh.material.roughness` no longer
  * writes through to the shared `Scene3DSource`. `traverse` inspects or customizes child nodes.
  */
-export const Model3D: PixiComponent3D<Model3DComponentProps, PixiModel3D> = (props) => {
-  const [runtimeProps, initialisationProps] = splitProps(props, MODEL_3D_RUNTIME_KEYS);
+export const Model3D: PixiComponent3D<Model3DComponentProps, PixiModel3D> = (props) =>
+  untrack(() => {
+    const as = props.as;
+    const isUserOwnedInstance = as !== undefined;
 
-  const isUserOwnedInstance = runtimeProps.as !== undefined;
-  // Initialize with autoUpdate: false so Pixi's AnimationPlayer does not bind to global Ticker.shared
-  const instance =
-    props.as ||
-    new PixiModel3D({
-      ...initialisationProps,
-      autoUpdate: false,
-    } as any);
+    // Initialize with autoUpdate: false so Pixi's AnimationPlayer does not bind to global
+    // Ticker.shared
+    const instance =
+      as ||
+      new PixiModel3D({
+        ...omit(props, ...MODEL_3D_RUNTIME_KEYS),
+        autoUpdate: false,
+      } as any);
 
-  // Re-wire to the scoped context ticker if player exists and autoUpdate is not false
-  if (instance.player) {
-    instance.player.autoUpdate = false;
+    // Re-wire to the scoped context ticker if the player exists and autoUpdate is not false
+    if (instance.player) {
+      instance.player.autoUpdate = false;
 
-    createRenderEffect(
-      on(
+      createRenderEffect(
         () => (props as any).autoUpdate,
         (autoUpdate) => {
           if (autoUpdate === false) return;
 
-          const onTick = (ticker: Ticker) => {
-            instance.player?.update(ticker);
-          };
-
           try {
-            const ticker = getTicker();
+            const ticker: Ticker = getTicker();
+            const onTick = (currentTicker: Ticker) => {
+              instance.player?.update(currentTicker);
+            };
+
             ticker.add(onTick);
-            onCleanup(() => {
-              ticker.remove(onTick);
-            });
+            return () => ticker.remove(onTick);
           } catch {
-            // Fallback gracefully if mounted without context ticker
+            // Rendered without a context ticker, so playback stays manual.
+            return;
           }
         },
-      ),
-    );
-  }
-
-  // Reactive traverse callback to customize model subtrees
-  createRenderEffect(() => {
-    const fn = (props as any).traverse;
-    if (typeof fn === "function") {
-      instance.traverse(fn);
+      );
     }
+
+    createRenderEffect(
+      () => (props as any).traverse,
+      (traverse) => {
+        if (typeof traverse === "function") instance.traverse(traverse);
+      },
+    );
+
+    onCleanup(() => {
+      if (isUserOwnedInstance) return;
+      instance.destroy({ children: true });
+    });
+
+    bindInitialisationProps3D(instance, props, MODEL_3D_INITIALISATION_RUNTIME_KEY_SET, {
+      deferInitialRun: !isUserOwnedInstance,
+    });
+    bindRuntimeProps3D(instance, props, CONTAINER3D_RUNTIME_KEY_SET);
+
+    return instance as PixiModel3D & JSX.Element;
   });
-
-  bindInitialisationProps3D(instance, initialisationProps);
-  const [, runtimeWithoutTraverse] = splitProps(runtimeProps, ["traverse"]);
-  bindRuntimeProps3D(instance, runtimeWithoutTraverse as any);
-
-  onCleanup(() => {
-    if (isUserOwnedInstance) return;
-    instance.destroy({ children: true });
-  });
-
-  return instance as PixiModel3D & JSX.Element;
-};
 
 /**
  * A SolidJS component that renders a `Sprite3D`.
@@ -254,41 +267,51 @@ export const Sprite3D: PixiComponent3D<Sprite3DComponentProps, PixiSprite3D> =
  * Must be mounted within a `<View3D>` component. When mounted, it automatically becomes
  * the view's active rendering camera (unless `active={false}` is explicitly provided).
  */
-export const Camera3D: PixiComponent3D<Camera3DComponentProps, PixiCamera3D> = (props) => {
-  const view = useView3D();
+export const Camera3D: PixiComponent3D<Camera3DComponentProps, PixiCamera3D> = (props) =>
+  untrack(() => {
+    const view = useView3D();
+    const as = props.as;
+    const isUserOwnedInstance = as !== undefined;
+    const instance =
+      as || new PixiCamera3D({ ...omit(props, ...LEAF3D_RUNTIME_KEYS, "active") } as any);
 
-  const [runtimeProps, initialisationProps] = splitProps(props, [...LEAF3D_RUNTIME_KEYS, "active"]);
+    const activate = () => {
+      const previousCamera = view.camera;
+      view.camera = instance;
 
-  const isUserOwnedInstance = runtimeProps.as !== undefined;
-  const instance = props.as || new PixiCamera3D({ ...initialisationProps } as any);
+      return () => {
+        if (view.camera === instance) view.camera = previousCamera;
+      };
+    };
 
-  createRenderEffect(
-    on(
+    // The camera is active the moment it mounts, so a sibling 2D component that reads the view on
+    // its first render already sees it. The effect below handles later changes only.
+    if (props.active !== false) {
+      onCleanup(activate());
+    }
+
+    createRenderEffect(
       () => (props as any).active,
       (active) => {
         if (active === false) return;
-        const previousCamera = view.camera;
-        view.camera = instance;
 
-        onCleanup(() => {
-          if (view.camera === instance) {
-            view.camera = previousCamera;
-          }
-        });
+        return activate();
       },
-    ),
-  );
+      { defer: true },
+    );
 
-  bindInitialisationProps3D(instance, initialisationProps);
-  bindRuntimeProps3D(instance, runtimeProps as any);
+    onCleanup(() => {
+      if (isUserOwnedInstance) return;
+      instance.destroy({ children: true });
+    });
 
-  onCleanup(() => {
-    if (isUserOwnedInstance) return;
-    instance.destroy({ children: true });
+    bindInitialisationProps3D(instance, props, CAMERA3D_INITIALISATION_RUNTIME_KEY_SET, {
+      deferInitialRun: !isUserOwnedInstance,
+    });
+    bindRuntimeProps3D(instance, props, LEAF3D_RUNTIME_KEY_SET);
+
+    return instance as PixiCamera3D & JSX.Element;
   });
-
-  return instance as PixiCamera3D & JSX.Element;
-};
 
 /**
  * A SolidJS component that renders an `AmbientLight`.

@@ -27,19 +27,23 @@ materials and passes are created and disposed with the scene.
 `pixi-solid-3d` declares its host packages as peers, so you install them alongside it:
 
 ```bash
-pnpm add pixi-solid-3d @pixi/3d pixi-solid pixi.js solid-js
+pnpm add pixi-solid-3d @pixi/3d pixi-solid pixi.js solid-js @solidjs/web
 ```
 
-Peer dependencies of
+Peer dependencies:
 
 ```json
 {
   "@pixi/3d": ">=0.1.0 <0.2",
-  "pixi-solid": ">=1.0.1 <2",
+  "@solidjs/web": ">=2.0.0 <3",
+  "pixi-solid": ">=2.0.0 <3",
   "pixi.js": ">=8.23.0 <9",
-  "solid-js": ">=1.9.10 <2"
+  "solid-js": ">=2.0.0 <3"
 }
 ```
+
+`pixi-solid-3d` 0.2 targets **SolidJS 2**, like `pixi-solid` 2. Point your JSX compiler at
+`@solidjs/web` with `"jsxImportSource": "@solidjs/web"` and use `@solidjs/vite-plugin` in Vite.
 
 ## Quick start
 

@@ -30,8 +30,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # pixi-solid-3d is on Solid 1 and is not part of this line, so every step below
-      # targets pixi-solid explicitly. pnpm test and pnpm typecheck are recursive.
+      # pixi-solid-3d resolves pixi-solid's built types, so it must be built first.
       - name: Build pixi-solid
         run: pnpm --filter pixi-solid build
 
@@ -42,11 +41,15 @@ jobs:
         run: pnpm fmt:check
 
       - name: Typecheck
-        run: pnpm --filter pixi-solid typecheck
+        run: pnpm typecheck
 
       - name: Test
-        run: pnpm --filter pixi-solid test
+        run: pnpm test
 
-      # The docs import pixi-solid through its built entry.
+      # Builds the artifact users install; tests import src, so this is separate.
+      - name: Build pixi-solid-3d
+        run: pnpm --filter pixi-solid-3d build
+
+      # The docs import both packages through their built entries, so this needs the two builds above.
       - name: Build docs
         run: pnpm --filter pixi-solid-docs build
