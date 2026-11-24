@@ -2,6 +2,7 @@
   "options": {
     "typeAware": true
   },
+  "ignorePatterns": ["pixi-3d/**"],
   "categories": {
     "correctness": "error"
   },
