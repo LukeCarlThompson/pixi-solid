@@ -305,26 +305,36 @@ Use `afterEach(() => vi.restoreAllMocks())` to clean up mocks between tests.
 
 ## Pull Requests
 
-Every PR must include, for each package it changes:
+A PR that changes a package must include, for that package:
 
-1. **A version bump** in that package's `package.json`.
-2. **A changelog entry** in that package's `CHANGELOG.md`.
+1. **A version bump** in its `package.json`.
+2. **A changelog entry** in its `CHANGELOG.md`.
 
-Target `main` for the stable line. Target a release line, such as `release/v2`, for a prerelease.
+Target `main` for the stable line. Target a release line, such as `release/v1`, only to patch that
+line.
 
-On `main`, every PR bumps the version. On a prerelease line, only the release PR bumps it, because a
-merge publishes the version it finds.
+On `main`, every PR that changes a package bumps its version. On a release line, only the release PR
+bumps it.
 
-Target `main` for the stable line. Target a release line, such as `release/v2`, for a prerelease.
-
-On `main`, every PR bumps the version. On a prerelease line, only the release PR bumps it, because a
-merge publishes the version it finds.
+A PR that changes only CI, repository tooling or documentation bumps nothing and publishes nothing.
 
 Follow semantic versioning: `MAJOR.MINOR.PATCH`.
 
 - Bug fix → patch bump
 - New feature (backward-compatible) → minor bump
 - Breaking change → major bump
+
+### Before you push
+
+```bash
+pnpm build
+pnpm lint
+pnpm fmt:check
+pnpm typecheck
+pnpm test
+```
+
+A workflow builds with `pnpm build`, never with a list of packages.
 
 ---
 
@@ -405,11 +415,6 @@ use them as working copies.
 - The ruleset `Protect published branches` covers the default branch and `release/**`. It requires a
   pull request and the `test` check, allows squash merges only, and blocks deletion and force pushes.
   It grants no bypass, so the rule holds for maintainers too.
-
-This is not ceremony. A working push to `release/v2` that carried `version: 2.0.0` published the
-version to `v2-latest` before `main` merged. The run on `main` then skipped it as already published,
-and `latest` stayed on 1.x until the tag was moved by hand. `release/v2` was deleted once `main`
-owned the version 2 line.
 
 ### Line policy
 
