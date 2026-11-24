@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## 2.0.1
+
+### Fixed
+
+- 🐞 `onTick` called outside a provider now throws `onTick must be used within a PixiApplicationProvider, PixiCanvas or a TickerProvider`. Solid 2 throws its own context error from `useContext`, so the previous null check never ran and the library's message was unreachable.
+
 ## 2.0.0
 
 `pixi-solid` 2 requires SolidJS 2. Component, hook, and utility names stay the same, but SolidJS 2 removed or replaced several of the framework APIs around them, so this is a major release. The [migration guide](https://lukecarlthompson.github.io/pixi-solid/migration/solid-2/) lists every change.
