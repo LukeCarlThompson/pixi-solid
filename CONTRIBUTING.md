@@ -314,7 +314,10 @@ unbumped merge ships nothing.
 Target `main` for all work. Target `release/v1` only to patch that line, with its version bump and
 changelog entry.
 
-A PR that changes only CI, repository tooling or documentation bumps nothing and publishes nothing.
+A PR that changes only CI, repository tooling, the docs site or repository documentation bumps
+nothing and publishes nothing.
+
+A shipped skill file is part of its package, so it takes a changelog entry.
 
 Follow semantic versioning: `MAJOR.MINOR.PATCH`.
 
