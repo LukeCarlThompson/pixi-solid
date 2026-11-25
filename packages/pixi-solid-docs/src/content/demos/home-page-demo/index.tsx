@@ -1,6 +1,6 @@
 import { CRTFilter } from "pixi-filters";
 import { Container, onTick, PixiCanvas, Sprite, usePixiScreen, TilingSprite } from "pixi-solid";
-import { objectFit, ObjectFitContainer } from "pixi-solid/utils";
+import { ObjectFitContainer } from "pixi-solid/utils";
 import type * as Pixi from "pixi.js";
 import { Assets, BlurFilter, Rectangle } from "pixi.js";
 import { createMemo, Loading, onCleanup, Show } from "solid-js";
@@ -28,6 +28,16 @@ const DemoScene = (props: { isRunning: boolean; direction: "left" | "right" }) =
     crtFilter.time += deltaTime * 0.3;
   });
 
+  let ground: Pixi.TilingSprite | undefined;
+
+  onTick(({ deltaTime }) => {
+    if (!ground) return;
+
+    const movementSpeed = props.isRunning ? 1.3 : 0;
+    const directionMultiplier = props.direction === "left" ? 1 : -1;
+    ground.tilePosition.x += movementSpeed * directionMultiplier * deltaTime;
+  });
+
   onCleanup(() => {
     blurFilter.destroy();
     crtFilter.destroy();
@@ -36,26 +46,15 @@ const DemoScene = (props: { isRunning: boolean; direction: "left" | "right" }) =
   return (
     <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode="cover">
       <Container filters={crtFilter} boundsArea={sceneBounds}>
-        <Sprite
-          label="Sky"
-          texture={Assets.get<Pixi.Texture>("sky")}
-          filters={blurFilter}
-          ref={(ref) => {
-            objectFit(ref, sceneBounds, "cover");
-          }}
-        />
+        <ObjectFitContainer width={sceneBounds.width} height={sceneBounds.height} fitMode="cover">
+          <Sprite label="Sky" texture={Assets.get<Pixi.Texture>("sky")} filters={blurFilter} />
+        </ObjectFitContainer>
         <TilingSprite
           label="Ground"
           width={sceneBounds.width}
           height={sceneBounds.height * 0.3}
           position={{ x: 0, y: sceneBounds.height * 0.7 }}
-          ref={(tileRef) => {
-            onTick(({ deltaTime }) => {
-              const movementSpeed = props.isRunning ? 1.3 : 0;
-              const directionMultiplier = props.direction === "left" ? 1 : -1;
-              tileRef.tilePosition.x += movementSpeed * directionMultiplier * deltaTime;
-            });
-          }}
+          ref={(instance) => (ground = instance)}
           texture={Assets.get<Pixi.Texture>("ground")}
         />
         <Character
@@ -70,8 +69,6 @@ const DemoScene = (props: { isRunning: boolean; direction: "left" | "right" }) =
 
 export const Demo = () => {
   const playerStore = createPlayerStore();
-  // Solid 2 removed `createResource`. The loader already reports success, so an async
-  // `createMemo` plus a read inside `<Loading>` gates the scene until the assets arrive.
   const assetsReady = createMemo(() => loadSceneAssets());
 
   return (

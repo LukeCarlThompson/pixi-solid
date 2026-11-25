@@ -22,6 +22,17 @@ export const Bird = (props: BirdProps) => {
   // Omitting flyingSpeed so we pass only the valid Container props to our AnimatedSprite
   const containerProps = omit(props, "flyingSpeed");
 
+  let bird: Pixi.AnimatedSprite | undefined;
+  let time = 0;
+
+  onTick((ticker) => {
+    if (!bird) return;
+
+    time = time + ticker.deltaTime * props.flyingSpeed;
+    bird.position.x = Math.sin(time / 90) * 20;
+    bird.position.y = Math.cos(time / 30) * 25;
+  });
+
   return (
     // Spread the containerProps to pass through all valid Container options and the ref
     <Container {...containerProps}>
@@ -30,14 +41,7 @@ export const Bird = (props: BirdProps) => {
         animationSpeed={0.4 * props.flyingSpeed}
         autoPlay={true}
         anchor={0.5}
-        ref={(bird) => {
-          let time = 0;
-          onTick((ticker) => {
-            time = time + ticker.deltaTime * props.flyingSpeed;
-            bird.position.x = Math.sin(time / 90) * 20;
-            bird.position.y = Math.cos(time / 30) * 25;
-          });
-        }}
+        ref={(instance) => (bird = instance)}
       />
     </Container>
   );

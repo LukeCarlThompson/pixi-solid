@@ -6,6 +6,7 @@
     "dev": "astro dev --host",
     "start": "astro dev",
     "build": "astro build",
+    "typecheck": "astro sync && tsc --noEmit -p tsconfig.json",
     "preview": "astro preview",
     "astro": "astro",
     "preinstall": "npx only-allow pnpm"

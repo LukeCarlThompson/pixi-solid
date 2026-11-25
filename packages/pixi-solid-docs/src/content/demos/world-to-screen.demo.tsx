@@ -50,9 +50,13 @@ const SceneContent = () => {
   let elapsed = 0;
   onTick((ticker) => {
     elapsed += 0.02 * ticker.deltaTime;
-    setCube("position", { x: Math.sin(elapsed) * 2, y: 0, z: 0 });
-    setCube("rotation", "x", (x) => x + 0.005 * ticker.deltaTime);
-    setCube("rotation", "y", (y) => y + 0.01 * ticker.deltaTime);
+    setCube((state) => {
+      state.position.x = Math.sin(elapsed) * 2;
+      state.position.y = 0;
+      state.position.z = 0;
+      state.rotation.x += 0.005 * ticker.deltaTime;
+      state.rotation.y += 0.01 * ticker.deltaTime;
+    });
   });
 
   // No refs or imperative reads: the overlay reads the same store the 3D node renders from.

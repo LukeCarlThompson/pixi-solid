@@ -13,8 +13,6 @@ const DemoComponent = () => {
   // Set scale mode for crisp pixel art
   TextureStyle.defaultOptions.scaleMode = "nearest";
 
-  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
-  // suspends, so the enclosing `<Loading>` holds the scene until the textures arrive.
   const assetsReady = createMemo(async () => {
     await Assets.load<Pixi.Texture>([
       { alias: "sky", src: skyAssetUrl },

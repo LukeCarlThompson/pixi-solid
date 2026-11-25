@@ -15,7 +15,7 @@ export const Demo = () => (
 const DemoContent = () => {
   const pixiScreen = usePixiScreen();
 
-  // Solid 2 has no createResource; start the load once the render settles.
+  // Start the load once the render settles.
   const [knightSource, setKnightSource] = createSignal<Scene3DSource>();
 
   onSettled(() => {
