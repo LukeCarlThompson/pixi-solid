@@ -129,6 +129,8 @@ const DelayedAsyncComponent = () => {
 
 Scale an object to fit within the given bounds according to the specified fit mode. Sets the `scale` and `position` properties of the object.
 
+**Use when:** you already hold the instance, such as a Pixi object you constructed yourself. In JSX, use `ObjectFitContainer` instead; a ref callback cannot call this, because it reads context.
+
 ```ts
 type objectFit = (
   object: Pixi.Container,
@@ -170,6 +172,8 @@ objectFit(container, { width: 800, height: 600 }, "contain", "top-left");
 ### `ObjectFitContainer`
 
 A reactive component that accepts children and fits them into a fixed area using `fitMode`, `objectPosition`, and optional `observeBounds`.
+
+**Use when:** you fit JSX children. It re-fits when its props or resolved children change, and it needs no ref.
 
 ```tsx
 import { PixiCanvas, Sprite } from "pixi-solid";
