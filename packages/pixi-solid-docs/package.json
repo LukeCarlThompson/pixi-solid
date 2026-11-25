@@ -1,6 +1,7 @@
 {
   "name": "pixi-solid-docs",
   "version": "0.0.2",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "astro dev --host",
