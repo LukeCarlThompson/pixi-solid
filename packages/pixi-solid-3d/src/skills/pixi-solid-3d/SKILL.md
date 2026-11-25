@@ -109,7 +109,7 @@ import { Model3D } from "pixi-solid-3d";
 import { createSignal, onSettled, Show } from "solid-js";
 
 function Character() {
-  // Solid 2 has no createResource; start the load once the render settles.
+  // Start the load once the render settles.
   const [source, setSource] = createSignal<Scene3DSource>();
 
   onSettled(() => {
@@ -235,7 +235,7 @@ For thousands of copies of one geometry, `<BatchedMesh3D>` draws them without a 
 />
 ```
 
-`size` is required and fixed for the batch's lifetime. Hide a slot with `setVisibleAt(i, false)` to despawn it; there is no `setItemActive` any more. For per-slot shader values such as a tint, pass `instanceData` and write it with `setInstanceDataAt`.
+`size` is required and fixed for the batch's lifetime. Hide a slot with `setVisibleAt(i, false)` to despawn it. For per-slot shader values such as a tint, pass `instanceData` and write it with `setInstanceDataAt`.
 
 ## Particles
 
