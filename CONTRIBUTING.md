@@ -305,16 +305,14 @@ Use `afterEach(() => vi.restoreAllMocks())` to clean up mocks between tests.
 
 ## Pull Requests
 
-A PR into `main` that changes a package must include, for that package:
+A PR that changes a package adds a changelog entry under `## Unreleased` in that package's
+`CHANGELOG.md`.
 
-1. **A version bump** in its `package.json`.
-2. **A changelog entry** in its `CHANGELOG.md`.
+A PR may leave the version alone. Merging publishes only a version that npm does not have, so an
+unbumped merge ships nothing.
 
-Target `main` for a change that ships on its own. Target `release/next` for a small change that
-waits for the next cycle. Target `release/v1` only to patch that line.
-
-On `main`, every PR that changes a package bumps its version. On a release line, only the release PR
-bumps it.
+Target `main` for all work. Target `release/v1` only to patch that line, with its version bump and
+changelog entry.
 
 A PR that changes only CI, repository tooling or documentation bumps nothing and publishes nothing.
 
@@ -359,7 +357,8 @@ The changelog follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) f
 - 🐞 Fixed anchor prop not updating reactively on `Sprite`.
 ```
 
-New entries go at the top of the file, above previous versions.
+Entries for unreleased work go under `## Unreleased` at the top of the file. A release renames that
+heading to the version.
 
 ---
 
@@ -369,11 +368,11 @@ The branch that receives the push publishes the package. The version in the pack
 `package.json` selects the npm dist-tag. Do not publish from a local machine, and do not pass a
 dist-tag by hand.
 
-| Line           | Branch         | Version      | dist-tag    |
-| -------------- | -------------- | ------------ | ----------- |
-| Stable         | `main`         | `2.0.0`      | `latest`    |
-| Next cycle     | `release/next` | `2.1.0-rc.1` | `next`      |
-| v1 maintenance | `release/v1`   | `1.0.2`      | `v1-latest` |
+| Line           | Branch       | Version      | dist-tag    |
+| -------------- | ------------ | ------------ | ----------- |
+| Stable         | `main`       | `2.1.0`      | `latest`    |
+| Pre-release    | any branch   | `2.1.0-rc.1` | `next`      |
+| v1 maintenance | `release/v1` | `1.0.2`      | `v1-latest` |
 
 Two rules produce the table:
 
@@ -393,21 +392,18 @@ It moves the tag and refuses a prerelease version, so an `-rc` cannot reach `lat
 repository token can add a dist-tag but not delete one, so a tag that must disappear needs a token
 with permission to delete a dist-tag.
 
-### Next cycle
+### Cutting a release
 
-Small changes that do not justify a release of their own accumulate on `release/next`.
+A release is a pull request that changes versions, and merging it publishes:
 
-- Target `release/next` with a pull request, and do not bump a version. A content PR publishes
-  nothing.
-- A promotion pull request into `main` bumps only the packages that ship in that release, with their
-  changelog entries, to a stable version.
-- A package left unbumped keeps its published version, and its queued changes wait on `main` for its
-  own release.
-- To publish a candidate before promotion, bump to a prerelease version such as `2.1.0-rc.1` on this
-  branch. That publishes to `next`.
-- A stable version is published from `main` only.
-- Bind the branch to one release, and promote or drop it when the cycle ends.
-- The docs site deploys from `main`, so documentation changes go live at promotion.
+1. Rename `## Unreleased` to the new version in each package that ships, such as `## 2.1.0`.
+2. Set that version in the package's `package.json`.
+
+Each package whose version changed publishes to `latest`. A package left unbumped keeps its
+published version and its entries stay under `## Unreleased`.
+
+To publish a candidate first, set a prerelease version such as `2.1.0-rc.1` instead. That publishes
+to `next`, and the release PR later sets the stable version.
 
 ### Branch discipline
 
