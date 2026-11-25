@@ -305,18 +305,19 @@ Use `afterEach(() => vi.restoreAllMocks())` to clean up mocks between tests.
 
 ## Pull Requests
 
-A PR that changes a package must include, for that package:
+A PR that changes a package adds a changelog entry under `## Unreleased` in that package's
+`CHANGELOG.md`.
 
-1. **A version bump** in its `package.json`.
-2. **A changelog entry** in its `CHANGELOG.md`.
+A PR may leave the version alone. Merging publishes only a version that npm does not have, so an
+unbumped merge ships nothing.
 
-Target `main` for the stable line. Target a release line, such as `release/v1`, only to patch that
-line.
+Target `main` for all work. Target `release/v1` only to patch that line, with its version bump and
+changelog entry.
 
-On `main`, every PR that changes a package bumps its version. On a release line, only the release PR
-bumps it.
+A PR that changes only CI, repository tooling, the docs site or repository documentation bumps
+nothing and publishes nothing.
 
-A PR that changes only CI, repository tooling or documentation bumps nothing and publishes nothing.
+A shipped skill file is part of its package, so it takes a changelog entry.
 
 Follow semantic versioning: `MAJOR.MINOR.PATCH`.
 
@@ -359,50 +360,53 @@ The changelog follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) f
 - 🐞 Fixed anchor prop not updating reactively on `Sprite`.
 ```
 
-New entries go at the top of the file, above previous versions.
+Entries for unreleased work go under `## Unreleased` at the top of the file. A release renames that
+heading to the version.
 
 ---
 
 ## Releasing
 
-The branch that receives the push publishes the package. The version in
-`packages/pixi-solid/package.json` selects the npm dist-tag. Do not publish from a local machine, and
-do not pass a dist-tag by hand.
+The branch that receives the push publishes the package. The version in the package's
+`package.json` selects the npm dist-tag. Do not publish from a local machine, and do not pass a
+dist-tag by hand.
 
-| Line           | Branch                    | Version      | dist-tag    |
-| -------------- | ------------------------- | ------------ | ----------- |
-| Stable         | `main`                    | `2.0.0`      | `latest`    |
-| Prerelease     | a line branched from main | `2.1.0-rc.1` | `next`      |
-| v1 maintenance | `release/v1`              | `1.0.2`      | `v1-latest` |
-
-There is no standing prerelease branch. Cut one from `main` when a prerelease needs one, and delete
-it once the stable version lands. `release/v1` is the only permanent release line, because version 1
-supports Solid 1 and cannot ship from `main`.
+| Line           | Branch       | Version      | dist-tag    |
+| -------------- | ------------ | ------------ | ----------- |
+| Stable         | `main`       | `2.1.0`      | `latest`    |
+| Pre-release    | any branch   | `2.1.0-rc.1` | `next`      |
+| v1 maintenance | `release/v1` | `1.0.2`      | `v1-latest` |
 
 Two rules produce the table:
 
-- A version with a prerelease suffix publishes to `next`, so an `-rc` version cannot reach
-  `latest`.
-- After a stable version publishes to `latest`, the workflow moves `next` onto that same version.
-  `next` therefore never points at a candidate older than the release.
-
-`next` and `latest` are equal most of the time. That is expected: a candidate exists only while one
-is being tested.
-
+- A version with a prerelease suffix publishes to `next`, so an `-rc` version cannot reach `latest`.
 - A stable version publishes to `latest` from `main` only. From any other branch it publishes to
   `v<major>-latest`.
 
+After a stable version publishes to `latest`, the workflow moves `next` onto it, so `next` never
+points at a candidate older than the release. `next` and `latest` are equal most of the time.
+
 `npm publish` always assigns a dist-tag and defaults to `latest`, so
-`.github/workflows/npm-publish.yml` always passes `--tag`. The workflow skips a version that npm
-already has, so a repeated push is safe.
+`.github/workflows/npm-publish.yml` always passes `--tag`. The workflow skips a version npm already
+has, so a repeated push is safe.
 
 If a version lands on the wrong channel, dispatch `npm-retag.yml` with the package, version and tag.
-It moves the tag with the repository token and refuses a prerelease version, so an `-rc` can never
-reach `latest` that way.
+It moves the tag and refuses a prerelease version, so an `-rc` cannot reach `latest` that way. The
+repository token can add a dist-tag but not delete one, so a tag that must disappear needs a token
+with permission to delete a dist-tag.
 
-`next` is not a separate line. It points at the newest candidate while one is being tested, and at
-the current release otherwise. The repository token can add a dist-tag but not remove one, so a tag
-that must disappear needs a token with permission to delete a dist-tag.
+### Cutting a release
+
+A release is a pull request that changes versions, and merging it publishes:
+
+1. Rename `## Unreleased` to the new version in each package that ships, such as `## 2.1.0`.
+2. Set that version in the package's `package.json`.
+
+Each package whose version changed publishes to `latest`. A package left unbumped keeps its
+published version and its entries stay under `## Unreleased`.
+
+To publish a candidate first, set a prerelease version such as `2.1.0-rc.1` instead. That publishes
+to `next`, and the release PR later sets the stable version.
 
 ### Branch discipline
 

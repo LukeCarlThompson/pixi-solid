@@ -173,7 +173,7 @@ let container: Pixi.Container | undefined;
 <Container ref={container} />;
 ```
 
-A ref callback **captures, and nothing else**. It runs once, without an owner. `onCleanup` inside one never runs, an effect created inside one never disposes, and `useContext` inside one throws. Reading a signal inside one does not re-run it.
+A ref callback **captures, and nothing else**. It runs once, without an owner. `onCleanup` inside one never runs, an effect created inside one never disposes, and `useContext` inside one throws. The same applies to anything that reads context, such as `onTick` and `objectFit`. Reading a signal inside one does not re-run it.
 
 ```tsx
 <Container

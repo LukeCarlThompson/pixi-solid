@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 💀 Removed for now removed features.
 - 🐞 Fixed for any bug fixes.
 
+## Unreleased
+
+### Changed
+
+- ⚙️ The shipped skill drops removed-API notes from its model loading and instancing examples.
+
 ## 0.2.0
 
 `pixi-solid-3d` 0.2 runs on SolidJS 2 and requires `pixi-solid` 2. The component names, props and
