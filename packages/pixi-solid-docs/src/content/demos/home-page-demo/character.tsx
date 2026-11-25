@@ -1,6 +1,6 @@
 import { AnimatedSprite, Container } from "pixi-solid";
 import type * as Pixi from "pixi.js";
-import { createEffect, Match, omit, Switch } from "solid-js";
+import { Match, omit, Switch } from "solid-js";
 
 import { getIdleAnimationTextures, getRunAnimationTextures } from "./get-animation-textures";
 
@@ -17,19 +17,7 @@ export const Character = (props: CharacterProps) => {
       <Switch>
         <Match when={props.isRunning}>
           <AnimatedSprite
-            autoPlay={props.isRunning}
-            ref={(instance) => {
-              createEffect(
-                () => props.isRunning,
-                (isRunning) => {
-                  if (isRunning) {
-                    instance.play();
-                  } else {
-                    instance.stop();
-                  }
-                },
-              );
-            }}
+            autoPlay={true}
             textures={getRunAnimationTextures()}
             scaleX={props.direction === "left" ? -1 : 1}
             animationSpeed={0.25}

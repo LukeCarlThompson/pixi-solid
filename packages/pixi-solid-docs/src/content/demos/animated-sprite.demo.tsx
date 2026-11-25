@@ -13,8 +13,6 @@ import assetUrl_06 from "@/assets/run_06.png";
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
 
-  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
-  // suspends, so the enclosing `<Loading>` holds the scene until the textures arrive.
   const textures = createMemo(async () => {
     // Setting scale mode to nearest for crisp pixel art
     TextureStyle.defaultOptions.scaleMode = "nearest";

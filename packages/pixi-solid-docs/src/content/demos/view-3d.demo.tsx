@@ -1,3 +1,4 @@
+import type * as Pixi3D from "@pixi/3d";
 import { CubeGeometry, Material3D } from "@pixi/3d";
 import { onTick, PixiCanvas, usePixiScreen } from "pixi-solid";
 import {
@@ -26,6 +27,15 @@ const DemoContent = () => {
     metallic: 0.2,
   });
 
+  let cube: Pixi3D.Container3D | undefined;
+
+  onTick((ticker) => {
+    if (!cube) return;
+
+    cube.rotation.y += 0.01 * ticker.deltaTime;
+    cube.rotation.x += 0.005 * ticker.deltaTime;
+  });
+
   return (
     <View3D width={pixiScreen.width} height={pixiScreen.height} toneMapping="aces">
       <Camera3D x={0} y={3} z={5} />
@@ -39,14 +49,7 @@ const DemoContent = () => {
         z={5}
         lookAt={{ x: 0, y: 0, z: 0 }}
       />
-      <Container3D
-        ref={(cubeContainer) => {
-          onTick((ticker) => {
-            cubeContainer.rotation.y += 0.01 * ticker.deltaTime;
-            cubeContainer.rotation.x += 0.005 * ticker.deltaTime;
-          });
-        }}
-      >
+      <Container3D ref={(container) => (cube = container)}>
         <Mesh3D geometry={geometry} material={material} castShadow={true} receiveShadow={true} />
       </Container3D>
     </View3D>

@@ -19,7 +19,6 @@ export const createPlayerStore = (): PlayerStore => {
     direction: "right",
   });
 
-  // Solid 2 setters take a single draft callback; per-path setters are gone.
   const toggleRunning = () => {
     setState((state) => {
       state.isRunning = !state.isRunning;

@@ -10,21 +10,21 @@ const DemoComponent = () => {
   // Setting scale mode to nearest for crisp pixel art
   TextureStyle.defaultOptions.scaleMode = "nearest";
 
-  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
-  // suspends, so the enclosing `<Loading>` holds the scene until the texture arrives.
   const texture = createMemo(() => Assets.load<Pixi.Texture>(assetUrl));
+
+  let tile: Pixi.TilingSprite | undefined;
+
+  onTick((ticker) => {
+    if (tile) tile.tilePosition.x -= 2 * ticker.deltaTime;
+  });
 
   return (
     <Loading>
       <TilingSprite
-        ref={(tileRef) => {
-          onTick((ticker) => {
-            tileRef.tilePosition.x -= 2 * ticker.deltaTime;
-          });
-          tileRef.width = pixiScreen.width;
-          tileRef.height = pixiScreen.height * 0.5;
-          tileRef.position.y = pixiScreen.height * 0.5;
-        }}
+        ref={(instance) => (tile = instance)}
+        width={pixiScreen.width}
+        height={pixiScreen.height * 0.5}
+        position={{ x: 0, y: pixiScreen.height * 0.5 }}
         texture={texture()}
         tileScale={{ x: 3, y: 3 }}
       />

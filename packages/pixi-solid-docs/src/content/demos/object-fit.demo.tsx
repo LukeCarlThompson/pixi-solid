@@ -25,7 +25,6 @@ const DemoScene = (props: { fitMode: ObjectFitMode; objectPosition: ObjectPositi
   const pixiScreen = usePixiScreen();
   let graphicsRef: Pixi.Graphics | undefined;
 
-  // Solid 2 removed the single-argument `createEffect`; name the dependencies in the compute phase.
   createEffect(
     () => [props.fitMode, props.objectPosition] as const,
     ([fitMode, objectPosition]) => {
@@ -48,7 +47,6 @@ const DemoScene = (props: { fitMode: ObjectFitMode; objectPosition: ObjectPositi
         ref={(g) => {
           graphicsRef = g;
           g.rect(0, 0, 100, 200).fill("#bc3232").circle(50, 100, 35).fill("#519d70");
-          objectFit(g, bounds, props.fitMode, props.objectPosition);
         }}
       />
     </Container>

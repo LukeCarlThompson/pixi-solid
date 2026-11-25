@@ -18,8 +18,6 @@ const DemoComponent = () => {
   const [flyingSpeed, setFlyingSpeed] = createSignal(1);
   const pixiScreen = usePixiScreen();
 
-  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
-  // suspends, so the enclosing `<Loading>` holds the scene until the textures arrive.
   const assetsReady = createMemo(async () => {
     await Assets.init();
     // Setting scale mode to nearest for crisp pixel art

@@ -7,8 +7,6 @@ import assetUrl from "@/assets/nine-slice.png";
 
 const DemoComponent = () => {
   const pixiScreen = usePixiScreen();
-  // Solid 2 removed `createResource`. An async `createMemo` is the replacement: reading it
-  // suspends, so the enclosing `<Loading>` holds the scene until the texture arrives.
   const texture = createMemo(() => Assets.load<Pixi.Texture>(assetUrl));
 
   return (
