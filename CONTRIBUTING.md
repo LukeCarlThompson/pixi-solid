@@ -305,13 +305,13 @@ Use `afterEach(() => vi.restoreAllMocks())` to clean up mocks between tests.
 
 ## Pull Requests
 
-A PR that changes a package must include, for that package:
+A PR into `main` that changes a package must include, for that package:
 
 1. **A version bump** in its `package.json`.
 2. **A changelog entry** in its `CHANGELOG.md`.
 
-Target `main` for the stable line. Target a release line, such as `release/v1`, only to patch that
-line.
+Target `main` for a change that ships on its own. Target `release/next` for a small change that
+waits for the next cycle. Target `release/v1` only to patch that line.
 
 On `main`, every PR that changes a package bumps its version. On a release line, only the release PR
 bumps it.
@@ -365,44 +365,49 @@ New entries go at the top of the file, above previous versions.
 
 ## Releasing
 
-The branch that receives the push publishes the package. The version in
-`packages/pixi-solid/package.json` selects the npm dist-tag. Do not publish from a local machine, and
-do not pass a dist-tag by hand.
+The branch that receives the push publishes the package. The version in the package's
+`package.json` selects the npm dist-tag. Do not publish from a local machine, and do not pass a
+dist-tag by hand.
 
-| Line           | Branch                    | Version      | dist-tag    |
-| -------------- | ------------------------- | ------------ | ----------- |
-| Stable         | `main`                    | `2.0.0`      | `latest`    |
-| Prerelease     | a line branched from main | `2.1.0-rc.1` | `next`      |
-| v1 maintenance | `release/v1`              | `1.0.2`      | `v1-latest` |
-
-There is no standing prerelease branch. Cut one from `main` when a prerelease needs one, and delete
-it once the stable version lands. `release/v1` is the only permanent release line, because version 1
-supports Solid 1 and cannot ship from `main`.
+| Line           | Branch         | Version      | dist-tag    |
+| -------------- | -------------- | ------------ | ----------- |
+| Stable         | `main`         | `2.0.0`      | `latest`    |
+| Next cycle     | `release/next` | `2.1.0-rc.1` | `next`      |
+| v1 maintenance | `release/v1`   | `1.0.2`      | `v1-latest` |
 
 Two rules produce the table:
 
-- A version with a prerelease suffix publishes to `next`, so an `-rc` version cannot reach
-  `latest`.
-- After a stable version publishes to `latest`, the workflow moves `next` onto that same version.
-  `next` therefore never points at a candidate older than the release.
-
-`next` and `latest` are equal most of the time. That is expected: a candidate exists only while one
-is being tested.
-
+- A version with a prerelease suffix publishes to `next`, so an `-rc` version cannot reach `latest`.
 - A stable version publishes to `latest` from `main` only. From any other branch it publishes to
   `v<major>-latest`.
 
+After a stable version publishes to `latest`, the workflow moves `next` onto it, so `next` never
+points at a candidate older than the release. `next` and `latest` are equal most of the time.
+
 `npm publish` always assigns a dist-tag and defaults to `latest`, so
-`.github/workflows/npm-publish.yml` always passes `--tag`. The workflow skips a version that npm
-already has, so a repeated push is safe.
+`.github/workflows/npm-publish.yml` always passes `--tag`. The workflow skips a version npm already
+has, so a repeated push is safe.
 
 If a version lands on the wrong channel, dispatch `npm-retag.yml` with the package, version and tag.
-It moves the tag with the repository token and refuses a prerelease version, so an `-rc` can never
-reach `latest` that way.
+It moves the tag and refuses a prerelease version, so an `-rc` cannot reach `latest` that way. The
+repository token can add a dist-tag but not delete one, so a tag that must disappear needs a token
+with permission to delete a dist-tag.
 
-`next` is not a separate line. It points at the newest candidate while one is being tested, and at
-the current release otherwise. The repository token can add a dist-tag but not remove one, so a tag
-that must disappear needs a token with permission to delete a dist-tag.
+### Next cycle
+
+Small changes that do not justify a release of their own accumulate on `release/next`.
+
+- Target `release/next` with a pull request, and do not bump a version. A content PR publishes
+  nothing.
+- A promotion pull request into `main` bumps only the packages that ship in that release, with their
+  changelog entries, to a stable version.
+- A package left unbumped keeps its published version, and its queued changes wait on `main` for its
+  own release.
+- To publish a candidate before promotion, bump to a prerelease version such as `2.1.0-rc.1` on this
+  branch. That publishes to `next`.
+- A stable version is published from `main` only.
+- Bind the branch to one release, and promote or drop it when the cycle ends.
+- The docs site deploys from `main`, so documentation changes go live at promotion.
 
 ### Branch discipline
 
