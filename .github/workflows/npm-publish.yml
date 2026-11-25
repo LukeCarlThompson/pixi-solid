@@ -1,13 +1,16 @@
-# Publish the workspace libraries to npm (pnpm). Each package is published only when its version is
-# not already on the registry, so bumping one package does not republish the other.
+# Publish the workspace libraries to npm (pnpm).
+#
+# A preflight job builds the matrix from the workspace and keeps only the packages whose current
+# version is not on npm, so no package list is maintained by hand. When every version is already
+# published the publish job is skipped rather than reported as a success.
 #
 # The npm dist-tag is derived from each package's own version:
-#   - prerelease version (0.2.0-beta.1) -> next
+#   - prerelease version (2.1.0-rc.1)   -> next
 #   - stable version on main            -> latest
-#   - stable version on any other branch -> v<major>-latest (for example v0-latest)
+#   - stable version on any other branch -> v<major>-latest (for example v1-latest)
 #
-# `next` means the upcoming version. When a stable version publishes to latest there is
-# no upcoming version, so `next` follows latest rather than pointing at an older candidate.
+# `next` means the upcoming version. When a stable version publishes to latest there is no upcoming
+# version, so `next` follows latest rather than pointing at an older candidate.
 #
 # Triggers:
 #  - push to main or a release line (real publish)
@@ -29,17 +32,35 @@ permissions:
   contents: read
 
 jobs:
-  publish:
+  prepare:
     # A branch deletion also fires a push event, and there is nothing to publish.
     if: github.event_name != 'push' || github.event.deleted == false
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.21.1
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Resolve unpublished packages
+        id: matrix
+        run: node .github/scripts/unpublished-matrix.mjs
+
+  publish:
+    needs: prepare
+    if: needs.prepare.outputs.matrix != '' && needs.prepare.outputs.matrix != '[]'
     runs-on: ubuntu-latest
     strategy:
       # One package failing should not hide the other's result.
       fail-fast: false
       matrix:
-        package:
-          - pixi-solid
-          - pixi-solid-3d
+        include: ${{ fromJson(needs.prepare.outputs.matrix) }}
     env:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
@@ -61,29 +82,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Check if version is already published
-        id: check_published
-        run: node .github/scripts/check-published-version.mjs packages/${{ matrix.package }}
-
       # Every package builds before anything publishes, because the packages depend on each other.
       - name: Build all packages
-        if: steps.check_published.outputs.published == 'false'
         run: pnpm build
 
       - name: Typecheck
-        if: steps.check_published.outputs.published == 'false'
         run: pnpm --filter "${{ matrix.package }}" typecheck
 
       - name: Test
-        if: steps.check_published.outputs.published == 'false'
         run: pnpm --filter "${{ matrix.package }}" test
 
       - name: Resolve npm dist-tag
         id: dist_tag
-        if: steps.check_published.outputs.published == 'false'
         run: |
           set -euo pipefail
-          version=$(node -p "require('./packages/${{ matrix.package }}/package.json').version")
+          version='${{ matrix.version }}'
 
           if [[ "$version" == *-* ]]; then
             dist_tag=next
@@ -97,24 +110,37 @@ jobs:
           echo "dist_tag=$dist_tag" >> "$GITHUB_OUTPUT"
 
       - name: Verify npm auth (safe)
-        if: steps.check_published.outputs.published == 'false'
         run: pnpm whoami --registry=https://registry.npmjs.org/ || true
 
       - name: Publish (dry-run for manual runs)
-        if: github.event_name == 'workflow_dispatch' && steps.check_published.outputs.published == 'false'
+        if: github.event_name == 'workflow_dispatch'
         run: pnpm --filter "${{ matrix.package }}" publish --access public --no-git-checks --dry-run --tag "${{ steps.dist_tag.outputs.dist_tag }}"
 
       - name: Publish
-        if: github.event_name == 'push' && steps.check_published.outputs.published == 'false'
+        if: github.event_name == 'push'
         run: pnpm --filter "${{ matrix.package }}" publish --access public --no-git-checks --tag "${{ steps.dist_tag.outputs.dist_tag }}"
 
-      # `next` must never sit on an older candidate once a stable version is out. The token
-      # can add a dist-tag but not delete one, so move it rather than remove it.
+      # `next` must never sit on an older candidate once a stable version is out. The token can add a
+      # dist-tag but not delete one, so move it rather than remove it.
       - name: Park next on the stable version
-        if: github.event_name == 'push' && steps.check_published.outputs.published == 'false' && steps.dist_tag.outputs.dist_tag == 'latest'
+        if: github.event_name == 'push' && steps.dist_tag.outputs.dist_tag == 'latest'
         run: |
           set -euo pipefail
           name=$(node -p "require('./packages/${{ matrix.package }}/package.json').name")
-          version=$(node -p "require('./packages/${{ matrix.package }}/package.json').version")
+          version='${{ matrix.version }}'
           npm dist-tag add "$name@$version" next --registry=https://registry.npmjs.org/
           npm view "$name" dist-tags --json
+
+      - name: Record the result
+        if: always()
+        run: |
+          set -euo pipefail
+          {
+            echo "### Publish result"
+            echo ""
+            echo "| Package | Version | dist-tag |"
+            echo "| --- | --- | --- |"
+            echo "| ${{ matrix.package }} | ${{ matrix.version }} | ${{ steps.dist_tag.outputs.dist_tag || 'not resolved' }} |"
+            echo ""
+            echo "Job status: ${{ job.status }}"
+          } >> "$GITHUB_STEP_SUMMARY"
