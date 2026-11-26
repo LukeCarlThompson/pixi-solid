@@ -4,7 +4,8 @@
   margin: 1.75rem 0 2.5rem;
 }
 
-// The stage owns the frame; the live demo fills it.
+// The stage frames whatever the demo renders and never imposes its own height: demos with
+// controls would be squeezed, and a canvas already carries its own shape.
 .stage {
   position: relative;
   overflow: hidden;
@@ -13,7 +14,12 @@
   background: var(--ps-bg-soft);
 }
 
+// Sizes itself to the demo; the demo owns its layout.
 .live {
-  position: absolute;
-  inset: 0;
+  position: relative;
+}
+
+// Only while the module loads, so the placeholder has a box to cover.
+.loading {
+  min-height: 14rem;
 }

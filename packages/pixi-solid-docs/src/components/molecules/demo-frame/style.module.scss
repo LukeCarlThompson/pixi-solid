@@ -1,10 +1,12 @@
 .frame {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  display: grid;
+  place-items: center;
   display: grid;
   place-items: center;
   align-content: center;
   gap: 0.75rem;
+  aspect-ratio: 16 / 9;
   background:
     radial-gradient(
       circle at 30% 20%,
@@ -12,6 +14,13 @@
       transparent 60%
     ),
     var(--ps-bg-soft);
+}
+
+// Covers the demo while its module loads; the demo sizes the stage once it mounts.
+.overlay {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
 }
 
 .label {
