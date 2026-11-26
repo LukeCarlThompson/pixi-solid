@@ -2,7 +2,11 @@
   "options": {
     "typeAware": true
   },
-  "ignorePatterns": ["pixi-3d/**", "packages/pixi-solid-docs-next/src/code-examples/**"],
+  "ignorePatterns": [
+    "pixi-3d/**",
+    "packages/pixi-solid-docs/src/code-examples/**",
+    "packages/pixi-solid-docs/file-routes.d.ts"
+  ],
   "categories": {
     "correctness": "error"
   },

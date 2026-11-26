@@ -1,6 +1,0 @@
-{
-  "rules": {
-    "no-unassigned-vars": "off",
-    "typescript/explicit-module-boundary-types": "off"
-  }
-}

@@ -1,5 +1,9 @@
 {
-  "extends": ["astro/tsconfigs/strict", "../../tsconfig.json"],
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "extends": "../../tsconfig.json",
+  "include": ["./src/**/*", "./vite.config.ts", "./file-routes.d.ts"],
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["vite/client"],
+    "allowImportingTsExtensions": true
+  }
 }
