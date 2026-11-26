@@ -1,10 +1,10 @@
 import type { JSX } from "@solidjs/web";
 import { Show } from "solid-js";
 
-import { href } from "../../href";
-import { orderedPages } from "../../nav";
+import { href } from "../../../href";
+import { orderedPages } from "../../../nav";
 
-import styles from "./Pagination.module.scss";
+import styles from "./style.module.scss";
 
 export type PaginationProps = {
   currentPath: string;

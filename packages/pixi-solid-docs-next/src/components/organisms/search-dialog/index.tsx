@@ -2,9 +2,9 @@ import type { JSX } from "@solidjs/web";
 import MiniSearch from "minisearch";
 import { createEffect, createSignal, For, onSettled, Show } from "solid-js";
 
-import { href } from "../../href";
+import { href } from "../../../href";
 
-import styles from "./SearchDialog.module.scss";
+import styles from "./style.module.scss";
 
 type SearchRecord = { id: string; title: string; headings: string; text: string };
 

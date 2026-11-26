@@ -1,10 +1,10 @@
 import type { JSX } from "@solidjs/web";
 import { For } from "solid-js";
 
-import { href } from "../../href";
-import { navGroups } from "../../nav";
+import { href } from "../../../href";
+import { navGroups } from "../../../nav";
 
-import styles from "./Sidebar.module.scss";
+import styles from "./style.module.scss";
 
 export type SidebarProps = {
   currentPath: string;

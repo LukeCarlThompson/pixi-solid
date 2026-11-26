@@ -1,9 +1,9 @@
 import type { JSX } from "@solidjs/web";
 
-import { href } from "../../href";
-import { ThemeToggle } from "../atoms/ThemeToggle";
+import { href } from "../../../href";
+import { ThemeToggle } from "../../atoms/theme-toggle";
 
-import styles from "./Header.module.scss";
+import styles from "./style.module.scss";
 
 export type HeaderProps = {
   onOpenNav: () => void;

@@ -1,8 +1,7 @@
 import type { JSX } from "@solidjs/web";
 
 import snippet1 from "../../code-examples/hooks-on-resize-1.tsx?raw";
-import { Aside } from "../../components/molecules/Aside";
-import { CodeBlock } from "../../components/molecules/CodeBlock";
+import { Aside, CodeBlock } from "../../components";
 
 export const route = {
   info: {

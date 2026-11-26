@@ -2,7 +2,7 @@ import type { JSX } from "@solidjs/web";
 
 import snippet2 from "../../code-examples/testing-mount-scene-2.tsx?raw";
 import snippet4 from "../../code-examples/testing-mount-scene-4.tsx?raw";
-import { CodeBlock } from "../../components/molecules/CodeBlock";
+import { CodeBlock } from "../../components";
 import { href } from "../../href";
 
 export const route = {

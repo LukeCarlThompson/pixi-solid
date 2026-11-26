@@ -1,7 +1,7 @@
 import type { JSX } from "@solidjs/web";
 import type { ParentProps } from "solid-js";
 
-import styles from "./Button.module.scss";
+import styles from "./style.module.scss";
 
 export type ButtonProps = ParentProps<{
   label: string;

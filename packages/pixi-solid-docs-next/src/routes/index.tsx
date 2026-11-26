@@ -1,9 +1,7 @@
 import type { JSX } from "@solidjs/web";
 import { clientOnly } from "@solidjs/web";
 
-import { CodeBlock } from "../components/molecules/CodeBlock";
-import { DemoFrame } from "../components/molecules/DemoFrame";
-import { Tabs } from "../components/molecules/Tabs";
+import { CodeBlock, DemoFrame, Tabs } from "../components";
 import characterSource from "../demos/home-page-demo/character.tsx?raw";
 import controlsSource from "../demos/home-page-demo/controls/index.tsx?raw";
 import controlsStyles from "../demos/home-page-demo/controls/style.module.css?raw";

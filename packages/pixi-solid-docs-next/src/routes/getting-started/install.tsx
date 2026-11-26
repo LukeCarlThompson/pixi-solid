@@ -1,7 +1,6 @@
 import type { JSX } from "@solidjs/web";
 
-import { Aside } from "../../components/molecules/Aside";
-import { CodeBlock } from "../../components/molecules/CodeBlock";
+import { Aside, CodeBlock } from "../../components";
 
 export const route = {
   info: {

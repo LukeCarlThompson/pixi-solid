@@ -1,7 +1,7 @@
 import type { JSX } from "@solidjs/web";
 import { createSignal, For } from "solid-js";
 
-import styles from "./Tabs.module.scss";
+import styles from "./style.module.scss";
 
 export type TabItem = {
   label: string;

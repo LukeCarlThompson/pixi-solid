@@ -3,15 +3,15 @@ import type { HeadTag, JSX } from "@solidjs/web";
 import { useHead } from "@solidjs/web";
 import { createEffect, createSignal, onSettled, Show } from "solid-js";
 
-import { pagesByPath } from "../../nav";
-import { installViewTransitions } from "../../view-transition";
-import { Pagination } from "../molecules/Pagination";
-import { Header } from "../organisms/Header";
-import { SearchDialog } from "../organisms/SearchDialog";
-import { Sidebar } from "../organisms/Sidebar";
-import { TableOfContents } from "../organisms/TableOfContents";
+import { pagesByPath } from "../../../nav";
+import { installViewTransitions } from "../../../view-transition";
+import { Pagination } from "../../molecules/pagination";
+import { Header } from "../../organisms/header";
+import { SearchDialog } from "../../organisms/search-dialog";
+import { Sidebar } from "../../organisms/sidebar";
+import { TableOfContents } from "../../organisms/table-of-contents";
 
-import styles from "./DocsLayout.module.scss";
+import styles from "./style.module.scss";
 
 const SITE_URL = "https://lukecarlthompson.github.io";
 

@@ -1,7 +1,7 @@
 import type { JSX } from "@solidjs/web";
 import { createSignal, For, onSettled, Show } from "solid-js";
 
-import styles from "./TableOfContents.module.scss";
+import styles from "./style.module.scss";
 
 export type TableOfContentsProps = {
   sections: readonly { id: string; title: string }[];

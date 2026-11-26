@@ -1,9 +1,7 @@
 import type { JSX } from "@solidjs/web";
 import { clientOnly } from "@solidjs/web";
 
-import { CodeBlock } from "../../components/molecules/CodeBlock";
-import { Tabs } from "../../components/molecules/Tabs";
-import { DemoSection } from "../../components/organisms/DemoSection";
+import { CodeBlock, DemoSection, Tabs } from "../../components";
 import demoCode from "../../demos/pass-through-props.demo.tsx?raw";
 import exampleCode from "../../demos/pass-through-props.tsx?raw";
 

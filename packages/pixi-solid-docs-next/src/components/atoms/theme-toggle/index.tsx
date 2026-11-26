@@ -1,8 +1,9 @@
 import type { JSX } from "@solidjs/web";
 import { createSignal } from "solid-js";
 
-import { Button } from "./Button";
-import styles from "./ThemeToggle.module.scss";
+import { Button } from "../button";
+
+import styles from "./style.module.scss";
 
 const readTheme = (): "light" | "dark" =>
   document.documentElement.dataset.theme === "light" ? "light" : "dark";

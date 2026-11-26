@@ -1,9 +1,7 @@
 import type { JSX } from "@solidjs/web";
 import { clientOnly } from "@solidjs/web";
 
-import { CodeBlock } from "../../components/molecules/CodeBlock";
-import { Tabs } from "../../components/molecules/Tabs";
-import { DemoSection } from "../../components/organisms/DemoSection";
+import { CodeBlock, DemoSection, Tabs } from "../../components";
 import demoCode from "../../demos/bitmap-text.demo.tsx?raw";
 
 const BitmapTextDemo = clientOnly(() => import("../../demos/bitmap-text.demo"), { export: "Demo" });

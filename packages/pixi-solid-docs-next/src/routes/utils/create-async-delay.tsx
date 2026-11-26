@@ -2,7 +2,7 @@ import type { JSX } from "@solidjs/web";
 
 import snippet1 from "../../code-examples/utils-create-async-delay-1.tsx?raw";
 import snippet2 from "../../code-examples/utils-create-async-delay-2.tsx?raw";
-import { CodeBlock } from "../../components/molecules/CodeBlock";
+import { CodeBlock } from "../../components";
 
 export const route = {
   info: {

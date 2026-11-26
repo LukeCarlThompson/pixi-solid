@@ -2,8 +2,7 @@ import type { JSX } from "@solidjs/web";
 import { clientOnly } from "@solidjs/web";
 
 import snippet1 from "../../code-examples/components-split-bitmap-text-1.tsx?raw";
-import { CodeBlock } from "../../components/molecules/CodeBlock";
-import { DemoSection } from "../../components/organisms/DemoSection";
+import { CodeBlock, DemoSection } from "../../components";
 import demoCode from "../../demos/split-bitmap-text.demo.tsx?raw";
 import { href } from "../../href";
 

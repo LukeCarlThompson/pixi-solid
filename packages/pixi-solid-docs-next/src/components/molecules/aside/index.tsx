@@ -2,7 +2,7 @@ import type { JSX } from "@solidjs/web";
 import { Show } from "solid-js";
 import type { ParentProps } from "solid-js";
 
-import styles from "./Aside.module.scss";
+import styles from "./style.module.scss";
 
 export type AsideProps = ParentProps<{
   tone?: "note" | "tip" | "warning";

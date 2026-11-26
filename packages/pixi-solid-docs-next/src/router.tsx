@@ -1,6 +1,6 @@
 import { createRouter } from "@solidjs/router";
 
-import { DocsLayout } from "./components/templates/DocsLayout";
+import { DocsLayout } from "./components/templates/docs-layout";
 import { fileRouteDefinitions } from "./routes";
 import NotFound from "./routes/404";
 

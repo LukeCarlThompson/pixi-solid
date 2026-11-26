@@ -3,8 +3,7 @@ import { clientOnly } from "@solidjs/web";
 
 import snippet1 from "../../code-examples/3d-container-texture-1.tsx?raw";
 import snippet3 from "../../code-examples/3d-container-texture-3.tsx?raw";
-import { CodeBlock } from "../../components/molecules/CodeBlock";
-import { DemoSection } from "../../components/organisms/DemoSection";
+import { CodeBlock, DemoSection } from "../../components";
 import demoCode from "../../demos/container-texture.demo.tsx?raw";
 
 const ContainerTextureDemo = clientOnly(() => import("../../demos/container-texture.demo"), {

@@ -3,8 +3,7 @@ import { clientOnly } from "@solidjs/web";
 
 import snippet1 from "../../code-examples/3d-meshes-and-materials-1.tsx?raw";
 import snippet5 from "../../code-examples/3d-meshes-and-materials-5.tsx?raw";
-import { CodeBlock } from "../../components/molecules/CodeBlock";
-import { DemoSection } from "../../components/organisms/DemoSection";
+import { CodeBlock, DemoSection } from "../../components";
 import demoCode from "../../demos/meshes-and-materials.demo.tsx?raw";
 
 const MeshesAndMaterialsDemo = clientOnly(() => import("../../demos/meshes-and-materials.demo"), {

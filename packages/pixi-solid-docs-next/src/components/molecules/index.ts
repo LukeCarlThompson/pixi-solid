@@ -1,0 +1,10 @@
+export { Aside } from "./aside";
+export type { AsideProps } from "./aside";
+export { CodeBlock } from "./code-block";
+export type { CodeBlockProps, CodeLang } from "./code-block";
+export { DemoFrame } from "./demo-frame";
+export type { DemoFrameProps } from "./demo-frame";
+export { Pagination } from "./pagination";
+export type { PaginationProps } from "./pagination";
+export { Tabs } from "./tabs";
+export type { TabItem, TabsProps } from "./tabs";

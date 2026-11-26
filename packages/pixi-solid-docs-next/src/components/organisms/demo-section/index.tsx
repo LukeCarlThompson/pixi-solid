@@ -1,10 +1,10 @@
 import type { JSX } from "@solidjs/web";
 import { Show } from "solid-js";
 
-import { CodeBlock } from "../molecules/CodeBlock";
-import { DemoFrame } from "../molecules/DemoFrame";
+import { CodeBlock } from "../../molecules/code-block";
+import { DemoFrame } from "../../molecules/demo-frame";
 
-import styles from "./DemoSection.module.scss";
+import styles from "./style.module.scss";
 
 export type DemoSectionProps = {
   title?: string;

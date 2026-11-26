@@ -1,8 +1,7 @@
 import type { JSX } from "@solidjs/web";
 import { clientOnly } from "@solidjs/web";
 
-import { CodeBlock } from "../../components/molecules/CodeBlock";
-import { DemoSection } from "../../components/organisms/DemoSection";
+import { CodeBlock, DemoSection } from "../../components";
 import demoCode from "../../demos/render-container.demo.tsx?raw";
 
 const RenderContainerDemo = clientOnly(() => import("../../demos/render-container.demo"), {

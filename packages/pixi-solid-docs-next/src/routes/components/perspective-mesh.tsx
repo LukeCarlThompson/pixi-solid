@@ -1,8 +1,7 @@
 import type { JSX } from "@solidjs/web";
 import { clientOnly } from "@solidjs/web";
 
-import { CodeBlock } from "../../components/molecules/CodeBlock";
-import { DemoSection } from "../../components/organisms/DemoSection";
+import { CodeBlock, DemoSection } from "../../components";
 import demoCode from "../../demos/perspective-mesh.demo.tsx?raw";
 
 const PerspectiveMeshDemo = clientOnly(() => import("../../demos/perspective-mesh.demo"), {

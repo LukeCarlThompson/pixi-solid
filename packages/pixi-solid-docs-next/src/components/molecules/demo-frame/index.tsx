@@ -1,6 +1,6 @@
 import type { JSX } from "@solidjs/web";
 
-import styles from "./DemoFrame.module.scss";
+import styles from "./style.module.scss";
 
 export type DemoFrameProps = {
   label?: string;

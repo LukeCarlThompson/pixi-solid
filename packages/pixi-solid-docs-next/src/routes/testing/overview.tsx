@@ -1,6 +1,6 @@
 import type { JSX } from "@solidjs/web";
 
-import { CodeBlock } from "../../components/molecules/CodeBlock";
+import { CodeBlock } from "../../components";
 import { href } from "../../href";
 
 export const route = {

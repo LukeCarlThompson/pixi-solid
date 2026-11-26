@@ -2,7 +2,7 @@ import type { JSX } from "@solidjs/web";
 
 import snippet1 from "../../code-examples/asset-loading-asset-manifest-1.json?raw";
 import snippet2 from "../../code-examples/asset-loading-asset-manifest-2.tsx?raw";
-import { CodeBlock } from "../../components/molecules/CodeBlock";
+import { CodeBlock } from "../../components";
 import { href } from "../../href";
 
 export const route = {

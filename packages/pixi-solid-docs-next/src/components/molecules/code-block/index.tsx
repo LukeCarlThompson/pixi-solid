@@ -6,7 +6,7 @@ import json from "refractor/json";
 import tsx from "refractor/tsx";
 import { createMemo, createSignal } from "solid-js";
 
-import styles from "./CodeBlock.module.scss";
+import styles from "./style.module.scss";
 
 refractor.register(tsx);
 refractor.register(bash);
