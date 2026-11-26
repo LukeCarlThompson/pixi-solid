@@ -1,0 +1,1810 @@
+{
+  "../../node_modules/.pnpm/@fontsource-variable+outfit@5.3.0/node_modules/@fontsource-variable/outfit/files/outfit-latin-ext-wght-normal.woff2": {
+    "file": "assets/outfit-latin-ext-wght-normal-DdQaqQDo.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+outfit@5.3.0/node_modules/@fontsource-variable/outfit/files/outfit-latin-ext-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+outfit@5.3.0/node_modules/@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2": {
+    "file": "assets/outfit-latin-wght-normal-Bc-8i84L.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+outfit@5.3.0/node_modules/@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-cyrillic-ext-wght-normal.woff2": {
+    "file": "assets/roboto-mono-cyrillic-ext-wght-normal-BUDPrIko.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-cyrillic-ext-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-cyrillic-wght-normal.woff2": {
+    "file": "assets/roboto-mono-cyrillic-wght-normal-HUlVHixE.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-cyrillic-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-greek-wght-normal.woff2": {
+    "file": "assets/roboto-mono-greek-wght-normal-BJJTbwTT.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-greek-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-latin-ext-wght-normal.woff2": {
+    "file": "assets/roboto-mono-latin-ext-wght-normal-QAYlOegK.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-latin-ext-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-latin-wght-normal.woff2": {
+    "file": "assets/roboto-mono-latin-wght-normal-CZtBPCCa.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-latin-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-vietnamese-wght-normal.woff2": {
+    "file": "assets/roboto-mono-vietnamese-wght-normal-DlC-zuDL.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto-mono@5.3.0/node_modules/@fontsource-variable/roboto-mono/files/roboto-mono-vietnamese-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-cyrillic-ext-wght-normal.woff2": {
+    "file": "assets/roboto-cyrillic-ext-wght-normal-BCp_3N7R.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-cyrillic-ext-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-cyrillic-wght-normal.woff2": {
+    "file": "assets/roboto-cyrillic-wght-normal-fOt7epNf.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-cyrillic-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-greek-ext-wght-normal.woff2": {
+    "file": "assets/roboto-greek-ext-wght-normal-Bgw4czJT.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-greek-ext-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-greek-wght-normal.woff2": {
+    "file": "assets/roboto-greek-wght-normal-DlT9XTxE.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-greek-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-latin-ext-wght-normal.woff2": {
+    "file": "assets/roboto-latin-ext-wght-normal-DYIxWhlt.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-latin-ext-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-latin-wght-normal.woff2": {
+    "file": "assets/roboto-latin-wght-normal-ccAYIvAh.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-latin-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-math-wght-normal.woff2": {
+    "file": "assets/roboto-math-wght-normal-4a3xuzGk.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-math-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-symbols-wght-normal.woff2": {
+    "file": "assets/roboto-symbols-wght-normal-B7iHSfaG.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-symbols-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-vietnamese-wght-normal.woff2": {
+    "file": "assets/roboto-vietnamese-wght-normal-_f1XEJpo.woff2",
+    "src": "../../node_modules/.pnpm/@fontsource-variable+roboto@5.3.0/node_modules/@fontsource-variable/roboto/files/roboto-vietnamese-wght-normal.woff2"
+  },
+  "../../node_modules/.pnpm/@pixi+3d@0.1.0_pixi.js@8.23.0/node_modules/@pixi/3d/dist/core/gl/init.mjs": {
+    "file": "assets/init-BmbbpRqC.js",
+    "name": "init",
+    "src": "../../node_modules/.pnpm/@pixi+3d@0.1.0_pixi.js@8.23.0/node_modules/@pixi/3d/dist/core/gl/init.mjs",
+    "isDynamicEntry": true,
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_RenderTargetSystem-CXGlBGSL.js",
+      "_Container3D-6nYjydl4.js",
+      "_updateView3DScene-BIfgm9px.js",
+      "_instanceFetchBitGl-ImlogTEr.js"
+    ]
+  },
+  "../../node_modules/.pnpm/@pixi+3d@0.1.0_pixi.js@8.23.0/node_modules/@pixi/3d/dist/core/gpu/init.mjs": {
+    "file": "assets/init-COcdNgzw.js",
+    "name": "init",
+    "src": "../../node_modules/.pnpm/@pixi+3d@0.1.0_pixi.js@8.23.0/node_modules/@pixi/3d/dist/core/gpu/init.mjs",
+    "isDynamicEntry": true,
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_dist-BacaWkv9.js",
+      "_getTexelRangeRects-7j664Y_P.js",
+      "_Container3D-6nYjydl4.js",
+      "_updateView3DScene-BIfgm9px.js"
+    ]
+  },
+  "../../node_modules/.pnpm/meshoptimizer@1.3.0/node_modules/meshoptimizer/meshopt_decoder.mjs": {
+    "file": "assets/meshopt_decoder-4Ef-c7zw.js",
+    "name": "meshopt_decoder",
+    "src": "../../node_modules/.pnpm/meshoptimizer@1.3.0/node_modules/meshoptimizer/meshopt_decoder.mjs",
+    "isDynamicEntry": true
+  },
+  "../../node_modules/.pnpm/pixi.js@8.23.0/node_modules/pixi.js/lib/environment-browser/browserAll.mjs": {
+    "file": "assets/browserAll-DgvwroeW.js",
+    "name": "browserAll",
+    "src": "../../node_modules/.pnpm/pixi.js@8.23.0/node_modules/pixi.js/lib/environment-browser/browserAll.mjs",
+    "isDynamicEntry": true,
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_EventSystem-C-891Yha.js",
+      "_init-DeP7i7JM.js"
+    ]
+  },
+  "../../node_modules/.pnpm/pixi.js@8.23.0/node_modules/pixi.js/lib/environment-webworker/webworkerAll.mjs": {
+    "file": "assets/webworkerAll-By6kAAzd.js",
+    "name": "webworkerAll",
+    "src": "../../node_modules/.pnpm/pixi.js@8.23.0/node_modules/pixi.js/lib/environment-webworker/webworkerAll.mjs",
+    "isDynamicEntry": true,
+    "imports": [
+      "_dist-BWyuAgmK.js",
+      "_init-DeP7i7JM.js"
+    ]
+  },
+  "../pixi-solid/dist/index.js": {
+    "file": "assets/dist-D7pShGY_.js",
+    "name": "dist",
+    "src": "../pixi-solid/dist/index.js",
+    "imports": [
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "_Assets-D-FVVTjl.js": {
+    "file": "assets/Assets-D-FVVTjl.js",
+    "name": "Assets",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_canvasUtils-BmkL-0m_.js",
+      "_Cache-DjsX-fAq.js",
+      "_GraphicsContext-oKSnaaQD.js",
+      "_checkExtension-BGvys2BB.js"
+    ],
+    "dynamicImports": [
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "_BlurFilter-BMdnZ5a3.js": {
+    "file": "assets/BlurFilter-BMdnZ5a3.js",
+    "name": "BlurFilter",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_Filter-tmaoo_H6.js"
+    ]
+  },
+  "_Cache-DjsX-fAq.js": {
+    "file": "assets/Cache-DjsX-fAq.js",
+    "name": "Cache",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js"
+    ]
+  },
+  "_CanvasPool-DtqSaXnh.js": {
+    "file": "assets/CanvasPool-DtqSaXnh.js",
+    "name": "CanvasPool",
+    "imports": [
+      "_rolldown-runtime-hePW80VL.js"
+    ]
+  },
+  "_Container3D-6nYjydl4.js": {
+    "file": "assets/Container3D-6nYjydl4.js",
+    "name": "Container3D",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_Cache-DjsX-fAq.js",
+      "_EventSystem-C-891Yha.js",
+      "_RenderTargetSystem-CXGlBGSL.js",
+      "_getTexelRangeRects-7j664Y_P.js"
+    ]
+  },
+  "_CubeGeometry-BthFmsAf.js": {
+    "file": "assets/CubeGeometry-BthFmsAf.js",
+    "name": "CubeGeometry",
+    "imports": [
+      "_dist-BacaWkv9.js",
+      "_Container3D-6nYjydl4.js"
+    ]
+  },
+  "_EventSystem-C-891Yha.js": {
+    "file": "assets/EventSystem-C-891Yha.js",
+    "name": "EventSystem",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_Filter-tmaoo_H6.js"
+    ]
+  },
+  "_Filter-tmaoo_H6.js": {
+    "file": "assets/Filter-tmaoo_H6.js",
+    "name": "Filter",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js"
+    ]
+  },
+  "_GCManagedHash-iaZqB6Fm.js": {
+    "file": "assets/GCManagedHash-iaZqB6Fm.js",
+    "name": "GCManagedHash",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js"
+    ]
+  },
+  "_GraphicsContext-oKSnaaQD.js": {
+    "file": "assets/GraphicsContext-oKSnaaQD.js",
+    "name": "GraphicsContext",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_canvasUtils-BmkL-0m_.js",
+      "_GCManagedHash-iaZqB6Fm.js",
+      "_getTextureBatchBindGroup-CPqe_4fB.js"
+    ]
+  },
+  "_RenderTargetSystem-CXGlBGSL.js": {
+    "file": "assets/RenderTargetSystem-CXGlBGSL.js",
+    "name": "RenderTargetSystem",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_Filter-tmaoo_H6.js",
+      "_GCManagedHash-iaZqB6Fm.js"
+    ]
+  },
+  "_bird_03-D1QJhzFY.js": {
+    "file": "assets/bird_03-D1QJhzFY.js",
+    "name": "bird_03",
+    "assets": [
+      "assets/bird_03-C-uc541x.png"
+    ]
+  },
+  "_bird_05-B2MZaQL_.js": {
+    "file": "assets/bird_05-B2MZaQL_.js",
+    "name": "bird_05",
+    "assets": [
+      "assets/bird_05-CzDl5AP9.png"
+    ]
+  },
+  "_canvasUtils-BmkL-0m_.js": {
+    "file": "assets/canvasUtils-BmkL-0m_.js",
+    "name": "canvasUtils",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js"
+    ]
+  },
+  "_checkExtension-BGvys2BB.js": {
+    "file": "assets/checkExtension-BGvys2BB.js",
+    "name": "checkExtension",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "_components-BiYutFnA.js": {
+    "file": "assets/components-BiYutFnA.js",
+    "name": "components",
+    "imports": [
+      "_rolldown-runtime-hePW80VL.js",
+      "_web-BTd9NawZ.js"
+    ],
+    "dynamicImports": [
+      "src/routes/3d/container-texture.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/instancing.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/lighting-and-cameras.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/loading-models.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/meshes-and-materials.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/overview.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/particles.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/picking-and-pointer-events.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/portals.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/post-processing.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/testing.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/use-screen-to-world.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/3d/use-world-to-screen.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/404.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/asset-loading/asset-manifest.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/asset-loading/individual-assets.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/animated-sprite.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/bitmap-text.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/container.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/graphics.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/html-text.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/mesh-plane.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/mesh-rope.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/nine-slice-sprite.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/overview.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/particle-container.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/perspective-mesh.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/pixi-application-provider.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/pixi-canvas.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/render-container.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/render-layer.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/split-bitmap-text.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/split-text.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/sprite.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/text.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/ticker-provider.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/components/tiling-sprite.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/events/clicking.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/events/dragging.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/events/overview.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/examples/filters.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/examples/html-and-pixi.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/examples/masks.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/examples/pass-through-props.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/getting-started/application-instantiation.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/getting-started/install.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/getting-started/pixi-devtools.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/getting-started/project-setup.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/hooks/get-pixi-app.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/hooks/get-renderer.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/hooks/get-ticker.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/hooks/on-resize.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/hooks/on-tick.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/hooks/use-pixi-screen.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/index.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/migration/solid-2.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/testing/cleanup.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/testing/create-manual-ticker.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/testing/create-test-context.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/testing/mount-scene.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/testing/overview.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/testing/render-hook.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/testing/scene-queries.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/utils/create-async-delay.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/utils/create-delay.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/utils/object-fit-container.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/utils/object-fit.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/utils/use-smooth-damp.tsx?pick=default&pick=$css&lang.tsx",
+      "src/routes/utils/use-spring.tsx?pick=default&pick=$css&lang.tsx"
+    ],
+    "css": [
+      "assets/components-WTDZFYXB.css"
+    ]
+  },
+  "_components-WTDZFYXB.css": {
+    "file": "assets/components-WTDZFYXB.css",
+    "src": "_components-WTDZFYXB.css"
+  },
+  "_dist-BWyuAgmK.js": {
+    "file": "assets/dist-BWyuAgmK.js",
+    "name": "dist",
+    "imports": [
+      "_rolldown-runtime-hePW80VL.js",
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_Filter-tmaoo_H6.js",
+      "_canvasUtils-BmkL-0m_.js",
+      "_Cache-DjsX-fAq.js",
+      "_RenderTargetSystem-CXGlBGSL.js",
+      "_GraphicsContext-oKSnaaQD.js",
+      "_GCManagedHash-iaZqB6Fm.js",
+      "_getTextureBatchBindGroup-CPqe_4fB.js",
+      "_getTexelRangeRects-7j664Y_P.js"
+    ],
+    "dynamicImports": [
+      "../../node_modules/.pnpm/pixi.js@8.23.0/node_modules/pixi.js/lib/environment-browser/browserAll.mjs",
+      "../../node_modules/.pnpm/pixi.js@8.23.0/node_modules/pixi.js/lib/environment-webworker/webworkerAll.mjs",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "_dist-BacaWkv9.js": {
+    "file": "assets/dist-BacaWkv9.js",
+    "name": "dist",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_EventSystem-C-891Yha.js",
+      "_RenderTargetSystem-CXGlBGSL.js",
+      "_checkExtension-BGvys2BB.js",
+      "_getTexelRangeRects-7j664Y_P.js",
+      "_Container3D-6nYjydl4.js"
+    ],
+    "dynamicImports": [
+      "../../node_modules/.pnpm/meshoptimizer@1.3.0/node_modules/meshoptimizer/meshopt_decoder.mjs",
+      "../../node_modules/.pnpm/@pixi+3d@0.1.0_pixi.js@8.23.0/node_modules/@pixi/3d/dist/core/gl/init.mjs",
+      "../../node_modules/.pnpm/@pixi+3d@0.1.0_pixi.js@8.23.0/node_modules/@pixi/3d/dist/core/gpu/init.mjs"
+    ]
+  },
+  "_eel-C4wBzGfg.js": {
+    "file": "assets/eel-C4wBzGfg.js",
+    "name": "eel",
+    "assets": [
+      "assets/eel-BBb5W0IY.png"
+    ]
+  },
+  "_getTexelRangeRects-7j664Y_P.js": {
+    "file": "assets/getTexelRangeRects-7j664Y_P.js",
+    "name": "getTexelRangeRects",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_RenderTargetSystem-CXGlBGSL.js",
+      "_GCManagedHash-iaZqB6Fm.js"
+    ]
+  },
+  "_getTextureBatchBindGroup-CPqe_4fB.js": {
+    "file": "assets/getTextureBatchBindGroup-CPqe_4fB.js",
+    "name": "getTextureBatchBindGroup",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js"
+    ]
+  },
+  "_ground-tile-Cp0xO0Yu.js": {
+    "file": "assets/ground-tile-Cp0xO0Yu.js",
+    "name": "ground-tile",
+    "assets": [
+      "assets/ground-tile-TtUBwAEN.png"
+    ]
+  },
+  "_init-DeP7i7JM.js": {
+    "file": "assets/init-DeP7i7JM.js",
+    "name": "init",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_canvasUtils-BmkL-0m_.js"
+    ]
+  },
+  "_instanceFetchBitGl-ImlogTEr.js": {
+    "file": "assets/instanceFetchBitGl-ImlogTEr.js",
+    "name": "instanceFetchBitGl",
+    "imports": [
+      "_Container3D-6nYjydl4.js"
+    ]
+  },
+  "_object-fit-B53WMoQZ.js": {
+    "file": "assets/object-fit-B53WMoQZ.js",
+    "name": "object-fit",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "_orbit-camera-BY0abxTi.js": {
+    "file": "assets/orbit-camera-BY0abxTi.js",
+    "name": "orbit-camera",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_dist-BacaWkv9.js",
+      "_Container3D-6nYjydl4.js"
+    ]
+  },
+  "_resources-DPHE43kQ.js": {
+    "file": "assets/resources-DPHE43kQ.js",
+    "name": "resources",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_dist-BacaWkv9.js",
+      "_Container3D-6nYjydl4.js",
+      "_CubeGeometry-BthFmsAf.js"
+    ]
+  },
+  "_rolldown-runtime-hePW80VL.js": {
+    "file": "assets/rolldown-runtime-hePW80VL.js",
+    "name": "rolldown-runtime"
+  },
+  "_run_03-BMWUeCLM.js": {
+    "file": "assets/run_03-BMWUeCLM.js",
+    "name": "run_03"
+  },
+  "_run_06-CTyTGqHK.js": {
+    "file": "assets/run_06-CTyTGqHK.js",
+    "name": "run_06"
+  },
+  "_sky-kt9IjSui.js": {
+    "file": "assets/sky-kt9IjSui.js",
+    "name": "sky",
+    "assets": [
+      "assets/sky-URXQioBD.png"
+    ]
+  },
+  "_smooth-damp-D4ZU0jAr.js": {
+    "file": "assets/smooth-damp-D4ZU0jAr.js",
+    "name": "smooth-damp",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "_updateView3DScene-BIfgm9px.js": {
+    "file": "assets/updateView3DScene-BIfgm9px.js",
+    "name": "updateView3DScene",
+    "imports": [
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_EventSystem-C-891Yha.js",
+      "_RenderTargetSystem-CXGlBGSL.js",
+      "_GCManagedHash-iaZqB6Fm.js",
+      "_getTexelRangeRects-7j664Y_P.js",
+      "_Container3D-6nYjydl4.js"
+    ]
+  },
+  "_web-BTd9NawZ.js": {
+    "file": "assets/web-BTd9NawZ.js",
+    "name": "web"
+  },
+  "src/assets/bird_01.png": {
+    "file": "assets/bird_01-BFJ-Frbr.png",
+    "src": "src/assets/bird_01.png"
+  },
+  "src/assets/bird_02.png": {
+    "file": "assets/bird_02-CpYimnvn.png",
+    "src": "src/assets/bird_02.png"
+  },
+  "src/assets/bird_03.png": {
+    "file": "assets/bird_03-C-uc541x.png",
+    "src": "src/assets/bird_03.png"
+  },
+  "src/assets/bird_04.png": {
+    "file": "assets/bird_04-5RdCC1OL.png",
+    "src": "src/assets/bird_04.png"
+  },
+  "src/assets/bird_05.png": {
+    "file": "assets/bird_05-CzDl5AP9.png",
+    "src": "src/assets/bird_05.png"
+  },
+  "src/assets/eel.png": {
+    "file": "assets/eel-BBb5W0IY.png",
+    "src": "src/assets/eel.png"
+  },
+  "src/assets/ground-tile.png": {
+    "file": "assets/ground-tile-TtUBwAEN.png",
+    "src": "src/assets/ground-tile.png"
+  },
+  "src/assets/ground.webp": {
+    "file": "assets/ground-sW3pzYCD.webp",
+    "src": "src/assets/ground.webp"
+  },
+  "src/assets/nine-slice.png": {
+    "file": "assets/nine-slice-BgR0mVDF.png",
+    "src": "src/assets/nine-slice.png"
+  },
+  "src/assets/sky.png": {
+    "file": "assets/sky-URXQioBD.png",
+    "src": "src/assets/sky.png"
+  },
+  "src/demos/animated-sprite.demo.tsx": {
+    "file": "assets/animated-sprite.demo-CVPHr-UE.js",
+    "name": "animated-sprite.demo",
+    "src": "src/demos/animated-sprite.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_run_06-CTyTGqHK.js",
+      "_run_03-BMWUeCLM.js"
+    ]
+  },
+  "src/demos/bitmap-text.demo.tsx": {
+    "file": "assets/bitmap-text.demo-NcfMKmZj.js",
+    "name": "bitmap-text.demo",
+    "src": "src/demos/bitmap-text.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "src/demos/clicking.demo.tsx": {
+    "file": "assets/clicking.demo-CKQ5VnZQ.js",
+    "name": "clicking.demo",
+    "src": "src/demos/clicking.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "src/demos/container-texture.demo.tsx": {
+    "file": "assets/container-texture.demo-CTT-BmdD.js",
+    "name": "container-texture.demo",
+    "src": "src/demos/container-texture.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_dist-BacaWkv9.js",
+      "_resources-DPHE43kQ.js",
+      "_orbit-camera-BY0abxTi.js"
+    ]
+  },
+  "src/demos/container.demo.tsx": {
+    "file": "assets/container.demo-BI7j9mXt.js",
+    "name": "container.demo",
+    "src": "src/demos/container.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "src/demos/dragging.demo.tsx": {
+    "file": "assets/dragging.demo-aXArlTTJ.js",
+    "name": "dragging.demo",
+    "src": "src/demos/dragging.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_GraphicsContext-oKSnaaQD.js"
+    ]
+  },
+  "src/demos/event-names.demo.tsx": {
+    "file": "assets/event-names.demo-TgZcBbw1.js",
+    "name": "event-names.demo",
+    "src": "src/demos/event-names.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js"
+    ],
+    "dynamicImports": [
+      "../pixi-solid/dist/index.js"
+    ]
+  },
+  "src/demos/filters.demo.tsx": {
+    "file": "assets/filters.demo-CFfUrhjG.js",
+    "name": "filters.demo",
+    "src": "src/demos/filters.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_BlurFilter-BMdnZ5a3.js",
+      "_object-fit-B53WMoQZ.js",
+      "_bird_03-D1QJhzFY.js",
+      "_sky-kt9IjSui.js"
+    ]
+  },
+  "src/demos/graphics.demo.tsx": {
+    "file": "assets/graphics.demo-CjhfvMI5.js",
+    "name": "graphics.demo",
+    "src": "src/demos/graphics.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "src/demos/home-page.demo.tsx": {
+    "file": "assets/home-page.demo-DrICJ_mX.js",
+    "name": "home-page.demo",
+    "src": "src/demos/home-page.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_Assets-D-FVVTjl.js",
+      "_BlurFilter-BMdnZ5a3.js",
+      "_run_06-CTyTGqHK.js",
+      "_run_03-BMWUeCLM.js",
+      "_object-fit-B53WMoQZ.js",
+      "_sky-kt9IjSui.js",
+      "_ground-tile-Cp0xO0Yu.js"
+    ],
+    "css": [
+      "assets/home-page-sGXi8Rdw.css"
+    ]
+  },
+  "src/demos/html-and-pixi.demo.tsx": {
+    "file": "assets/html-and-pixi.demo-t8Hmy9UE.js",
+    "name": "html-and-pixi.demo",
+    "src": "src/demos/html-and-pixi.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "src/demos/html-text.demo.tsx": {
+    "file": "assets/html-text.demo-DLbvDP6I.js",
+    "name": "html-text.demo",
+    "src": "src/demos/html-text.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "src/demos/instancing.demo.tsx": {
+    "file": "assets/instancing.demo-TDH82wHy.js",
+    "name": "instancing.demo",
+    "src": "src/demos/instancing.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_dist-BacaWkv9.js",
+      "_Container3D-6nYjydl4.js",
+      "_CubeGeometry-BthFmsAf.js",
+      "_orbit-camera-BY0abxTi.js"
+    ]
+  },
+  "src/demos/lighting-and-cameras.demo.tsx": {
+    "file": "assets/lighting-and-cameras.demo-OqrOPARy.js",
+    "name": "lighting-and-cameras.demo",
+    "src": "src/demos/lighting-and-cameras.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_dist-BacaWkv9.js",
+      "_resources-DPHE43kQ.js",
+      "_orbit-camera-BY0abxTi.js"
+    ]
+  },
+  "src/demos/masks.demo.tsx": {
+    "file": "assets/masks.demo-B7YbvGWp.js",
+    "name": "masks.demo",
+    "src": "src/demos/masks.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_object-fit-B53WMoQZ.js",
+      "_sky-kt9IjSui.js"
+    ]
+  },
+  "src/demos/mesh-plane.demo.tsx": {
+    "file": "assets/mesh-plane.demo-mj_mc1I6.js",
+    "name": "mesh-plane.demo",
+    "src": "src/demos/mesh-plane.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_object-fit-B53WMoQZ.js",
+      "_sky-kt9IjSui.js"
+    ]
+  },
+  "src/demos/mesh-rope.demo.tsx": {
+    "file": "assets/mesh-rope.demo-DfkE_OOx.js",
+    "name": "mesh-rope.demo",
+    "src": "src/demos/mesh-rope.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_object-fit-B53WMoQZ.js",
+      "_eel-C4wBzGfg.js"
+    ]
+  },
+  "src/demos/meshes-and-materials.demo.tsx": {
+    "file": "assets/meshes-and-materials.demo-DE0nm1Ij.js",
+    "name": "meshes-and-materials.demo",
+    "src": "src/demos/meshes-and-materials.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_dist-BacaWkv9.js",
+      "_resources-DPHE43kQ.js",
+      "_orbit-camera-BY0abxTi.js"
+    ]
+  },
+  "src/demos/model-3d.demo.tsx": {
+    "file": "assets/model-3d.demo-DRG3z3BJ.js",
+    "name": "model-3d.demo",
+    "src": "src/demos/model-3d.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_dist-BacaWkv9.js",
+      "_smooth-damp-D4ZU0jAr.js"
+    ]
+  },
+  "src/demos/nine-slice-sprite.demo.tsx": {
+    "file": "assets/nine-slice-sprite.demo-sWaUB_jT.js",
+    "name": "nine-slice-sprite.demo",
+    "src": "src/demos/nine-slice-sprite.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js"
+    ],
+    "assets": [
+      "assets/nine-slice-BgR0mVDF.png"
+    ]
+  },
+  "src/demos/object-fit-container.demo.tsx": {
+    "file": "assets/object-fit-container.demo-BjWa5Cgo.js",
+    "name": "object-fit-container.demo",
+    "src": "src/demos/object-fit-container.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_object-fit-B53WMoQZ.js"
+    ]
+  },
+  "src/demos/object-fit.demo.tsx": {
+    "file": "assets/object-fit.demo-CfR8QvcM.js",
+    "name": "object-fit.demo",
+    "src": "src/demos/object-fit.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_object-fit-B53WMoQZ.js"
+    ]
+  },
+  "src/demos/particle-container-3d.demo.tsx": {
+    "file": "assets/particle-container-3d.demo-D2UzFAFT.js",
+    "name": "particle-container-3d.demo",
+    "src": "src/demos/particle-container-3d.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_dist-BacaWkv9.js",
+      "_orbit-camera-BY0abxTi.js"
+    ]
+  },
+  "src/demos/particle-container.demo.tsx": {
+    "file": "assets/particle-container.demo-BZO07g9U.js",
+    "name": "particle-container.demo",
+    "src": "src/demos/particle-container.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_Assets-D-FVVTjl.js"
+    ]
+  },
+  "src/demos/particle-system-3d.demo.tsx": {
+    "file": "assets/particle-system-3d.demo-CH7jJkfJ.js",
+    "name": "particle-system-3d.demo",
+    "src": "src/demos/particle-system-3d.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_RenderTargetSystem-CXGlBGSL.js",
+      "_dist-BacaWkv9.js",
+      "_Container3D-6nYjydl4.js",
+      "_orbit-camera-BY0abxTi.js"
+    ]
+  },
+  "src/demos/pass-through-props.demo.tsx": {
+    "file": "assets/pass-through-props.demo-Xb9ZtD1C.js",
+    "name": "pass-through-props.demo",
+    "src": "src/demos/pass-through-props.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_object-fit-B53WMoQZ.js",
+      "_bird_03-D1QJhzFY.js",
+      "_sky-kt9IjSui.js",
+      "_bird_05-B2MZaQL_.js"
+    ],
+    "assets": [
+      "assets/bird_01-BFJ-Frbr.png",
+      "assets/bird_02-CpYimnvn.png",
+      "assets/bird_04-5RdCC1OL.png"
+    ]
+  },
+  "src/demos/perspective-mesh.demo.tsx": {
+    "file": "assets/perspective-mesh.demo-Bolge0y4.js",
+    "name": "perspective-mesh.demo",
+    "src": "src/demos/perspective-mesh.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_object-fit-B53WMoQZ.js"
+    ],
+    "assets": [
+      "assets/ground-sW3pzYCD.webp"
+    ]
+  },
+  "src/demos/picking.demo.tsx": {
+    "file": "assets/picking.demo-DJD22peZ.js",
+    "name": "picking.demo",
+    "src": "src/demos/picking.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_dist-BacaWkv9.js",
+      "_resources-DPHE43kQ.js",
+      "_orbit-camera-BY0abxTi.js"
+    ]
+  },
+  "src/demos/post-processing.demo.tsx": {
+    "file": "assets/post-processing.demo-Bkw-lpQa.js",
+    "name": "post-processing.demo",
+    "src": "src/demos/post-processing.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Filter-tmaoo_H6.js",
+      "_dist-BacaWkv9.js",
+      "_Container3D-6nYjydl4.js",
+      "_instanceFetchBitGl-ImlogTEr.js",
+      "_resources-DPHE43kQ.js",
+      "_orbit-camera-BY0abxTi.js"
+    ]
+  },
+  "src/demos/render-container.demo.tsx": {
+    "file": "assets/render-container.demo-DhlFdrNO.js",
+    "name": "render-container.demo",
+    "src": "src/demos/render-container.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_sky-kt9IjSui.js"
+    ]
+  },
+  "src/demos/render-layer.demo.tsx": {
+    "file": "assets/render-layer.demo-Ftoazl0K.js",
+    "name": "render-layer.demo",
+    "src": "src/demos/render-layer.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_run_03-BMWUeCLM.js",
+      "_object-fit-B53WMoQZ.js",
+      "_sky-kt9IjSui.js",
+      "_eel-C4wBzGfg.js",
+      "_bird_05-B2MZaQL_.js"
+    ]
+  },
+  "src/demos/split-bitmap-text.demo.tsx": {
+    "file": "assets/split-bitmap-text.demo-Dd8LUYv_.js",
+    "name": "split-bitmap-text.demo",
+    "src": "src/demos/split-bitmap-text.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "src/demos/split-text.demo.tsx": {
+    "file": "assets/split-text.demo-CXcZshW_.js",
+    "name": "split-text.demo",
+    "src": "src/demos/split-text.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "src/demos/sprite.demo.tsx": {
+    "file": "assets/sprite.demo-BsGrT5wA.js",
+    "name": "sprite.demo",
+    "src": "src/demos/sprite.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_sky-kt9IjSui.js"
+    ]
+  },
+  "src/demos/text.demo.tsx": {
+    "file": "assets/text.demo-CdT4jkrl.js",
+    "name": "text.demo",
+    "src": "src/demos/text.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js"
+    ]
+  },
+  "src/demos/tiling-sprite.demo.tsx": {
+    "file": "assets/tiling-sprite.demo--zRCwOUL.js",
+    "name": "tiling-sprite.demo",
+    "src": "src/demos/tiling-sprite.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_CanvasPool-DtqSaXnh.js",
+      "_dist-BWyuAgmK.js",
+      "_Assets-D-FVVTjl.js",
+      "_ground-tile-Cp0xO0Yu.js"
+    ]
+  },
+  "src/demos/use-smooth-damp.demo.tsx": {
+    "file": "assets/use-smooth-damp.demo-Dql9HXyB.js",
+    "name": "use-smooth-damp.demo",
+    "src": "src/demos/use-smooth-damp.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_GraphicsContext-oKSnaaQD.js",
+      "_smooth-damp-D4ZU0jAr.js"
+    ]
+  },
+  "src/demos/use-spring.demo.tsx": {
+    "file": "assets/use-spring.demo-fA9FV8qE.js",
+    "name": "use-spring.demo",
+    "src": "src/demos/use-spring.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_GraphicsContext-oKSnaaQD.js"
+    ]
+  },
+  "src/demos/view-3d.demo.tsx": {
+    "file": "assets/view-3d.demo-CSl_2tg3.js",
+    "name": "view-3d.demo",
+    "src": "src/demos/view-3d.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_dist-BacaWkv9.js",
+      "_CubeGeometry-BthFmsAf.js",
+      "_orbit-camera-BY0abxTi.js"
+    ]
+  },
+  "src/demos/world-to-screen.demo.tsx": {
+    "file": "assets/world-to-screen.demo-C4mBLMqX.js",
+    "name": "world-to-screen.demo",
+    "src": "src/demos/world-to-screen.demo.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_dist-BWyuAgmK.js",
+      "_dist-BacaWkv9.js",
+      "_resources-DPHE43kQ.js"
+    ]
+  },
+  "src/routes/3d/container-texture.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/container-texture-BDaMIPfx.js",
+    "name": "container-texture",
+    "src": "src/routes/3d/container-texture.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/container-texture.demo.tsx"
+    ]
+  },
+  "src/routes/3d/instancing.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/instancing-BrCt1Hy-.js",
+    "name": "instancing",
+    "src": "src/routes/3d/instancing.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/instancing.demo.tsx"
+    ]
+  },
+  "src/routes/3d/lighting-and-cameras.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/lighting-and-cameras-DSWqov0S.js",
+    "name": "lighting-and-cameras",
+    "src": "src/routes/3d/lighting-and-cameras.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/lighting-and-cameras.demo.tsx"
+    ]
+  },
+  "src/routes/3d/loading-models.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/loading-models-CB4OV03l.js",
+    "name": "loading-models",
+    "src": "src/routes/3d/loading-models.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/model-3d.demo.tsx"
+    ]
+  },
+  "src/routes/3d/meshes-and-materials.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/meshes-and-materials-Dwib6TPG.js",
+    "name": "meshes-and-materials",
+    "src": "src/routes/3d/meshes-and-materials.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/meshes-and-materials.demo.tsx"
+    ]
+  },
+  "src/routes/3d/overview.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/overview-x6yI2TfX.js",
+    "name": "overview",
+    "src": "src/routes/3d/overview.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/view-3d.demo.tsx"
+    ]
+  },
+  "src/routes/3d/particles.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/particles-D1pHgLXx.js",
+    "name": "particles",
+    "src": "src/routes/3d/particles.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/particle-system-3d.demo.tsx",
+      "src/demos/particle-container-3d.demo.tsx"
+    ]
+  },
+  "src/routes/3d/picking-and-pointer-events.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/picking-and-pointer-events-1jf2TsEV.js",
+    "name": "picking-and-pointer-events",
+    "src": "src/routes/3d/picking-and-pointer-events.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/picking.demo.tsx"
+    ]
+  },
+  "src/routes/3d/portals.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/portals-o80XH4hm.js",
+    "name": "portals",
+    "src": "src/routes/3d/portals.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/3d/post-processing.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/post-processing-O_cvM5Hp.js",
+    "name": "post-processing",
+    "src": "src/routes/3d/post-processing.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/post-processing.demo.tsx"
+    ]
+  },
+  "src/routes/3d/testing.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/testing-CNZzfYgG.js",
+    "name": "testing",
+    "src": "src/routes/3d/testing.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/3d/use-screen-to-world.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/use-screen-to-world-CZu0xcy4.js",
+    "name": "use-screen-to-world",
+    "src": "src/routes/3d/use-screen-to-world.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/3d/use-world-to-screen.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/use-world-to-screen-BrIaDlwS.js",
+    "name": "use-world-to-screen",
+    "src": "src/routes/3d/use-world-to-screen.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/world-to-screen.demo.tsx"
+    ]
+  },
+  "src/routes/404.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/404-OOLmgieV.js",
+    "name": "404",
+    "src": "src/routes/404.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/asset-loading/asset-manifest.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/asset-manifest-DxDWhzDq.js",
+    "name": "asset-manifest",
+    "src": "src/routes/asset-loading/asset-manifest.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/asset-loading/individual-assets.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/individual-assets-Xmi8u5K_.js",
+    "name": "individual-assets",
+    "src": "src/routes/asset-loading/individual-assets.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/components/animated-sprite.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/animated-sprite-DgUVlGM8.js",
+    "name": "animated-sprite",
+    "src": "src/routes/components/animated-sprite.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/animated-sprite.demo.tsx"
+    ]
+  },
+  "src/routes/components/bitmap-text.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/bitmap-text-r9JjvX2V.js",
+    "name": "bitmap-text",
+    "src": "src/routes/components/bitmap-text.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/bitmap-text.demo.tsx"
+    ]
+  },
+  "src/routes/components/container.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/container-BIlpuo2j.js",
+    "name": "container",
+    "src": "src/routes/components/container.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/container.demo.tsx"
+    ]
+  },
+  "src/routes/components/graphics.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/graphics-Da4fHjLn.js",
+    "name": "graphics",
+    "src": "src/routes/components/graphics.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/graphics.demo.tsx"
+    ]
+  },
+  "src/routes/components/html-text.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/html-text-NJbsnIAs.js",
+    "name": "html-text",
+    "src": "src/routes/components/html-text.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/html-text.demo.tsx"
+    ]
+  },
+  "src/routes/components/mesh-plane.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/mesh-plane-CQqtnX_s.js",
+    "name": "mesh-plane",
+    "src": "src/routes/components/mesh-plane.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/mesh-plane.demo.tsx"
+    ]
+  },
+  "src/routes/components/mesh-rope.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/mesh-rope-B-G0NPQG.js",
+    "name": "mesh-rope",
+    "src": "src/routes/components/mesh-rope.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/mesh-rope.demo.tsx"
+    ]
+  },
+  "src/routes/components/nine-slice-sprite.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/nine-slice-sprite-Bh64DxRt.js",
+    "name": "nine-slice-sprite",
+    "src": "src/routes/components/nine-slice-sprite.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/nine-slice-sprite.demo.tsx"
+    ]
+  },
+  "src/routes/components/overview.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/overview-Bm9r7815.js",
+    "name": "overview",
+    "src": "src/routes/components/overview.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/components/particle-container.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/particle-container-B3zNjgs_.js",
+    "name": "particle-container",
+    "src": "src/routes/components/particle-container.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/particle-container.demo.tsx"
+    ]
+  },
+  "src/routes/components/perspective-mesh.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/perspective-mesh-DAuv-cFK.js",
+    "name": "perspective-mesh",
+    "src": "src/routes/components/perspective-mesh.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/perspective-mesh.demo.tsx"
+    ]
+  },
+  "src/routes/components/pixi-application-provider.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/pixi-application-provider-BovPz9_X.js",
+    "name": "pixi-application-provider",
+    "src": "src/routes/components/pixi-application-provider.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/components/pixi-canvas.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/pixi-canvas-Dw7IXZTr.js",
+    "name": "pixi-canvas",
+    "src": "src/routes/components/pixi-canvas.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/components/render-container.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/render-container-C-2nklVO.js",
+    "name": "render-container",
+    "src": "src/routes/components/render-container.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/render-container.demo.tsx"
+    ]
+  },
+  "src/routes/components/render-layer.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/render-layer-B9TJk_pL.js",
+    "name": "render-layer",
+    "src": "src/routes/components/render-layer.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/render-layer.demo.tsx"
+    ]
+  },
+  "src/routes/components/split-bitmap-text.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/split-bitmap-text-Dps3nviG.js",
+    "name": "split-bitmap-text",
+    "src": "src/routes/components/split-bitmap-text.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/split-bitmap-text.demo.tsx"
+    ]
+  },
+  "src/routes/components/split-text.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/split-text-DuFB0Ktw.js",
+    "name": "split-text",
+    "src": "src/routes/components/split-text.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/split-text.demo.tsx"
+    ]
+  },
+  "src/routes/components/sprite.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/sprite-Cad4WX4N.js",
+    "name": "sprite",
+    "src": "src/routes/components/sprite.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/sprite.demo.tsx"
+    ]
+  },
+  "src/routes/components/text.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/text-SZ_uKDOv.js",
+    "name": "text",
+    "src": "src/routes/components/text.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/text.demo.tsx"
+    ]
+  },
+  "src/routes/components/ticker-provider.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/ticker-provider-CEknMt3H.js",
+    "name": "ticker-provider",
+    "src": "src/routes/components/ticker-provider.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/components/tiling-sprite.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/tiling-sprite-D995uzcq.js",
+    "name": "tiling-sprite",
+    "src": "src/routes/components/tiling-sprite.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/tiling-sprite.demo.tsx"
+    ]
+  },
+  "src/routes/events/clicking.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/clicking-Bs5qVsGt.js",
+    "name": "clicking",
+    "src": "src/routes/events/clicking.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/clicking.demo.tsx"
+    ]
+  },
+  "src/routes/events/dragging.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/dragging-B0tmZDUh.js",
+    "name": "dragging",
+    "src": "src/routes/events/dragging.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/dragging.demo.tsx"
+    ]
+  },
+  "src/routes/events/overview.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/overview-C1HxbXfu.js",
+    "name": "overview",
+    "src": "src/routes/events/overview.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/event-names.demo.tsx"
+    ]
+  },
+  "src/routes/examples/filters.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/filters-0ldtEgMt.js",
+    "name": "filters",
+    "src": "src/routes/examples/filters.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/filters.demo.tsx"
+    ]
+  },
+  "src/routes/examples/html-and-pixi.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/html-and-pixi-DDDev6Bj.js",
+    "name": "html-and-pixi",
+    "src": "src/routes/examples/html-and-pixi.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/html-and-pixi.demo.tsx"
+    ]
+  },
+  "src/routes/examples/masks.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/masks-Dx-fxNaZ.js",
+    "name": "masks",
+    "src": "src/routes/examples/masks.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/masks.demo.tsx"
+    ]
+  },
+  "src/routes/examples/pass-through-props.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/pass-through-props-bz2dFxe-.js",
+    "name": "pass-through-props",
+    "src": "src/routes/examples/pass-through-props.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/pass-through-props.demo.tsx"
+    ]
+  },
+  "src/routes/getting-started/application-instantiation.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/application-instantiation-JczT4x9B.js",
+    "name": "application-instantiation",
+    "src": "src/routes/getting-started/application-instantiation.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/getting-started/install.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/install-DJMb78jr.js",
+    "name": "install",
+    "src": "src/routes/getting-started/install.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/getting-started/pixi-devtools.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/pixi-devtools-Cnuy36zW.js",
+    "name": "pixi-devtools",
+    "src": "src/routes/getting-started/pixi-devtools.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/getting-started/project-setup.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/project-setup-CEy2M4pW.js",
+    "name": "project-setup",
+    "src": "src/routes/getting-started/project-setup.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/hooks/get-pixi-app.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/get-pixi-app-DD2-AyPj.js",
+    "name": "get-pixi-app",
+    "src": "src/routes/hooks/get-pixi-app.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/hooks/get-renderer.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/get-renderer-BigzbMPe.js",
+    "name": "get-renderer",
+    "src": "src/routes/hooks/get-renderer.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/hooks/get-ticker.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/get-ticker-DkqLk5Ik.js",
+    "name": "get-ticker",
+    "src": "src/routes/hooks/get-ticker.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/hooks/on-resize.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/on-resize-Ci1pPwad.js",
+    "name": "on-resize",
+    "src": "src/routes/hooks/on-resize.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/hooks/on-tick.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/on-tick-D5iXDc6r.js",
+    "name": "on-tick",
+    "src": "src/routes/hooks/on-tick.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/hooks/use-pixi-screen.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/use-pixi-screen-BlTjx-6v.js",
+    "name": "use-pixi-screen",
+    "src": "src/routes/hooks/use-pixi-screen.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/index.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/index-DL5kbVrQ.js",
+    "name": "index",
+    "src": "src/routes/index.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/home-page.demo.tsx"
+    ]
+  },
+  "src/routes/migration/solid-2.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/solid-2-CS2vp1YS.js",
+    "name": "solid-2",
+    "src": "src/routes/migration/solid-2.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/testing/cleanup.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/cleanup-D34Mrlb3.js",
+    "name": "cleanup",
+    "src": "src/routes/testing/cleanup.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/testing/create-manual-ticker.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/create-manual-ticker-C6EJ-y_w.js",
+    "name": "create-manual-ticker",
+    "src": "src/routes/testing/create-manual-ticker.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/testing/create-test-context.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/create-test-context-CeLW4bbn.js",
+    "name": "create-test-context",
+    "src": "src/routes/testing/create-test-context.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/testing/mount-scene.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/mount-scene-DtEvHZVx.js",
+    "name": "mount-scene",
+    "src": "src/routes/testing/mount-scene.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/testing/overview.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/overview-BO1HBvHG.js",
+    "name": "overview",
+    "src": "src/routes/testing/overview.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/testing/render-hook.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/render-hook-BKiV6D5-.js",
+    "name": "render-hook",
+    "src": "src/routes/testing/render-hook.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/testing/scene-queries.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/scene-queries-U3JAyvt3.js",
+    "name": "scene-queries",
+    "src": "src/routes/testing/scene-queries.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/utils/create-async-delay.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/create-async-delay-CaKrsmuQ.js",
+    "name": "create-async-delay",
+    "src": "src/routes/utils/create-async-delay.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/utils/create-delay.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/create-delay-CqOjDc8Y.js",
+    "name": "create-delay",
+    "src": "src/routes/utils/create-delay.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ]
+  },
+  "src/routes/utils/object-fit-container.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/object-fit-container-Hj6ks10b.js",
+    "name": "object-fit-container",
+    "src": "src/routes/utils/object-fit-container.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/object-fit-container.demo.tsx"
+    ]
+  },
+  "src/routes/utils/object-fit.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/object-fit-DkhtXXrf.js",
+    "name": "object-fit",
+    "src": "src/routes/utils/object-fit.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/object-fit.demo.tsx"
+    ]
+  },
+  "src/routes/utils/use-smooth-damp.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/use-smooth-damp-Drofxckm.js",
+    "name": "use-smooth-damp",
+    "src": "src/routes/utils/use-smooth-damp.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/use-smooth-damp.demo.tsx"
+    ]
+  },
+  "src/routes/utils/use-spring.tsx?pick=default&pick=$css&lang.tsx": {
+    "file": "assets/use-spring-BTathjYn.js",
+    "name": "use-spring",
+    "src": "src/routes/utils/use-spring.tsx?pick=default&pick=$css&lang.tsx",
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "dynamicImports": [
+      "src/demos/use-spring.demo.tsx"
+    ]
+  },
+  "virtual:solid-ssr-entry-client.tsx": {
+    "file": "assets/virtual_solid-ssr-entry-client-B_B93LYy.js",
+    "name": "virtual_solid-ssr-entry-client",
+    "src": "virtual:solid-ssr-entry-client.tsx",
+    "isEntry": true,
+    "imports": [
+      "_web-BTd9NawZ.js",
+      "_components-BiYutFnA.js"
+    ],
+    "css": [
+      "assets/virtual_solid-ssr-entry-client-y8_6uuuk.css"
+    ],
+    "assets": [
+      "assets/outfit-latin-ext-wght-normal-DdQaqQDo.woff2",
+      "assets/outfit-latin-wght-normal-Bc-8i84L.woff2",
+      "assets/roboto-cyrillic-ext-wght-normal-BCp_3N7R.woff2",
+      "assets/roboto-cyrillic-wght-normal-fOt7epNf.woff2",
+      "assets/roboto-greek-ext-wght-normal-Bgw4czJT.woff2",
+      "assets/roboto-greek-wght-normal-DlT9XTxE.woff2",
+      "assets/roboto-math-wght-normal-4a3xuzGk.woff2",
+      "assets/roboto-symbols-wght-normal-B7iHSfaG.woff2",
+      "assets/roboto-vietnamese-wght-normal-_f1XEJpo.woff2",
+      "assets/roboto-latin-ext-wght-normal-DYIxWhlt.woff2",
+      "assets/roboto-latin-wght-normal-ccAYIvAh.woff2",
+      "assets/roboto-mono-cyrillic-ext-wght-normal-BUDPrIko.woff2",
+      "assets/roboto-mono-cyrillic-wght-normal-HUlVHixE.woff2",
+      "assets/roboto-mono-greek-wght-normal-BJJTbwTT.woff2",
+      "assets/roboto-mono-vietnamese-wght-normal-DlC-zuDL.woff2",
+      "assets/roboto-mono-latin-ext-wght-normal-QAYlOegK.woff2",
+      "assets/roboto-mono-latin-wght-normal-CZtBPCCa.woff2"
+    ]
+  }
+}

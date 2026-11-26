@@ -1,0 +1,6 @@
+import{J as e,L as t,p as n}from"./web-BTd9NawZ.js";import{c as r,i,o as a,s as o}from"./components-BiYutFnA.js";var s=t(`<h1>Installation`),c=t(`<p>pixi-solid 2 targets SolidJS 2 and PixiJS 8. Peer dependencies are declared, so you install the hosts yourself.`),l=t(`<h2 id=requirements>Requirements`),u=t(`<ul><li>SolidJS 2</li><li>PixiJS 8.14 or newer</li><li>Vite 8 with <code>@solidjs/vite-plugin`),d=t(`<h2 id=install>Install`),f=t(`<p>Solid is a peer, never bundled, and npm installs it with the package. Keep one copy in your app so components and your code share the same reactive graph.`),p=t(`<h2 id=configure>Configure the compiler`),m=t(`<p>Use Solid 2's Vite plugin. It compiles JSX against the renderer that ships with Solid 2, so there is nothing extra to install. Follow Solid's own setup guide if you configure a JSX import source yourself.`);function h(){return e(r,{get children(){return e(i,{get children(){return[n(s),n(c),n(l),n(u),n(d),e(a,{code:`npm i pixi-solid`,title:`install.sh`,lang:`bash`}),e(o,{tone:`note`,title:`Peer dependencies`,get children(){return n(f)}}),n(p),n(m),e(a,{code:`import solid from "@solidjs/vite-plugin";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  plugins: [solid()],
+});`,title:`vite.config.ts`,lang:`tsx`})]}})}})}export{h as default};

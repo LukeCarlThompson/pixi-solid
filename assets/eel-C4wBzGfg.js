@@ -1,0 +1,1 @@
+var e=`/pixi-solid/assets/eel-BBb5W0IY.png`;export{e as t};

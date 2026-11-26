@@ -1,0 +1,1 @@
+import{J as e}from"./web-BTd9NawZ.js";import{n as t,v as n}from"./dist-BWyuAgmK.js";var r=()=>e(n,{text:`Hello World`,style:{fill:`white`,fontSize:68,fontFamily:`Arial`}}),i=()=>e(t,{style:{"aspect-ratio":`2/1.5`},background:`#1099bb`,get children(){return e(r,{})}});export{i as Demo};

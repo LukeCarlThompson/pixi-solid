@@ -1,3 +1,0 @@
-import{t as e}from"./pixi-canvas.CjyKCql-.js";import{b as t}from"./DemoMount.astro_astro_type_script_index_0_lang.BSIN7oNQ.js";import{i as n}from"./components.BgLzrcVv.js";import{t as r}from"./use-pixi-screen.D0afJkZ9.js";var i=()=>{let e=r();return[t(n,{get x(){return e.width*.5},get y(){return e.height*.5},draw:e=>{e.rect(-50,-50,100,100).fill(`#ffd500ff`)}}),t(n,{draw:e=>{e.rect(50,50,100,200).fill(16711680).circle(200,200,50).stroke(65280)}}),t(n,{draw:e=>{e.svg(`<svg>
-                          <path d="M 100 300 q 150 200 300 100" stroke="blue" stroke-width="5" fill="pink" />
-                        </svg>`)}})]},a=()=>t(e,{style:{"aspect-ratio":`2/1.5`},get children(){return t(i,{})}});export{a as Demo};

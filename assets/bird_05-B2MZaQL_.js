@@ -1,0 +1,1 @@
+var e=`/pixi-solid/assets/bird_05-CzDl5AP9.png`;export{e as t};

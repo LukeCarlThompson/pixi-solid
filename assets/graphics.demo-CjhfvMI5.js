@@ -1,0 +1,3 @@
+import{J as e}from"./web-BTd9NawZ.js";import{n as t,o as n,t as r}from"./dist-BWyuAgmK.js";var i=()=>{let t=r();return[e(n,{get x(){return t.width*.5},get y(){return t.height*.5},draw:e=>{e.rect(-50,-50,100,100).fill(`#ffd500ff`)}}),e(n,{draw:e=>{e.rect(50,50,100,200).fill(16711680).circle(200,200,50).stroke(65280)}}),e(n,{draw:e=>{e.svg(`<svg>
+                          <path d="M 100 300 q 150 200 300 100" stroke="blue" stroke-width="5" fill="pink" />
+                        </svg>`)}})]},a=()=>e(t,{style:{"aspect-ratio":`2/1.5`},get children(){return e(i,{})}});export{a as Demo};

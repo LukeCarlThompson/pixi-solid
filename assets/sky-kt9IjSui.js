@@ -1,0 +1,1 @@
+var e=`/pixi-solid/assets/sky-URXQioBD.png`;export{e as t};

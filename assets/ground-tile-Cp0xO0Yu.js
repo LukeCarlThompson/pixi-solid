@@ -1,0 +1,1 @@
+var e=`/pixi-solid/assets/ground-tile-TtUBwAEN.png`;export{e as t};
