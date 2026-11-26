@@ -39,7 +39,7 @@ export default function Page(): JSX.Element {
       <h2 id="upgrade-the-packages">Upgrade the packages</h2>
       <p>Install SolidJS 2 and its web renderer, then add the compiler plugin:</p>
       <CodeBlock
-        code={`npm i solid-js@2.0.0-rc.9 @solidjs/web@2.0.0-rc.9
+        code={`npm i solid-js@2.0.1 @solidjs/web@2.0.1
 npm i -D @solidjs/vite-plugin@3.0.0-next.35`}
         title="bash"
       />
@@ -47,7 +47,7 @@ npm i -D @solidjs/vite-plugin@3.0.0-next.35`}
         <code>pixi-solid</code> declares all three as peers. The supported range for{" "}
         <code>solid-js</code> and <code>@solidjs/web</code> is{" "}
         <code>
-          {">"}=2.0.0-rc.9 {"<"}3
+          {">"}=2.0.0 {"<"}3
         </code>
         .
       </p>

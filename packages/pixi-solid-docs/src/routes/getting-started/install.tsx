@@ -5,6 +5,7 @@ import { Aside, CodeBlock } from "../../components";
 export const route = {
   info: {
     label: "Installation",
+    description: "Install pixi-solid and its peers, then mount a first canvas.",
     order: 1,
     sections: [
       { id: "requirements", title: "Requirements" },
