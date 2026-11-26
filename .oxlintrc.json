@@ -2,7 +2,11 @@
   "options": {
     "typeAware": true
   },
-  "ignorePatterns": ["pixi-3d/**"],
+  "ignorePatterns": [
+    "pixi-3d/**",
+    "packages/pixi-solid-docs/src/code-examples/**",
+    "packages/pixi-solid-docs/file-routes.d.ts"
+  ],
   "categories": {
     "correctness": "error"
   },
@@ -14,7 +18,10 @@
     "typescript/consistent-type-definitions": ["error", "type"],
     "typescript/consistent-type-imports": [
       "error",
-      { "prefer": "type-imports", "fixStyle": "separate-type-imports" }
+      {
+        "prefer": "type-imports",
+        "fixStyle": "separate-type-imports"
+      }
     ],
     "prefer-const": "error",
     "oxc/no-const-enum": "error",

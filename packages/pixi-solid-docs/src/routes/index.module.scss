@@ -1,0 +1,132 @@
+.home {
+  display: grid;
+  /* Grid children default to min-width auto, which lets a wide code block widen the column. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4rem;
+  max-width: 960px;
+}
+
+.hero {
+  display: grid;
+  gap: 1rem;
+  padding-top: 2rem;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--ps-font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ps-ink-soft);
+}
+
+.title {
+  font-size: clamp(2.4rem, 1.6rem + 3.4vw, 3.6rem);
+  font-weight: 700;
+  max-width: 20ch;
+}
+
+.accent {
+  color: var(--ps-accent);
+}
+
+.lede {
+  max-width: 58ch;
+  font-size: 1.075rem;
+  color: var(--ps-ink-soft);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 1rem;
+  border-radius: var(--ps-radius-sm);
+  font-size: 0.925rem;
+  font-weight: 500;
+  transition:
+    background-color var(--ps-ease),
+    border-color var(--ps-ease),
+    color var(--ps-ease);
+}
+
+.primary {
+  background: var(--ps-accent);
+  color: #fff;
+
+  &:hover {
+    background: var(--ps-accent-strong);
+    color: #fff;
+  }
+}
+
+.secondary {
+  border: 1px solid var(--ps-line-strong);
+  color: var(--ps-ink);
+
+  &:hover {
+    border-color: var(--ps-ink-soft);
+    color: var(--ps-ink);
+  }
+}
+
+.install {
+  margin: 1.25rem 0 0;
+  padding: 0.85rem 1rem;
+  border-radius: var(--ps-radius);
+  border: 1px solid var(--ps-line);
+  background: var(--ps-code-bg);
+  overflow-x: auto;
+
+  code {
+    font-family: var(--ps-font-mono);
+    font-size: 0.875rem;
+    color: var(--ps-code-ink);
+  }
+}
+
+.sectionTitle {
+  font-size: 1.35rem;
+  margin: 0 0 0.75rem;
+}
+
+.demo {
+  border-radius: var(--ps-radius);
+  overflow: hidden;
+  border: 1px solid var(--ps-line);
+  box-shadow: var(--ps-shadow);
+  background: var(--ps-bg-soft);
+}
+
+.features {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+  .card {
+    padding: 1.15rem 1.15rem 1.3rem;
+    border-radius: var(--ps-radius);
+    border: 1px solid var(--ps-line);
+    background: var(--ps-surface);
+    box-shadow: var(--ps-shadow);
+  }
+
+  h2 {
+    font-size: 1rem;
+    margin-bottom: 0.35rem;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: var(--ps-ink-soft);
+  }
+}

@@ -74,7 +74,7 @@ A `View3D` is an ordinary 2D display object that renders a 3D scene into its rec
 packages/
   pixi-solid/      2D renderer, utils and testing entry
   pixi-solid-3d/   3D renderer on @pixi/3d, plus its testing entry
-  pixi-solid-docs/ Astro + Starlight documentation site
+  pixi-solid-docs/ documentation site (Solid 2, Vite, prerendered)
 .github/           CI, npm publish and docs deploy workflows
 ```
 

@@ -1,0 +1,49 @@
+// Typographic scope for a documentation page. Tag selectors stay inside the block, so they
+// cannot leak to components rendered by demo code.
+.article {
+  max-width: var(--ps-content-max);
+
+  > * + * {
+    margin-top: 1rem;
+  }
+
+  p,
+  li {
+    color: var(--ps-ink-soft);
+    font-size: 1.0125rem;
+  }
+
+  strong {
+    color: var(--ps-ink);
+    font-weight: 500;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.15rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  code {
+    font-size: 0.875em;
+    padding: 0.15em 0.4em;
+    border-radius: var(--ps-radius-sm);
+    background: var(--ps-bg-soft);
+    border: 1px solid var(--ps-line);
+    color: var(--ps-ink);
+  }
+
+  a code {
+    color: inherit;
+  }
+
+  /* Inline code styling paints a box per line box inside a pre, which reads as a bubble per line. */
+  pre code {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: inherit;
+    color: inherit;
+  }
+}

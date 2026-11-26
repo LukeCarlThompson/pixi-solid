@@ -1,7 +1,7 @@
 # Build & publish pixi-solid-docs to the gh-pages branch (push deploy)
 # - Runs pnpm install at the repository root so `workspace:*` deps resolve
 # - Builds library packages (so pixi-solid has its built entry available)
-# - Builds the docs in packages/pixi-solid-docs and pushes the built site to gh-pages
+# - Builds the docs in packages/pixi-solid-docs and pushes the prerendered site to gh-pages
 name: Build & publish docs to gh-pages
 
 on:
@@ -19,8 +19,8 @@ jobs:
     env:
       # path to your docs project relative to repo root
       DOCS_DIR: "packages/pixi-solid-docs"
-      # output folder inside DOCS_DIR
-      BUILD_OUTPUT: "dist"
+      # output folder inside DOCS_DIR: the prerendered client build
+      BUILD_OUTPUT: "dist/client"
       # package to verify build output for
       LIB_PACKAGE: "packages/pixi-solid"
       PUBLISH_BRANCH: "gh-pages"

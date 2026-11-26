@@ -39,7 +39,7 @@ pnpm fmt       # format with oxfmt
 ```
 packages/
   pixi-solid/         # the library package
-  pixi-solid-docs/    # public docs site (Astro + Starlight) — for consumers, not contributors
+  pixi-solid-docs/    # public docs site (Solid 2 + Vite, prerendered) — for consumers, not contributors
 ```
 
 - Root `tsconfig.json`, `.oxlintrc.json`, and `.oxfmtrc.json` apply across the monorepo.
@@ -75,27 +75,34 @@ packages/
 
 ## Docs
 
-`packages/pixi-solid-docs/src/content/docs/` holds the public docs. Two kinds of code appear there:
+`packages/pixi-solid-docs` is a Solid 2 site built by Vite in start mode. `vite build` produces a
+client bundle and a server handler; `prerender-crawler` renders every route through that handler into
+`dist/client`, writes the sitemap, and emits the search index. `vite dev` serves the same pages with
+the same code, so what you see locally is what ships.
 
-- **Demos** in `src/content/demos/`, imported by `?raw` and rendered client-side. These are real
-  modules, so `tsc` checks them and the build bundles them.
-- **Code fences** in `.mdx`. These are text. Nothing compiles them, so a prop renamed upstream is
-  silently wrong on the page.
-
-Prefer a demo when the point is visual, and compile a fenced sample against the installed package
-before trusting it:
-
-```bash
-cd packages/pixi-solid-docs
-npx tsc --noEmit -p tsconfig.json
+```
+src/routes/          one file per URL, with its title, description and table-of-contents sections
+src/code-examples/   samples that must compile; shown whole on a page
+src/demos/           live demos, imported by the page and shown as source
+src/components/      atoms, molecules, organisms, templates
+src/styles/          tokens and global styles
 ```
 
-That command checks the demos and any page components, not the fences. For a fence, paste it into a
-scratch `.tsx` under `src/`, run the check, then delete it. An option name that does not exist costs a
-reader real time: props we do not recognise are dropped, so the scene renders without the effect and
-nothing warns.
+Three kinds of code appear on a page:
 
----
+- **Demos** in `src/demos/`, imported by `?raw` and rendered client-side. Real modules, so `tsc`
+  checks them and the build bundles them.
+- **Examples** in `src/code-examples/`, imported by `?raw` and shown whole. Also real modules, so
+  `tsc` checks them. Keep only samples that need to compile; a one-liner belongs in the page.
+- **Inline samples**, written as ``code={`…`}`` in the page and highlighted at render. No file, no
+  checking.
+
+The build fails on a broken internal link or anchor (`scripts/check-links.mjs`), on a type error
+(`tsc`), and on a page that fails to render.
+
+Prefer a demo when the point is visual, an example when it must compile, and inline text for
+everything shorter. An option name that does not exist costs a reader real time: props we do not
+recognise are dropped, so the scene renders without the effect and nothing warns.
 
 ## TypeScript Conventions
 
@@ -276,7 +283,7 @@ Located in `packages/pixi-solid/src/testing/`:
 - `getByLabel(root, label)` / `queryByLabel(root, label)` / `getAllByLabel(root, label)` — scene graph queries.
 - `cleanup()` — run all registered disposers (wire into `afterEach`).
 
-See the [testing docs](./packages/pixi-solid-docs/src/content/docs/testing/overview.mdx) for consumer usage examples.
+See the [testing docs](./packages/pixi-solid-docs/src/routes/testing/overview.tsx) for consumer usage examples.
 
 Use `afterEach(() => vi.restoreAllMocks())` to clean up mocks between tests.
 

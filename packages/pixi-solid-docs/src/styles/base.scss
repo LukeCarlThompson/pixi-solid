@@ -1,0 +1,78 @@
+@use "./tokens.scss";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ps-bg);
+  color: var(--ps-ink);
+  font-family: var(--ps-font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--ps-accent);
+  text-decoration: none;
+  transition: color var(--ps-ease);
+}
+
+a:hover {
+  color: var(--ps-accent-strong);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ps-accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--ps-font-display);
+  color: var(--ps-ink);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+}
+
+code,
+kbd,
+pre {
+  font-family: var(--ps-font-mono);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--ps-accent) 28%, transparent);
+}
+
+/* Heading scale for page content. Global on purpose: it is part of the type system, and headings
+   appear in every page's authored markup rather than through a component. */
+article h2 {
+  font-size: clamp(1.45rem, 1.2rem + 0.9vw, 1.85rem);
+  margin-top: 2.75rem;
+  padding-top: 0.25rem;
+  scroll-margin-top: calc(var(--ps-header-h) + 16px);
+}
+
+article h3 {
+  font-size: 1.15rem;
+  margin-top: 2rem;
+  scroll-margin-top: calc(var(--ps-header-h) + 16px);
+}

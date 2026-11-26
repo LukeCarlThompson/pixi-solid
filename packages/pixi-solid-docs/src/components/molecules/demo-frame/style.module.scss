@@ -1,0 +1,53 @@
+.frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.75rem;
+  aspect-ratio: 16 / 9;
+  background:
+    radial-gradient(
+      circle at 30% 20%,
+      color-mix(in oklab, var(--ps-accent) 12%, transparent),
+      transparent 60%
+    ),
+    var(--ps-bg-soft);
+}
+
+// Covers the demo while its module loads; the demo sizes the stage once it mounts.
+.overlay {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+}
+
+.label {
+  font-family: var(--ps-font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ps-ink-soft);
+}
+
+.spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in oklab, var(--ps-ink-soft) 30%, transparent);
+  border-top-color: var(--ps-accent);
+  animation: demo-spin 900ms linear infinite;
+}
+
+@keyframes demo-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2.4s;
+  }
+}

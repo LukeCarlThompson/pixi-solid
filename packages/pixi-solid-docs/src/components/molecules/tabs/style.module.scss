@@ -1,0 +1,53 @@
+.tabs {
+  margin: 1.25rem 0;
+  min-width: 0;
+  max-width: 100%;
+  border-radius: var(--ps-radius);
+  border: 1px solid var(--ps-line);
+  overflow: hidden;
+}
+
+.list {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.35rem;
+  border-bottom: 1px solid var(--ps-line);
+  background: var(--ps-bg-soft);
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 0.35rem 0.7rem;
+  border: 0;
+  border-radius: var(--ps-radius-sm);
+  background: transparent;
+  color: var(--ps-ink-soft);
+  font: inherit;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--ps-ease),
+    background-color var(--ps-ease);
+
+  &:hover {
+    color: var(--ps-ink);
+  }
+}
+
+.active {
+  background: var(--ps-surface);
+  color: var(--ps-ink);
+  box-shadow: var(--ps-shadow);
+}
+
+.panel {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0.25rem 1rem 1rem;
+
+  :global(pre) {
+    margin: 0.75rem 0;
+  }
+}

@@ -1,0 +1,4 @@
+// A marker, not a box: it must not affect layout.
+.searchable {
+  display: contents;
+}

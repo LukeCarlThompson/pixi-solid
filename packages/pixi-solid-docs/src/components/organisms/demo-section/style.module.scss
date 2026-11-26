@@ -1,0 +1,25 @@
+.section {
+  display: grid;
+  gap: 1.25rem;
+  margin: 1.75rem 0 2.5rem;
+}
+
+// The stage frames whatever the demo renders and never imposes its own height: demos with
+// controls would be squeezed, and a canvas already carries its own shape.
+.stage {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--ps-line);
+  border-radius: var(--ps-radius);
+  background: var(--ps-bg-soft);
+}
+
+// Sizes itself to the demo; the demo owns its layout.
+.live {
+  position: relative;
+}
+
+// Only while the module loads, so the placeholder has a box to cover.
+.loading {
+  min-height: 14rem;
+}

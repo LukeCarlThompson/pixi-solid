@@ -22,3 +22,6 @@ dist-ssr
 *.sw?
 
 .pi
+
+# Scratch space (screenshots, logs, one-off probes)
+.tmp

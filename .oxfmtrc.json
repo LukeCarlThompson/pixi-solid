@@ -9,5 +9,9 @@
       ["sibling", "type-sibling"],
       ["index", "type-index"]
     ]
-  }
+  },
+  "ignorePatterns": [
+    "packages/pixi-solid-docs/src/code-examples/**",
+    "packages/pixi-solid-docs/file-routes.d.ts"
+  ]
 }
