@@ -1,5 +1,6 @@
 import type { JSX } from "@solidjs/web";
 
+import { Article, Searchable } from "../components";
 import { href } from "../href";
 
 export const route = {
@@ -12,12 +13,14 @@ export const route = {
 
 export default function NotFound(): JSX.Element {
   return (
-    <article class="ps-prose">
-      <h1>Page not found</h1>
-      <p>
-        There is no page at this address. Start from the <a href={href("/")}>introduction</a>, or
-        use the search box to find what you need.
-      </p>
-    </article>
+    <Article>
+      <Searchable>
+        <h1>Page not found</h1>
+        <p>
+          There is no page at this address. Start from the <a href={href("/")}>introduction</a>, or
+          use the search box to find what you need.
+        </p>
+      </Searchable>
+    </Article>
   );
 }

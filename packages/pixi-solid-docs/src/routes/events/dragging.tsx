@@ -1,7 +1,7 @@
 import type { JSX } from "@solidjs/web";
 import { clientOnly } from "@solidjs/web";
 
-import { CodeBlock, DemoSection } from "../../components";
+import { Article, CodeBlock, DemoSection, Searchable } from "../../components";
 import demoCode from "../../demos/dragging.demo.tsx?raw";
 
 const DraggingDemo = clientOnly(() => import("../../demos/dragging.demo"), { export: "Demo" });
@@ -20,15 +20,17 @@ export const route = {
 
 export default function Page(): JSX.Element {
   return (
-    <article class="ps-prose">
-      <h1>Dragging</h1>
-      <p>An example of using event handlers to create dragging functionality.</p>
-      <h2 id="demo">Demo</h2>
-      <DemoSection title="dragging">
-        <DraggingDemo fallback={<span />} />
-      </DemoSection>
-      <h2 id="code-example">Code example</h2>
-      <CodeBlock code={demoCode} title="demo-app.tsx" />
-    </article>
+    <Article>
+      <Searchable>
+        <h1>Dragging</h1>
+        <p>An example of using event handlers to create dragging functionality.</p>
+        <h2 id="demo">Demo</h2>
+        <DemoSection title="dragging">
+          <DraggingDemo fallback={<span />} />
+        </DemoSection>
+        <h2 id="code-example">Code example</h2>
+        <CodeBlock code={demoCode} title="demo-app.tsx" />
+      </Searchable>
+    </Article>
   );
 }

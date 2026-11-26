@@ -56,7 +56,7 @@ export const CodeBlock = (props: CodeBlockProps): JSX.Element => {
           {copied() ? "Copied" : "Copy"}
         </button>
       </div>
-      <div class={styles.shiki}>
+      <div class={styles.body}>
         <pre class={`language-${props.lang ?? "tsx"}`}>
           <code innerHTML={html()} />
         </pre>

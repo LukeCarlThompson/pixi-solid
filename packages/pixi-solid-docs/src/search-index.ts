@@ -22,19 +22,36 @@ const strip = (value: string): string =>
 export const routeOf = (path: string): string =>
   path.replace(/^\/pixi-solid/, "").replace(/\/$/, "") || "/";
 
+/** Content of the element carrying `data-search`, matched by tag depth so nested divs survive. */
+const searchableContent = (html: string): string | undefined => {
+  const open = /<div[^>]*data-search[^>]*>/.exec(html);
+  if (!open) return undefined;
+
+  const start = open.index + open[0].length;
+  const tags = /<\/?div\b/g;
+  tags.lastIndex = start;
+
+  let depth = 1;
+  for (let match = tags.exec(html); match; match = tags.exec(html)) {
+    depth += match[0] === "</div" ? -1 : 1;
+    if (depth === 0) return html.slice(start, match.index);
+  }
+
+  return undefined;
+};
+
 /** Builds the payload from rendered pages. Shared by the build integration and dev. */
 export const buildRecords = (pages: readonly { path: string; html: string }[]): SearchRecord[] =>
   pages
     .filter(({ path }) => routeOf(path) !== "/404")
     .map(({ path, html }) => {
-      const article =
-        html.match(/<article[^>]*class="ps-prose"[^>]*>([\s\S]*?)<\/article>/)?.[1] ?? html;
+      const article = searchableContent(html) ?? "";
       const title = strip(article.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? path);
       const headings = [...article.matchAll(/<h[23][^>]*>([\s\S]*?)<\/h[23]>/g)]
         .map((match) => strip(match[1]))
         .join(" ");
       // Prose only: paragraphs and list items, without code, headings or demo chrome.
-      const text = [...article.matchAll(/<(p|li)[^>]*>([\s\S]*?)<\/\1>/g)]
+      const text = [...article.matchAll(/<(p|li)\b[^>]*>([\s\S]*?)<\/\1>/g)]
         .map((match) => strip(match[2].replace(/<code[^>]*>[\s\S]*?<\/code>/g, " ")))
         .filter(Boolean)
         .join(" ")

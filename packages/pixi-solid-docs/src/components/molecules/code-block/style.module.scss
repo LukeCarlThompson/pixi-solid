@@ -45,7 +45,7 @@
   }
 }
 
-.shiki {
+.body {
   max-width: 100%;
   overflow-x: auto;
   padding: 1rem 0;
@@ -61,13 +61,9 @@
   :global(code) {
     font-family: var(--ps-font-mono);
   }
-
-  :global(.shiki) {
-    background: transparent !important;
-  }
 }
 
-.shiki {
+.body {
   :global(.token.comment),
   :global(.token.prolog),
   :global(.token.doctype),

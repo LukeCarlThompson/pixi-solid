@@ -1,0 +1,27 @@
+// The wrapper scrolls on narrow screens instead of stretching the page.
+.scroll {
+  max-width: 100%;
+  margin: 1.25rem 0;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  :global(th),
+  :global(td) {
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--ps-line);
+    text-align: left;
+    vertical-align: top;
+    color: var(--ps-ink-soft);
+  }
+
+  :global(th) {
+    color: var(--ps-ink);
+    background: var(--ps-bg-soft);
+    font-weight: 500;
+  }
+}

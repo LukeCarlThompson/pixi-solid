@@ -1,13 +1,15 @@
-export { Button, ThemeToggle } from "./atoms";
-export type { ButtonProps } from "./atoms";
+export { Article, Button, ThemeToggle } from "./atoms";
+export type { ArticleProps, ButtonProps } from "./atoms";
 
-export { Aside, CodeBlock, DemoFrame, Pagination, Tabs } from "./molecules";
+export { Aside, CodeBlock, DemoFrame, Pagination, Searchable, Table, Tabs } from "./molecules";
 export type {
   AsideProps,
   CodeBlockProps,
   CodeLang,
   DemoFrameProps,
   PaginationProps,
+  SearchableProps,
+  TableProps,
   TabItem,
   TabsProps,
 } from "./molecules";

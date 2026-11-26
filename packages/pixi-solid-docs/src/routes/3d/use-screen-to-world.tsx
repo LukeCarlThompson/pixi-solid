@@ -1,6 +1,6 @@
 import type { JSX } from "@solidjs/web";
 
-import { Aside, CodeBlock } from "../../components";
+import { Article, Aside, CodeBlock, Searchable, Table } from "../../components";
 
 export const route = {
   info: {
@@ -19,16 +19,17 @@ export const route = {
 
 export default function Page(): JSX.Element {
   return (
-    <article class="ps-prose">
-      <h1>useScreenToWorld</h1>
-      <p>
-        <code>useScreenToWorld</code> is a reactive SolidJS hook that takes a 2D screen coordinate
-        (such as mouse cursor or touch point) and unprojects it into 3D world space against a given
-        3D <code>Plane</code> (like a floor or wall) or along the camera ray.
-      </p>
-      <h2 id="usage">Usage</h2>
-      <CodeBlock
-        code={`import { Plane, Vector3 } from "@pixi/3d";
+    <Article>
+      <Searchable>
+        <h1>useScreenToWorld</h1>
+        <p>
+          <code>useScreenToWorld</code> is a reactive SolidJS hook that takes a 2D screen coordinate
+          (such as mouse cursor or touch point) and unprojects it into 3D world space against a
+          given 3D <code>Plane</code> (like a floor or wall) or along the camera ray.
+        </p>
+        <h2 id="usage">Usage</h2>
+        <CodeBlock
+          code={`import { Plane, Vector3 } from "@pixi/3d";
 import { useScreenToWorld, Mesh3D } from "pixi-solid-3d";
 import { createSignal, Show } from "solid-js";
 
@@ -53,81 +54,82 @@ export const GroundReticle = () => {
     </Show>
   );
 };`}
-        title="tsx"
-      />
-      <h2 id="parameters">Parameters</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Parameter</th>
-            <th>Type</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <code>screenPoint</code>
-            </td>
-            <td>
-              <code>
-                PointData | Accessor{"<"}PointData{">"}
-              </code>
-            </td>
-            <td>The 2D screen position to unproject</td>
-          </tr>
-          <tr>
-            <td>
-              <code>target</code>
-            </td>
-            <td>
-              <code>
-                Plane | number | Accessor{"<"}...{">"}
-              </code>
-            </td>
-            <td>
-              A 3D <code>Plane</code> to intersect with, or a number representing distance along the
-              ray
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <h2 id="context-requirement">Context requirement</h2>
-      <p>
-        <code>useScreenToWorld</code> reads the ambient <code>View3DContext</code>. Call it inside{" "}
-        <code>
-          {"<"}View3D{">"}
-        </code>
-        , or anywhere within a{" "}
-        <code>
-          {"<"}View3DProvider{">"}
-        </code>{" "}
-        (including sibling 2D overlays). Calling it outside both throws:
-      </p>
-      <Aside tone="warning">
+          title="tsx"
+        />
+        <h2 id="parameters">Parameters</h2>
+        <Table>
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <code>screenPoint</code>
+              </td>
+              <td>
+                <code>
+                  PointData | Accessor{"<"}PointData{">"}
+                </code>
+              </td>
+              <td>The 2D screen position to unproject</td>
+            </tr>
+            <tr>
+              <td>
+                <code>target</code>
+              </td>
+              <td>
+                <code>
+                  Plane | number | Accessor{"<"}...{">"}
+                </code>
+              </td>
+              <td>
+                A 3D <code>Plane</code> to intersect with, or a number representing distance along
+                the ray
+              </td>
+            </tr>
+          </tbody>
+        </Table>
+        <h2 id="context-requirement">Context requirement</h2>
+        <p>
+          <code>useScreenToWorld</code> reads the ambient <code>View3DContext</code>. Call it inside{" "}
+          <code>
+            {"<"}View3D{">"}
+          </code>
+          , or anywhere within a{" "}
+          <code>
+            {"<"}View3DProvider{">"}
+          </code>{" "}
+          (including sibling 2D overlays). Calling it outside both throws:
+        </p>
+        <Aside tone="warning">
+          <p>
+            <code>
+              useScreenToWorld must be used within a {"<"}View3D{">"}, a {"<"}View3DProvider{">"},
+              or a component mounted inside one.
+            </code>
+          </p>
+        </Aside>
         <p>
           <code>
-            useScreenToWorld must be used within a {"<"}View3D{">"}, a {"<"}View3DProvider{">"}, or
-            a component mounted inside one.
-          </code>
+            {"<"}View3DProvider{">"}
+          </code>{" "}
+          creates the <code>View3D</code> up front, so the hook always has an instance to unproject
+          through. The result becomes meaningful once the scene is built and the camera is in the
+          graph, which happens during the first tick after mount.
         </p>
-      </Aside>
-      <p>
-        <code>
-          {"<"}View3DProvider{">"}
-        </code>{" "}
-        creates the <code>View3D</code> up front, so the hook always has an instance to unproject
-        through. The result becomes meaningful once the scene is built and the camera is in the
-        graph, which happens during the first tick after mount.
-      </p>
-      <h2 id="return-value">Return Value</h2>
-      <p>
-        Returns an Accessor to{" "}
-        <code>
-          {"{"} x: number, y: number, z: number {"}"} | null
-        </code>
-        . Returns <code>null</code> if the ray misses or is parallel to the target plane.
-      </p>
-    </article>
+        <h2 id="return-value">Return Value</h2>
+        <p>
+          Returns an Accessor to{" "}
+          <code>
+            {"{"} x: number, y: number, z: number {"}"} | null
+          </code>
+          . Returns <code>null</code> if the ray misses or is parallel to the target plane.
+        </p>
+      </Searchable>
+    </Article>
   );
 }

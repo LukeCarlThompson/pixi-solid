@@ -62,101 +62,17 @@ pre {
   background: color-mix(in oklab, var(--ps-accent) 28%, transparent);
 }
 
-.ps-prose {
-  max-width: var(--ps-content-max);
-
-  > * + * {
-    margin-top: 1rem;
-  }
-
-  h2 {
-    font-size: clamp(1.45rem, 1.2rem + 0.9vw, 1.85rem);
-    margin-top: 2.75rem;
-    padding-top: 0.25rem;
-    scroll-margin-top: calc(var(--ps-header-h) + 16px);
-  }
-
-  h3 {
-    font-size: 1.15rem;
-    margin-top: 2rem;
-    scroll-margin-top: calc(var(--ps-header-h) + 16px);
-  }
-
-  p,
-  li {
-    color: var(--ps-ink-soft);
-    font-size: 1.0125rem;
-  }
-
-  strong {
-    color: var(--ps-ink);
-    font-weight: 500;
-  }
-
-  ul,
-  ol {
-    padding-left: 1.15rem;
-    display: grid;
-    gap: 0.4rem;
-  }
-
-  code {
-    font-size: 0.875em;
-    padding: 0.15em 0.4em;
-    border-radius: var(--ps-radius-sm);
-    background: var(--ps-bg-soft);
-    border: 1px solid var(--ps-line);
-    color: var(--ps-ink);
-  }
-
-  a code {
-    color: inherit;
-  }
-
-  /* Inline code styling paints a box per line box inside a pre, which reads as a bubble per line. */
-  pre code,
-  .shiki code {
-    padding: 0;
-    border: 0;
-    background: transparent;
-    font-size: inherit;
-    color: inherit;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-    margin: 1.25rem 0;
-  }
-
-  th,
-  td {
-    padding: 0.5rem 0.7rem;
-    border: 1px solid var(--ps-line);
-    text-align: left;
-    vertical-align: top;
-    color: var(--ps-ink-soft);
-  }
-
-  th {
-    color: var(--ps-ink);
-    background: var(--ps-bg-soft);
-    font-weight: 500;
-  }
+/* Heading scale for page content. Global on purpose: it is part of the type system, and headings
+   appear in every page's authored markup rather than through a component. */
+article h2 {
+  font-size: clamp(1.45rem, 1.2rem + 0.9vw, 1.85rem);
+  margin-top: 2.75rem;
+  padding-top: 0.25rem;
+  scroll-margin-top: calc(var(--ps-header-h) + 16px);
 }
 
-/* Shiki emits both palettes as custom properties; the theme picks one. */
-.shiki,
-.shiki span {
-  color: var(--shiki-light);
-}
-
-.shiki {
-  background-color: transparent;
-}
-
-html[data-theme="dark"] .shiki,
-html[data-theme="dark"] .shiki span {
-  color: var(--shiki-dark);
+article h3 {
+  font-size: 1.15rem;
+  margin-top: 2rem;
+  scroll-margin-top: calc(var(--ps-header-h) + 16px);
 }

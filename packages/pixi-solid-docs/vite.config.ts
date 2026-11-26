@@ -69,6 +69,14 @@ const searchIndex = (): PrerenderIntegration => ({
   name: "search-index",
   teardown(context) {
     const records = buildRecords(context.pages.map(({ path, html }) => ({ path, html })));
+    const unindexed = records.filter((record) => record.text.length === 0);
+
+    if (unindexed.length > 0) {
+      throw new Error(
+        `no <Searchable> content on: ${unindexed.map((record) => record.id).join(", ")}`,
+      );
+    }
+
     context.emitFile({ filename: "search-index.json", contents: JSON.stringify(records) });
   },
 });
