@@ -1,0 +1,83 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  padding: 12vh 1rem 1rem;
+  background: rgb(6 6 10 / 55%);
+  backdrop-filter: blur(3px);
+}
+
+.dialog {
+  width: min(640px, 100%);
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: var(--ps-radius);
+  border: 1px solid var(--ps-line-strong);
+  background: var(--ps-surface);
+  box-shadow: var(--ps-shadow);
+}
+
+.input {
+  width: 100%;
+  height: 44px;
+  padding: 0 0.75rem;
+  border-radius: var(--ps-radius-sm);
+  border: 1px solid var(--ps-line);
+  background: var(--ps-bg-soft);
+  color: var(--ps-ink);
+  font: inherit;
+  font-size: 1rem;
+
+  &:focus {
+    outline: 2px solid var(--ps-accent);
+    outline-offset: 1px;
+  }
+}
+
+.results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.result {
+  display: grid;
+  gap: 0.15rem;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border: 0;
+  border-radius: var(--ps-radius-sm);
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+
+  &[data-active="true"],
+  &:hover {
+    background: var(--ps-bg-soft);
+  }
+}
+
+.resultTitle {
+  font-family: var(--ps-font-display);
+  font-size: 0.95rem;
+  color: var(--ps-ink);
+}
+
+.resultSnippet {
+  font-size: 0.8rem;
+  color: var(--ps-ink-soft);
+}
+
+.empty {
+  margin: 0;
+  padding: 0.75rem;
+  color: var(--ps-ink-soft);
+  font-size: 0.9rem;
+}

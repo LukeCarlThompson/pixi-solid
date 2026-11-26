@@ -1,0 +1,47 @@
+.pagination {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  max-width: var(--ps-content-max);
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ps-line);
+}
+
+.previous,
+.next {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--ps-radius);
+  border: 1px solid var(--ps-line);
+  background: var(--ps-surface);
+  color: var(--ps-ink);
+  transition:
+    border-color var(--ps-ease),
+    background-color var(--ps-ease);
+
+  &:hover {
+    border-color: var(--ps-line-strong);
+    background: var(--ps-bg-soft);
+    color: var(--ps-ink);
+  }
+}
+
+.next {
+  text-align: right;
+}
+
+.direction {
+  font-family: var(--ps-font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ps-ink-soft);
+}
+
+.title {
+  font-family: var(--ps-font-display);
+  font-size: 0.95rem;
+  color: var(--ps-accent);
+}

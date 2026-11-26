@@ -1,0 +1,99 @@
+.toc {
+  position: sticky;
+  top: calc(var(--ps-header-h) + 1.5rem);
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.5rem 0;
+}
+
+.compact {
+  position: static;
+  justify-items: end;
+  padding: 0;
+}
+
+.popover {
+  position: relative;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--ps-line);
+  border-radius: var(--ps-radius-sm);
+  background: var(--ps-bg-soft);
+  color: var(--ps-ink-soft);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--ps-ink);
+    border-color: var(--ps-line-strong);
+  }
+}
+
+.chevron {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-right: 1.5px solid currentcolor;
+  border-bottom: 1.5px solid currentcolor;
+  transform: rotate(45deg) translateY(-1px);
+
+  [aria-expanded="true"] & {
+    transform: rotate(-135deg) translateY(-1px);
+  }
+}
+
+// Overlays the article, so opening it cannot move anything.
+.panel {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  gap: 0.15rem;
+  min-width: 12rem;
+  max-height: 60vh;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--ps-bg);
+  border: 1px solid var(--ps-line);
+  border-radius: var(--ps-radius-sm);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 35%);
+
+  a {
+    display: block;
+    padding: 0.25rem 0.3rem;
+    font-size: 0.83rem;
+    color: var(--ps-ink-soft);
+
+    &:hover {
+      color: var(--ps-ink);
+    }
+  }
+}
+
+.list {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0 0 0 0.75rem;
+  list-style: none;
+  border-left: 1px solid var(--ps-line);
+
+  a {
+    display: block;
+    padding: 0.2rem 0;
+    font-size: 0.83rem;
+    color: var(--ps-ink-soft);
+
+    &:hover {
+      color: var(--ps-ink);
+    }
+  }
+}

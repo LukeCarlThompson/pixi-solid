@@ -1,0 +1,85 @@
+import { Graphics, PixiCanvas } from "pixi-solid";
+import type * as Pixi from "pixi.js";
+import { FillGradient } from "pixi.js";
+import { createSignal } from "solid-js";
+
+const DraggingDemo = () => {
+  const [isDragging, setIsDragging] = createSignal(false);
+  const [x, setX] = createSignal(100);
+  const [y, setY] = createSignal(100);
+
+  const scale = () => (isDragging() ? 1.1 : 1);
+
+  // A point-shaped object backed by signals. Pixi writes into it directly (`toLocal` assigns
+  // `point.x`/`point.y`), so the handlers below need no copying and allocate nothing per frame.
+  const pointerPosition = {
+    get x() {
+      return x();
+    },
+    set x(value: number) {
+      setX(value);
+    },
+    get y() {
+      return y();
+    },
+    set y(value: number) {
+      setY(value);
+    },
+  };
+
+  let dragTarget: Pixi.Container | undefined;
+
+  const handlePointerDown = (e: Pixi.FederatedPointerEvent) => {
+    dragTarget = e.target;
+    setIsDragging(true);
+
+    if (!e.target.parent) return;
+    // Convert the global coords to the targets parent coordinate space
+    e.target.parent.toLocal(e.global, undefined, pointerPosition);
+  };
+
+  const handlePointerUp = () => {
+    dragTarget = undefined;
+    setIsDragging(false);
+  };
+
+  const handlePointerMove = (e: Pixi.FederatedPointerEvent) => {
+    if (!dragTarget || !dragTarget.parent) return;
+    dragTarget.parent.toLocal(e.global, undefined, pointerPosition);
+  };
+
+  const gradient = new FillGradient({
+    type: "linear",
+    colorStops: [
+      { offset: 0, color: "#b6e3ff" },
+      { offset: 1, color: "#0099ff" },
+    ],
+  });
+
+  return (
+    <Graphics
+      ref={(graphics) => {
+        graphics.roundRect(-50, -50, 100, 100, 20).fill(gradient);
+      }}
+      eventMode={"static"}
+      cursor={isDragging() ? "grabbing" : "grab"}
+      onpointerdown={handlePointerDown}
+      onpointerup={handlePointerUp}
+      onpointerupoutside={handlePointerUp}
+      onglobalpointermove={handlePointerMove}
+      scale={scale()}
+      x={pointerPosition.x}
+      y={pointerPosition.y}
+    />
+  );
+};
+
+export const Demo = () => (
+  <PixiCanvas
+    style={{ "aspect-ratio": "2/1.5" }}
+    antialias={true}
+    resolution={window.devicePixelRatio}
+  >
+    <DraggingDemo />
+  </PixiCanvas>
+);

@@ -1,0 +1,47 @@
+import type * as Pixi from "pixi.js";
+import { Assets } from "pixi.js";
+
+export const getRunAnimationTextures = () => [
+  Assets.get<Pixi.Texture>("run_01"),
+  Assets.get<Pixi.Texture>("run_02"),
+  Assets.get<Pixi.Texture>("run_03"),
+  Assets.get<Pixi.Texture>("run_04"),
+  Assets.get<Pixi.Texture>("run_05"),
+  Assets.get<Pixi.Texture>("run_06"),
+];
+
+export const getIdleAnimationTextures = () => [
+  Assets.get<Pixi.Texture>("idle_01"),
+  Assets.get<Pixi.Texture>("idle_02"),
+  Assets.get<Pixi.Texture>("idle_03"),
+  Assets.get<Pixi.Texture>("idle_03"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_04"),
+  Assets.get<Pixi.Texture>("idle_05"),
+  Assets.get<Pixi.Texture>("idle_06"),
+  Assets.get<Pixi.Texture>("idle_07"),
+  Assets.get<Pixi.Texture>("idle_07"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+  Assets.get<Pixi.Texture>("idle_08"),
+];

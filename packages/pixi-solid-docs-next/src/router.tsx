@@ -1,0 +1,15 @@
+import { createRouter } from "@solidjs/router";
+
+import { DocsLayout } from "./components/templates/DocsLayout";
+import { fileRouteDefinitions } from "./routes";
+import NotFound from "./routes/404";
+
+export const routes = [
+  {
+    path: "/",
+    component: DocsLayout,
+    children: [...fileRouteDefinitions, { path: "**", component: NotFound }],
+  },
+];
+
+export const Router = createRouter({ routes, base: import.meta.env.BASE_URL });

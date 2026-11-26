@@ -1,0 +1,121 @@
+.block {
+  margin: 1.25rem 0;
+  min-width: 0;
+  max-width: 100%;
+  border-radius: var(--ps-radius);
+  overflow: hidden;
+  border: 1px solid var(--ps-line);
+  background: var(--ps-code-bg);
+  box-shadow: var(--ps-shadow);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0.5rem 0.45rem 0.9rem;
+  border-bottom: 1px solid var(--ps-code-line);
+}
+
+.title {
+  font-family: var(--ps-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ps-code-chrome);
+  text-transform: lowercase;
+}
+
+.copy {
+  border: 1px solid var(--ps-line-strong);
+  background: transparent;
+  color: var(--ps-code-chrome);
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition:
+    color var(--ps-ease),
+    border-color var(--ps-ease);
+
+  &:hover {
+    color: var(--ps-ink);
+    border-color: var(--ps-ink-soft);
+  }
+}
+
+.shiki {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 1rem 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+
+  :global(pre) {
+    margin: 0;
+    padding: 0 1.1rem;
+    background: transparent !important;
+  }
+
+  :global(code) {
+    font-family: var(--ps-font-mono);
+  }
+
+  :global(.shiki) {
+    background: transparent !important;
+  }
+}
+
+.shiki {
+  :global(.token.comment),
+  :global(.token.prolog),
+  :global(.token.doctype),
+  :global(.token.cdata) {
+    color: var(--ps-code-comment);
+    font-style: italic;
+  }
+
+  :global(.token.keyword),
+  :global(.token.boolean),
+  :global(.token.important),
+  :global(.token.atrule) {
+    color: var(--ps-code-keyword);
+  }
+
+  :global(.token.string),
+  :global(.token.attr-value),
+  :global(.token.char),
+  :global(.token.regex) {
+    color: var(--ps-code-string);
+  }
+
+  :global(.token.number),
+  :global(.token.constant),
+  :global(.token.symbol) {
+    color: var(--ps-code-number);
+  }
+
+  :global(.token.function),
+  :global(.token.method),
+  :global(.token.class-name) {
+    color: var(--ps-code-function);
+  }
+
+  :global(.token.tag),
+  :global(.token.selector),
+  :global(.token.builtin) {
+    color: var(--ps-code-tag);
+  }
+
+  :global(.token.attr-name),
+  :global(.token.property),
+  :global(.token.variable) {
+    color: var(--ps-code-attr);
+  }
+
+  :global(.token.punctuation),
+  :global(.token.operator) {
+    color: var(--ps-code-punct);
+  }
+}

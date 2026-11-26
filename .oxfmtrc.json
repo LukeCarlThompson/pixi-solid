@@ -9,5 +9,6 @@
       ["sibling", "type-sibling"],
       ["index", "type-index"]
     ]
-  }
+  },
+  "ignorePatterns": ["packages/pixi-solid-docs-next/src/snippets/**"]
 }

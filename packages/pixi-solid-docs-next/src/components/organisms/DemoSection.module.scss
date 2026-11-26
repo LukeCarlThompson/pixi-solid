@@ -1,0 +1,19 @@
+.section {
+  display: grid;
+  gap: 1.25rem;
+  margin: 1.75rem 0 2.5rem;
+}
+
+// The stage owns the frame; the live demo fills it.
+.stage {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--ps-line);
+  border-radius: var(--ps-radius);
+  background: var(--ps-bg-soft);
+}
+
+.live {
+  position: absolute;
+  inset: 0;
+}

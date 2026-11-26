@@ -1,0 +1,60 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem 1rem 2rem 1.25rem;
+}
+
+.group {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.groupLabel {
+  margin: 0;
+  padding: 0 0.5rem;
+  font-family: var(--ps-font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ps-ink-soft);
+}
+
+.list {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: block;
+  padding: 0.32rem 0.5rem;
+  border-radius: var(--ps-radius-sm);
+  color: var(--ps-ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  transition:
+    color var(--ps-ease),
+    background-color var(--ps-ease);
+
+  &:hover {
+    color: var(--ps-ink);
+    background: var(--ps-bg-soft);
+  }
+}
+
+.active {
+  color: var(--ps-ink);
+  background: color-mix(in oklab, var(--ps-accent) 12%, transparent);
+  box-shadow: inset 2px 0 0 var(--ps-accent);
+}
+
+.version {
+  margin: auto 0 0;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  color: var(--ps-ink-soft);
+}

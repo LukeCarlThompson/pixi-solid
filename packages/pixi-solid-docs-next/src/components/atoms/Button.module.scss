@@ -1,0 +1,36 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 36px;
+  min-width: 36px;
+  padding: 0 0.6rem;
+  border-radius: var(--ps-radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ps-ink-soft);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    color var(--ps-ease),
+    background-color var(--ps-ease),
+    border-color var(--ps-ease);
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    color: var(--ps-ink);
+    background: var(--ps-bg-soft);
+    border-color: var(--ps-line);
+  }
+}
+
+.solid {
+  border-color: var(--ps-line);
+  background: var(--ps-bg-soft);
+  color: var(--ps-ink);
+}

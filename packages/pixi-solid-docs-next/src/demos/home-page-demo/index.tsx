@@ -1,0 +1,102 @@
+import { CRTFilter } from "pixi-filters";
+import { Container, onTick, PixiCanvas, Sprite, usePixiScreen, TilingSprite } from "pixi-solid";
+import { ObjectFitContainer } from "pixi-solid/utils";
+import type * as Pixi from "pixi.js";
+import { Assets, BlurFilter, Rectangle } from "pixi.js";
+import { createMemo, Loading, onCleanup, Show } from "solid-js";
+
+import { Character } from "./character";
+import { Controls } from "./controls";
+import { loadSceneAssets } from "./load-scene-assets";
+import { createPlayerStore } from "./player-store";
+
+const DemoScene = (props: { isRunning: boolean; direction: "left" | "right" }) => {
+  const pixiScreen = usePixiScreen();
+  const sceneBounds = new Rectangle(0, 0, 400, 400);
+
+  const blurFilter = new BlurFilter({ strength: 8 });
+  const crtFilter = new CRTFilter({
+    curvature: 3,
+    lineContrast: 0.1,
+    vignetting: 0.1,
+    noise: 0.04,
+    noiseSize: 2,
+  });
+
+  onTick(({ deltaTime }) => {
+    crtFilter.seed = Math.random() * 10;
+    crtFilter.time += deltaTime * 0.3;
+  });
+
+  let ground: Pixi.TilingSprite | undefined;
+
+  onTick(({ deltaTime }) => {
+    if (!ground) return;
+
+    const movementSpeed = props.isRunning ? 1.3 : 0;
+    const directionMultiplier = props.direction === "left" ? 1 : -1;
+    ground.tilePosition.x += movementSpeed * directionMultiplier * deltaTime;
+  });
+
+  onCleanup(() => {
+    blurFilter.destroy();
+    crtFilter.destroy();
+  });
+
+  return (
+    <ObjectFitContainer width={pixiScreen.width} height={pixiScreen.height} fitMode="cover">
+      <Container filters={crtFilter} boundsArea={sceneBounds}>
+        <ObjectFitContainer width={sceneBounds.width} height={sceneBounds.height} fitMode="cover">
+          <Sprite label="Sky" texture={Assets.get<Pixi.Texture>("sky")} filters={blurFilter} />
+        </ObjectFitContainer>
+        <TilingSprite
+          label="Ground"
+          width={sceneBounds.width}
+          height={sceneBounds.height * 0.3}
+          position={{ x: 0, y: sceneBounds.height * 0.7 }}
+          ref={(instance) => (ground = instance)}
+          texture={Assets.get<Pixi.Texture>("ground")}
+        />
+        <Character
+          direction={props.direction}
+          isRunning={props.isRunning}
+          position={{ x: sceneBounds.width * 0.5, y: sceneBounds.height * 0.7 }}
+        />
+      </Container>
+    </ObjectFitContainer>
+  );
+};
+
+export const Demo = () => {
+  const playerStore = createPlayerStore();
+  const assetsReady = createMemo(() => loadSceneAssets());
+
+  return (
+    <div style={{ position: "relative" }}>
+      <Controls
+        isRunning={playerStore.state.isRunning}
+        direction={playerStore.state.direction}
+        onToggleDirectionClicked={playerStore.toggleDirection}
+        onToggleRunningClicked={playerStore.toggleRunning}
+      />
+      {/* The fallback is a DOM element, so the boundary sits outside the canvas. A `<Loading>`
+          inside `PixiCanvas` would add its fallback as a Pixi child. */}
+      <Loading fallback={<div>Loading...</div>}>
+        <Show when={assetsReady()}>
+          <PixiCanvas
+            style={{
+              "aspect-ratio": "16/9",
+              overflow: "hidden",
+              "border-radius": "10px",
+            }}
+          >
+            <DemoScene
+              isRunning={playerStore.state.isRunning}
+              direction={playerStore.state.direction}
+            />
+          </PixiCanvas>
+        </Show>
+      </Loading>
+    </div>
+  );
+};
