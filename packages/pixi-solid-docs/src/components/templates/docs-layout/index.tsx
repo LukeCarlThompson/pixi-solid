@@ -135,7 +135,7 @@ export const DocsLayout = (props: RouteSectionProps): JSX.Element => {
           inert={isNarrow() && !navOpen() ? true : undefined}
           aria-hidden={isNarrow() && !navOpen() ? "true" : undefined}
         >
-          <Sidebar currentPath={props.location.pathname} onNavigate={() => setNavOpen(false)} />
+          <Sidebar currentPath={pathname()} onNavigate={() => setNavOpen(false)} />
         </aside>
 
         <main class={styles.main} id="content" tabindex="-1">
